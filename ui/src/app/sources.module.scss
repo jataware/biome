@@ -1,0 +1,72 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+
+  h4 {
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+  }
+}
+
+.description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.dataview {
+  &>[class~="p-dataview-header"] {
+    background: none;
+    border: none;
+  }
+
+  &>[class~="p-dataview-content"] {
+    background: none;
+    overflow-y: auto;
+  }
+}
+
+.categories {
+  display: flex;
+  justify-content: flex-start;
+  // width: 100%;
+}
+
+.grayTag {
+  background: var(--gray-500);
+}
+
+.sourceName {
+  min-height: 3rem;
+}
+
+.actionIcons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  color: var(--gray-500);
+}
+
+.categoryWeather {
+  background: var(--green-700);
+  padding: 5px 7px;
+}
+
+.categoryAll {
+  background: var(--blue-700);
+  padding: 5px 7px;
+}
+
+.squareCard {
+  @media screen and (min-width: 1200px) and (max-width: 1500px) {
+    width: 50%;
+    padding: 0.2rem;
+  }
+}
+
+.cardContents {
+  height: 22rem;
+}

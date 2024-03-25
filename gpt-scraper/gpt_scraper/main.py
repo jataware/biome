@@ -1,0 +1,250 @@
+import json
+import requests
+from openai import OpenAI
+import re
+
+import argparse
+from pathlib import Path
+from os.path import join as path_join, exists as path_exists
+from os import getenv, makedirs
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from dotenv import load_dotenv
+
+from scrape_schema import schema
+
+load_dotenv()  # take environment variables from .env.
+
+
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent
+
+
+def output_path(filename):
+    return path_join(get_project_root(), "out", filename)
+
+
+out_dir = path_join(get_project_root(), "out")
+
+if not path_exists(out_dir):
+    print("Creating out dir")
+    makedirs(out_dir)
+
+
+print("schema:")
+print(schema)
+
+web_sources = [
+    {
+        "name": "Genomic Data Commons",
+        "pages": [
+            "https://gdc.cancer.gov/about-gdc/gdc-faqs",
+            "https://gdc.cancer.gov/support/gdc-webinars",
+        ],
+    },
+    {
+        "name": "Proteomic Data Commons",
+        "pages": [
+            "https://pdc.cancer.gov/pdc/about",
+            "https://pdc.cancer.gov/pdc/data-use-guidelines",
+            "https://pdc.cancer.gov/pdc/data-dictionary",
+        ],
+    },
+    {
+        # Clinical and Translational Data Commons
+        "name": "Clinical and Translational Data Commons",
+        "pages": [
+            "https://datacommons.cancer.gov/repository/clinical-and-translational-data-commons",
+            "https://moonshotbiobank.cancer.gov/",
+        ],
+    },
+    {
+        "name": "Imaging Data Commons",
+        "pages": [
+            # "https://portal.imaging.datacommons.cancer.gov/"
+            "https://learn.canceridc.dev/"
+            "https://learn.canceridc.dev/getting-started-with-idc",
+            "https://learn.canceridc.dev/core-functions-of-idc",
+            "https://learn.canceridc.dev/data/introduction",
+            "https://learn.canceridc.dev/frequently-asked-questions",
+            "https://learn.canceridc.dev/support",
+        ],
+    },
+    {
+        "name": "Cancer Research Data Commons",
+        "pages": [
+            "https://datacommons.cancer.gov/explore",
+            "https://datacommons.cancer.gov/support-for-researchers",
+            "https://datacommons.cancer.gov/publications",
+            "https://datacommons.cancer.gov/about",
+            "https://datacommons.cancer.gov/explore/select-datasets",
+            "https://datacommons.cancer.gov/crdc-faqs",
+        ],
+    },
+    # {
+    #     "name": "Integrated Canine Data Commons"
+    # },
+    {
+        "name": "Cancer Data Service",
+        "pages": [
+            "https://datacommons.cancer.gov/repository/cancer-data-service",
+            "https://dataservice.datacommons.cancer.gov/#/home",
+            "https://dataservice.datacommons.cancer.gov/#/programs",
+            "https://dataservice.datacommons.cancer.gov/#/studies",
+            "https://dataservice.datacommons.cancer.gov/#/cancerDataService",
+        ],
+    },
+    {
+        "name": "Seven Bridges Cancer Genomics Cloud",
+        "pages": [
+            "https://docs.cancergenomicscloud.org/docs/before-you-start",
+            "https://docs.cancergenomicscloud.org/page/uncontrolled-data-quickstart-guide",
+            "https://docs.cancergenomicscloud.org/docs/about-datasets",
+        ],
+    },
+    {
+        "name": "ISB Cancer Gateway in the Cloud",
+        "pages": [
+            "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowToGetStartedonISB-CGC.html",
+            "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/FAQ.html",
+            "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/ExploringISB-CGC.html",
+        ],
+    }
+    # {
+    #     "name": "Broad FireCloud Powered by Terra",
+    #     "pages": [
+    #     ]
+    # }
+]
+
+
+print("web_sources:")
+print(web_sources)
+
+
+client = OpenAI(
+    organization=getenv("JATA_OPENAI_SCRAPE_ORG"),
+    api_key=getenv("JATA_OPENAI_SCRAPE_KEY"),
+)
+
+
+def gpt_scrape_html(html_text):
+    # Chat Completion API from OpenAI
+    completion = client.chat.completions.create(
+        model="gpt-4-1106-preview",  # Feel free to change the model to gpt-3.5-turbo-1106
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a master at scraping and parsing raw HTML.",
+            },
+            {"role": "user", "content": html_text},
+        ],
+        tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "parse_data",
+                    "description": "Parse raw HTML data nicely into json using schema provided",
+                    "parameters": {
+                        "type": "object",
+                        # Wrap with data?
+                        "properties": {
+                            "data": {"type": "object", "properties": schema}
+                        },
+                    },
+                },
+            }
+        ],
+        tool_choice={"type": "function", "function": {"name": "parse_data"}},
+    )
+
+    # Calling the data results
+    argument_str = (
+        completion.choices[0].message.tool_calls[0].function.arguments
+    )
+    argument_dict = json.loads(argument_str)
+    return argument_dict  # [data] or another key?
+
+
+def trim_string(input_string, max_length):
+    """
+    Trims a string to the specified character count.
+    """
+    if len(input_string) <= max_length:
+        return input_string
+    else:
+        return input_string[:max_length]
+
+
+def scrape_one_page(name, target_url, page_index):
+    # target_url = "https://pdc.cancer.gov/pdc/about"  # Target URL will always change
+    # response = requests.get(target_url)
+    # html_text = response.text
+
+
+    save_filename = output_path(name.replace(" ", "_") + "_" + str(page_index) + ".json")
+
+    print("filename:")
+    print(save_filename)
+
+    if path_exists(save_filename):
+        print("File already exists, skipping")
+        return
+
+    op = webdriver.ChromeOptions()
+    op.add_argument("headless")
+    driver = webdriver.Chrome(options=op)
+    driver.get(target_url)
+    driver.implicitly_wait(1.2)  # seconds
+
+    # get raw html
+    html_text = driver.page_source
+
+    # Remove unnecessary part to prevent HUGE TOKEN cost!
+    # Remove everything between <head> and </head>
+    html_text = re.sub(r"<head.*?>.*?</head>", "", html_text, flags=re.DOTALL)
+    # Remove all occurrences of content between <script> and </script>
+    html_text = re.sub(
+        r"<script.*?>.*?</script>", "", html_text, flags=re.DOTALL
+    )
+    # Remove all occurrences of content between <style> and </style>
+    html_text = re.sub(r"<style.*?>.*?</style>", "", html_text, flags=re.DOTALL)
+    html_text = re.sub(
+        r"<iframe.*?>.*?</iframe>", "", html_text, flags=re.DOTALL
+    )
+    html_text = re.sub(r'style=".*?>.*?"', "", html_text, flags=re.DOTALL)
+    html_text = re.sub(r'class=".*?>.*?"', "", html_text, flags=re.DOTALL)
+
+    print(html_text)
+
+    print("\n\n\n=======\nHTML LEN:\n")
+
+    print(len(html_text))
+
+    metadata_dict = gpt_scrape_html(html_text)
+
+    print(metadata_dict)
+
+
+    with open(save_filename, "w") as f:
+        f.write(json.dumps(metadata_dict))
+
+    print("DONE")
+
+    return 0
+
+
+test_source = web_sources[0]
+test_name = test_source["name"]
+test_page = test_source["pages"][0]
+
+print("test_page:")
+print(test_page)
+
+# TODO loop
+
+if __name__ == "__main__":
+    print("running main")
+    scrape_one_page(test_name, test_page, 0)

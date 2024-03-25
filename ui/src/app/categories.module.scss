@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+
+  h4 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.listbox {
+  min-width: 12rem;
+  text-transform: capitalize;
+}
