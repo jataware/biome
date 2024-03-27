@@ -1,0 +1,100 @@
+name: sourceman
+services:
+  sourceman_server:
+    build:
+      context: .
+    working_dir: /sourceman
+    depends_on:
+      sourceman_rq_redis:
+        condition: service_healthy
+    command: ["bash", "-c", "poetry run uvicorn sourceman.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
+    container_name: sourceman_server
+    ports:
+    - mode: ingress
+      target: 8082
+      published: "8082"
+      protocol: tcp
+    restart: always
+    volumes:
+    - type: bind
+      source: .
+      target: /sourceman
+    networks:
+      sourceman: null
+  sourceman_rq_redis:
+    container_name: sourceman_rq_redis
+    restart: always
+    image: redis
+    networks:
+      sourceman: null
+    ports:
+    - mode: ingress
+      target: 6379
+      published: "6380"
+      protocol: tcp
+    expose:
+      - '6379'
+    healthcheck:
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      timeout: 30s
+      interval: 5s
+      retries: 50
+    # extra_hosts:
+    # - host.docker.internal:host-gateway
+  sourceman_worker:
+    environment:
+      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - AWS_BUCKET=${AWS_BUCKET}
+      - CACHE_DIR_NAME=${CACHE_DIR_NAME}
+    build:
+      context: .
+    working_dir: /sourceman
+    depends_on:
+      sourceman_rq_redis:
+        condition: service_healthy
+    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c sourceman.rq_settings"]
+    container_name: sourceman_worker
+    restart: always
+    volumes:
+    - type: bind
+      source: .
+      target: /sourceman
+    networks:
+      sourceman: null
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  sourceman_router:
+    image: caddy
+    hostname: sourceman_router.sourceman
+    networks:
+      - sourceman
+    container_name: sourceman_router
+    ports:
+      - 80:80
+    configs:
+      - source: sourceman_router_Caddyfile
+        target: /etc/caddy/Caddyfile
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "5"
+    profiles:
+      - deploy
+
+configs:
+  sourceman_router_Caddyfile:
+    file: Caddyfile
+networks:
+  sourceman:
+    name: sourceman
+    driver: bridge

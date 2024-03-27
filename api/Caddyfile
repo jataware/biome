@@ -1,0 +1,23 @@
+(common) {
+  log {
+    output stdout
+    level DEBUG
+  }
+  header -Server
+}
+
+(errors-common) {
+  header -Server
+}
+
+:80 {
+    import common
+
+    handle_path /* {
+        reverse_proxy sourceman_server.sourceman:8082
+    }
+
+	handle_errors {
+		import errors-common
+	}	
+}

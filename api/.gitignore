@@ -1,0 +1,4 @@
+*.pyc
+documents_cache/*
+logs/*
+.env

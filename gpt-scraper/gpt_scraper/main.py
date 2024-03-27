@@ -3,6 +3,8 @@ import requests
 from openai import OpenAI
 import re
 
+
+import pprint
 import argparse
 from pathlib import Path
 from os.path import join as path_join, exists as path_exists
@@ -13,9 +15,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 
-from scrape_schema import schema
+from scrape_schema import schema, simple_schema
 
 load_dotenv()  # take environment variables from .env.
+
+pp = pprint.PrettyPrinter(indent=2)
 
 
 def get_project_root() -> Path:
@@ -32,9 +36,6 @@ if not path_exists(out_dir):
     print("Creating out dir")
     makedirs(out_dir)
 
-
-print("schema:")
-print(schema)
 
 web_sources = [
     {
@@ -129,6 +130,25 @@ client = OpenAI(
     api_key=getenv("JATA_OPENAI_SCRAPE_KEY"),
 )
 
+parse_data_spec = {
+    "type": "function",
+    "function": {
+        "name": "parse_data",
+        "description": "Parse raw HTML data nicely into json",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object", "properties": schema
+                }
+            },
+        },
+    },
+}
+
+print("parse data spec:")
+pp.pprint(parse_data_spec)
+
 
 def gpt_scrape_html(html_text):
     # Chat Completion API from OpenAI
@@ -141,22 +161,7 @@ def gpt_scrape_html(html_text):
             },
             {"role": "user", "content": html_text},
         ],
-        tools=[
-            {
-                "type": "function",
-                "function": {
-                    "name": "parse_data",
-                    "description": "Parse raw HTML data nicely into json using schema provided",
-                    "parameters": {
-                        "type": "object",
-                        # Wrap with data?
-                        "properties": {
-                            "data": {"type": "object", "properties": schema}
-                        },
-                    },
-                },
-            }
-        ],
+        tools=[parse_data_spec],
         tool_choice={"type": "function", "function": {"name": "parse_data"}},
     )
 
@@ -165,10 +170,10 @@ def gpt_scrape_html(html_text):
         completion.choices[0].message.tool_calls[0].function.arguments
     )
     argument_dict = json.loads(argument_str)
-    return argument_dict  # [data] or another key?
+    return argument_dict["data"]
 
 
-def trim_string(input_string, max_length):
+def truncate_string(input_string, max_length):
     """
     Trims a string to the specified character count.
     """
@@ -183,8 +188,11 @@ def scrape_one_page(name, target_url, page_index):
     # response = requests.get(target_url)
     # html_text = response.text
 
+    print(f"Scraping {target_url}")
 
-    save_filename = output_path(name.replace(" ", "_") + "_" + str(page_index) + ".json")
+    save_filename = output_path(
+        name.replace(" ", "_") + "_" + str(page_index) + ".json"
+    )
 
     print("filename:")
     print(save_filename)
@@ -217,34 +225,44 @@ def scrape_one_page(name, target_url, page_index):
     html_text = re.sub(r'style=".*?>.*?"', "", html_text, flags=re.DOTALL)
     html_text = re.sub(r'class=".*?>.*?"', "", html_text, flags=re.DOTALL)
 
-    print(html_text)
+    # with open(output_path("sample_html.html"), "w") as ff:
+    #     ff.write(html_text)
 
     print("\n\n\n=======\nHTML LEN:\n")
 
     print(len(html_text))
+    print("\n")
 
-    metadata_dict = gpt_scrape_html(html_text)
+    metadata_dict = gpt_scrape_html(truncate_string(html_text, 80000))
+    # metadata_dict = gpt_scrape_html(html_text)
 
-    print(metadata_dict)
-
+    # print(metadata_dict)
 
     with open(save_filename, "w") as f:
-        f.write(json.dumps(metadata_dict))
+        f.write(json.dumps(metadata_dict, indent=2))
 
     print("DONE")
 
     return 0
 
 
-test_source = web_sources[0]
-test_name = test_source["name"]
-test_page = test_source["pages"][0]
-
-print("test_page:")
-print(test_page)
-
-# TODO loop
+def scrape_all_pages():
+    for source_index, source_obj in enumerate(web_sources):
+        for page_index, page in enumerate(web_sources[source_index]["pages"]):
+            name = source_obj["name"]
+            # save_name = name.replace(" ", "_") + str(page_index)
+            # print("save name")
+            # print(save_name)
+            scrape_one_page(name, page, page_index)
 
 if __name__ == "__main__":
-    print("running main")
-    scrape_one_page(test_name, test_page, 0)
+    scrape_all_pages()
+    # Running program one by one:
+    # test_source = web_sources[0]
+    # test_name = test_source["name"]
+    # test_page = test_source["pages"][1]
+
+    # print("test_page:")
+    # print(test_page)
+    # print("running main")
+    # scrape_one_page(test_name, test_page, 1)

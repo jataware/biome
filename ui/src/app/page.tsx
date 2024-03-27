@@ -1,4 +1,3 @@
-// import Image from "next/image";
 'use client';
 
 import React, { useState } from "react";
@@ -6,6 +5,10 @@ import styles from "./page.module.scss";
 import { Toolbar } from "primereact/toolbar";
 import { Avatar } from "primereact/avatar";
 import { InputText } from "primereact/inputtext";
+
+// import Image from "next/image";
+
+import AddSourceDialog from './AddSourceDialog';
 
 import { classNames } from 'primereact/utils';
 
@@ -33,6 +36,7 @@ export default function Home() {
         <Toolbar
           start={startContent}
           center={centerContent}
+          end={AddSourceDialog}
           className={classNames("shadow-4", styles.toolbar)}
         />
       </header>
