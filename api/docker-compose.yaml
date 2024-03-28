@@ -65,13 +65,13 @@ services:
       target: /sourceman
     networks:
       sourceman: null
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
   sourceman_router:
     image: caddy
     hostname: sourceman_router.sourceman
@@ -90,7 +90,42 @@ services:
         max-file: "5"
     profiles:
       - deploy
-
+  sourceman_selenium:
+    image: selenium/standalone-chrome
+    container_name: sourceman_selenium
+    # TODO use docker networking to connect
+    networks:
+      - sourceman
+    ports:
+    - 4444:4444
+  sourceman_elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    networks:
+      - sourceman
+    ports:
+      - 9200:9200
+    container_name: sourceman_elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:9200/_cluster/health
+      timeout: 3s
+      interval: 3s
+      retries: 20
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: volume
+        source: sourceman_esdata
+        target: /usr/share/elasticsearch/data
+        volume: {}
 configs:
   sourceman_router_Caddyfile:
     file: Caddyfile
@@ -98,3 +133,7 @@ networks:
   sourceman:
     name: sourceman
     driver: bridge
+volumes:
+  sourceman_esdata:
+    name: sourceman_esdata  
+    driver: local

@@ -10,6 +10,8 @@ import { Tag } from 'primereact/tag';
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 
+import { ScrollTop } from 'primereact/scrolltop';
+
 import s from './sources.module.scss';
 
 function lower(s: string) {
@@ -228,6 +230,7 @@ const Sources = ({ category = { name: 'all' } }) => {
         sortField={sortField}
         sortOrder={sortOrder}
       />
+      <ScrollTop />
     </div>
   )
 

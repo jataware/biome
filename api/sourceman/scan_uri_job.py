@@ -9,6 +9,8 @@ import tempfile
 import requests
 
 from sourceman.settings import settings
+from sourceman.gpt_scraper.main import scrape_one_page
+
 # from sourceman.ocr import NougatExtractor
 
 
@@ -25,8 +27,8 @@ logger.info("Loaded scan_uri_job namespace")
 
 
 CACHE_FOLDER = path_join(get_project_root(), settings.CACHE_DIR_NAME)
-if not os.path.exists(CACHE_FOLDER):
-    os.makedirs(CACHE_FOLDER)
+# if not os.path.exists(CACHE_FOLDER):
+#     os.makedirs(CACHE_FOLDER)
 
 
 def test_task(url):
@@ -43,7 +45,7 @@ def test_task(url):
 # s3 = boto3.resource("s3")
 
 
-def start(uri):
+def start(name, uri, index=0):
     """
     Uri example:
     https://datasource.gov/faq
@@ -51,48 +53,15 @@ def start(uri):
 
     logger.info(f"Starting uri scanning to json: {uri}")
 
-    # BUCKET = settings.AWS_BUCKET
+    # cache_file_path = path_join(CACHE_FOLDER, f"{uri}.json")
 
-    cache_file_path = path_join(CACHE_FOLDER, f"{uri}.json")
+    result = scrape_one_page(name, uri, index)
 
-    # s3_path = s3_url.replace(f"s3://{BUCKET}/", "")
+    print(f"====\nScanning and json data complete for: {uri}.")
 
-    # try:
-    #     if not os.path.isfile(cache_file_path):
-    #         s3.Bucket(BUCKET).download_file(s3_path, cache_file_path)
-    #     else:
-    #         logger.info("File already cached, skip download.")
-    # except botocore.exceptions.ClientError as e:
-    #     logger.info("Failed S3 download.")
-    #     raise e
+    # TODO actually return something to stream as steps are completed
 
-    # text = extractor.extract_pdf_text(Path(cache_file_path))
-
-    temp_file_path = None
-
-    # with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
-    #     f.write(text)
-    #     temp_file_path = f.name
-
-    # assert temp_file_path is not None, "temporary file should not be empty!"
-
-    # os.remove(temp_file_path)
-
-    # if callback_url:
-    #     try:
-    #         data = {
-    #             "context": {
-    #                 # "s3_key": s3_key,
-    #                 "result": json_properties
-    #             }
-    #         }
-    #         # requests.post(callback_url, data=json.dumps(data))
-    #         # logger.info("Request successful to callback url.")
-    #     except requests.RequestException as e:
-    #         logger.error(f"Error making GET request to callback_url: {e}")
-    #         raise e
-
-    return f"====\nScanning and json data complete for: {uri}."
+    return result
 
 
 def tryit():

@@ -1,5 +1,5 @@
 .urlBox {
-  width: 20rem;
+  width: 100%;
   font-size: 1.5rem;
   line-height: 2.5rem;
 
@@ -30,15 +30,6 @@
       background-size: 100% 3px;
     }
   }
-
-  &>[class~="p-dialog-content"] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 0;
-  }
-
 }
 
 .addSourceButton {
@@ -54,5 +45,95 @@
 .confirmSourceButton {
   &[class~="p-button"] {
     font-size: 1.25rem;
+  }
+}
+
+.scanRoot {
+  // border: 1px dashed red;
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+}
+
+.scanLeftPane {
+  // border: 1px dashed blue;
+}
+
+.scanRightPane {
+  // border: 1px dashed orange;
+  padding: 1.25rem;
+}
+
+.scanRightContents {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  grid-gap: 1.25rem;
+
+  & label {
+    color: var(--text-color-secondary);
+    font-size: 0.85rem;
+  }
+}
+
+.url {
+  width: 50vw;
+  height: 35vh;
+
+  &>[class~="p-dialog-content"] {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    grid-template-columns: 1fr;
+  }
+
+}
+
+.scan {
+  // TODO animate the resizing
+  width: 80vw;
+  height: 70vh;
+
+  &>[class~="p-dialog-content"] {
+    // padding: 1.5rem;
+  }
+}
+
+.review {}
+
+.submit {}
+
+// Needs a position: relative parent
+// to use all available height without
+// overflowing from content
+.scroller {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+
+.customizedTimeline {
+  @media screen and (max-width: 1050px) {
+
+    .p-timeline-event:nth-child(even) {
+      flex-direction: row !important;
+
+      .p-timeline-event-content {
+        text-align: left !important;
+      }
+    }
+
+    .p-timeline-event-opposite {
+      flex: 0;
+    }
+
+    .p-card {
+      margin-top: 1rem;
+    }
   }
 }
