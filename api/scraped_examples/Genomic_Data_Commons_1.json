@@ -1,0 +1,91 @@
+{
+  "name": "NCI Genomic Data Commons",
+  "initials": "GDC",
+  "description": "NCI's Genomic Data Commons (GDC) provides the cancer research community with a unified repository and cancer knowledge base that enables data sharing across cancer genomic studies in support of precision medicine. GDC enables access to data from various projects, genes, and mutations.",
+  "logo_url": "https://gdc.cancer.gov/sites/all/themes/gdc_bootstrap/logo.png",
+  "datasets": [
+    "Standardized data from cancer studies"
+  ],
+  "categories": [
+    "genomics"
+  ],
+  "tags": [
+    "human",
+    "genetics",
+    "cancer"
+  ],
+  "urls": {
+    "homepage": "https://gdc.cancer.gov",
+    "sitemap": "",
+    "data_landing": "https://portal.gdc.cancer.gov",
+    "git_repository": "https://github.com/NCI-GDC",
+    "git_org": "https://github.com/NCIP",
+    "submission_portal": "https://portal.gdc.cancer.gov/submission",
+    "openapi_spec": "https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started"
+  },
+  "use_cases": [
+    "Standardized data access",
+    "Data analysis and visualization",
+    "Gene and variant level data analysis"
+  ],
+  "documentation": [
+    {
+      "name": "GDC Data Portal User\u2019s Guide",
+      "url": "https://docs.gdc.cancer.gov/Data_Portal/Users_Guide/getting_started"
+    },
+    {
+      "name": "GDC Data Transfer Tool User's Guide",
+      "url": "http://docs.gdc.cancer.gov/Data_Transfer_Tool/Users_Guide/Getting_Started"
+    },
+    {
+      "name": "GDC Application Programming Interface (API) User's Guide",
+      "url": "https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started"
+    }
+  ],
+  "collections": [
+    "case sets",
+    "projects"
+  ],
+  "data_categories": [
+    "Clinical",
+    "Biospecimen",
+    "Analytical Data"
+  ],
+  "data_types": [
+    "Genomic Data",
+    "Bioinformatic Pipelines"
+  ],
+  "file_formats": [
+    "json",
+    "tsv",
+    "bam",
+    "vcf",
+    "xlsx"
+  ],
+  "external_references": [
+    {
+      "name": "GDC Documentation",
+      "base_url": "https://docs.gdc.cancer.gov/"
+    },
+    {
+      "name": "GDC API",
+      "base_url": "https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started"
+    }
+  ],
+  "access_type": "mixed",
+  "capabilities": [
+    "workspaces",
+    "http_api",
+    "ui_case_search",
+    "ui_organ_search"
+  ],
+  "data_use_limitations": "Access to some datasets may be restricted due to patient confidentiality.",
+  "omics_methods": [
+    "Genomics",
+    "Bioinformatics"
+  ],
+  "contact": {
+    "email": "support@nci-gdc.datacommons.io",
+    "name": "GDC Help Desk"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Imaging Data Commons User Guide",
+  "initials": "IDC",
+  "description": "The IDC User Guide provides information and guidelines for utilizing the Imaging Data Commons portal, including how to access and explore data, understand the DICOM standard, make use of cloud resources, and leverage the IDC API for programmatic access.",
+  "urls": {
+    "homepage": "https://learn.canceridc.dev/"
+  },
+  "datasets": [],
+  "categories": [
+    "clinical",
+    "imaging"
+  ],
+  "tags": [
+    "human",
+    "genetics",
+    "cancer"
+  ],
+  "documentation": [
+    {
+      "name": "Getting Started with IDC",
+      "url": "/getting-started-with-idc"
+    },
+    {
+      "name": "Core Functions of IDC",
+      "url": "/core-functions-of-idc"
+    },
+    {
+      "name": "Frequently Asked Questions",
+      "url": "/frequently-asked-questions"
+    },
+    {
+      "name": "Support",
+      "url": "/support"
+    }
+  ],
+  "data_categories": [
+    "DICOM Images",
+    "Genomic Data",
+    "Clinical Data"
+  ],
+  "data_types": [
+    "Imaging Data",
+    "Structured Reports",
+    "Segmentation Objects"
+  ],
+  "file_formats": [
+    "DICOM",
+    "NIFTI",
+    "JSON",
+    "TSV"
+  ],
+  "access_type": "open",
+  "capabilities": [
+    "ui_case_search"
+  ],
+  "data_use_limitations": "Data usage is generally open but may be subject to specific terms of use depending on the dataset."
+}

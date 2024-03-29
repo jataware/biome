@@ -65,6 +65,8 @@ services:
       target: /sourceman
     networks:
       sourceman: null
+    # links:
+    # - sourceman_chrome
     # deploy:
     #   resources:
     #     reservations:
@@ -90,14 +92,20 @@ services:
         max-file: "5"
     profiles:
       - deploy
-  sourceman_selenium:
-    image: selenium/standalone-chrome
-    container_name: sourceman_selenium
-    # TODO use docker networking to connect
-    networks:
-      - sourceman
-    ports:
-    - 4444:4444
+  # sourceman_chrome:
+  #   image: selenium/standalone-chrome:latest
+  #   container_name: sourceman_chrome
+  #   # TODO use docker networking to connect
+  #   networks:
+  #     - sourceman
+  #   hostname: chrome
+  #   ports:
+  #     - "5900:5900"
+  #     - "7900:7900"
+  #     - "4444:4444"
+  #   privileged: true
+  #   shm_size: 2g
+
   sourceman_elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
     networks:

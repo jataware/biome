@@ -1,0 +1,41 @@
+{
+  "data": {
+    "name": "NCI Genomic Data Commons",
+    "initials": "GDC",
+    "description": "NCI's Genomic Data Commons (GDC) is not just a database or a tool. It is a platform for efficiently querying and downloading high-quality and complete data.",
+    "logo_url": "https://gdc.cancer.gov/sites/all/themes/gdc_bootstrap/logo.png",
+    "urls": {
+      "homepage": "https://gdc.cancer.gov/",
+      "sitemap": null,
+      "data_landing": "https://portal.gdc.cancer.gov/",
+      "git_repository": null,
+      "git_org": null,
+      "submission_portal": "https://portal.gdc.cancer.gov/submission/",
+      "openapi_spec": null
+    },
+    "use_cases": [],
+    "documentation": [
+      {
+        "name": "GDC Data Portal User’s Guide",
+        "url": "https://docs.gdc.cancer.gov/Data_Portal/Users_Guide/getting_started/"
+      },
+      {
+        "name": "API User’s Guide",
+        "url": "https://docs.gdc.cancer.gov/API/Users_Guide/Data_Analysis"
+      }
+    ],
+    "file_formats": [
+      "Data Types and File Formats"
+    ],
+    "access_type": "open controlled mixed",
+    "capabilities": [
+      "Data Analysis",
+      "Visualization",
+      "Exploration"
+    ],
+    "data_use_limitations": null,
+    "contact": {
+      "email": null
+    }
+  }
+}

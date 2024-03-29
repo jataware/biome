@@ -1,0 +1,76 @@
+{
+  "name": "ISB Cancer Gateway in the Cloud",
+  "initials": "ISB-CGC",
+  "description": "The ISB Cancer Gateway in the Cloud (ISB-CGC) is a cloud-based platform that provides cancer researchers with access to a variety of cancer genomics datasets and bioinformatics tools. The platform is designed to facilitate large-scale computational analyses of cancer data by leveraging Google Cloud technologies.",
+  "logo_url": "NA",
+  "datasets": [
+    "TCGA data"
+  ],
+  "categories": [
+    "genomics",
+    "clinical"
+  ],
+  "tags": [
+    "human",
+    "genetics",
+    "cancer"
+  ],
+  "urls": {
+    "homepage": "https://isb-cancer-genomics-cloud.readthedocs.io/",
+    "git_repository": "https://github.com/isb-cgc/readthedocs",
+    "submission_portal": "NA"
+  },
+  "use_cases": [
+    "Running bioinformatics analyses using Google Cloud",
+    "Accessing TCGA data"
+  ],
+  "documentation": [
+    {
+      "name": "Quick Start Guide",
+      "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/Quick-links-updated.html"
+    },
+    {
+      "name": "FAQ",
+      "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/FAQ.html"
+    },
+    {
+      "name": "Community Notebooks",
+      "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowTos.html"
+    }
+  ],
+  "collections": [
+    "cohorts",
+    "projects"
+  ],
+  "data_categories": [
+    "Genomic Data",
+    "Clinical Data"
+  ],
+  "data_types": [
+    "Sequence Data",
+    "BigQuery Tables"
+  ],
+  "file_formats": [
+    "BigQuery format"
+  ],
+  "external_references": [
+    {
+      "name": "dbGaP",
+      "base_url": "https://dbgap.ncbi.nlm.nih.gov/"
+    }
+  ],
+  "access_type": "controlled",
+  "capabilities": [
+    "workspaces",
+    "http_api",
+    "ui_case_search"
+  ],
+  "data_use_limitations": "Access to some datasets, such as TCGA data, requires dbGaP authorization prior to access.",
+  "omics_methods": [
+    "Genomics"
+  ],
+  "contact": {
+    "email": "feedback@isb-cgc.org",
+    "name": "ISB-CGC team"
+  }
+}

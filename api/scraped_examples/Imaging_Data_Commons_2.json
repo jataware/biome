@@ -1,0 +1,55 @@
+{
+  "name": "Imaging Data Commons User Guide",
+  "description": "The user guide for Imaging Data Commons, containing information about accessing and organizing data, working with DICOM format, using the API, and more.",
+  "urls": {
+    "homepage": "https://learn.canceridc.dev/",
+    "data_landing": "https://datastudio.google.com/u/0/reporting/04cf5976-4ea0-4fee-a749-8bfd162f2e87"
+  },
+  "categories": [
+    "clinical",
+    "imaging"
+  ],
+  "tags": [
+    "human",
+    "cancer",
+    "genetics"
+  ],
+  "use_cases": [
+    "IDC data replication",
+    "accessing hosted datasets",
+    "data organization"
+  ],
+  "documentation": [
+    {
+      "name": "IDC Data Studio report",
+      "url": "https://datastudio.google.com/u/0/reporting/04cf5976-4ea0-4fee-a749-8bfd162f2e87"
+    }
+  ],
+  "external_references": [
+    {
+      "name": "The Cancer Imaging Archive (TCIA)",
+      "base_url": "https://www.cancerimagingarchive.net/"
+    },
+    {
+      "name": "The Cancer Genome Atlas (TCGA)",
+      "base_url": "https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga"
+    },
+    {
+      "name": "National Lung Screening Trial (NLST)",
+      "base_url": "https://www.cancer.gov/types/lung/research/nlst"
+    },
+    {
+      "name": "Human Tumor Atlas Network (HTAN)",
+      "base_url": "https://humantumoratlas.org/"
+    }
+  ],
+  "collections": [
+    "case sets",
+    "cohorts",
+    "projects"
+  ],
+  "file_formats": [
+    "DICOM",
+    "TIFF"
+  ]
+}

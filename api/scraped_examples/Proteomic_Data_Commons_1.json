@@ -1,0 +1,24 @@
+{
+  "name": "NCI Proteomics Data Commons",
+  "initials": "PDC",
+  "description": "PDC data submission and data use are governed by Creative Commons CC-BY 4.0 licensing terms.",
+  "logo_url": "assets/css/images/PDC-NIH-Logo.png",
+  "urls": {
+    "homepage": "https://pdc.cancer.gov",
+    "data_landing": "https://pdc.cancer.gov/pdc/study/PDC000250"
+  },
+  "data_use_limitations": "CC-BY 4.0 license. User is free to share, adapt, and use the material. Attribution required. No additional restrictions on the licensor's freedoms as long as license terms are followed.",
+  "contact": {
+    "email": "PDCHelpDesk@mail.nih.gov"
+  },
+  "external_references": [
+    {
+      "name": "Creative Commons License",
+      "base_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "name": "Intellectual Property Policy",
+      "base_url": "https://pdc.cancer.gov"
+    }
+  ]
+}

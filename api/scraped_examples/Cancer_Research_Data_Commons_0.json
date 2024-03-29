@@ -1,0 +1,70 @@
+{
+  "name": "National Cancer Institute Center for Biomedical Informatics and Information Technology",
+  "initials": "CBIIT",
+  "description": "The website provides information about exploring, analyzing, and submitting data related to cancer research. It includes various resources such as the implementations of Data Commons, Cloud Resources, and Core Standards & Services to facilitate data exploration and research.",
+  "logo_url": "/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+  "categories": [
+    "genomics",
+    "clinical",
+    "imaging"
+  ],
+  "tags": [
+    "human",
+    "genetics",
+    "cancer"
+  ],
+  "urls": {
+    "homepage": "https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/cancer-genomics-cloud",
+    "data_landing": "https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/cancer-genomics-cloud"
+  },
+  "use_cases": [
+    "Exploring Data using Data Commons",
+    "Aggregated Exploration Across Data Commons",
+    "Data Exploration through the CRDC Cloud Resources",
+    "CRDC Core Standards and Services"
+  ],
+  "documentation": [
+    {
+      "name": "About",
+      "url": "/about"
+    },
+    {
+      "name": "Data Commons",
+      "url": "/explore/data-commons"
+    },
+    {
+      "name": "Cloud Resources",
+      "url": "/explore/cloud-resources"
+    },
+    {
+      "name": "CRDC Core Standards and Services",
+      "url": "/explore/core-standards-services"
+    }
+  ],
+  "collections": [
+    "case sets",
+    "cohorts",
+    "projects"
+  ],
+  "data_categories": [
+    "APOLLO",
+    "CPTAC",
+    "TARGET"
+  ],
+  "file_formats": [
+    "json",
+    "tsv",
+    "bam",
+    "tif",
+    "png",
+    "bedpe",
+    "excel",
+    "idat",
+    "txt"
+  ],
+  "access_type": "mixed",
+  "contact": {
+    "email": "NCIinfo@nih.gov",
+    "name": "National Cancer Institute"
+  }
+}

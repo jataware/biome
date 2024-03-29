@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import s from "./add_source.module.scss";
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
@@ -45,14 +45,14 @@ const AnimatedTimeline = () => {
       index: ScanStep.inputUri
     },
     {
-      status: 'Reviewing Links & Docs',
+      status: 'Reviewing Links',
       date: '14:00',
       // icon: 'pi pi-cog',
       color: '#673AB7',
       index: ScanStep.reviewLinks
     },
     {
-      status: 'Scanning Best Source',
+      status: 'Selecting Best Source',
       date: '16:15',
       icon: 'pi pi-shopping-cart',
       color: '#FF9800',
@@ -139,6 +139,9 @@ export default function AddSource() {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(Step.url);
   const [color, setColor] = useState(randomColor);
+  const [sourceUri, setSourceUri] = useState('');
+
+  const sourceUriInputRef = useRef(null);
 
   function closeAndReset() {
     setStep(Step.url);
@@ -147,6 +150,7 @@ export default function AddSource() {
 
   function gotoScan() {
     // TODO make http request to server to start process
+    setSourceUri(sourceUriInputRef.current.value);
     setStep(Step.scan);
   }
 
@@ -179,6 +183,7 @@ export default function AddSource() {
                 <i className="pi pi-globe" />
                 <InputText
                   className={s.urlBox}
+                  ref={sourceUriInputRef}
                   placeholder="https://www.data.gov"
                 />
               </span>
@@ -207,7 +212,7 @@ export default function AddSource() {
 
             <div className={s.scanRightPane}>
 
-              <h5>Source: https://gdc.datasource.gov</h5>
+              <h5>Source: {sourceUri}</h5>
 
               <div className={s.scanRightContents}>
                 <div className="flex flex-column gap-1">
@@ -247,14 +252,6 @@ export default function AddSource() {
                   </small>
                 </div>
 
-                <div>
-                  <label htmlFor="color-picker">Color:&nbsp;</label>
-                  <ColorPicker
-                    id="color-picker"
-                    value={color}
-                    onChange={(e) => setColor(e.value)}
-                  />
-                </div>
 
 
               </div> {/*scanRightContents*/}
@@ -269,3 +266,12 @@ export default function AddSource() {
   );
 
 }
+
+  // <div>
+  //   <label htmlFor="color-picker">Color:&nbsp;</label>
+  //   <ColorPicker
+  //     id="color-picker"
+  //     value={color}
+  //     onChange={(e) => setColor(e.value)}
+  //   />
+  // </div>

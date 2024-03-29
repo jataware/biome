@@ -2,25 +2,21 @@ import json
 import requests
 from openai import OpenAI
 import re
-
-
 import pprint
 import argparse
 from pathlib import Path
 from os.path import join as path_join, exists as path_exists
 from os import getenv, makedirs
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from dotenv import load_dotenv
-
 from .scrape_schema import schema, simple_schema
 
-load_dotenv()  # take environment variables from .env.
 
+load_dotenv()  # use .env
 pp = pprint.PrettyPrinter(indent=2)
 
 
@@ -39,6 +35,7 @@ if not path_exists(out_dir):
     makedirs(out_dir)
 
 
+# Mock, tests
 web_sources = [
     {
         "name": "Genomic Data Commons",
@@ -86,9 +83,6 @@ web_sources = [
             "https://datacommons.cancer.gov/crdc-faqs",
         ],
     },
-    # {
-    #     "name": "Integrated Canine Data Commons"
-    # },
     {
         "name": "Cancer Data Service",
         "pages": [
@@ -115,11 +109,6 @@ web_sources = [
             "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/ExploringISB-CGC.html",
         ],
     }
-    # {
-    #     "name": "Broad FireCloud Powered by Terra",
-    #     "pages": [
-    #     ]
-    # }
 ]
 
 
@@ -186,10 +175,6 @@ def truncate_string(input_string, max_length):
 
 
 def scrape_one_page(name, target_url, page_index):
-    # target_url = "https://pdc.cancer.gov/pdc/about"  # Target URL will always change
-    # response = requests.get(target_url)
-    # html_text = response.text
-
     print(f"Scraping {target_url}")
 
     save_filename = output_path(
@@ -199,20 +184,15 @@ def scrape_one_page(name, target_url, page_index):
     print("filename:")
     print(save_filename)
 
+    # TODO decide what to do with repeated requests, as names aren't required to
+    # be unique. This is mostly only needed for demo purposes
     if path_exists(save_filename):
-        print("File already exists, skipping")
+        print("File already exists, skipping...")
         return
 
-    ops = webdriver.ChromeOptions()
-    ops.add_argument("headless")
-
-    # local:
-    # driver = webdriver.Chrome(options=op)
-    # remote option b
-    # driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME)    driver = webdriver.Chrome(options=op)
-
-    # Remote:
-    driver = webdriver.Remote("http://sourceman_selenium.sourceman:4444/wd/hub", options=ops)
+    options = FirefoxOptions()
+    options.add_argument("--headless")
+    driver = webdriver.Firefox(options=options)
 
     driver.get(target_url)
     driver.implicitly_wait(1.2)  # seconds
@@ -235,13 +215,12 @@ def scrape_one_page(name, target_url, page_index):
     html_text = re.sub(r'style=".*?>.*?"', "", html_text, flags=re.DOTALL)
     html_text = re.sub(r'class=".*?>.*?"', "", html_text, flags=re.DOTALL)
 
-    # with open(output_path("sample_html.html"), "w") as ff:
+    # NOTE If we need to save the scraped HTML for debugging/etc:
+    # with open(output_path(save_filename.replace("json", "html")), "w") as ff:
     #     ff.write(html_text)
 
-    print("\n\n\n=======\nHTML LEN:\n")
-
+    print("\n=======\nHTML LEN:")
     print(len(html_text))
-    print("\n")
 
     if len(html_text) > 10:
         metadata_dict = gpt_scrape_html(truncate_string(html_text, 80000))
@@ -250,26 +229,20 @@ def scrape_one_page(name, target_url, page_index):
         print(html_text)
         print("FAILED")
         return {}
-    # metadata_dict = gpt_scrape_html(html_text)
-
-    # print(metadata_dict)
 
     with open(save_filename, "w") as f:
         f.write(json.dumps(metadata_dict, indent=2))
 
-    print("DONE")
-
     return metadata_dict
 
 
+# TODO for running locally/main/demo with hardcoded websources
 def scrape_all_pages():
     for source_index, source_obj in enumerate(web_sources):
         for page_index, page in enumerate(web_sources[source_index]["pages"]):
             name = source_obj["name"]
-            # save_name = name.replace(" ", "_") + str(page_index)
-            # print("save name")
-            # print(save_name)
             scrape_one_page(name, page, page_index)
+
 
 if __name__ == "__main__":
     scrape_all_pages()
