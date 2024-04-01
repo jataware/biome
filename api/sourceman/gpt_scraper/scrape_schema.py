@@ -38,8 +38,8 @@ schema = {
     "urls": {
         "type": "object",
         "properties": {
-            "homepage": {"type": "string"},
-            "sitemap": {"type": "string"},
+            "home_page": {"type": "string"},
+            "site_map": {"type": "string"},
             "data_landing": {"type": "string"},
             "git_repository": {"type": "string"},
             "git_org": {"type": "string"},

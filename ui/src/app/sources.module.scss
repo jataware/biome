@@ -1,7 +1,7 @@
 .root {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 0.5rem 1rem 1rem 1rem;
 
   h4 {
     padding-bottom: 0.5rem;
@@ -12,8 +12,11 @@
 .description {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   overflow: hidden;
+  min-height: 4rem;
+  align-items: center;
+  padding-top: 0.5rem;
 }
 
 .dataview {
@@ -30,8 +33,10 @@
 
 .categories {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
-  // width: 100%;
+  margin-left: -0.75rem;
+  margin-top: 0.5rem
 }
 
 .grayTag {
@@ -39,7 +44,10 @@
 }
 
 .sourceName {
-  min-height: 3rem;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+
 }
 
 .actionIcons {
@@ -50,14 +58,16 @@
   color: var(--gray-500);
 }
 
-.categoryWeather {
-  background: var(--green-700);
+.category {
+  background: var(--green-400);
   padding: 5px 7px;
+  margin: 0.25rem 0.25rem;
 }
 
-.categoryAll {
-  background: var(--blue-700);
+.tag {
+  background: var(--blue-400);
   padding: 5px 7px;
+  margin: 0.25rem 0.25rem;
 }
 
 .squareCard {
@@ -65,8 +75,37 @@
     width: 50%;
     padding: 0.2rem;
   }
+
 }
 
 .cardContents {
   height: 22rem;
+  cursor: pointer;
+}
+
+.sourceImage {
+  width: 100%;
+}
+
+.availableUrls {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  // h4 {
+  //   color: var(--text-color-secondary);
+  // }
+
+  // a {
+  //   color: var(--)
+  // }
+
+}
+
+.accessType {
+  display: flex;
+  width: 100%;
+  color: var(--text-color-secondary);
+  padding-bottom: 0.5rem;
 }

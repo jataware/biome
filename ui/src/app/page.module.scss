@@ -1,6 +1,14 @@
 .root {
   background: var(--surface-50);
   min-height: 100vh;
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+  }
 }
 
 .apisLayout {
@@ -52,9 +60,10 @@
   display: flex;
   width: 100%;
   justify-content: center;
-  margin-top: 3.25rem;
+  margin-top: 5rem;
+  padding-top: 1rem;
   align-items: center;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 
   h1 {
     margin: 0;
@@ -91,4 +100,12 @@
   width: 7rem;
   height: 6rem;
   padding-right: -10px;
+}
+
+.accessFilters {
+  padding: 0.75rem 1.25rem;
+
+  h4 {
+    margin-bottom: 0.5rem;
+  }
 }

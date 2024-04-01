@@ -21,8 +21,8 @@ export const ProductService = {
           "cancer"
         ],
         "urls": {
-          "homepage": "https://gdc.cancer.gov",
-          "sitemap": "",
+          "home_page": "https://gdc.cancer.gov",
+          "site_map": "",
           "data_landing": "https://portal.gdc.cancer.gov",
           "git_repository": "https://github.com/NCI-GDC",
           "git_org": "https://github.com/NCIP",
@@ -113,7 +113,7 @@ export const ProductService = {
         // "name": "National Cancer Institute Center for Biomedical Informatics and Information Technology",
         "initials": "CBIIT",
         "description": "The CBIIT supports data sharing and science informatics related to cancer research. It offers guidance on data management and sharing policy through its Office of Data Sharing (ODS).",
-        "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo.svg",
+        "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/crdc_logo_color.svg",
         "datasets": [
           "NCI-funded research datasets",
           "International Cancer Proteogenome Consortium (ICPC) datasets"
@@ -129,7 +129,7 @@ export const ProductService = {
           "cancer"
         ],
         "urls": {
-          "homepage": "https://datacommons.cancer.gov/",
+          "home_page": "https://datacommons.cancer.gov/",
           "data_landing": "https://datacommons.cancer.gov/explore",
           "submission_portal": "https://datacommons.cancer.gov/submit",
         },
@@ -236,8 +236,8 @@ export const ProductService = {
           "genetics"
         ],
         "urls": {
-          "homepage": "/",
-          "sitemap": "",
+          "home_page": "/",
+          "site_map": "",
           "data_landing": "",
           "git_repository": "",
           "git_org": "",
@@ -327,7 +327,7 @@ export const ProductService = {
           "cancer"
         ],
         "urls": {
-          "homepage": "https://datacommons.cancer.gov/",
+          "home_page": "https://datacommons.cancer.gov/",
           "data_landing": "/explore/data-commons"
         },
         "use_cases": [],
@@ -418,8 +418,8 @@ export const ProductService = {
           "cancer"
         ],
         "urls": {
-          "homepage": "https://portal.imaging.datacommons.cancer.gov/",
-          "sitemap": "",
+          "home_page": "https://portal.imaging.datacommons.cancer.gov/",
+          "site_map": "",
           "data_landing": "",
           "git_repository": "https://github.com/ImagingDataCommons/IDC-Examples",
           "git_org": "",
@@ -529,7 +529,7 @@ export const ProductService = {
           "cancer"
         ],
         "urls": {
-          "homepage": "https://dataservice.datacommons.cancer.gov/#/home",
+          "home_page": "https://dataservice.datacommons.cancer.gov/#/home",
           "data_landing": "https://dataservice.datacommons.cancer.gov/#/submit",
           "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit"
         },
@@ -616,71 +616,71 @@ export const ProductService = {
       //   rating: 2,
       //   icon: 'shield'
       // },
-      {
-        id: '1008',
-        code: 'vbb124btr',
-        name: 'The Cancer Imaging Archive (TCIA)',
-        description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        image: 'game-controller.jpg',
-        price: 99,
-        category: 'Electronics',
-        quantity: 2,
-        inventoryStatus: 'LOWSTOCK',
-        rating: 1,
-        icon: 'telegram'
-      },
-      {
-        id: '1009',
-        code: 'cm230f032',
-        name: 'The Cancer Genome Atlas (TCGA)',
-        description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        image: 'gaming-set.jpg',
-        price: 299,
-        category: 'Electronics',
-        quantity: 63,
-        inventoryStatus: 'INSTOCK',
-        rating: 3,
-        icon: 'wifi'
-      },
-      {
-        id: '1010',
-        code: 'plb34234v',
-        name: 'Human Cancer Model Initiative (HCMI)',
-        description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        image: 'gold-phone-case.jpg',
-        price: 24,
-        category: 'Accessories',
-        quantity: 0,
-        inventoryStatus: 'OUTOFSTOCK',
-        rating: 2,
-        icon: 'youtube'
-      },
-      {
-        id: '1011',
-        code: '4920nnc2d',
-        name: 'Foundation Medicine (FM)',
-        description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        image: 'green-earbuds.jpg',
-        price: 89,
-        category: 'Electronics',
-        quantity: 23,
-        inventoryStatus: 'INSTOCK',
-        rating: 3,
-        icon: 'truck'
-      },
-      {
-        id: '1012',
-        code: '250vm23cc',
-        name: 'Multiple Myeloma Research Foundation (MMRF)',
-        description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        image: 'green-t-shirt.jpg',
-        price: 49,
-        category: 'Clothing',
-        quantity: 74,
-        inventoryStatus: 'INSTOCK',
-        rating: 2,
-        icon: 'video'
-      },
+      // {
+      //   id: '1008',
+      //   code: 'vbb124btr',
+      //   name: 'The Cancer Imaging Archive (TCIA)',
+      //   description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      //   image: 'game-controller.jpg',
+      //   price: 99,
+      //   category: 'Electronics',
+      //   quantity: 2,
+      //   inventoryStatus: 'LOWSTOCK',
+      //   rating: 1,
+      //   icon: 'telegram'
+      // },
+      // {
+      //   id: '1009',
+      //   code: 'cm230f032',
+      //   name: 'The Cancer Genome Atlas (TCGA)',
+      //   description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      //   image: 'gaming-set.jpg',
+      //   price: 299,
+      //   category: 'Electronics',
+      //   quantity: 63,
+      //   inventoryStatus: 'INSTOCK',
+      //   rating: 3,
+      //   icon: 'wifi'
+      // },
+      // {
+      //   id: '1010',
+      //   code: 'plb34234v',
+      //   name: 'Human Cancer Model Initiative (HCMI)',
+      //   description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      //   image: 'gold-phone-case.jpg',
+      //   price: 24,
+      //   category: 'Accessories',
+      //   quantity: 0,
+      //   inventoryStatus: 'OUTOFSTOCK',
+      //   rating: 2,
+      //   icon: 'youtube'
+      // },
+      // {
+      //   id: '1011',
+      //   code: '4920nnc2d',
+      //   name: 'Foundation Medicine (FM)',
+      //   description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      //   image: 'green-earbuds.jpg',
+      //   price: 89,
+      //   category: 'Electronics',
+      //   quantity: 23,
+      //   inventoryStatus: 'INSTOCK',
+      //   rating: 3,
+      //   icon: 'truck'
+      // },
+      // {
+      //   id: '1012',
+      //   code: '250vm23cc',
+      //   name: 'Multiple Myeloma Research Foundation (MMRF)',
+      //   description: 'Lorem ipsum dolor sit amet, consec adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      //   image: 'green-t-shirt.jpg',
+      //   price: 49,
+      //   category: 'Clothing',
+      //   quantity: 74,
+      //   inventoryStatus: 'INSTOCK',
+      //   rating: 2,
+      //   icon: 'video'
+      // },
       // {
       //   id: '1013',
       //   code: 'fldsmn31b',

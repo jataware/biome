@@ -34,7 +34,7 @@
 
 .addSourceButton {
   &[class~="p-button"] {
-    background-image: radial-gradient(circle at left top, var(--blue-400), var(--blue-500), var(--indigo-400));
+    background-image: radial-gradient(circle at left top, var(--primary-300), var(--primary-400), var(--indigo-400));
     background-position: 0 100%;
     background-size: 100% 3px;
     border: none;

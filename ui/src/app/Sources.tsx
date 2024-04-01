@@ -11,6 +11,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 
 import { ScrollTop } from 'primereact/scrolltop';
+// import Image from 'next/image';
 
 import s from './sources.module.scss';
 
@@ -23,12 +24,43 @@ interface CategoryModel {
   name: string,
   code: string,
   image: string,
-  category: string
+  // category: string,
+  categories: [string]
+}
+
+const uriLabelMappings = {
+  "home_page": "Website",
+  "data_landing": "Data",
+  "site_map": "Site Map"
+};
+
+const AvailableUrls = ({ urlObj }) => {
+  return (
+    <div className={s.availableUrls}>
+      <div>
+        {['home_page', 'data_landing'].map((uriName) => urlObj[uriName] && (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={urlObj[uriName]}
+          >
+            <Button
+              icon="pi pi-external-link"
+              severity="info"
+              text
+              size="small"
+              label={uriLabelMappings[uriName]}
+            />
+          </a>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 const Sources = ({ category = { name: 'all' } }) => {
 
-  const [products, setProducts] = useState([]);
+  const [sources, setSources] = useState([]);
   const [layout, setLayout] = useState('grid');
 
   const [sortKey, setSortKey] = useState('');
@@ -43,20 +75,20 @@ const Sources = ({ category = { name: 'all' } }) => {
     ProductService
       .getProducts()
       .then((data) => {
+      // TODO filter on other categories
         let filtered = data.slice(0, 13);
         if (!['all', undefined, null].includes(category.name)) {
           filtered = data.filter((item: CategoryModel) => {
-            const dog = lower(category?.name);
-            const cat = lower(item?.category);
-            return cat === dog;
+            const selectedCategoryName = lower(category?.name);
+            return (item?.categories || []).map(i => i.toLowerCase()).includes(selectedCategoryName);
           });
         }
-        setProducts(filtered);
+        setSources(filtered);
       });
   }, [category]);
 
-  const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
+  const getSeverity = (source) => {
+    switch (source.inventoryStatus) {
       case 'INSTOCK':
       case 'Verified':
         return 'success';
@@ -86,27 +118,27 @@ const Sources = ({ category = { name: 'all' } }) => {
     }
   };
 
-  const listItem = (product, index) => {
+  const listItem = (source, index) => {
     return (
 
-      <div className="col-12" key={product.id}>
-        <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-          <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`https://primefaces.org/cdn/primereact/images/product/${product.image}`} alt={product.name} />
+      <div className="col-12" key={source.id}>
+        <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-3 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+          <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`https://primefaces.org/cdn/primereact/images/products/${source.image}`} alt={source.name} />
           <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-              <div className="text-2xl font-bold text-900">{product.name}</div>
-              <Rating value={product.rating} readOnly cancel={false}></Rating>
+              <div className="text-2xl font-bold text-900">{source.name}</div>
+              <Rating value={source.rating} readOnly cancel={false}></Rating>
               <div className="flex align-items-center gap-3">
                 <span className="flex align-items-center gap-2">
                   <i className="pi pi-tag"></i>
-                  <span className="font-semibold">{product.category}</span>
+                  <span className="font-semibold">{source.category}</span>
                 </span>
-                <Tag value={product.inventoryStatus} severity={getSeverity(product)}></Tag>
+                <Tag value={source.inventoryStatus} severity={getSeverity(source)}></Tag>
               </div>
             </div>
             <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-              <span className="text-2xl font-semibold">${product.price}</span>
-              <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={product.inventoryStatus === 'OUTOFSTOCK'}></Button>
+              <span className="text-2xl font-semibold">${source.price}</span>
+              <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={source.inventoryStatus === 'OUTOFSTOCK'}></Button>
             </div>
           </div>
         </div>
@@ -115,60 +147,116 @@ const Sources = ({ category = { name: 'all' } }) => {
   };
 
   // <Avatar 
-  //   icon={`pi pi-${product.icon}`} 
+  //   icon={`pi pi-${source.icon}`} 
   //   size="normal"
   //    shape="circle"
   //    style={{ backgroundColor: colors[index] || randomColor }}
   //   />
 
-  const gridItem = (product, index) => {
+  const gridItem = (source, index) => {
     const colors = ["#ff1744", "#2979ff", "#f50057", "#d500f9", "#651fff", "#1de9b6", "#ffea00", "#76ff03"];
 
     const randomColor = "#000000".replace(/0/g, function() { return (~~(Math.random() * 16)).toString(16); });
 
-    return (
-      <div className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard)}
-        key={product.id}
-      >
-        <div className={classNames("p-4 border-1 surface-border surface-card border-round", s.cardContents)}>
+    const logoUrl = Boolean(source.logo_url) && source.logo_url.includes('http') && source.logo_url;
 
-          <div className={s.actionIcons}>
-            <Button rounded icon={`pi pi-${product.icon}`} style={{ backgroundColor: colors[index] || randomColor, border: 'none' }} />
-            <Button text size="large" icon="pi pi-bookmark" style={{ fontSize: '1.5rem', padding: 0 }} />
-          </div>
+    // <>
+    // className={s.actionIcons}
+    //   <Button rounded icon={`pi pi-${source.icon}`} style={{ backgroundColor: colors[index] || randomColor, border: 'none' }} />
+    //   <Button text size="large" icon="pi pi-bookmark" style={{ fontSize: '1.5rem', padding: 0 }} />
+    // </>
+
+
+    // {!logoUrl && (
+    //   <div className={classNames("font-bold text-xl line-height-2", s.sourceName)}>
+    //     {source.name}
+    //   </div>
+    // )}
+
+    return (
+      <div className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard)}>
+        <div
+          className={classNames("p-3 border-1 surface-border surface-card border-round", s.cardContents)}
+        >
 
           <div className={classNames("font-bold text-xl line-height-2", s.sourceName)}>
-            {product.name}
+            {logoUrl ? (
+              <img src={logoUrl}
+                // height={45}
+                className={s.sourceImage}
+                title={`Logo for ${source.name}`}
+                alt={`Logo for ${source.name}`}
+              />
+            ) : (
+              <div>
+                {source.name} {source.initials && `(${source.initials})`}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-column align-items-center py-1">
 
-            <span className={s.description}>{product.description}</span>
+            <span className={s.description}>
+              {source.description}
+            </span>
 
-            <div className={classNames(s.categories, 'w-full py-3')}>
-              <Tag className={s.categoryWeather} rounded value={product.category} />
-              &nbsp;
-              <Tag className={s.categoryAll} rounded value={product.category} />
+            <div className={classNames(s.categories, 'w-full p-1')}>
+              {Boolean(source?.categories?.length) && (
+                source.categories.map((cat: string) => (
+                  <Tag
+                    key={cat}
+                    className={s.category}
+                    rounded
+                    value={cat}
+                  />
+                ))
+              )}
+              {Boolean(source?.tags?.length) && (
+                source.tags.map((tag: string) => (
+                  <Tag
+                    key={tag}
+                    className={s.tag}
+                    rounded
+                    value={tag}
+                  />
+                ))
+              )}
             </div>
 
-            <div className="flex justify-content-between w-full">
-              <Rating stars={3} value={product.rating} readOnly cancel={false}></Rating>
+            {Boolean(Object.keys(source?.urls || {}).length) && (
+              <AvailableUrls urlObj={source.urls} />
+            )}
 
-              {['INSTOCK', 'Verified'].includes(product.inventoryStatus) && (
+            <div className={s.accessType}>
+              <h4>Data Access:</h4>
+              &nbsp;
+              <span>
+                {source.access_type}
+              </span>
+            </div>
+
+            {/*
+            <div className="flex justify-content-between w-full">
+              <Rating stars={3} value={source.rating} readOnly cancel={false}></Rating>
+
+              {['INSTOCK', 'Verified'].includes(source.inventoryStatus) && (
                 <Tag
                   icon="pi pi-check-circle"
-                  value={product.inventoryStatus}
-                  severity={getSeverity(product)}
+                  value={source.inventoryStatus}
+                  severity={getSeverity(source)}
                 />
               )}
             </div>
+          */}
+
           </div>
 
+          {/*
           <div className="flex align-items-center pt-2">
             <Tag
               rounded
               icon="pi pi-clock"
-              value={`${product.price}ms`}
+              value={`${source.price}ms`}
               className={s.grayTag}
             />
             &nbsp;
@@ -180,22 +268,24 @@ const Sources = ({ category = { name: 'all' } }) => {
               className={s.grayTag}
             />
           </div>
+    */}
+
         </div>
       </div>
     );
   };
 
-  const itemTemplate = (product, layout, index) => {
-    if (!product) {
+  const itemTemplate = (source, layout, index) => {
+    if (!source) {
       return;
     }
 
-    if (layout === 'list') return listItem(product, index);
-    else if (layout === 'grid') return gridItem(product, index);
+    if (layout === 'list') return listItem(source, index);
+    else if (layout === 'grid') return gridItem(source, index);
   };
 
-  const listTemplate = (products, layout) => {
-    return <div className="grid grid-nogutter">{products.map((product, index) => itemTemplate(product, layout, index))}</div>;
+  const listTemplate = (sources, layout) => {
+    return <div className="grid grid-nogutter">{sources.map((source, index) => itemTemplate(source, layout, index))}</div>;
   };
 
   const header = () => {
@@ -223,9 +313,9 @@ const Sources = ({ category = { name: 'all' } }) => {
 
       <DataView
         className={s.dataview}
-        value={products}
+        value={sources}
         listTemplate={listTemplate}
-        layout={layout}
+        layout={'grid'}
         header={header()}
         sortField={sortField}
         sortOrder={sortOrder}
