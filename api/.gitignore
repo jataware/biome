@@ -2,5 +2,5 @@
 documents_cache/*
 logs/*
 .env
-sourceman/out/*
+sources/out/*
 certs/*

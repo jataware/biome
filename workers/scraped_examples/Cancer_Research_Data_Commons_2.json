@@ -1,0 +1,67 @@
+{
+  "name": "Center for Biomedical Informatics and Information Technology",
+  "initials": "CBIIT",
+  "description": "The CBIIT is part of the National Cancer Institute and oversees the Cancer Research Data Commons (CRDC), which is a data-sharing platform to accelerate cancer research through data discovery, access, and analytics. The site provides information about scientific publications, featured research, and guidelines for citing data and resources.",
+  "logo_url": "/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+  "datasets": [
+    "AACR series square",
+    "Cancer Cell",
+    "npj Breast Cancer"
+  ],
+  "categories": [
+    "clinical",
+    "genomics",
+    "imaging"
+  ],
+  "tags": [
+    "human",
+    "cancer",
+    "genetics"
+  ],
+  "urls": {
+    "homepage": "https://datacommons.cancer.gov/",
+    "data_landing": "/explore",
+    "submission_portal": "/submit"
+  },
+  "use_cases": [
+    "Comparative analysis",
+    "Testing computation methods"
+  ],
+  "documentation": [
+    {
+      "name": "How to Cite CRDC",
+      "url": "/publications/how-to-cite-crdc"
+    },
+    {
+      "name": "Featured Publications",
+      "url": "/publications/featured-publications"
+    },
+    {
+      "name": "Select Publications",
+      "url": "/publications/select-publications"
+    }
+  ],
+  "collections": [
+    "projects",
+    "cohorts"
+  ],
+  "data_categories": [
+    "Usage metrics",
+    "Citations",
+    "Peer-reviewed papers"
+  ],
+  "external_references": [
+    {
+      "name": "National Cancer Institute",
+      "base_url": "https://www.cancer.gov"
+    }
+  ],
+  "access_type": "mixed",
+  "capabilities": [
+    "ui_case_search",
+    "ui_organ_search"
+  ],
+  "contact": {
+    "email": "NCIinfo@nih.gov"
+  }
+}

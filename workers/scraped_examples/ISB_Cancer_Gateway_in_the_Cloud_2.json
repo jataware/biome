@@ -1,0 +1,68 @@
+{
+  "name": "ISB Cancer Gateway in the Cloud",
+  "description": "The ISB-CGC Data Overview section describes how the majority of data available through ISB-CGC originates from NCI projects and data contributions. Proteomics Data Commons (PDC) data is also integrated into ISB-CGC resources. Raw data is generally controlled-access, accessible through Google Cloud Storage buckets to authorized users. ISB-CGC provides processed data, generally open-access on the platform, in two ways: through Google Cloud Storage and Google BigQuery. There are specific data use guidelines and policies for data access.",
+  "categories": [
+    "clinical",
+    "genomics"
+  ],
+  "tags": [
+    "human",
+    "cancer",
+    "genetics"
+  ],
+  "urls": {
+    "homepage": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/ExploringISB-CGC.html",
+    "data_landing": "https://pdc.cancer.gov/pdc/",
+    "git_repository": "https://github.com/isb-cgc/readthedocs",
+    "submission_portal": "https://bsky.app/profile/isb-cgc.bsky.social"
+  },
+  "use_cases": [],
+  "documentation": [
+    {
+      "name": "Google Cloud Storage",
+      "url": "https://cloud.google.com/storage/"
+    },
+    {
+      "name": "Google BigQuery",
+      "url": "https://cloud.google.com/bigquery/"
+    },
+    {
+      "name": "GDC Data Use Guidelines",
+      "url": "https://pdc.cancer.gov/pdc/data-use-guidelines"
+    },
+    {
+      "name": "TCIA Data Use Policy Statement",
+      "url": "https://datacommons.cancer.gov/data#policy"
+    }
+  ],
+  "collections": [
+    "projects"
+  ],
+  "data_categories": [
+    "clinical data",
+    "biospecimen data",
+    "molecular data"
+  ],
+  "file_formats": [],
+  "external_references": [
+    {
+      "name": "NCI Proteomics Data Commons",
+      "base_url": "https://pdc.cancer.gov/pdc/"
+    },
+    {
+      "name": "GDC Google Cloud Storage",
+      "base_url": "https://console.cloud.google.com/bigquery?p=isb-cgc&d=0_README&page=dataset"
+    }
+  ],
+  "access_type": "mixed",
+  "capabilities": [
+    "workspaces",
+    "sql",
+    "http_api"
+  ],
+  "data_use_limitations": "Refer to the Genomic Data Commons (GDC) Data Use Guidelines and The Cancer Imaging Archive (TCIA) Data Use Policy Statement for detailed information.",
+  "omics_methods": [],
+  "contact": {
+    "email": "N/A"
+  }
+}

@@ -9,8 +9,11 @@ from typing import Optional, List
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
+
+# TODO copy Dojo's setup that creates es indeces if missing?
+
 redis = Redis(
-    environ.get("REDIS_HOST", "sourceman_rq_redis.sourceman"),
+    environ.get("REDIS_HOST", "sources_rq_redis.sources"),
     environ.get("REDIS_PORT", "6379"),
 )
 q = Queue(connection=redis, default_timeout=-1)
@@ -19,22 +22,20 @@ q = Queue(connection=redis, default_timeout=-1)
 @app.get("/")
 def index():
     logger.info("Get test route.")
-    return {"hello": "sourceman is ready"}
+    return {"hello": "sources is ready"}
+
 
 
 class ExtractArgs(BaseModel):
     uris: List[str]
     name: str
 
-# TODO copy Dojo's setup that creates indeces if not existing
-
-
 @app.post("/scan")
 def gpt_scan_uri(payload: ExtractArgs):
     logger.info(f"Queueing scan fn, uris: {payload.uris}")
 
     job = q.enqueue_call(
-        func="sourceman.scan_uri_job.start",
+        func="workers.scan_uri_job.start",
         args=[payload.name, payload.uris[0]],
         retry=Retry(max=3, interval=[10, 30, 60]),
     )

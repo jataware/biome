@@ -1,32 +1,35 @@
-name: sourceman
+name: sources
 services:
-  sourceman_server:
+  sources_api:
+    working_dir: /api
     build:
-      context: .
-    working_dir: /sourceman
+      context: ./api
     depends_on:
-      sourceman_rq_redis:
+      sources_rq_redis:
         condition: service_healthy
-    command: ["bash", "-c", "poetry run uvicorn sourceman.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
-    container_name: sourceman_server
+    command: ["bash", "-c", "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
+    container_name: sources_api
     ports:
     - mode: ingress
       target: 8082
       published: "8082"
       protocol: tcp
-    restart: always
+    # restart: always
+    environment:
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+      - ES_PORT=${ES_PORT}
     volumes:
     - type: bind
-      source: .
-      target: /sourceman
+      source: ./api
+      target: /api
     networks:
-      sourceman: null
-  sourceman_rq_redis:
-    container_name: sourceman_rq_redis
-    restart: always
+      sources: null
+  sources_rq_redis:
+    container_name: sources_rq_redis
+    # restart: always
     image: redis
     networks:
-      sourceman: null
+      sources: null
     ports:
     - mode: ingress
       target: 6379
@@ -44,31 +47,29 @@ services:
       retries: 50
     # extra_hosts:
     # - host.docker.internal:host-gateway
-  sourceman_worker:
+  sources_workers:
     environment:
-      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      # - AWS_BUCKET=${AWS_BUCKET}
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
       - ES_PORT=${ES_PORT}
       - CACHE_DIR_NAME=${CACHE_DIR_NAME}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    working_dir: /workers
     build:
-      context: .
-    working_dir: /sourceman
+      context: ./workers
     depends_on:
-      sourceman_rq_redis:
+      sources_rq_redis:
         condition: service_healthy
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c sourceman.rq_settings"]
-    container_name: sourceman_worker
-    restart: always
+    container_name: sources_workers
+    # restart: always
     volumes:
     - type: bind
-      source: .
-      target: /sourceman
+      source: ./workers
+      target: /workers
     networks:
-      sourceman: null
-    # links:
-    # - sourceman_chrome
+      sources: null
+    # command: ["tail -f /dev/null"]
+    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c workers.rq_settings"]
+
     # deploy:
     #   resources:
     #     reservations:
@@ -76,16 +77,16 @@ services:
     #         - driver: nvidia
     #           count: all
     #           capabilities: [gpu]
-  sourceman_router:
+  sources_router:
     image: caddy
-    hostname: sourceman_router.sourceman
+    hostname: sources_router.sources
     networks:
-      - sourceman
-    container_name: sourceman_router
+      - sources
+    container_name: sources_router
     ports:
       - 80:80
     configs:
-      - source: sourceman_router_Caddyfile
+      - source: sources_router_Caddyfile
         target: /etc/caddy/Caddyfile
     logging:
       driver: json-file
@@ -96,12 +97,12 @@ services:
       - deploy
 
   # In case we wish to set up separate images for browser
-  # sourceman_chrome:
+  # sources_chrome:
   #   image: selenium/standalone-chrome:latest
-  #   container_name: sourceman_chrome
+  #   container_name: sources_chrome
   #   # TODO use docker networking to connect
   #   networks:
-  #     - sourceman
+  #     - sources
   #   hostname: chrome
   #   ports:
   #     - "5900:5900"
@@ -166,11 +167,11 @@ services:
   #     timeout: 5s
   #     retries: 120     
 
-  sourceman_es:
+  sources_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: sourceman_es
+    container_name: sources_es
     networks:
-      - sourceman
+      - sources
     labels:
       co.elastic.logs/module: elasticsearch
     ports:
@@ -196,7 +197,7 @@ services:
       interval: 3s
       retries: 20
     volumes:
-      - sourceman_esdata:/usr/share/elasticsearch/data
+      - sources_esdata:/usr/share/elasticsearch/data
 
   # For Prod with https and security, depends on setup
   # es01:
@@ -205,7 +206,7 @@ services:
   #       condition: service_healthy
   #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
   #   networks:
-  #     - sourceman
+  #     - sources
   #   labels:
   #     co.elastic.logs/module: elasticsearch
   #   ports:
@@ -250,14 +251,14 @@ services:
   #     - certs:/usr/share/elasticsearch/config/certs
   #     - esdata01:/usr/share/elasticsearch/data
 
-  sourceman_kibana:
-    container_name: sourceman_kibana
+  sources_kibana:
+    container_name: sources_kibana
     # depends_on:
-    #   sourceman_es:
+    #   sources_es:
     #     condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     networks:
-      - sourceman
+      - sources
     labels:
       co.elastic.logs/module: kibana
     volumes:
@@ -267,7 +268,7 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://sourceman_es.sourceman:9200
+      - ELASTICSEARCH_HOSTS=http://sources_es.sources:9200
       # - ELASTICSEARCH_USERNAME=kibana_system
       # - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -288,11 +289,11 @@ services:
       retries: 120
        
 configs:
-  sourceman_router_Caddyfile:
+  sources_router_Caddyfile:
     file: Caddyfile
 networks:
-  sourceman:
-    name: sourceman
+  sources:
+    name: sources
     driver: bridge
 volumes:
   # For setting up es in prod
@@ -302,5 +303,5 @@ volumes:
   #   driver: local
   kibanadata:
     driver: local
-  sourceman_esdata:
+  sources_esdata:
     driver: local

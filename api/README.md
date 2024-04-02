@@ -1,6 +1,6 @@
 # Data Source Management
 
-### Or: SOURCE MAN
+### Or: SOURCES...
 
 ## Initial Project Setup
 

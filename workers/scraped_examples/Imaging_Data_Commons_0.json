@@ -1,0 +1,291 @@
+{
+  "name": "Imaging Data Commons (IDC) User Guide",
+  "initials": "IDC",
+  "description": "The official user guide for the Imaging Data Commons, including documentations, how-to guides, and supporting information for users of the IDC portal.",
+  "logo_url": "",
+  "datasets": [],
+  "categories": [
+    "imaging",
+    "clinical"
+  ],
+  "tags": [
+    "human",
+    "cancer",
+    "genetics"
+  ],
+  "urls": {
+    "homepage": "https://learn.canceridc.dev/",
+    "data_landing": "https://learn.canceridc.dev/",
+    "sitemap": "",
+    "git_repository": "",
+    "git_org": "",
+    "submission_portal": "",
+    "openapi_spec": ""
+  },
+  "use_cases": [
+    "educational"
+  ],
+  "documentation": [
+    {
+      "name": "Welcome!",
+      "url": "/"
+    },
+    {
+      "name": "Getting started",
+      "url": "/getting-started-with-idc"
+    },
+    {
+      "name": "Core functions",
+      "url": "/core-functions-of-idc"
+    },
+    {
+      "name": "Frequently asked questions",
+      "url": "/frequently-asked-questions"
+    },
+    {
+      "name": "Support",
+      "url": "/support"
+    },
+    {
+      "name": "Key pointers",
+      "url": "/idc-key-pointers"
+    },
+    {
+      "name": "Publications",
+      "url": "/publications"
+    },
+    {
+      "name": "IDC team",
+      "url": "/idc-team"
+    },
+    {
+      "name": "Acknowledgments",
+      "url": "/acknowledgments"
+    },
+    {
+      "name": "Getting started with GCP",
+      "url": "/introduction/google-cloud-platform/getting-started-with-gcp"
+    },
+    {
+      "name": "Amazon AWS platform",
+      "url": "/introduction/amazon-aws-platform"
+    },
+    {
+      "name": "DICOM",
+      "url": "/introduction/dicom"
+    },
+    {
+      "name": "Requesting GCP cloud credits",
+      "url": "/introduction/requesting-gcp-cloud-credits"
+    },
+    {
+      "name": "Requesting AWS cloud credits",
+      "url": "/introduction/requesting-aws-cloud-credits"
+    },
+    {
+      "name": "Files and metadata",
+      "url": "/data/organization-of-data/files-and-metadata"
+    },
+    {
+      "name": "Resolving CRDC Globally Unique Identifiers (GUIDs)",
+      "url": "/data/organization-of-data/guids-and-uuids"
+    },
+    {
+      "name": "Clinical data",
+      "url": "/data/organization-of-data/clinical"
+    },
+    {
+      "name": "Downloading data",
+      "url": "/data/downloading-data"
+    },
+    {
+      "name": "Downloading data with s5cmd",
+      "url": "/data/downloading-data/downloading-data-with-s5cmd"
+    },
+    {
+      "name": "Data release notes",
+      "url": "/data/data-release-notes"
+    },
+    {
+      "name": "Data known issues",
+      "url": "/data/data-known-issues"
+    },
+    {
+      "name": "DICOM Segmentations",
+      "url": "/dicom/derived-objects/dicom-segmentations"
+    },
+    {
+      "name": "DICOM Radiotherapy Structure Sets",
+      "url": "/dicom/derived-objects/dicom-radiotherapy-structure-sets"
+    },
+    {
+      "name": "DICOM Structured Reports",
+      "url": "/dicom/derived-objects/dicom-structured-reports"
+    },
+    {
+      "name": "Coding schemes",
+      "url": "/dicom/coding-schemes"
+    },
+    {
+      "name": "DICOM-TIFF dual personality files",
+      "url": "/dicom/dicom-tiff-dual-personality-files"
+    },
+    {
+      "name": "IDC DICOM white papers",
+      "url": "/dicom/idc-dicom-white-papers"
+    },
+    {
+      "name": "Exploring imaging data",
+      "url": "/portal/data-exploration-and-cohorts/exploring-imaging-data"
+    },
+    {
+      "name": "Viewing collections, studies, and series",
+      "url": "/portal/data-exploration-and-cohorts/viewing-collections-studies-and-series"
+    },
+    {
+      "name": "Understanding cohorts",
+      "url": "/portal/data-exploration-and-cohorts/understanding-cohorts"
+    },
+    {
+      "name": "Cohort manifests",
+      "url": "/portal/cohort-manifests"
+    },
+    {
+      "name": "Visualizing images",
+      "url": "/portal/visualization"
+    },
+    {
+      "name": "Proxy policy",
+      "url": "/portal/proxy-policy"
+    },
+    {
+      "name": "Viewer release notes",
+      "url": "/portal/viewer-release-notes"
+    },
+    {
+      "name": "Portal release notes",
+      "url": "/portal/release-notes"
+    },
+    {
+      "name": "Portal known issues",
+      "url": "/portal/portal-known-issues"
+    },
+    {
+      "name": "Getting Started with API",
+      "url": "/api/getting-started"
+    },
+    {
+      "name": "IDC API Concepts",
+      "url": "/api/idc-api-concepts"
+    },
+    {
+      "name": "Manifests",
+      "url": "/api/manifests"
+    },
+    {
+      "name": "Accessing the API",
+      "url": "/api/accessing-the-api"
+    },
+    {
+      "name": "Endpoint Details",
+      "url": "/api/endpoint-details"
+    },
+    {
+      "name": "V1 API Getting Started",
+      "url": "/api/v1-api/getting-started"
+    },
+    {
+      "name": "IDC Data Model Concepts",
+      "url": "/api/v1-api/idc-data-model-concepts"
+    },
+    {
+      "name": "Accessing the V1 API",
+      "url": "/api/v1-api/accessing-the-api"
+    },
+    {
+      "name": "V1 API Endpoint Details",
+      "url": "/api/v1-api/endpoint-details"
+    },
+    {
+      "name": "V1 API Release Notes",
+      "url": "/api/v1-api/release-notes"
+    },
+    {
+      "name": "Colab notebooks",
+      "url": "/cookbook/notebooks"
+    },
+    {
+      "name": "BigQuery",
+      "url": "/cookbook/bigquery"
+    },
+    {
+      "name": "Data Studio",
+      "url": "/cookbook/data-studio"
+    },
+    {
+      "name": "Dashboard for your cohort",
+      "url": "/cookbook/data-studio/cohort-dashboard"
+    },
+    {
+      "name": "More dashboard examples",
+      "url": "/cookbook/data-studio/more-dashboard-examples"
+    },
+    {
+      "name": "ACCESS allocations",
+      "url": "/cookbook/access-allocations"
+    },
+    {
+      "name": "3D Slicer desktop VM",
+      "url": "/cookbook/virtual-machines/idc-desktop"
+    },
+    {
+      "name": "Using a BQ Manifest to Load DICOM Files onto a VM",
+      "url": "/cookbook/virtual-machines/using-a-bq-manifest-to-load-dicom-files-onto-a-vm"
+    },
+    {
+      "name": "Using VS Code with GCP VMs",
+      "url": "/cookbook/virtual-machines/using-vs-code-with-gcp-vms"
+    },
+    {
+      "name": "NCI Cloud Resources",
+      "url": "/cookbook/nci-data-commons-cloud-resources"
+    }
+  ],
+  "collections": [
+    "cohorts",
+    "projects"
+  ],
+  "data_categories": [
+    "Imaging Data",
+    "Clinical Data",
+    "Derived Data",
+    "Segmentation Data"
+  ],
+  "data_types": [
+    "DICOM",
+    "TIFF"
+  ],
+  "file_formats": [
+    "DICOM",
+    "TIFF",
+    "json",
+    "csv"
+  ],
+  "external_references": [],
+  "access_type": "open",
+  "capabilities": [
+    "workspaces",
+    "http_api",
+    "ui_case_search",
+    "ui_organ_search"
+  ],
+  "data_use_limitations": "For approved research or educational purposes",
+  "omics_methods": [
+    "Radiomics",
+    "Pathomics"
+  ],
+  "contact": {
+    "email": "",
+    "name": ""
+  }
+}

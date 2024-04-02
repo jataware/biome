@@ -1,4 +1,4 @@
-REDIS_URL = "redis://sourceman_rq_redis.sourceman:6379"
+REDIS_URL = "redis://sources_rq_redis.sources:6379"
 
 # Queues to listen on
 QUEUES = ["high", "default", "low"]

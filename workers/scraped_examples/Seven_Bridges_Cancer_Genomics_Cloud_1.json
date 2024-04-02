@@ -1,0 +1,63 @@
+{
+  "name": "The CGC Knowledge Center",
+  "description": "Uncontrolled Data QuickStart Guide",
+  "urls": {
+    "homepage": "https://cgc.sbgenomics.com/",
+    "documentation": [
+      {
+        "name": "Guides",
+        "url": "/docs"
+      },
+      {
+        "name": "API Reference",
+        "url": "/reference"
+      },
+      {
+        "name": "Datasets Hub",
+        "url": "/page/datasets-hub"
+      }
+    ]
+  },
+  "use_cases": [
+    "Single executions of bioinformatics tools and workflows on the platform",
+    "Running analyses on public data",
+    "Working with public data that is 'uncontrolled'",
+    "Copying files to projects for analysis",
+    "Using cloud-optimized tools and workflows from the Public Apps gallery"
+  ],
+  "capabilities": [
+    "ui_case_search"
+  ],
+  "tags": [
+    "cancer",
+    "genomics"
+  ],
+  "collections": [
+    "projects"
+  ],
+  "data_categories": [
+    "public data"
+  ],
+  "data_types": [
+    "bioinformatics tools",
+    "workflows"
+  ],
+  "file_formats": [
+    "Common Workflow Language (CWL)"
+  ],
+  "access_type": "open",
+  "external_references": [
+    {
+      "name": "CGC Docs",
+      "base_url": "https://docs.cancergenomicscloud.org/docs"
+    },
+    {
+      "name": "Seven Bridges Blog",
+      "base_url": "https://www.sevenbridges.com/blog/"
+    },
+    {
+      "name": "Controlled Data Access",
+      "base_url": "http://www.cancergenomicscloud.org/controlled-access-data"
+    }
+  ]
+}
