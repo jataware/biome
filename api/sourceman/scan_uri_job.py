@@ -1,22 +1,32 @@
 import os
 import logging
-import boto3
+# import boto3
 import json
-import botocore.exceptions
+# import botocore.exceptions
 from pathlib import Path
 from os.path import join as path_join
 import tempfile
 import requests
 
+from elasticsearch import Elasticsearch
+
 from sourceman.settings import settings
 from sourceman.gpt_scraper.main import scrape_one_page
-
-# from sourceman.ocr import NougatExtractor
 
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
+
+es = Elasticsearch(
+    [
+        {
+            "scheme": "http", # env
+            "host": settings.ELASTICSEARCH_URL,
+            "port": settings.ES_PORT,
+        }
+    ]
+)
 
 
 def get_project_root() -> Path:
@@ -41,7 +51,6 @@ def test_task(url):
     return len(url)
 
 
-# extractor = NougatExtractor(batch_size=settings.EXTRACTOR_BATCH_SIZE)
 # s3 = boto3.resource("s3")
 
 
@@ -59,7 +68,17 @@ def start(name, uri, index=0):
 
     print(f"====\nScanning and json data complete for: {uri}.")
 
-    # TODO actually return something to stream as steps are completed
+    result["metadata"] = {
+        # "created_at": 0,
+        # "updated_at": 0,
+        "scanned_uris": [uri]
+    }
+
+    # TODO store in es, let es autogenerate ID
+    body = json.dumps(result)
+    es.index(index="datasources", body=body)
+
+    # TODO return results in server-push stream?
 
     return result
 
@@ -69,33 +88,38 @@ def tryit():
     mock_url = "http://192.168.1.253:8000/job/3ff8aa9a-32bb-49fa-be94-6718e40cbd22/paragraph_embeddings_processors.calculate_store_embeddings"
     # mock_key = "3ff8aa9a-32bb-49fa-be94-6718e40cbd22-DIDX-documents/125284.mmd"
 
-    res = requests.post(mock_url, data=json.dumps({
-        "context": {
-            "s3_key": mock_key,
-            "document_id": "3ff8aa9a-32bb-49fa-be94-6718e40cbd22"
-        }
-    }))
+    res = requests.post(
+        mock_url,
+        data=json.dumps(
+            {
+                "context": {
+                    "s3_key": mock_key,
+                    "document_id": "3ff8aa9a-32bb-49fa-be94-6718e40cbd22",
+                }
+            }
+        ),
+    )
 
     logger.info(f"got status code: {res.status_code}")
 
 
 # if __name__ == "__main__":
-    # import sys
+# import sys
 
-    # root = logging.getLogger()
-    # root.setLevel(logging.DEBUG)
+# root = logging.getLogger()
+# root.setLevel(logging.DEBUG)
 
-    # handler = logging.StreamHandler(sys.stdout)
-    # handler.setLevel(logging.DEBUG)
-    # formatter = logging.Formatter(
-    #     "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    # )
-    # handler.setFormatter(formatter)
-    # root.addHandler(handler)
+# handler = logging.StreamHandler(sys.stdout)
+# handler.setLevel(logging.DEBUG)
+# formatter = logging.Formatter(
+#     "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+# )
+# handler.setFormatter(formatter)
+# root.addHandler(handler)
 
-    # logger.info("Running main file")
+# logger.info("Running main file")
 
-    # MOCK_ID = "fb18f69c-bd3e-4a44-91ab"
-    # MOCK_URL = "s3://fb18f69c-bd3e-4a44-91ab/hello.pdf"
+# MOCK_ID = "fb18f69c-bd3e-4a44-91ab"
+# MOCK_URL = "s3://fb18f69c-bd3e-4a44-91ab/hello.pdf"
 
-    # extract_text_from_S3_doc(MOCK_ID, MOCK_URL)
+# extract_text_from_S3_doc(MOCK_ID, MOCK_URL)

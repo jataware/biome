@@ -49,6 +49,8 @@ services:
       # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       # - AWS_BUCKET=${AWS_BUCKET}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+      - ES_PORT=${ES_PORT}
       - CACHE_DIR_NAME=${CACHE_DIR_NAME}
     build:
       context: .
@@ -92,6 +94,8 @@ services:
         max-file: "5"
     profiles:
       - deploy
+
+  # In case we wish to set up separate images for browser
   # sourceman_chrome:
   #   image: selenium/standalone-chrome:latest
   #   container_name: sourceman_chrome
@@ -106,148 +110,154 @@ services:
   #   privileged: true
   #   shm_size: 2g
 
-  setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-    user: "0"
-    command: >
-      bash -c '
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-          exit 1;
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
-          exit 1;
-        fi;
-        if [ ! -f config/certs/ca.zip ]; then
-          echo "Creating CA";
-          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
-          unzip config/certs/ca.zip -d config/certs;
-        fi;
-        if [ ! -f config/certs/certs.zip ]; then
-          echo "Creating certs";
-          echo -ne \
-          "instances:\n"\
-          "  - name: es01\n"\
-          "    dns:\n"\
-          "      - es01\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
-          "  - name: kibana\n"\
-          "    dns:\n"\
-          "      - kibana\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
-          > config/certs/instances.yml;
-          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
-          unzip config/certs/certs.zip -d config/certs;
-        fi;
-        echo "Setting file permissions"
-        chown -R root:root config/certs;
-        find . -type d -exec chmod 750 \{\} \;;
-        find . -type f -exec chmod 640 \{\} \;;
-        echo "Waiting for Elasticsearch availability";
-        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
-        echo "Setting kibana_system password";
-        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
-        echo "All done!";
-      '
-    healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
-      interval: 1s
-      timeout: 5s
-      retries: 120     
+  # For Prod with SSL/security, needed to set up nodes
+  # setup:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   volumes:
+  #     - certs:/usr/share/elasticsearch/config/certs
+  #   user: "0"
+  #   command: >
+  #     bash -c '
+  #       if [ x${ELASTIC_PASSWORD} == x ]; then
+  #         echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+  #         exit 1;
+  #       elif [ x${KIBANA_PASSWORD} == x ]; then
+  #         echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+  #         exit 1;
+  #       fi;
+  #       if [ ! -f config/certs/ca.zip ]; then
+  #         echo "Creating CA";
+  #         bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+  #         unzip config/certs/ca.zip -d config/certs;
+  #       fi;
+  #       if [ ! -f config/certs/certs.zip ]; then
+  #         echo "Creating certs";
+  #         echo -ne \
+  #         "instances:\n"\
+  #         "  - name: es01\n"\
+  #         "    dns:\n"\
+  #         "      - es01\n"\
+  #         "      - localhost\n"\
+  #         "    ip:\n"\
+  #         "      - 127.0.0.1\n"\
+  #         "  - name: kibana\n"\
+  #         "    dns:\n"\
+  #         "      - kibana\n"\
+  #         "      - localhost\n"\
+  #         "    ip:\n"\
+  #         "      - 127.0.0.1\n"\
+  #         > config/certs/instances.yml;
+  #         bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+  #         unzip config/certs/certs.zip -d config/certs;
+  #       fi;
+  #       echo "Setting file permissions"
+  #       chown -R root:root config/certs;
+  #       find . -type d -exec chmod 750 \{\} \;;
+  #       find . -type f -exec chmod 640 \{\} \;;
+  #       echo "Waiting for Elasticsearch availability";
+  #       until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+  #       echo "Setting kibana_system password";
+  #       until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+  #       echo "All done!";
+  #     '
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+  #     interval: 1s
+  #     timeout: 5s
+  #     retries: 120     
 
-  es_open:
+  sourceman_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: es_open
+    container_name: sourceman_es
     networks:
       - sourceman
     labels:
       co.elastic.logs/module: elasticsearch
     ports:
-      - 9201:9200
+      - 9200:9200
     environment:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
       - xpack.security.enabled=false 
       - xpack.security.http.ssl.enabled=false
+      - cluster.name=${CLUSTER_NAME}
     mem_limit: ${ES_MEM_LIMIT}
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    # healthcheck:
-    #   test:
-    #     [
-    #       "CMD",
-    #       "curl --fail http://localhost:9201/_cluster/health",
-    #     ]
-    #   timeout: 3s
-    #   interval: 3s
-    #   retries: 20
-    volumes:
-      - esdata02:/usr/share/elasticsearch/data
-
-  es01:
-    depends_on:
-      setup:
-        condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    networks:
-      - sourceman
-    labels:
-      co.elastic.logs/module: elasticsearch
-    ports:
-      - ${ES_PORT}:9200
-    container_name: es01
-    environment:
-      - node.name=es01
-      - cluster.name=${CLUSTER_NAME}
-      - discovery.type=single-node
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - bootstrap.memory_lock=true
-      - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=certs/es01/es01.key
-      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
-      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=certs/es01/es01.key
-      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
-      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.verification_mode=certificate
-      - xpack.license.self_generated.type=${LICENSE}
-      # - http.host=0.0.0.0
-      # - transport.host=127.0.0.1
-      # -e "xpack.security.enabled=false" \
-      # -e "xpack.security.http.ssl.enabled=false" \
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+          "CMD",
+          "curl http://localhost:9200",
         ]
       timeout: 3s
       interval: 3s
       retries: 20
-    mem_limit: ${ES_MEM_LIMIT}
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - esdata01:/usr/share/elasticsearch/data
-  kibana:
-    container_name: kibana
+      - sourceman_esdata:/usr/share/elasticsearch/data
+
+  # For Prod with https and security, depends on setup
+  # es01:
+  #   depends_on:
+  #     setup:
+  #       condition: service_healthy
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   networks:
+  #     - sourceman
+  #   labels:
+  #     co.elastic.logs/module: elasticsearch
+  #   ports:
+  #     - ${ES_PORT}:9200
+  #   container_name: es01
+  #   environment:
+  #     - node.name=es01
+  #     - cluster.name=${CLUSTER_NAME}
+  #     - discovery.type=single-node
+  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+  #     - bootstrap.memory_lock=true
+  #     - xpack.security.enabled=true
+  #     - xpack.security.http.ssl.enabled=true
+  #     - xpack.security.http.ssl.key=certs/es01/es01.key
+  #     - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+  #     - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.transport.ssl.enabled=true
+  #     - xpack.security.transport.ssl.key=certs/es01/es01.key
+  #     - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+  #     - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.transport.ssl.verification_mode=certificate
+  #     - xpack.license.self_generated.type=${LICENSE}
+  #     # - http.host=0.0.0.0
+  #     # - transport.host=127.0.0.1
+  #     # -e "xpack.security.enabled=false" \
+  #     # -e "xpack.security.http.ssl.enabled=false" \
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+  #       ]
+  #     timeout: 3s
+  #     interval: 3s
+  #     retries: 20
+  #   mem_limit: ${ES_MEM_LIMIT}
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - certs:/usr/share/elasticsearch/config/certs
+  #     - esdata01:/usr/share/elasticsearch/data
+
+  sourceman_kibana:
+    container_name: sourceman_kibana
     # depends_on:
-    #   es_open:
+    #   sourceman_es:
     #     condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    networks:
+      - sourceman
     labels:
       co.elastic.logs/module: kibana
     volumes:
@@ -257,13 +267,15 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es02:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_HOSTS=http://sourceman_es.sourceman:9200
+      # - ELASTICSEARCH_USERNAME=kibana_system
+      # - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-      - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      # - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      # - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      - xpack.security.enabled=false 
+      - xpack.security.http.ssl.enabled=false
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
       test:
@@ -283,11 +295,12 @@ networks:
     name: sourceman
     driver: bridge
 volumes:
-  certs:
-    driver: local
-  esdata01:
-    driver: local
+  # For setting up es in prod
+  # certs:
+  #   driver: local
+  # esdata01:
+  #   driver: local
   kibanadata:
     driver: local
-  esdata02:
+  sourceman_esdata:
     driver: local

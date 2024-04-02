@@ -141,15 +141,16 @@ print("parse data spec:")
 pp.pprint(parse_data_spec)
 
 
-def gpt_scrape_html(html_text):
+def gpt_scrape_html(url, html_text):
     # Chat Completion API from OpenAI
     completion = client.chat.completions.create(
         model="gpt-4-1106-preview",  # Feel free to change the model to gpt-3.5-turbo-1106
         messages=[
             {
                 "role": "system",
-                "content": "You are a master at scraping and parsing raw HTML.",
+                "content": "You are a master at scraping and parsing raw HTML. You will receive both the page url that hosted the data as well as the HTML content.",
             },
+            {"role": "user", "content": f"Page url: {url}"},
             {"role": "user", "content": html_text},
         ],
         tools=[parse_data_spec],
@@ -223,7 +224,7 @@ def scrape_one_page(name, target_url, page_index):
     print(len(html_text))
 
     if len(html_text) > 10:
-        metadata_dict = gpt_scrape_html(truncate_string(html_text, 80000))
+        metadata_dict = gpt_scrape_html(target_url, truncate_string(html_text, 80000))
     else:
         print("html len is too short, not proceeding")
         print(html_text)

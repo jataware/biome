@@ -3,12 +3,10 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
 
-
 class Settings(BaseSettings):
-    # EXTRACTOR_BATCH_SIZE: int = 2
-    # AWS_BUCKET: str
-    CACHE_DIR_NAME: str = "documents_cache"
-
+    CACHE_DIR_NAME: str = "out"
+    ELASTICSEARCH_URL: str = "localhost"
+    ES_PORT: int = 9200
 
 settings = Settings()
 print("Settings:")

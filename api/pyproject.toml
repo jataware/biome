@@ -16,6 +16,7 @@ openai = "^1.14.2"
 requests = "^2.31.0"
 selenium = "^4.18.1"
 python-dotenv = "^1.0.1"
+elasticsearch = "^8.13.0"
 
 [tool.poetry.scripts]
 scan_url = "sourceman.scanner:tryit"

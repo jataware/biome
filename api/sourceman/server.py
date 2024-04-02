@@ -26,6 +26,8 @@ class ExtractArgs(BaseModel):
     uris: List[str]
     name: str
 
+# TODO copy Dojo's setup that creates indeces if not existing
+
 
 @app.post("/scan")
 def gpt_scan_uri(payload: ExtractArgs):
