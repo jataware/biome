@@ -11,13 +11,13 @@
 }
 
 :80 {
-    import common
+  import common
 
-    handle_path /* {
-        reverse_proxy sources_server.sources:8082
-    }
+  handle_path /* {
+    reverse_proxy sources_server.sources:8082
+  }
 
-	handle_errors {
-		import errors-common
-	}	
+  handle_errors {
+    import errors-common
+  }	
 }

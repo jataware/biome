@@ -67,7 +67,6 @@ services:
       target: /workers
     networks:
       sources: null
-    # command: ["tail -f /dev/null"]
     command: ["bash", "-c", "poetry run rq worker --with-scheduler -c workers.rq_settings"]
 
     # deploy:
@@ -287,7 +286,30 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-       
+  sources_ui:
+    image: node:20
+    container_name: sources_ui
+    volumes:
+      - ./ui:/ui
+    working_dir: "/ui"
+    ports:
+      - "3000:3000"
+    command: ["npm", "run", "dev"]
+    profiles:
+      - dev
+  sources_rq_dashboard:
+    container_name: sources_rq_dashboard
+    build: 
+      context: ./dev/dockerfiles/rq-dashboard
+    ports:
+      - '9181:9181'
+    networks:
+      - sources
+    environment:
+      RQ_DASHBOARD_REDIS_URL: redis://sources_rq_redis.sources:6379
+    command: ["bash", "-c", "rq-dashboard"]
+    profiles:
+      - dev
 configs:
   sources_router_Caddyfile:
     file: Caddyfile
