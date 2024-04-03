@@ -52,7 +52,7 @@ services:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
       - ES_PORT=${ES_PORT}
       - CACHE_DIR_NAME=${CACHE_DIR_NAME}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JATA_OPENAI_SCRAPE_KEY=${OPENAI_API_KEY}
     working_dir: /workers
     build:
       context: ./workers

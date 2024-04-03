@@ -46,10 +46,14 @@ POST http://localhost:8082/scan
 ```
 
 WEB UI:
-Currently started manually from `ui` folder:
+To use the docker compose to run dev-time services, run with the dev profile:
+```
+docker compose --profile dev up -d
+```
+
+Or, start web interface from `ui` folder:
 ```
   cd ui;
-  npm install;
   npm run dev;
 ```
 
