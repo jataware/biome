@@ -6,14 +6,27 @@ Web project to manage registering, browsing, tuning datasources.
 Frontend: Javascript with Nextjs / Reactjs
 Backend: python 3.11, `poetry` for dependency management and packaging.
 
+## Requirements
+
+python 3.11
+poetry
+nodejs < 18.17
+docker, with compose plugin
+
 ## Initial Project Setup
 
-1. Add environment variables to environment, or to .env file (for docker to use).
-See file `env.sample` file for required variables.
+1. Add environment variables to environment, or to `.env` file (for use with docker).
+See file `env.sample` file for required variables. You may copy it for your own`.env`.
 
 The variables with values on env.sample have a sensible default value. The rest are required (such as openai api key).
 
+For the most part, during development, some values in `.env` can be picked up from
+the HOST environment, so that's an option for sensitive data such as API keys,
+which you may encrypt on disk.
+
 ## Quick Start
+
+One the Initial project setup is completed,
 
 Backend:
 `docker-compose up -d`
