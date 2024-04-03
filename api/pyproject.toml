@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sources-api"
+name = "api"
 version = "0.0.1"
 description = "FASTAPI server that hosts api and manages queue/worker job start."
 authors = ["Team Jataware <joel@jataware.com>"]

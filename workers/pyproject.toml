@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sources-workers"
+name = "workers"
 version = "0.0.1"
 description = "Runs scraping and other helper jobs using RQ queues"
 authors = ["Team Jataware <joel@jataware.com>"]
