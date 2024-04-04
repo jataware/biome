@@ -4,9 +4,10 @@ import json
 import dotenv
 
 from openai import OpenAI
+from workers import api_clients
 from workers.gpt_scraper.gpt_scraper import GPTScraper, WebSource
 
-OUTPUT_DIR = os.path.join(".", "output")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 
 
 def save_dict_to_json(data, filename: str):
@@ -103,12 +104,8 @@ if __name__ == "__main__":
     print("running tests for web scraping")
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
-    client = OpenAI(
-        organization=os.environ.get("JATA_OPENAI_SCRAPE_ORG", ""),
-        api_key=os.environ.get("JATA_OPENAI_SCRAPE_KEY", ""),
-    )
-    scraper = GPTScraper(client)
-    scraped_text = scraper.scrape_multiple_pages(
+    scraper = GPTScraper(api_clients.get_openai())
+    scraped_text = scraper.scrape_web_sources(
         [WebSource(name=source["name"], pages=source["pages"]) for source in WEB_SOURCES]
     )
     save_dict_to_json(scraped_text, os.path.join(OUTPUT_DIR, "scrape_results.json"))

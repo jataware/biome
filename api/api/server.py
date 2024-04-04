@@ -1,10 +1,10 @@
-from fastapi import FastAPI  # , HTTPException, status
+from fastapi import FastAPI
 import logging
 from pydantic import BaseModel
-from os import environ
+import os
 from rq import Queue, Retry
 from redis import Redis
-from typing import Optional, List
+from api.job_queue import get_job_status
 
 
 logger = logging.getLogger(__name__)
@@ -13,10 +13,10 @@ app = FastAPI()
 # TODO copy Dojo's setup that creates es indeces if missing?
 
 redis = Redis(
-    environ.get("REDIS_HOST", "sources_rq_redis.sources"),
-    environ.get("REDIS_PORT", "6379"),
+    host=os.environ.get("REDIS_HOST", "sources_rq_redis.sources"),
+    port=int(os.environ.get("REDIS_PORT", 6379)),
 )
-q = Queue(connection=redis, default_timeout=-1)
+job_queue = Queue(connection=redis, default_timeout=-1)
 
 
 @app.get("/")
@@ -25,16 +25,21 @@ def index():
     return {"hello": "sources is ready"}
 
 
+@app.get("/status")
+def status(job_id: str):
+    return get_job_status(job_id, redis)
 
-class ExtractArgs(BaseModel):
-    uris: List[str]
+
+class ScanArguments(BaseModel):
+    uris: list[str]
     name: str
 
+
 @app.post("/scan")
-def gpt_scan_uri(payload: ExtractArgs):
+def gpt_scan_uri(payload: ScanArguments):
     logger.info(f"Queueing scan fn, uris: {payload.uris}")
 
-    job = q.enqueue_call(
+    job = job_queue.enqueue_call(
         func="workers.scan_uri_job.start",
         args=[payload.name, payload.uris[0]],
         retry=Retry(max=3, interval=[10, 30, 60]),

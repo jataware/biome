@@ -1,13 +1,17 @@
 from pydantic_settings import BaseSettings
 import pprint
+import dotenv
+import os
 
 pp = pprint.PrettyPrinter(indent=2)
+dotenv.load_dotenv()
+
 
 class Settings(BaseSettings):
-    CACHE_DIR_NAME: str = "out"
-    ELASTICSEARCH_URL: str = "localhost"
-    ES_PORT: int = 9200
+    ELASTICSEARCH_URL: str = os.environ.get("ELASTICSEARCH_URL", "")
+    ELASTICSEARCH_PORT: int = int(os.environ.get("ELASTICSEARCH_PORT", 9200))
+    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
+    OPENAI_ORG_ID: str = os.environ.get("OPENAI_ORG_ID", "")
+
 
 settings = Settings()
-print("Settings:")
-pp.pprint(Settings().model_dump())

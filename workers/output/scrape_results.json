@@ -1,0 +1,1492 @@
+{
+  "Genomic Data Commons": [
+    {
+      "name": "Genomic Data Commons",
+      "initials": "GDC",
+      "description": "The NCI Genomic Data Commons (GDC) is a data repository and cancer knowledge base that provides the cancer research community with a unified data system supporting the import and standardization of genomic and clinical data from cancer research programs. The GDC supports the harmonization of sequence data to the genome/transcriptome and applies state-of-the-art methods for derived data.",
+      "logo_url": "https://gdc.cancer.gov/themes/custom/gdc_foundation/images/GDC_LOGO.svg",
+      "categories": [
+        "genomics",
+        "clinical"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://gdc.cancer.gov",
+        "data_landing": "https://portal.gdc.cancer.gov",
+        "git_repository": "https://github.com/NCI-GDC",
+        "submission_portal": "https://portal.gdc.cancer.gov/submission",
+        "site_map": "https://gdc.cancer.gov/sitemap"
+      },
+      "documentation": [
+        {
+          "name": "GDC Docs",
+          "url": "https://docs.gdc.cancer.gov"
+        }
+      ],
+      "access_type": "controlled",
+      "data_types": [
+        "genomics data"
+      ],
+      "contact": {
+        "email": "support@nci-gdc.datacommons.io"
+      }
+    },
+    {
+      "name": "Genomic Data Commons",
+      "initials": "GDC",
+      "description": "Support section for the Genomic Data Commons with webinars listed as part of the resources provided.",
+      "logo_url": "https://gdc.cancer.gov/themes/custom/gdc_foundation/images/GDC_LOGO.svg",
+      "datasets": [
+        "GDC Data Portal",
+        "GDC Data Submission Portal",
+        "GDC Data Transfer Tool",
+        "GDC Docs",
+        "GDC 2.0"
+      ],
+      "categories": [
+        "genomics"
+      ],
+      "tags": [
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://gdc.cancer.gov/",
+        "site_map": "",
+        "data_landing": "https://portal.gdc.cancer.gov/",
+        "git_repository": "https://github.com/NCI-GDC",
+        "git_org": "NCI-GDC",
+        "submission_portal": "https://portal.gdc.cancer.gov/submission",
+        "openapi_spec": "https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started"
+      },
+      "use_cases": [
+        "Genomic Mutation Analysis in GDC 2.0",
+        "Introducing GDC 2.0: A New Cohort-Centric Design",
+        "Downloading Large Data Sets from the GDC",
+        "Navigating the HCMI Searchable Catalog and Accessing Data in the GDC"
+      ],
+      "documentation": [
+        {
+          "name": "Users Guide",
+          "url": "https://docs.gdc.cancer.gov/Data_Portal/Users_Guide/getting_started/"
+        },
+        {
+          "name": "Data Transfer Tool Guide",
+          "url": "https://docs.gdc.cancer.gov/Data_Transfer_Tool/Users_Guide/Getting_Started/"
+        },
+        {
+          "name": "Data Submission Portal Guide",
+          "url": "http://docs.gdc.cancer.gov/Data_Submission_Portal/Users_Guide/Checklist/"
+        },
+        {
+          "name": "API Users Guide",
+          "url": "http://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started/"
+        }
+      ],
+      "external_references": [
+        {
+          "name": "Data_Portal/Users_Guide/Video_Tutorials",
+          "base_url": "https://docs.gdc.cancer.gov/Data_Portal/Users_Guide/Video_Tutorials/"
+        },
+        {
+          "name": "YouTube Playlist",
+          "base_url": "https://www.youtube.com/playlist?list=PLaXJeOudgf60aE6tqrZcIhm9B4Ivxar4a"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "cohorts",
+        "http_api",
+        "ui_case_search"
+      ],
+      "contact": {
+        "email": "support@nci-gdc.datacommons.io",
+        "name": "GDC Help Desk"
+      }
+    }
+  ],
+  "Proteomic Data Commons": [
+    {
+      "name": "National Cancer Institute\u2019s Proteomic Data Commons (PDC)",
+      "initials": "NCI PDC",
+      "description": "The objectives of the National Cancer Institute\u2019s Proteomic Data Commons (PDC) are (1) to make cancer-related proteomic datasets easily accessible to the public, and (2) facilitate direct multiomics integration in support of precision medicine through interoperability with accompanying data resources (genomic and medical image datasets).",
+      "logo_url": "https://pdc.cancer.gov/assets/css/images/PDC-NIH-Logo.png",
+      "categories": [
+        "genomics",
+        "clinical",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://pdc.cancer.gov/",
+        "data_landing": "https://pdc.cancer.gov/pdc/",
+        "submission_portal": "https://pdc.cancer.gov/pdc/submitData",
+        "git_repository": "",
+        "git_org": "",
+        "openapi_spec": "",
+        "site_map": ""
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "PDC API",
+          "url": "https://pdc.cancer.gov/pdc/swagger-ui.html"
+        }
+      ],
+      "collections": [
+        "cohorts",
+        "case sets"
+      ],
+      "data_categories": [
+        "biospecimen",
+        "clinical",
+        "proteomic"
+      ],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [
+        {
+          "name": "NCI Cancer Research Data Commons (CRDC)",
+          "base_url": "https://datacommons.cancer.gov"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "workspaces",
+        "http_api",
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "data_use_limitations": "Distributes controlled access data, such as the patient-specific protein fasta sequence databases, with dbGaP authorization and eRA Commons authentication.",
+      "omics_methods": [],
+      "contact": {
+        "email": "PDCHelpDesk@mail.nih.gov"
+      }
+    },
+    {
+      "name": "Proteomics Data Commons",
+      "initials": "PDC",
+      "description": "PDC data submission and data use are governed by Creative Commons CC-BY 4.0 licensing terms. Users are free to share and adapt the material for any purpose, even commercially. The licensor cannot revoke these freedoms as long as you follow the license terms, which require attribution and do not permit additional restrictions. Users are encouraged not to acquire ownership interest in PDC data or any intellectual property rights in research conducted using the PDC data. Intellectual property on downstream discoveries is recognized as important, especially in therapeutics, to support investment in products that the public needs. For further information about the PDC Intellectual Property policy, contact PDCHelpDesk@mail.nih.gov.",
+      "logo_url": "https://pdc.cancer.gov/assets/css/images/PDC-NIH-Logo.png",
+      "urls": {
+        "home_page": "https://pdc.cancer.gov",
+        "submission_portal": "https://pdc.cancer.gov/pdc/submit",
+        "data_landing": "https://pdc.cancer.gov/pdc/browse"
+      },
+      "capabilities": [
+        "cohorts"
+      ],
+      "file_formats": [
+        "various"
+      ],
+      "access_type": "open",
+      "contact": {
+        "email": "PDCHelpDesk@mail.nih.gov"
+      },
+      "data_use_limitations": "Data used in research shall remain freely available without requiring licensing."
+    },
+    {
+      "name": "NCI Proteomics Data Commons",
+      "initials": "PDC",
+      "description": "The PDC Data Dictionary defines the metadata, data structure, and file formats used within the Proteomics Data Commons. It serves as a guide for researchers to understand the types of data available as well as the standards utilized for data collection, storage, and dissemination. The PDC provides integrative data analysis tools and allows for the submission of proteomic data.",
+      "logo_url": "https://pdc.cancer.gov/assets/css/images/PDC-NIH-Logo.png",
+      "urls": {
+        "home_page": "https://pdc.cancer.gov",
+        "data_landing": "https://pdc.cancer.gov/pdc/data-dictionary",
+        "submission_portal": "https://pdc.cancer.gov/submission/"
+      },
+      "contact": {
+        "email": "PDCHelpDesk@mail.nih.gov"
+      },
+      "categories": [
+        "clinical",
+        "genomics"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "access_type": "mixed"
+    }
+  ],
+  "Clinical and Translational Data Commons": [
+    {
+      "name": "Clinical and Translational Data Commons",
+      "initials": "CTDC",
+      "description": "The Clinical and Translational Data Commons (CTDC) is being developed to accelerate scientific discoveries that make an impact on cancer outcomes to help people live longer, healthier lives. The CTDC supports cancer research by sharing NCI-funded clinical studies, with features including: Data Exploration dashboard, Multiple data types, Data harmonization, Data visualization and analysis on the cloud, Developer resources, and Federated identity management system.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "categories": [
+        "clinical"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/repository/clinical-and-translational-data-commons",
+        "submission_portal": "https://datacommons.cancer.gov/submit",
+        "data_landing": "https://datacommons.cancer.gov/explore/data-commons"
+      },
+      "use_cases": [],
+      "documentation": [],
+      "data_categories": [
+        "Clinical data and reports",
+        "Molecular findings and sequence annotation"
+      ],
+      "data_types": [
+        "txt",
+        "pdf",
+        "vcf",
+        "bam"
+      ],
+      "file_formats": [
+        "txt",
+        "pdf",
+        "vcf",
+        "bam"
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "workspaces",
+        "http_api",
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "data_use_limitations": "Federated identity management system for easy, secure access to registered and controlled access data.",
+      "omics_methods": [],
+      "contact": {
+        "email": "NCIinfo@nih.gov"
+      }
+    },
+    {
+      "name": "NCI Cancer Moonshot Biobank",
+      "initials": "NCI CMB",
+      "description": "The Cancer Moonshot Biobank is a 5-year project to learn more about cancer with the help of participants who donate samples as they receive treatment. It aims to help change the future of cancer treatments by enabling the discovery of new cancer therapies, thus helping patients everywhere.",
+      "logo_url": "https://moonshotbiobank.cancer.gov/assets/images/biobank-logo.svg",
+      "categories": [
+        "clinical",
+        "genomics"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://moonshotbiobank.cancer.gov/",
+        "site_map": null,
+        "data_landing": null,
+        "git_repository": null,
+        "git_org": null,
+        "submission_portal": null,
+        "openapi_spec": null
+      },
+      "use_cases": null,
+      "documentation": [],
+      "collections": [],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [],
+      "access_type": null,
+      "capabilities": [],
+      "omics_methods": [],
+      "contact": {
+        "email": "moonshotbiobank@nih.gov",
+        "name": null
+      }
+    }
+  ],
+  "Imaging Data Commons": [
+    {
+      "name": "IDC User Guide",
+      "urls": {
+        "home_page": "https://learn.canceridc.dev/",
+        "data_landing": "https://learn.canceridc.dev/getting-started-with-idc"
+      }
+    },
+    {
+      "name": "Imaging Data Commons User Guide",
+      "description": "The page outlines the core functions of the Imaging Data Commons, covering cloud-based analysis, FAIR science, use cases, open-source contributions, and community building. It emphasizes connecting cancer researchers to data and compute resources on the cloud, implementing FAIR principles, applying the DICOM standard for imaging data, solving research problems through developed technology, harmonizing data, supporting open-source tools, and fostering an open and supportive community for cancer imaging research.",
+      "urls": {
+        "home_page": "https://learn.canceridc.dev",
+        "data_landing": "https://learn.canceridc.dev/core-functions-of-idc"
+      },
+      "use_cases": [
+        "Connect cancer researchers with data and compute resources co-located on the cloud.",
+        "Enable building of imaging-focused cohorts for cross-omics analyses.",
+        "Implement and refine FAIR data stewardship principles for cancer imaging research.",
+        "Apply DICOM standard to harmonize imaging and image-derived cancer imaging data.",
+        "Define best practices for using and generating FAIR data.",
+        "Apply developed technology to meaningful research problems in radiology, digital pathology, etc.",
+        "Develop examples of harmonization of images, image-derived, and image-related data.",
+        "Simplify access to open source image computing tools.",
+        "Support adoption of IDC-developed tools.",
+        "Identify and address unmet needs of the cancer imaging community.",
+        "Promote openness, support, and education."
+      ]
+    },
+    {
+      "name": "Imaging Data Commons (IDC)",
+      "initials": "IDC",
+      "description": "IDC User Guide to accessing and understanding the publicly available radiology collections and analysis results from The Cancer Imaging Archive (TCIA), whole slide pathology images, The Cancer Genome Atlas (TCGA), National Lung Screening Trial (NLST), fluorescence images from the Human Tumor Atlas Network (HTAN), and more.",
+      "logo_url": "https://learn.canceridc.dev/learn.canceridc.dev/static/media/logo-without-text.99ad4d78.svg",
+      "datasets": [
+        "The Cancer Imaging Archive (TCIA)",
+        "The Cancer Genome Atlas (TCGA)",
+        "National Lung Screening Trial (NLST)",
+        "Human Tumor Atlas Network (HTAN)"
+      ],
+      "categories": [
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://learn.canceridc.dev",
+        "site_map": "",
+        "data_landing": "",
+        "git_repository": "",
+        "git_org": "",
+        "submission_portal": "",
+        "openapi_spec": ""
+      },
+      "use_cases": [
+        ""
+      ],
+      "documentation": [],
+      "collections": [
+        "cohorts"
+      ],
+      "data_categories": [
+        "DICOM"
+      ],
+      "data_types": [
+        "radiology collections",
+        "analysis results collections",
+        "whole slide pathology images",
+        "fluorescence images"
+      ],
+      "file_formats": [
+        "DICOM"
+      ],
+      "external_references": [],
+      "access_type": "open",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "http_api",
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "data_use_limitations": "",
+      "omics_methods": [],
+      "contact": {}
+    },
+    {
+      "name": "Imaging Data Commons User Guide",
+      "initials": "IDC",
+      "description": "IDC User Guide with frequently asked questions about data download from IDC, data submissions, the cost of using the cloud, and other related topics.",
+      "logo_url": "https://www.gitbook.com/?utm_source=content&utm_medium=trademark&utm_campaign=-MCTG4fXybYgGMalZnmf-2668963341",
+      "datasets": [
+        "TCIA",
+        "HTAN"
+      ],
+      "categories": [
+        "imaging"
+      ],
+      "tags": [
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://learn.canceridc.dev",
+        "site_map": null,
+        "data_landing": null,
+        "git_repository": null,
+        "git_org": null,
+        "submission_portal": "mailto:support+submissions@canceridc.dev",
+        "openapi_spec": null
+      },
+      "use_cases": [
+        "data exploration",
+        "visualization",
+        "subsetting",
+        "cohort building"
+      ],
+      "documentation": [
+        {
+          "name": "FAQ",
+          "url": "https://learn.canceridc.dev/frequently-asked-questions"
+        }
+      ],
+      "collections": [
+        "cohorts"
+      ],
+      "data_categories": [
+        "clinical data",
+        "DICOM attributes",
+        "imaging metadata",
+        "non-imaging data"
+      ],
+      "file_formats": [
+        "DICOM"
+      ],
+      "external_references": [
+        {
+          "name": "TCIA",
+          "base_url": "https://www.cancerimagingarchive.net"
+        }
+      ],
+      "access_type": "open",
+      "capabilities": [
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "omics_methods": [],
+      "contact": {
+        "email": "support+submissions@canceridc.dev"
+      },
+      "data_use_limitations": "IDC only hosts public datasets and does not support access limitations such as data embargoes or sequestration."
+    },
+    {
+      "name": "IDC User Guide",
+      "description": "The IDC User Guide provides support resources, user guides, and frequently asked questions regarding the Imaging Data Commons (IDC) platform. Users can find information on the core functions of IDC, how to get started, and other topics such as cloud platforms, DICOM standards, and downloading data. The guide also offers specialized channels for IDC support, including public forums and an NIH initiative for discounted cloud resources and training.",
+      "logo_url": "",
+      "datasets": [],
+      "categories": [
+        "imaging"
+      ],
+      "tags": [
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://learn.canceridc.dev",
+        "site_map": "",
+        "data_landing": "",
+        "git_repository": "",
+        "git_org": "",
+        "submission_portal": "",
+        "openapi_spec": ""
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "IDC User Guide",
+          "url": "https://learn.canceridc.dev"
+        }
+      ],
+      "collections": [],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [
+        {
+          "name": "NIH STRIDES Initiative",
+          "base_url": "https://datascience.nih.gov/strides"
+        }
+      ],
+      "access_type": "open",
+      "capabilities": [],
+      "data_use_limitations": "",
+      "omics_methods": [],
+      "contact": {
+        "email": "",
+        "name": ""
+      }
+    }
+  ],
+  "Cancer Research Data Commons": [
+    {
+      "name": "Cancer Data Commons",
+      "initials": "CDC",
+      "description": "Cancer Data Commons (CDC) is a data portal that aims to facilitate data exploration and analysis by providing resources and tools for cancer research. The CDC aggregates data from multiple sources and enables researchers to access and work with the data in a streamlined manner. It offers various data commons with visualization and analytical tools, metadata exploration through the Cancer Data Aggregator (CDA), and access to cloud resources to avoid the need for large local data downloads.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "datasets": [
+        "APOLLO",
+        "CPTAC",
+        "TARGET"
+      ],
+      "categories": [
+        "genomics",
+        "clinical"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "data_landing": "https://datacommons.cancer.gov/explore",
+        "site_map": null,
+        "git_repository": null,
+        "submission_portal": "https://datacommons.cancer.gov/submit"
+      },
+      "use_cases": [
+        "Exploring Data using Data Commons",
+        "Aggregated Exploration Across Data Commons",
+        "Data Exploration through the CRDC Cloud Resources",
+        "CRDC Core Standards and Services"
+      ],
+      "documentation": [],
+      "collections": [
+        "cohorts",
+        "case sets"
+      ],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [],
+      "access_type": "mixed",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "http_api",
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "omics_methods": [],
+      "contact": {
+        "email": "NCIinfo@nih.gov"
+      }
+    },
+    {
+      "name": "Cancer Data Commons",
+      "initials": "CRDC",
+      "description": "CRDC Cloud Resources and Data Commons offer support to researchers at all stages of their careers through community forums, training events, tutorials, and virtual office hours. Cloud Resources make data accessible in a secure environment, providing access to data from NCI-funded programs, and allowing data upload for comparative analysis and secure collaboration. CRDC Data Commons store, manage, and make data searchable and accessible for analysis.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "data_landing": "https://datacommons.cancer.gov/explore/data-commons",
+        "submission_portal": "https://datacommons.cancer.gov/submit",
+        "openapi_spec": "https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/"
+      },
+      "use_cases": [
+        "CRDC Cloud Resources make data accessible in a secure environment.",
+        "CRDC Data Commons make data searchable and accessible for analysis."
+      ],
+      "documentation": [
+        {
+          "name": "CRDC FAQs",
+          "url": "https://datacommons.cancer.gov/crdc-faqs"
+        },
+        {
+          "name": "GDC Webinars",
+          "url": "https://gdc.cancer.gov/support/gdc-webinars"
+        },
+        {
+          "name": "GDC FAQs",
+          "url": "https://gdc.cancer.gov/about-gdc/gdc-faqs"
+        },
+        {
+          "name": "PDC FAQs",
+          "url": "https://pdc.cancer.gov/pdc/faq"
+        },
+        {
+          "name": "IDC Resources",
+          "url": "https://learn.canceridc.dev/"
+        }
+      ],
+      "collections": [
+        "cohorts"
+      ],
+      "data_categories": [
+        "Cloud Resources",
+        "Data Commons"
+      ],
+      "file_formats": [
+        "JSON"
+      ],
+      "external_references": [
+        {
+          "name": "Terra Support",
+          "base_url": "https://support.terra.bio/hc/en-us"
+        },
+        {
+          "name": "ISB-CGC Docs",
+          "base_url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/"
+        },
+        {
+          "name": "Seven Bridges CGC",
+          "base_url": "https://www.cancergenomicscloud.org/"
+        }
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "http_api"
+      ],
+      "data_use_limitations": "Some data may have use restrictions.",
+      "contact": {
+        "email": "NCIinfo@nih.gov"
+      }
+    },
+    {
+      "name": "Cancer Data Commons",
+      "initials": "CRDC",
+      "description": "The CRDC team tracks usage metrics, citations, and peer reviewed papers that re-use CRDC data for comparative analysis and/or to test computation methods.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "categories": [
+        "clinical",
+        "genomics",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "site_map": null,
+        "data_landing": "https://datacommons.cancer.gov/explore",
+        "git_repository": null,
+        "git_org": null,
+        "submission_portal": "https://datacommons.cancer.gov/submit",
+        "openapi_spec": null
+      },
+      "use_cases": [
+        "Re-use CRDC data for comparative analysis",
+        "Test computation methods"
+      ],
+      "documentation": [
+        {
+          "name": "Select Publications",
+          "url": "https://datacommons.cancer.gov/publications/selected-publications"
+        }
+      ],
+      "collections": [
+        "cohorts"
+      ],
+      "data_categories": [
+        "genomics",
+        "clinical trials",
+        "imaging data"
+      ],
+      "data_types": [
+        "datasets"
+      ],
+      "file_formats": [
+        "json",
+        "tsv",
+        "bam",
+        "tif",
+        "png",
+        "bedpe",
+        "excel",
+        "idat",
+        "txt"
+      ],
+      "external_references": [
+        {
+          "name": "AACR Cancer Research",
+          "base_url": "https://www.aacr.org/"
+        },
+        {
+          "name": "Scottish Childhood Cancer Survivor Study",
+          "base_url": "https://www.nature.com/sdata/"
+        },
+        {
+          "name": "UCSC Xena",
+          "base_url": "https://xenabrowser.net/"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "http_api",
+        "ui_case_search"
+      ],
+      "omics_methods": [
+        "genomics",
+        "proteomics"
+      ],
+      "contact": {
+        "email": "NCIinfo@nih.gov",
+        "name": "National Cancer Institute"
+      }
+    },
+    {
+      "name": "National Cancer Institute",
+      "description": "The National Cancer Institute's (NCI) Center for Biomedical Informatics and Information Technology (CBIIT) provides data and resources that leverage the immense potential of computational and informational advances that enable researchers and clinicians to accelerate research, clinical care, and precision medicine.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "categories": [
+        "clinical",
+        "genomics"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "site_map": null,
+        "data_landing": "https://datacommons.cancer.gov/explore/data-commons",
+        "submission_portal": "https://datacommons.cancer.gov/submit",
+        "git_repository": null
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "CRDC Fact Sheet",
+          "url": "https://datacommons.cancer.gov/sites/default/files/2024-03/CRDC_One_pager_v6.pdf"
+        }
+      ],
+      "collections": [
+        "cohorts"
+      ],
+      "data_categories": [
+        "Genomic Data",
+        "Clinical Data",
+        "Proteomic Data",
+        "Imaging Data"
+      ],
+      "data_types": [],
+      "file_formats": [
+        "json",
+        "tsv",
+        "bam",
+        "tif",
+        "png",
+        "bedpe",
+        "excel",
+        "idat",
+        "txt"
+      ],
+      "external_references": [
+        {
+          "name": "CBIIT",
+          "base_url": "https://datascience.cancer.gov/"
+        },
+        {
+          "name": "NCI Office of Data Sharing",
+          "base_url": "https://datascience.cancer.gov/data-sharing"
+        }
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "ui_case_search"
+      ],
+      "data_use_limitations": "Please refer to the NCI Office of Data Sharing website for more information.",
+      "omics_methods": [],
+      "contact": {
+        "email": "NCICRDC@mail.nih.gov",
+        "name": "CRDC team"
+      }
+    },
+    {
+      "name": "Cancer Data Commons",
+      "initials": "CRDC",
+      "description": "The Cancer Data Commons hosts various datasets for research and analysis, including genomics, proteomics, and imaging data.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "datasets": [
+        "Applied Proteogenomics Organizational Learning and Outcomes (APOLLO)",
+        "Cancer Genome Characterization Initiative (CGCI)",
+        "Childhood Cancer Data Initiative (CCDI)",
+        "Clinical Proteomic Tumor Analysis Consortium (CPTAC)",
+        "Genome Sequencing Program (GSP)",
+        "Human Cancer Models Initiative (HCMI)",
+        "Human Tumor Atlas Network (HTAN)",
+        "International Cancer Proteogenome Consortium (ICPC)",
+        "Multiple Myeloma Research Foundation (MMRF)"
+      ],
+      "categories": [
+        "genomics",
+        "clinical",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "data_landing": "https://datacommons.cancer.gov/explore/select-datasets",
+        "submission_portal": "https://datacommons.cancer.gov/submit",
+        "site_map": null,
+        "git_repository": "https://github.com/NCI-GDC",
+        "git_org": null,
+        "openapi_spec": null
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "Cancer Data Service",
+          "url": "https://dataservice.datacommons.cancer.gov/#/home"
+        },
+        {
+          "name": "Genomic Data Commons",
+          "url": "https://gdc.cancer.gov/"
+        },
+        {
+          "name": "Imaging Data Commons",
+          "url": "https://portal.imaging.datacommons.cancer.gov/"
+        },
+        {
+          "name": "Integrated Canine Data Commons",
+          "url": "https://caninecommons.cancer.gov/#/"
+        },
+        {
+          "name": "Proteomic Data Commons",
+          "url": "https://pdc.cancer.gov/pdc/"
+        }
+      ],
+      "collections": [],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [],
+      "access_type": null,
+      "capabilities": [
+        "ui_case_search"
+      ],
+      "data_use_limitations": null,
+      "omics_methods": [],
+      "contact": {
+        "email": "NCIinfo@nih.gov",
+        "name": "National Cancer Institute"
+      }
+    },
+    {
+      "name": "The Cancer Research Data Commons (CRDC)",
+      "description": "The CRDC FAQ page contains frequently asked questions about the Cancer Research Data Commons (CRDC), including information on data submission, costs associated with data submission and storage, and other related topics.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/",
+        "data_landing": "https://datacommons.cancer.gov/explore",
+        "submission_portal": "https://datacommons.cancer.gov/submit"
+      },
+      "documentation": [
+        {
+          "name": "NCI Policy related questions",
+          "url": "https://datascience.cancer.gov/data-sharing/policies"
+        },
+        {
+          "name": "NIH Scientific Data Sharing",
+          "url": "https://sharing.nih.gov/data-management-and-sharing-policy/sharing-scientific-data/repositories-for-sharing-scientific-data"
+        }
+      ],
+      "external_references": [
+        {
+          "name": "International Cancer Proteogenome Consortium (ICPC)",
+          "base_url": "https://proteomics.cancer.gov/programs/international-cancer-proteogenome-consortium"
+        }
+      ]
+    }
+  ],
+  "Cancer Data Service": [
+    {
+      "name": "Cancer Data Service",
+      "initials": "CDS",
+      "description": "The Cancer Data Service (CDS) is one of several data commons within the Cancer Research Data Commons (CRDC). The CDS provides data storage and sharing capabilities for NCI-funded studies that fall under the following categories: Studies with data that do not match an existing CRDC data commons, studies with data that do not fit current data type criteria and/or the minimum metadata standards for a CRDC data commons. CDS currently hosts a variety of data types from NCI projects such as the Human Tumor Atlas Network (HTAN), Division of Cancer Control and Population Sciences (DCCPS), and Childhood Cancer Data Initiative (CCDI) as well as data from independent research projects.",
+      "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo.svg",
+      "datasets": [
+        "Childhood Cancer Data Initiative (CCDI): Genomic Analysis in Pediatric Malignancies - phs002430.v1.p1",
+        "DCCPS CIDR: The Role of Rare Coding Variation in Prostate Cancer in Men of African Ancestry - RESPOND Project 2 \u2013 phs002637.v1.p1",
+        "CCDI: MCI - Molecular Characterization Initiative \u2013 phs002790.v5.p1",
+        "TCGA WGS Variants Across 18 Cancer Types - phs003155.v1.p1",
+        "and more..."
+      ],
+      "categories": [
+        "genomics",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://datacommons.cancer.gov/repository/cancer-data-service",
+        "data_landing": "https://dataservice.datacommons.cancer.gov/#/home",
+        "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit",
+        "openapi_spec": "https://dataservice.datacommons.cancer.gov/#/analysis"
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "CDS User Guide",
+          "url": "https://dataservice.datacommons.cancer.gov/#/submit"
+        },
+        {
+          "name": "Access and Analysis Guide",
+          "url": "https://dataservice.datacommons.cancer.gov/#/analysis"
+        }
+      ],
+      "data_categories": [
+        "Genomic",
+        "Imaging"
+      ],
+      "data_types": [
+        "Genomic",
+        "Imaging"
+      ],
+      "file_formats": [],
+      "external_references": [
+        {
+          "name": "Cancer Genomics Cloud",
+          "base_url": "https://www.cancergenomicscloud.org/"
+        },
+        {
+          "name": "dbGaP",
+          "base_url": "https://dbgap.ncbi.nlm.nih.gov/aa/wga.cgi?page=login"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "http_api",
+        "ui_case_search"
+      ],
+      "data_use_limitations": "The CDS is home to both open and controlled access data. Open-access data are publicly accessible; no approval is required. Controlled-access data require requesting access through dbGaP.",
+      "omics_methods": [],
+      "contact": {
+        "email": "CDSHelpDesk@mail.nih.gov"
+      }
+    },
+    {
+      "name": "Cancer Data Service (CDS)",
+      "description": "A data repository in the Cancer Research Data Commons (CRDC) ecosystem for storing and sharing data generated by NCI funded programs. The CDS provides secure and authorized storage and data sharing capabilities in the cloud for studies that are not a good match for submission to other CRDC repositories. The CDS will host cancer data of all types including genomic, proteomic, and imaging data.",
+      "logo_url": "https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/cds/landing/landingTile1.png",
+      "categories": [
+        "genomics",
+        "proteomics",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://dataservice.datacommons.cancer.gov/#/home",
+        "site_map": null,
+        "data_landing": "https://dataservice.datacommons.cancer.gov/#/data",
+        "git_repository": null,
+        "submission_portal": "https://dataservice.datacommons.cancer.gov/#/datasubmit"
+      },
+      "external_references": [
+        {
+          "name": "Cancer Research Data Commons (CRDC)",
+          "base_url": "https://datacommons.cancer.gov/"
+        }
+      ],
+      "contact": {
+        "email": "cdshelpdesk@mail.nih.gov"
+      }
+    },
+    {
+      "name": "Data Commons",
+      "initials": "CDS",
+      "description": "SEARCH CDS",
+      "logo_url": "https://raw.githubusercontent.com/cbiit/datacommons-assets/main/bento/images/icons/png/footerlogo.png",
+      "categories": [
+        "genomics",
+        "clinical",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://dataservice.datacommons.cancer.gov/",
+        "site_map": null,
+        "data_landing": "https://datacommons.cancer.gov/",
+        "git_repository": null,
+        "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit",
+        "openapi_spec": "https://dataservice.datacommons.cancer.gov/#/graphql"
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "Support",
+          "url": "https://dataservice.datacommons.cancer.gov/#/support"
+        },
+        {
+          "name": "Resources",
+          "url": "https://dataservice.datacommons.cancer.gov/#/resources"
+        }
+      ],
+      "collections": [
+        "case sets",
+        "cohorts",
+        "projects"
+      ],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [],
+      "access_type": "open",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "graphql",
+        "sql",
+        "http_api",
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "contact": {
+        "email": null,
+        "name": null
+      }
+    },
+    {
+      "name": "National Cancer Institute Data Commons",
+      "initials": "CDS",
+      "description": "The Cancer Data Service (CDS) is a community-driven data service ecosystem for sharing, integrating, analyzing, and managing cancer research data.",
+      "logo_url": "https://raw.githubusercontent.com/cbiit/datacommons-assets/main/bento/images/icons/png/footerlogo.png",
+      "urls": {
+        "home_page": "https://dataservice.datacommons.cancer.gov/",
+        "site_map": null,
+        "data_landing": "https://dataservice.datacommons.cancer.gov/#/studies",
+        "git_repository": null,
+        "git_org": null,
+        "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit",
+        "openapi_spec": "https://dataservice.datacommons.cancer.gov/#/graphql"
+      },
+      "capabilities": [
+        "cohorts",
+        "graphql"
+      ],
+      "categories": [
+        "genomics",
+        "clinical",
+        "imaging"
+      ],
+      "tags": [
+        "cancer"
+      ],
+      "contact": {
+        "email": null
+      },
+      "access_type": "controlled"
+    },
+    {
+      "name": "Cancer Data Service (CDS)",
+      "initials": "CDS",
+      "description": "The Cancer Data Service (CDS) is a service provided by the National Cancer Institute (NCI) to facilitate cancer research by providing access to various cancer-related data collected from studies, participants, samples, and files.",
+      "logo_url": "https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/cds/icons/svgs/files.svg",
+      "categories": [
+        "genomics",
+        "clinical"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://dataservice.datacommons.cancer.gov/#/cancerDataService",
+        "site_map": null,
+        "data_landing": "https://dataservice.datacommons.cancer.gov/#/cancerDataService",
+        "git_repository": "https://github.com/CBIIT/datacommons-assets",
+        "git_org": "CBIIT",
+        "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit",
+        "openapi_spec": "https://dataservice.datacommons.cancer.gov/#/graphql"
+      },
+      "contact": {
+        "email": null,
+        "name": null
+      }
+    }
+  ],
+  "Seven Bridges Cancer Genomics Cloud": [
+    {
+      "name": "Cancer Genomics Cloud",
+      "initials": "CGC",
+      "description": "The Cancer Genomics Cloud (CGC), powered by Seven Bridges, is a comprehensive cloud resource that allows any researcher to interactively analyze and visualize large-scale cancer genomics datasets and algorithms. ",
+      "logo_url": "https://cgc.sbgenomics.com/assets/sbg_logo.png",
+      "categories": [
+        "genomics",
+        "clinical",
+        "imaging"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://cancergenomicscloud.org",
+        "data_landing": "https://cgc.sbgenomics.com/"
+      },
+      "use_cases": [
+        "creating a project on the CGC and running an analysis"
+      ],
+      "documentation": [
+        {
+          "name": "Knowledge Center",
+          "url": "https://docs.cancergenomicscloud.org"
+        }
+      ],
+      "collections": [
+        "projects"
+      ],
+      "external_references": [
+        {
+          "name": "Cancer Genomics Cloud Support",
+          "base_url": "mailto:support@sbgenomics.com"
+        }
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "ui_case_search"
+      ],
+      "data_use_limitations": "Pilot funds for using CGC are available upon request; contact our Support for more information.",
+      "contact": {
+        "email": "support@sbgenomics.com"
+      }
+    },
+    {
+      "name": "Cancer Genomics Cloud",
+      "description": "Uncontrolled Data QuickStart Guide for the Cancer Genomics Cloud (CGC), detailing the steps for project creation, adding files, and running analyses on the CGC platform.",
+      "logo_url": "https://cgc.sbgenomics.com/assets/images/sbg-logo.svg",
+      "categories": [
+        "clinical"
+      ],
+      "tags": [
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://cancergenomicscloud.org",
+        "git_repository": "https://github.com/sbg"
+      },
+      "use_cases": [
+        "Creating a project",
+        "Adding files to a project for analysis",
+        "Running analyses using public apps",
+        "Reviewing completed analyses and planning next steps",
+        "Working with controlled data"
+      ],
+      "documentation": [
+        {
+          "name": "Knowledge Center",
+          "url": "https://docs.cancergenomicscloud.org/docs"
+        },
+        {
+          "name": "Seven Bridges Platform Blog",
+          "url": "https://www.sevenbridges.com/blog/"
+        }
+      ],
+      "collections": [
+        "projects"
+      ],
+      "data_types": [
+        "public data",
+        "controlled-access patient data"
+      ],
+      "file_formats": [
+        "CWL"
+      ],
+      "external_references": [
+        {
+          "name": "Controlled Data Access Information",
+          "base_url": "http://www.cancergenomicscloud.org/controlled-access-data"
+        }
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "workspaces",
+        "ui_case_search"
+      ],
+      "omics_methods": [
+        "genomics"
+      ],
+      "contact": {
+        "email": "support@sbgenomics.com"
+      }
+    },
+    {
+      "name": "Seven Bridges - Cancer Genomics Cloud",
+      "initials": "CGC",
+      "description": "The Cancer Genomics Cloud (CGC), powered by Seven Bridges, is one of three pilot systems funded by the National Cancer Institute to explore the paradigm of collocating massive genomics datasets, like The Cancer Genome Atlas (TCGA), alongside secure and compliant analytic capabilities.",
+      "logo_url": "https://www.cancergenomicscloud.org/static/images/svg/logo-color.svg",
+      "datasets": [
+        "The Cancer Genome Atlas (TCGA)",
+        "Clinical Proteomic Tumor Analysis Consortium (CPTAC)",
+        "The Cancer Imaging Archive (TCIA) dataset",
+        "Therapeutically Applicable Research to Generate Effective Treatments (TARGET)",
+        "International Cancer Genome Consortium (ICGC) dataset"
+      ],
+      "categories": [
+        "clinical",
+        "imaging",
+        "genomics"
+      ],
+      "tags": [
+        "human",
+        "cancer",
+        "genomics",
+        "proteomics",
+        "imaging"
+      ],
+      "urls": {
+        "home_page": "https://www.cancergenomicscloud.org",
+        "data_landing": "https://docs.cancergenomicscloud.org/docs/about-datasets",
+        "submission_portal": "https://docs.cancergenomicscloud.org/docs/dbgap-controlled-data-access",
+        "openapi_spec": "https://docs.cancergenomicscloud.org/reference"
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "Documentation",
+          "url": "https://docs.cancergenomicscloud.org/docs/about-datasets"
+        }
+      ],
+      "collections": [
+        "projects"
+      ],
+      "data_categories": [
+        "Open Data",
+        "Controlled Data"
+      ],
+      "data_types": [
+        "genomic",
+        "clinical",
+        "imaging"
+      ],
+      "file_formats": [
+        "FASTQ",
+        "BAM",
+        "DICOM"
+      ],
+      "external_references": [
+        {
+          "name": "National Cancer Institute (NCI)",
+          "base_url": "https://www.cancer.gov/"
+        },
+        {
+          "name": "National Human Genome Research Institute (NHGRI)",
+          "base_url": "https://www.genome.gov/"
+        },
+        {
+          "name": "U.S. Department of Health and Human Services",
+          "base_url": "http://www.hhs.gov/"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "ui_case_search",
+        "ui_organ_search"
+      ],
+      "omics_methods": [
+        "Whole Genome Sequencing (WGS)",
+        "RNA Sequencing (RNA-Seq)",
+        "Whole Genome Bisulphite Sequencing (WGBS)"
+      ],
+      "contact": {
+        "email": null,
+        "name": null
+      }
+    }
+  ],
+  "ISB Cancer Gateway in the Cloud": [
+    {
+      "name": "ISB Cancer Gateway in the Cloud",
+      "initials": "ISB-CGC",
+      "description": "The ISB-CGC platform offers both web-based (via a web application) and programmatic access to data hosted by institutes such as the Genomic Data Commons (GDC) and the Proteomic Data Commons (PDC) of the National Cancer Institute (NCI) and Human Tumor Atlas Network (HTAN), leveraging many aspects of the Google Cloud Platform. To get started, you\u2019ll need a Google Cloud Project. Additionally, to access controlled data, you\u2019ll also need dbGaP authorization.",
+      "logo_url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/_images/GettingStarted.png",
+      "urls": {
+        "home_page": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/index.html",
+        "git_repository": "https://github.com/isb-cgc/readthedocs",
+        "data_landing": "https://isb-cgc.appspot.com/",
+        "submission_portal": "https://cloud.google.com/resource-manager/docs/creating-managing-projects",
+        "openapi_spec": "https://isb-cgc.appspot.com/docs/apis"
+      },
+      "categories": [
+        "genomics",
+        "clinical"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "use_cases": [
+        "Perform analysis using web-based interactive analysis, Google BigQuery, and APIs and VMs."
+      ],
+      "documentation": [
+        {
+          "name": "Quick-Start Guide",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowToGetStartedonISB-CGC.html"
+        },
+        {
+          "name": "Google Cloud Project Setup",
+          "url": "https://cloud.google.com/resource-manager/docs/creating-managing-projects"
+        },
+        {
+          "name": "GDC Data Access",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/Gaining-Access-To-Controlled-Access-Data.html"
+        }
+      ],
+      "collections": [
+        "cohorts"
+      ],
+      "data_types": [
+        "Public accessible tumor and disease samples",
+        "Private restricted access datasets"
+      ],
+      "external_references": [
+        {
+          "name": "Genomic Data Commons (GDC)",
+          "base_url": "https://portal.gdc.cancer.gov/"
+        },
+        {
+          "name": "Proteomic Data Commons (PDC)",
+          "base_url": "https://pdc.cancer.gov/"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "workspaces",
+        "cohorts",
+        "http_api",
+        "ui_case_search"
+      ],
+      "data_use_limitations": "To access controlled data, dbGaP authorization is required. User\u2019s Google identity is added to the ACL for controlled data, which must be renewed every 24 hours.",
+      "contact": {
+        "email": "feedback@isb-cgc.org"
+      }
+    },
+    {
+      "name": "ISB Cancer Genomics Cloud",
+      "initials": "ISB-CGC",
+      "description": "ISB Cancer Genomics Cloud (ISB-CGC) FAQ provides answers to frequently asked questions regarding accounts, cloud projects, the web interface, data access, data content, Python and R users, and Regulome Explorer users.",
+      "logo_url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/_images/isb-cgc-logo.png",
+      "datasets": [
+        "TCGA"
+      ],
+      "categories": [
+        "genomics"
+      ],
+      "tags": [
+        "human"
+      ],
+      "urls": {
+        "home_page": "https://isb-cgc.org",
+        "site_map": "",
+        "data_landing": "",
+        "git_repository": "https://github.com/isb-cgc/readthedocs",
+        "git_org": "isb-cgc",
+        "submission_portal": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/cBioPortal/SubmitData.html",
+        "openapi_spec": ""
+      },
+      "use_cases": [
+        "Accessing TCGA data hosted by ISB-CGC",
+        "Running big jobs using Google Compute Engine on TCGA data with cloud credits",
+        "Linking Google identity with NIH identity"
+      ],
+      "documentation": [
+        {
+          "name": "How to Request Cloud Credits",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowtoRequestCloudCredits.html"
+        },
+        {
+          "name": "Google Cloud Project Setup and Data Access",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowToGetStartedonISB-CGC.html#data-access-and-google-cloud-project-setup"
+        },
+        {
+          "name": "Understanding Data Security",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/data/TCGA_Data_Security.html"
+        },
+        {
+          "name": "Community Notebooks",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/HowTos.html"
+        }
+      ],
+      "collections": [
+        "projects"
+      ],
+      "data_categories": [
+        "DNA and RNA sequence data"
+      ],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [
+        {
+          "name": "National Institutes of Health (NIH)",
+          "base_url": "https://www.nih.gov"
+        },
+        {
+          "name": "dbGaP",
+          "base_url": "https://dbgap.ncbi.nlm.nih.gov"
+        },
+        {
+          "name": "BigQuery",
+          "base_url": "https://console.cloud.google.com/bigquery"
+        }
+      ],
+      "access_type": "controlled",
+      "capabilities": [
+        "workspaces",
+        "http_api",
+        "ui_case_search"
+      ],
+      "data_use_limitations": "Access to certain ISB-CGC hosted data requires dbGaP authorization prior to access.",
+      "omics_methods": [],
+      "contact": {
+        "email": "feedback@isb-cgc.org",
+        "name": "ISB-CGC Support Team"
+      }
+    },
+    {
+      "name": "ISB Cancer Gateway in the Cloud",
+      "initials": "ISB-CGC",
+      "description": "ISB-CGC Data Overview provides details on the data available through the ISB-CGC platform. The data primarily originates from NCI's Genomic Data Commons (GDC) and also includes Proteomics Data Commons (PDC) data available in ISB-CGC Google BigQuery tables. Processed data is open-access while raw data is controlled-access, accessible through Google Cloud Storage buckets. The platform offers access to high-level clinical, biospecimen, and molecular data as well as metadata about files in GDC Google Cloud Storage and genome reference sources.",
+      "logo_url": "",
+      "datasets": [
+        "Genomic Data Commons (GDC)",
+        "Proteomics Data Commons (PDC)"
+      ],
+      "categories": [
+        "genomics"
+      ],
+      "tags": [
+        "human",
+        "cancer"
+      ],
+      "urls": {
+        "home_page": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/index.html",
+        "site_map": "",
+        "data_landing": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/ExploringISB-CGC.html",
+        "git_repository": "https://github.com/isb-cgc/readthedocs",
+        "git_org": "isb-cgc",
+        "submission_portal": "",
+        "openapi_spec": ""
+      },
+      "use_cases": [],
+      "documentation": [
+        {
+          "name": "ISB-CGC Data Overview",
+          "url": "https://isb-cancer-genomics-cloud.readthedocs.io/en/latest/sections/ExploringISB-CGC.html"
+        }
+      ],
+      "collections": [],
+      "data_categories": [],
+      "data_types": [],
+      "file_formats": [],
+      "external_references": [
+        {
+          "name": "Genomic Data Commons (GDC)",
+          "base_url": "https://pdc.cancer.gov/pdc/"
+        },
+        {
+          "name": "Proteomics Data Commons (PDC)",
+          "base_url": "https://pdc.cancer.gov/pdc/"
+        }
+      ],
+      "access_type": "mixed",
+      "capabilities": [
+        "http_api",
+        "ui_case_search"
+      ],
+      "data_use_limitations": "",
+      "omics_methods": [],
+      "contact": {
+        "email": "support@isb-cgc.org"
+      }
+    }
+  ]
+}

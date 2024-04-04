@@ -5,7 +5,7 @@ from openai import OpenAI
 import re
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from .scrape_schema import schema, simple_schema
+from .scrape_schema import schema
 
 # truncate to MAX_CHAR_LIMIT chars before passing to GPT
 MAX_CHAR_LIMIT = 80000
@@ -88,7 +88,7 @@ class GPTScraper:
             html = re.sub(regex, "", html, flags=re.DOTALL)
         return html
 
-    def scrape_page(self, name: str, target_url: str) -> dict[str, Any]:
+    def scrape_page(self, target_url: str) -> dict[str, Any]:
         """
         uses selenium to fetch page contents with scripts included and ran
         before filtering the html and passing the rest to GPT
@@ -110,13 +110,13 @@ class GPTScraper:
             return {}
 
         metadata_dict = self.gpt_scrape_html(target_url, html_text[:MAX_CHAR_LIMIT])
+        metadata_dict["source_url"] = target_url
         return metadata_dict
 
-    def scrape_multiple_pages(
-        self, sources: list[WebSource], options={}
-    ) -> dict[str, Any]:
-        output = {
-            source.name: [self.scrape_page(source.name, url) for url in source.pages]
-            for source in sources
-        }
+    def scrape_web_source(self, source: WebSource) -> list[dict[str, Any]]:
+        return [self.scrape_page(url) for url in source.pages]
+
+    # TODO: should run in parallel!
+    def scrape_web_sources(self, sources: list[WebSource], options={}) -> dict[str, Any]:
+        output = {source.name: self.scrape_web_source(source) for source in sources}
         return output
