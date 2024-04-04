@@ -2,7 +2,7 @@
   "name": "NCI Proteomics Data Commons",
   "initials": "PDC",
   "description": "PDC is a fully open-access cancer proteomic dataportal that provides access to highly curated human cancer multi'omics data.",
-  "logo_url": "assets/css/images/PDC-NIH-Logo.png",
+  "logo_url": "https://pdc.cancer.gov/assets/css/images/PDC-NIH-Logo.png",
   "datasets": [],
   "categories": [
     "clinical",

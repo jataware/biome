@@ -83,7 +83,7 @@ services:
       - sources
     container_name: sources_router
     ports:
-      - 80:80
+      - 8001:8001
     configs:
       - source: sources_router_Caddyfile
         target: /etc/caddy/Caddyfile
@@ -289,6 +289,8 @@ services:
   sources_ui:
     image: node:20
     container_name: sources_ui
+    networks:
+      - sources
     volumes:
       - ./ui:/ui
     working_dir: "/ui"

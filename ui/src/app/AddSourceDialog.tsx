@@ -4,8 +4,8 @@ import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { classNames } from "primereact/utils";
-import { ColorPicker } from 'primereact/colorpicker';
-import { MultiSelect } from 'primereact/multiselect';
+// import { ColorPicker } from 'primereact/colorpicker';
+// import { MultiSelect } from 'primereact/multiselect';
 import { Timeline } from 'primereact/timeline';
 import { Card } from 'primereact/card';
 
@@ -103,7 +103,6 @@ const AnimatedTimeline = () => {
   // {
   //   item.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${item.image}`} alt={item.name} width={200} className="shadow-1" />
   // }
-  // <p> Culpa ratione quam perferendis esse.</p>
 
   const customizedContent = (item) => {
     return (
@@ -252,10 +251,7 @@ export default function AddSource() {
                   </small>
                 </div>
 
-
-
               </div> {/*scanRightContents*/}
-
 
             </div> {/*scanRightPane*/}
 
@@ -266,12 +262,3 @@ export default function AddSource() {
   );
 
 }
-
-  // <div>
-  //   <label htmlFor="color-picker">Color:&nbsp;</label>
-  //   <ColorPicker
-  //     id="color-picker"
-  //     value={color}
-  //     onChange={(e) => setColor(e.value)}
-  //   />
-  // </div>

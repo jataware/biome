@@ -2,7 +2,7 @@
   "name": "IDC User Guide",
   "initials": "IDC",
   "description": "A guide providing information on how to interact with the Imaging Data Commons portal and utilize its various features. It includes guidance on downloading data, submitting data to IDC, and understanding the costs of using cloud resources. It also explains IDC's purpose, status, the data available, how to acknowledge IDC, and the differences between IDC and TCIA.",
-  "logo_url": "",
+  "logo_url": "https://storage.googleapis.com/idc-prod-web-static-files/static/img/NIH_IDC_title.svg",
   "datasets": [],
   "categories": [
     "imaging"
@@ -12,13 +12,13 @@
     "cancer"
   ],
   "urls": {
-    "homepage": "",
-    "sitemap": "",
-    "data_landing": "",
-    "git_repository": "https://github.com/ImagingDataCommons/IDC-Examples",
-    "git_org": "",
+    "home_page": "https://portal.imaging.datacommons.cancer.gov/",
+    "site_map": "",
+    "data_landing": "https://portal.imaging.datacommons.cancer.gov/explore/",
+    "git_repository": "https://github.com/ImagingDataCommons/IDC-Tutorials",
+    "git_org": "https://github.com/ImagingDataCommons",
     "submission_portal": "",
-    "openapi_spec": ""
+    "openapi_spec": "https://api.imaging.datacommons.cancer.gov/v1/swagger"
   },
   "use_cases": [
     "Explore metadata, visualize images and annotations, build cohorts from the data included in public TCIA collections",
@@ -87,6 +87,6 @@
   "omics_methods": [],
   "contact": {
     "email": "support+submissions@canceridc.dev",
-    "name": ""
+    "name": "Cancer Imaging Data Commons"
   }
 }

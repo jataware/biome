@@ -27,7 +27,7 @@
 
   &>[class~="p-dataview-content"] {
     background: none;
-    overflow-y: auto;
+    overflow-y: hidden; // TODO
   }
 }
 
@@ -47,7 +47,6 @@
   min-height: 3.5rem;
   display: flex;
   align-items: center;
-
 }
 
 .actionIcons {
@@ -85,6 +84,7 @@
 
 .sourceImage {
   width: 100%;
+  max-height: 5rem;
 }
 
 .availableUrls {

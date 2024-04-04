@@ -19,7 +19,7 @@
     "cancer"
   ],
   "urls": {
-    "homepage": "https://dataservice.datacommons.cancer.gov/#/home",
+    "home_page": "https://dataservice.datacommons.cancer.gov/#/home",
     "data_landing": "https://dataservice.datacommons.cancer.gov/#/submit",
     "submission_portal": "https://dataservice.datacommons.cancer.gov/#/submit"
   },

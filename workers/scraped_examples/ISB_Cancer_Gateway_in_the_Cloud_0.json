@@ -2,13 +2,14 @@
   "name": "ISB Cancer Gateway in the Cloud",
   "description": "A web application (ISB-CGC) providing both web-based and programmatic access to data hosted by institutes such as the Genomic Data Commons (GDC) and the Proteomic Data Commons (PDC) of the National Cancer Institute (NCI) and Human Tumor Atlas Network (HTAN), utilizing the Google Cloud Platform. It includes services for accessing open and controlled data, linking BigQuery tables, and using ISB-CGC Cloud Credits. It also offers interactive analysis, analysis with Google BigQuery, and analysis using APIs and VMs.",
   "initials": "ISB-CGC",
+  "logo_url": "https://storage.googleapis.com/webapp-prod-static-files/static/img/isblogo.png",
   "urls": {
-    "homepage": "https://isb-cgc.appspot.com/",
+    "home_page": "https://isb-cgc.appspot.com/",
     "data_landing": "https://cloud.google.com/resource-manager/docs/creating-managing-projects",
     "git_repository": "https://github.com/isb-cgc/readthedocs/blob/master/docs/source/sections/HowToGetStartedonISB-CGC.rst",
-    "sitemap": "//readthedocs.org/projects/isb-cancer-genomics-cloud/",
     "submission_portal": "https://cloud.google.com/resource-manager/docs/creating-managing-projects"
   },
+  "file_formats": [],
   "datasets": [
     "Genomic Data Commons (GDC)",
     "Proteomic Data Commons (PDC)",
@@ -50,6 +51,7 @@
     "Open-access",
     "Controlled-access"
   ],
+  "data_types": [],
   "access_type": "mixed",
   "capabilities": [
     "workspaces",

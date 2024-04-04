@@ -2,7 +2,7 @@
   "name": "Clinical and Translational Data Commons",
   "initials": "CTDC",
   "description": "The Clinical and Translational Data Commons (CTDC) is being developed to accelerate scientific discoveries that make an impact on cancer outcomes to help people live longer, healthier lives. The CTDC supports cancer research by sharing NCI-funded clinical studies, with features including a Data Exploration dashboard, multiple data types including clinical (PDF, CSV) and molecular/sequencing data (bam/bai, vcf, tsv), data harmonization, data visualization and analysis on the cloud via Seven Bridges Cancer Genomics Cloud, developer resources including a Graphical user interface (GUI) and an Application Programming Interface (API), and a federated identity management system.",
-  "logo_url": "/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
+  "logo_url": "https://datacommons.cancer.gov/themes/custom/crdc_foundation/images/logos/CRDC-logo-mobile.svg",
   "datasets": [
     "Cancer Moonshot Biobank (first release Fall 2023)"
   ],
@@ -15,8 +15,8 @@
     "cancer"
   ],
   "urls": {
-    "homepage": "https://datacommons.cancer.gov/",
-    "data_landing": "/explore/data-commons"
+    "home_page": "https://datacommons.cancer.gov/",
+    "data_landing": "https://datacommons.cancer.gov/explore/data-commons"
   },
   "use_cases": [],
   "documentation": [
@@ -29,12 +29,7 @@
     "Clinical data and reports",
     "Molecular findings and sequence annotation"
   ],
-  "data_types": [
-    "txt",
-    "pdf",
-    "vcf",
-    "bam"
-  ],
+  "data_types": [],
   "file_formats": [
     "txt",
     "pdf",
@@ -49,5 +44,8 @@
     "http_api",
     "ui_case_search"
   ],
-  "omics_methods": []
+  "omics_methods": [],
+  "contact": {
+    "email": "NCIinfo@nih.gov"
+  }
 }
