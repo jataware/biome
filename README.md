@@ -29,7 +29,7 @@ which you may encrypt on disk.
 One the Initial project setup is completed,
 
 Backend:
-`docker-compose --profile deploy --profile dev up -d`
+`docker compose --profile deploy --profile dev up -d`
 
 
 The stack will start on port 8001.
