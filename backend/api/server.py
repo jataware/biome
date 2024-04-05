@@ -4,11 +4,11 @@ from pydantic import BaseModel
 import os
 from rq import Queue, Retry
 from redis import Redis
-from api.job_queue import get_job_status
-
+from lib.job_queue import get_job_status
+from lib.gpt_scraper.websource import WebSource
 
 logger = logging.getLogger(__name__)
-app = FastAPI()
+app = FastAPI(docs_url="/")
 
 # TODO copy Dojo's setup that creates es indeces if missing?
 
@@ -17,12 +17,6 @@ redis = Redis(
     port=int(os.environ.get("REDIS_PORT", 6379)),
 )
 job_queue = Queue(connection=redis, default_timeout=-1)
-
-
-@app.get("/")
-def index():
-    logger.info("Get test route.")
-    return {"hello": "sources is ready"}
 
 
 @app.get("/status")
@@ -36,12 +30,12 @@ class ScanArguments(BaseModel):
 
 
 @app.post("/scan")
-def gpt_scan_uri(payload: ScanArguments):
-    logger.info(f"Queueing scan fn, uris: {payload.uris}")
-
+def gpt_scan_uri(payload: list[ScanArguments]):
+    logger.info(f"Queueing scan fn, uris: {payload}")
+    sources = [WebSource(source.name, source.uris) for source in payload]
     job = job_queue.enqueue_call(
-        func="workers.scan_uri_job.start",
-        args=[payload.name, payload.uris[0]],
+        func="worker.jobs.scrape.scrape_sources",
+        args=[sources],
         retry=Retry(max=3, interval=[10, 30, 60]),
     )
 

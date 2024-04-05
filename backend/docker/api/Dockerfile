@@ -1,12 +1,12 @@
 FROM --platform=linux/amd64 python:3.11.6-bookworm
 
-WORKDIR /api
+WORKDIR /backend
 RUN apt update
 
 RUN pip install --upgrade pip poetry
-COPY ./pyproject.toml /api/
+COPY ./pyproject.toml /backend/
 
-COPY ./README.md /api/README.md
+COPY ./README.md /backend/README.md
 
 RUN poetry install --no-root
 

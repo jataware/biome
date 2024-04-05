@@ -1,7 +1,10 @@
 import logging
 import json
-from workers.gpt_scraper.gpt_scraper import GPTScraper, WebSource
-from workers import api_clients
+
+from typing import Any
+from lib.gpt_scraper.scraper import GPTScraper
+from lib.gpt_scraper.websource import WebSource
+from lib import api_clients
 
 
 logging.basicConfig()

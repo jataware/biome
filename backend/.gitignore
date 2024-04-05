@@ -4,3 +4,4 @@ logs/*
 .env
 sources/out/*
 certs/*
+tests/output*

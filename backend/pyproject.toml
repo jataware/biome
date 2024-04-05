@@ -1,22 +1,23 @@
 [tool.poetry]
-name = "workers"
+name = "api"
 version = "0.0.1"
-description = "Runs scraping and other helper jobs using RQ queues"
+description = "FASTAPI server that hosts api and manages queue/worker job start."
 authors = ["Team Jataware <joel@jataware.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-rq = "1.10.0"
+fastapi = "^0.104.1"
 pydantic-settings = "^2.1.0"
 openai = "^1.14.2"
+rq = "1.10.0"
+uvicorn = "^0.24.0.post1"
 requests = "^2.31.0"
-selenium = "^4.18.1"
 python-dotenv = "^1.0.1"
 elasticsearch = "^8.13.0"
 
-[tool.poetry.scripts]
-scan_url = "workers.scan_uri_job:test_task"
+[tool.poetry.group.workers.dependencies]
+selenium = "^4.18.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"

@@ -1,9 +1,10 @@
 name: sources
 services:
   sources_api:
-    working_dir: /api
+    working_dir: /backend
     build:
-      context: ./api
+      context: ./backend
+      dockerfile: ./docker/api/Dockerfile
     depends_on:
       sources_rq_redis:
         condition: service_healthy
@@ -17,11 +18,11 @@ services:
     # restart: always
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ES_PORT=${ES_PORT}
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
     volumes:
     - type: bind
-      source: ./api
-      target: /api
+      source: ./backend
+      target: /backend
     networks:
       sources: null
   sources_rq_redis:
@@ -50,12 +51,14 @@ services:
   sources_workers:
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ES_PORT=${ES_PORT}
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
       - CACHE_DIR_NAME=${CACHE_DIR_NAME}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-    working_dir: /workers
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+    working_dir: /backend
     build:
-      context: ./workers
+      context: ./backend/
+      dockerfile: ./docker/workers/Dockerfile
     depends_on:
       sources_rq_redis:
         condition: service_healthy
@@ -63,11 +66,11 @@ services:
     # restart: always
     volumes:
     - type: bind
-      source: ./workers
-      target: /workers
+      source: ./backend/
+      target: /backend
     networks:
       sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c workers.rq_settings"]
+    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings"]
 
     # deploy:
     #   resources:
