@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./page.module.scss";
 import { Toolbar } from "primereact/toolbar";
 import { Avatar } from "primereact/avatar";
@@ -59,6 +59,30 @@ export default function Home() {
 
   const [category, setCategory] = useState({ name: 'all', code: 'all' });
 
+  const [sourceList, setSourceList] = useState([]);
+
+  function fetchSources() {
+    fetch('http://localhost:8001/api/sources')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // console.log('data', data.sources);
+        setSourceList(data.sources);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }
+
+  useEffect(() => {
+    fetchSources();
+  }, []);
+
+
   const startContent = (
     <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" shape="circle" />
   );
@@ -76,7 +100,7 @@ export default function Home() {
         <Toolbar
           start={startContent}
           center={centerContent}
-          end={AddSourceDialog}
+          end={() => (<AddSourceDialog onRegisterDone={fetchSources} />)}
           className={classNames("shadow-4", styles.toolbar)}
         />
       </header>
@@ -113,7 +137,7 @@ export default function Home() {
 
         </aside>
         <main className={styles.main}>
-          <Sources category={category} />
+          <Sources category={category} sources={sourceList} />
         </main>
         <footer className={styles.footer}>
         </footer>

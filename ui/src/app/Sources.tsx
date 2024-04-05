@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ProductService } from "./mock_product_data";
 import { Button } from "primereact/button";
 // import { Avatar } from "primereact/avatar";
@@ -59,9 +59,9 @@ const AvailableUrls = ({ urlObj }) => {
   );
 }
 
-const Sources = ({ category = { name: 'all' } }) => {
+const Sources = ({ category = { name: 'all' }, sources }) => {
 
-  const [sources, setSources] = useState([]);
+  // const [sources, setFilteredSources] = useState([]);
   const [layout, setLayout] = useState('grid');
 
   const [sortKey, setSortKey] = useState('');
@@ -74,23 +74,6 @@ const Sources = ({ category = { name: 'all' } }) => {
 
   // TODO filter items on category changes with
   //  useState and such
-  useEffect(() => {
-
-    fetch('http://localhost:8001/api/sources')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // console.log('data', data.sources);
-        setSources(data.sources);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-
     // ProductService
     //   .getProducts()
     //   .then((data) => {
@@ -101,9 +84,8 @@ const Sources = ({ category = { name: 'all' } }) => {
     //         return (item?.categories || []).map(i => i.toLowerCase()).includes(selectedCategoryName);
     //       });
     //     }
-    //     setSources(filtered);
+    //     setFilteredSources(filtered);
     //   });
-  }, []);
 
   const getSeverity = (source) => {
     switch (source.inventoryStatus) {
