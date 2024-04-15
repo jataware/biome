@@ -3,15 +3,15 @@
 Codename: `Sources`
 
 Web project to manage registering, browsing, tuning datasources.
-Frontend: Javascript with Nextjs / Reactjs
-Backend: python 3.11, `poetry` for dependency management and packaging.
+- Frontend: Javascript with Nextjs / Reactjs
+- Backend: python 3.11, `poetry` for dependency management and packaging.
 
 ## Requirements
 
-python 3.11
-poetry
-nodejs < 18.17
-docker, with compose plugin
+- python 3.11
+- poetry
+- nodejs < 18.17
+- docker, with compose plugin
 
 ## Initial Project Setup
 
@@ -29,28 +29,23 @@ which you may encrypt on disk.
 One the Initial project setup is completed,
 
 Backend:
-`docker-compose up -d`
+`docker compose --profile deploy --profile dev up -d`
 
 
-Server will start on port 8082. See [Deploying](#Deploying) if you'd like to also
-start the router server which proxies from port 80.
+The stack will start on port 8001.
+
+UI on:
+
+http://localhost:8001
 
 Sample server request:
 
 ```
-POST http://localhost:8082/scan
+POST http://localhost:8001/api/scan
 {
-	"uri": ["https://my-datasource.gov"],
+	"uris": ["https://my-datasource.gov"],
   "name": "My Datasource 101"
 }
-```
-
-WEB UI:
-Currently started manually from `ui` folder:
-```
-  cd ui;
-  npm install;
-  npm run dev;
 ```
 
 ## Components
@@ -96,7 +91,4 @@ or exec into container, and stop/re-start the rq process.
 
 ### Deploying
 
-To start the docker stack and a router server on port 80:
-```
-docker compose --profile deploy up -d
-```
+TODO

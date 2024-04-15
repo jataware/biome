@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ProductService } from "./mock_product_data";
 import { Button } from "primereact/button";
 // import { Avatar } from "primereact/avatar";
@@ -40,6 +40,7 @@ const AvailableUrls = ({ urlObj }) => {
       <div>
         {['home_page', 'data_landing'].map((uriName) => urlObj[uriName] && (
           <a
+            key={uriName}
             target="_blank"
             rel="noopener noreferrer"
             href={urlObj[uriName]}
@@ -58,9 +59,9 @@ const AvailableUrls = ({ urlObj }) => {
   );
 }
 
-const Sources = ({ category = { name: 'all' } }) => {
+const Sources = ({ category = { name: 'all' }, sources }) => {
 
-  const [sources, setSources] = useState([]);
+  // const [sources, setFilteredSources] = useState([]);
   const [layout, setLayout] = useState('grid');
 
   const [sortKey, setSortKey] = useState('');
@@ -71,21 +72,20 @@ const Sources = ({ category = { name: 'all' } }) => {
     { label: 'Asc', value: 'name' }
   ];
 
-  useEffect(() => {
-    ProductService
-      .getProducts()
-      .then((data) => {
-      // TODO filter on other categories
-        let filtered = data.slice(0, 13);
-        if (!['all', undefined, null].includes(category.name)) {
-          filtered = data.filter((item: CategoryModel) => {
-            const selectedCategoryName = lower(category?.name);
-            return (item?.categories || []).map(i => i.toLowerCase()).includes(selectedCategoryName);
-          });
-        }
-        setSources(filtered);
-      });
-  }, [category]);
+  // TODO filter items on category changes with
+  //  useState and such
+    // ProductService
+    //   .getProducts()
+    //   .then((data) => {
+    //     let filtered = data.slice(0, 13);
+    //     if (!['all', undefined, null].includes(category.name)) {
+    //       filtered = data.filter((item: CategoryModel) => {
+    //         const selectedCategoryName = lower(category?.name);
+    //         return (item?.categories || []).map(i => i.toLowerCase()).includes(selectedCategoryName);
+    //       });
+    //     }
+    //     setFilteredSources(filtered);
+    //   });
 
   const getSeverity = (source) => {
     switch (source.inventoryStatus) {
@@ -166,7 +166,6 @@ const Sources = ({ category = { name: 'all' } }) => {
     //   <Button text size="large" icon="pi pi-bookmark" style={{ fontSize: '1.5rem', padding: 0 }} />
     // </>
 
-
     // {!logoUrl && (
     //   <div className={classNames("font-bold text-xl line-height-2", s.sourceName)}>
     //     {source.name}
@@ -235,40 +234,7 @@ const Sources = ({ category = { name: 'all' } }) => {
               </span>
             </div>
 
-            {/*
-            <div className="flex justify-content-between w-full">
-              <Rating stars={3} value={source.rating} readOnly cancel={false}></Rating>
-
-              {['INSTOCK', 'Verified'].includes(source.inventoryStatus) && (
-                <Tag
-                  icon="pi pi-check-circle"
-                  value={source.inventoryStatus}
-                  severity={getSeverity(source)}
-                />
-              )}
-            </div>
-          */}
-
           </div>
-
-          {/*
-          <div className="flex align-items-center pt-2">
-            <Tag
-              rounded
-              icon="pi pi-clock"
-              value={`${source.price}ms`}
-              className={s.grayTag}
-            />
-            &nbsp;
-            &nbsp;
-            <Tag
-              rounded
-              icon="pi pi-check"
-              value="90%"
-              className={s.grayTag}
-            />
-          </div>
-    */}
 
         </div>
       </div>

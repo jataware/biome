@@ -6,6 +6,8 @@ services:
       context: ./backend
       dockerfile: ./docker/api/Dockerfile
     depends_on:
+      sources_es:
+        condition: service_healthy
       sources_rq_redis:
         condition: service_healthy
     command: ["bash", "-c", "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
@@ -62,6 +64,8 @@ services:
     depends_on:
       sources_rq_redis:
         condition: service_healthy
+      sources_es:
+        condition: service_healthy
     container_name: sources_workers
     # restart: always
     volumes:
@@ -86,7 +90,7 @@ services:
       - sources
     container_name: sources_router
     ports:
-      - 80:80
+      - 8001:8001
     configs:
       - source: sources_router_Caddyfile
         target: /etc/caddy/Caddyfile
@@ -190,13 +194,9 @@ services:
         soft: -1
         hard: -1
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl http://localhost:9200",
-        ]
+      test: curl -s -f http://localhost:9200/_cat/health >/dev/null || exit 1
       timeout: 3s
-      interval: 3s
+      interval: 5s
       retries: 20
     volumes:
       - sources_esdata:/usr/share/elasticsearch/data
@@ -255,9 +255,9 @@ services:
 
   sources_kibana:
     container_name: sources_kibana
-    # depends_on:
-    #   sources_es:
-    #     condition: service_healthy
+    depends_on:
+      sources_es:
+        condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     networks:
       - sources
@@ -292,6 +292,8 @@ services:
   sources_ui:
     image: node:20
     container_name: sources_ui
+    networks:
+      - sources
     volumes:
       - ./ui:/ui
     working_dir: "/ui"

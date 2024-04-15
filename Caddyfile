@@ -10,12 +10,15 @@
   header -Server
 }
 
-:80 {
+:8001 {
   import common
 
-  handle_path /* {
-    reverse_proxy sources_server.sources:8082
-  }
+ handle_path /api* {
+   reverse_proxy sources_api.sources:8082
+ }
+ handle_path /* {
+   reverse_proxy sources_ui.sources:3000
+ }
 
   handle_errors {
     import errors-common
