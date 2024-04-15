@@ -8,10 +8,10 @@ dotenv.load_dotenv()
 
 
 class Settings(BaseSettings):
-    ELASTICSEARCH_URL: str = os.environ.get("ELASTICSEARCH_URL", "")
-    ELASTICSEARCH_PORT: int = int(os.environ.get("ELASTICSEARCH_PORT", 9200))
-    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
-    OPENAI_ORG_ID: str = os.environ.get("OPENAI_ORG_ID", "")
+    ELASTICSEARCH_URL: str
+    ELASTICSEARCH_PORT: int
+    OPENAI_API_KEY: str
+    OPENAI_ORG_ID: str
 
 
 settings = Settings()
