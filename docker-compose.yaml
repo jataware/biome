@@ -21,6 +21,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
       - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
     volumes:
     - type: bind
       source: ./backend
@@ -54,7 +56,6 @@ services:
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
       - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
-      - CACHE_DIR_NAME=${CACHE_DIR_NAME}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
     working_dir: /backend
