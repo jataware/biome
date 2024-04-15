@@ -41,7 +41,7 @@ def get_job_status(job_id: str, redis: Redis):
             "enqueued_at": job.enqueued_at,
             "started_at": job.started_at,
             "job_error": job.exc_info,
-            "job_result": job.return_value(),
+            "job_result": job.return_value,
         }
         return SliceJob(id=job_id, status=job.get_status(), result=result)
     except NoSuchJobError:
