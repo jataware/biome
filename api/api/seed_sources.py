@@ -1,3 +1,5 @@
+import json
+
 starting_sources = [
     {
         "name": "Genomic Data Commons",

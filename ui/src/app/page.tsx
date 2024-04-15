@@ -106,7 +106,7 @@ export default function Home() {
       </header>
       <section className={styles.heading}>
         <Avatar className={styles.logo} image="logo.png" shape="circle" size="xlarge" />
-        <h1 className="text-6xl">DataSource Browser</h1>
+        <h1 className="text-6xl">DataSource Manager</h1>
       </section>
       <div className={styles.apisLayout}>
         <aside className={styles.aside}>

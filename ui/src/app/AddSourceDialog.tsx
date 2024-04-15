@@ -38,8 +38,8 @@ const AnimatedTimeline = ({onDone}) => {
 
   const rawEvents = [
     {
-      status: 'Scanning Input URI',
-      date: '10:30',
+      status: 'Scanning Input URL',
+      date: '10:00',
       color: '#9C27B0',
       // image: 'game-controller.jpg', // TODO?
       index: ScanStep.inputUri
@@ -52,16 +52,16 @@ const AnimatedTimeline = ({onDone}) => {
       index: ScanStep.reviewLinks
     },
     {
-      status: 'Selecting Best Source',
-      date: '16:15',
-      icon: 'pi pi-shopping-cart',
+      status: 'Extracting Information',
+      date: '16:00',
+      // icon: 'pi pi-shopping-cart',
       color: '#FF9800',
       index: ScanStep.scanningBest
     },
     {
-      status: 'Generating Data',
-      date: '10:00',
-      icon: 'pi pi-check',
+      status: 'Generating Metadata',
+      date: '18:00',
+      // icon: 'pi pi-check',
       color: '#607D8B',
       index: ScanStep.generating
     }
@@ -83,7 +83,7 @@ const AnimatedTimeline = ({onDone}) => {
 
         return [...current, nextEvent];
       });
-    }, 8000);
+    }, 20000);
     return () => {
       clearTimeout(timer);
     }
@@ -104,12 +104,12 @@ const AnimatedTimeline = ({onDone}) => {
   // {
   //   item.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${item.image}`} alt={item.name} width={200} className="shadow-1" />
   // }
+  // subTitle={item.date}
 
   const customizedContent = (item) => {
     return (
       <Card
         title={item.status}
-        subTitle={item.date}
       >
       </Card>
     );
