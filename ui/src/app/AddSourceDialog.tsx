@@ -4,8 +4,8 @@ import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { classNames } from "primereact/utils";
-import { ColorPicker } from 'primereact/colorpicker';
-import { MultiSelect } from 'primereact/multiselect';
+// import { ColorPicker } from 'primereact/colorpicker';
+// import { MultiSelect } from 'primereact/multiselect';
 import { Timeline } from 'primereact/timeline';
 import { Card } from 'primereact/card';
 
@@ -32,14 +32,14 @@ enum ScanStep {
   done
 }
 
-const AnimatedTimeline = () => {
+const AnimatedTimeline = ({onDone}) => {
 
   const [loadingScanStep, setLoadingScanStep] = useState(ScanStep.inputUri);
 
   const rawEvents = [
     {
-      status: 'Scanning Input URI',
-      date: '10:30',
+      status: 'Scanning Input URL',
+      date: '10:00',
       color: '#9C27B0',
       // image: 'game-controller.jpg', // TODO?
       index: ScanStep.inputUri
@@ -52,16 +52,16 @@ const AnimatedTimeline = () => {
       index: ScanStep.reviewLinks
     },
     {
-      status: 'Selecting Best Source',
-      date: '16:15',
-      icon: 'pi pi-shopping-cart',
+      status: 'Extracting Information',
+      date: '16:00',
+      // icon: 'pi pi-shopping-cart',
       color: '#FF9800',
       index: ScanStep.scanningBest
     },
     {
-      status: 'Generating Data',
-      date: '10:00',
-      icon: 'pi pi-check',
+      status: 'Generating Metadata',
+      date: '18:00',
+      // icon: 'pi pi-check',
       color: '#607D8B',
       index: ScanStep.generating
     }
@@ -74,6 +74,7 @@ const AnimatedTimeline = () => {
       setEvents(current => {
         if (current.length > 3) {
           setLoadingScanStep(ScanStep.done);
+          onDone();
           return current;
         }
 
@@ -82,7 +83,7 @@ const AnimatedTimeline = () => {
 
         return [...current, nextEvent];
       });
-    }, 2000);
+    }, 20000);
     return () => {
       clearTimeout(timer);
     }
@@ -103,13 +104,12 @@ const AnimatedTimeline = () => {
   // {
   //   item.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${item.image}`} alt={item.name} width={200} className="shadow-1" />
   // }
-  // <p> Culpa ratione quam perferendis esse.</p>
+  // subTitle={item.date}
 
   const customizedContent = (item) => {
     return (
       <Card
         title={item.status}
-        subTitle={item.date}
       >
       </Card>
     );
@@ -130,28 +130,64 @@ const AnimatedTimeline = () => {
   );
 }
 
+function makeid(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 
-
-export default function AddSource() {
+export default function AddSource({onRegisterDone}) {
 
   const randomColor = "#000000".replace(/0/g, function() { return (~~(Math.random() * 16)).toString(16); });
 
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(Step.url);
-  const [color, setColor] = useState(randomColor);
+  // const [color, setColor] = useState(randomColor);
   const [sourceUri, setSourceUri] = useState('');
 
-  const sourceUriInputRef = useRef(null);
+  // const sourceUriInputRef = useRef(null);
 
   function closeAndReset() {
     setStep(Step.url);
     setVisible(false);
   }
 
+  function onRegisterSourceDone() {
+    onRegisterDone();
+    closeAndReset();
+  }
+
   function gotoScan() {
-    // TODO make http request to server to start process
-    setSourceUri(sourceUriInputRef.current.value);
-    setStep(Step.scan);
+    fetch('http://localhost:8001/api/scan', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uris: [sourceUri],
+        name: makeid(5)
+      })
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+    }).then(data => {
+      if (data.queued) {
+        console.log('data queued successfully!');
+        setStep(Step.scan);
+      } else {
+        console.log('Error check logs');
+      }
+    }).catch(err => {
+      console.log('Error queueing job scan:', err);
+    });
   }
 
   return (
@@ -183,7 +219,8 @@ export default function AddSource() {
                 <i className="pi pi-globe" />
                 <InputText
                   className={s.urlBox}
-                  ref={sourceUriInputRef}
+                  onChange={e => setSourceUri(e.target.value)}
+                  value={sourceUri}
                   placeholder="https://www.data.gov"
                 />
               </span>
@@ -193,6 +230,7 @@ export default function AddSource() {
               <Button
                 className={s.confirmSourceButton}
                 label="Start Import"
+                disabled={!sourceUri}
                 onClick={gotoScan}
                 text
               />
@@ -205,7 +243,7 @@ export default function AddSource() {
           <div className={s.scanRoot}>
 
             <div className={s.scanLeftPane}>
-              <AnimatedTimeline />
+              <AnimatedTimeline onDone={onRegisterSourceDone} />
             </div>
 
             <Divider layout="vertical" />
@@ -252,10 +290,7 @@ export default function AddSource() {
                   </small>
                 </div>
 
-
-
               </div> {/*scanRightContents*/}
-
 
             </div> {/*scanRightPane*/}
 
@@ -266,12 +301,3 @@ export default function AddSource() {
   );
 
 }
-
-  // <div>
-  //   <label htmlFor="color-picker">Color:&nbsp;</label>
-  //   <ColorPicker
-  //     id="color-picker"
-  //     value={color}
-  //     onChange={(e) => setColor(e.value)}
-  //   />
-  // </div>

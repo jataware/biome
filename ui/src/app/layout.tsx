@@ -14,8 +14,8 @@ import "primeflex/primeflex.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DataSource Browser",
-  description: "DataSource Browser",
+  title: "DataSource Manager",
+  description: "DataSource Manager",
 };
 
 export default function RootLayout({

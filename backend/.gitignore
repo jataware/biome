@@ -1,0 +1,7 @@
+*.pyc
+documents_cache/*
+logs/*
+.env
+sources/out/*
+certs/*
+tests/output*

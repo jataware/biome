@@ -1,10 +1,13 @@
 name: sources
 services:
   sources_api:
-    working_dir: /api
+    working_dir: /backend
     build:
-      context: ./api
+      context: ./backend
+      dockerfile: ./docker/api/Dockerfile
     depends_on:
+      sources_es:
+        condition: service_healthy
       sources_rq_redis:
         condition: service_healthy
     command: ["bash", "-c", "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
@@ -17,11 +20,13 @@ services:
     # restart: always
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ES_PORT=${ES_PORT}
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
     volumes:
     - type: bind
-      source: ./api
-      target: /api
+      source: ./backend
+      target: /backend
     networks:
       sources: null
   sources_rq_redis:
@@ -50,24 +55,27 @@ services:
   sources_workers:
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ES_PORT=${ES_PORT}
-      - CACHE_DIR_NAME=${CACHE_DIR_NAME}
-      - JATA_OPENAI_SCRAPE_KEY=${OPENAI_API_KEY}
-    working_dir: /workers
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+    working_dir: /backend
     build:
-      context: ./workers
+      context: ./backend/
+      dockerfile: ./docker/workers/Dockerfile
     depends_on:
       sources_rq_redis:
+        condition: service_healthy
+      sources_es:
         condition: service_healthy
     container_name: sources_workers
     # restart: always
     volumes:
     - type: bind
-      source: ./workers
-      target: /workers
+      source: ./backend/
+      target: /backend
     networks:
       sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c workers.rq_settings"]
+    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings"]
 
     # deploy:
     #   resources:
@@ -83,7 +91,7 @@ services:
       - sources
     container_name: sources_router
     ports:
-      - 80:80
+      - 8001:8001
     configs:
       - source: sources_router_Caddyfile
         target: /etc/caddy/Caddyfile
@@ -187,13 +195,9 @@ services:
         soft: -1
         hard: -1
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl http://localhost:9200",
-        ]
+      test: curl -s -f http://localhost:9200/_cat/health >/dev/null || exit 1
       timeout: 3s
-      interval: 3s
+      interval: 5s
       retries: 20
     volumes:
       - sources_esdata:/usr/share/elasticsearch/data
@@ -252,9 +256,9 @@ services:
 
   sources_kibana:
     container_name: sources_kibana
-    # depends_on:
-    #   sources_es:
-    #     condition: service_healthy
+    depends_on:
+      sources_es:
+        condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     networks:
       - sources
@@ -289,6 +293,8 @@ services:
   sources_ui:
     image: node:20
     container_name: sources_ui
+    networks:
+      - sources
     volumes:
       - ./ui:/ui
     working_dir: "/ui"
