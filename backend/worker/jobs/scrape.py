@@ -17,8 +17,8 @@ def scrape_sources(sources: list[WebSource]):
     scraper = GPTScraper(api_clients.get_openai())
     for source in sources:
         source_details = scraper.scrape_web_source(source)
-        # TODO mock-accepts multiple URIs but in reality
-        # we're accepting one for now, until we merge the
+        # TODO hardcoded to 1st item... accepts multiple URIs
+        # but we'll accept one for now, until we merge the
         # json output. Additionally, this may completely
         # change if doing a spider crawl from 1 URL
         body = json.dumps(source_details[0])
