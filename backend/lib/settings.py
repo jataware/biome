@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
-import pprint
 
-pp = pprint.PrettyPrinter(indent=2)
+# import pprint
+# pp = pprint.PrettyPrinter(indent=2)
 
 class Settings(BaseSettings):
     ELASTICSEARCH_URL: str = "http://localhost"
@@ -10,4 +10,4 @@ class Settings(BaseSettings):
     OPENAI_ORG_ID: str
 
 settings = Settings()
-pp.pprint(Settings().model_dump())
+# pp.pprint(Settings().model_dump())
