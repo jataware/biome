@@ -170,10 +170,10 @@ export default function AddSource({onRegisterDone}) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: JSON.stringify([{
         uris: [sourceUri],
         name: makeid(5)
-      })
+      }])
     }).then(response => {
       if (response.ok) {
         return response.json();
