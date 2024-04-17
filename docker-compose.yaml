@@ -172,7 +172,7 @@ services:
   #     test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
   #     interval: 1s
   #     timeout: 5s
-  #     retries: 120     
+  #     retries: 120
 
   sources_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
@@ -186,7 +186,7 @@ services:
     environment:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
-      - xpack.security.enabled=false 
+      - xpack.security.enabled=false
       - xpack.security.http.ssl.enabled=false
       - cluster.name=${CLUSTER_NAME}
     mem_limit: ${ES_MEM_LIMIT}
@@ -278,7 +278,7 @@ services:
       # - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       # - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - xpack.security.enabled=false 
+      - xpack.security.enabled=false
       - xpack.security.http.ssl.enabled=false
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
@@ -305,7 +305,7 @@ services:
       - dev
   sources_rq_dashboard:
     container_name: sources_rq_dashboard
-    build: 
+    build:
       context: ./dev/dockerfiles/rq-dashboard
     ports:
       - '9181:9181'
@@ -316,6 +316,38 @@ services:
     command: ["bash", "-c", "rq-dashboard"]
     profiles:
       - dev
+
+  beaker:
+    build:
+      context: ./dev/dockerfiles/beaker
+
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_SERVER=http://beaker:8888
+      - JUPYTER_TOKEN=89f73481102c46c0bc13b2998f9a4fce
+      - ENABLE_USER_PROMPT=true
+      - OPENAI_API_KEY
+      - PYTHONPATH=/jupyter
+    networks:
+      sources: null
+    command: ["python", "-m", "beaker_kernel.server.main", "--debug", "--ip", "0.0.0.0"]
+
+
+  notebook:
+    image: node:20
+    user: node
+    volumes:
+      - ./notebook:/ui
+    working_dir: "/ui"
+    ports:
+      - "8080:8080"
+    command: ["npm", "run", "serve"]
+    networks:
+      sources: null
+
+
+
 configs:
   sources_router_Caddyfile:
     file: Caddyfile
