@@ -336,6 +336,7 @@ services:
 
   notebook:
     image: node:20
+    user: node
     volumes:
       - ./notebook:/ui
     working_dir: "/ui"
