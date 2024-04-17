@@ -119,7 +119,7 @@ const currStep = ref(Steps.sources);
 
 onMounted(() => {
 
-  fetch('/sources_api/api/sources')
+  fetch('/sources_api/sources')
     .then(response => {
       return response.json();
     })
