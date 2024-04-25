@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "primereact/resources/themes/fluent-light/theme.css";
 import "primeflex/primeflex.css";
 import 'primeicons/primeicons.css';
+
+// import "primereact/resources/themes/fluent-light/theme.css";
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
 
 import styles from "./layout.module.scss";
 

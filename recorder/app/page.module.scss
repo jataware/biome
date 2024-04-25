@@ -7,13 +7,11 @@
 .main {
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   flex: 0 1 20vw;
   height: 100%;
-  color: white;
   padding: 0.5rem 1.5rem 1.5rem 1rem;
-  h4 {
-    color: black;
+  &>h4 {
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -25,8 +23,8 @@
 .logs {
   width: 100%;
   height: 50%;
-  border: 1px solid gray;
-  background: white;
+  border: 1px solid var(--surface-d);
+  background: var(--surface-a);
 }
 
 .browser {
@@ -66,11 +64,11 @@
 @media (min-width: 701px) and (max-width: 1120px) {
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
-  }
-}
+// @media (prefers-color-scheme: dark) {
+  // .logo {
+    // filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
+//   }
+// }
 
 @keyframes rotate {
   from {
@@ -79,4 +77,11 @@
   to {
     transform: rotate(0deg);
   }
+}
+
+.miscDebug {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from 'next/link';
 
@@ -83,6 +83,14 @@ const steps = [
 
 export default function(props) {
   const [taskDescription, setTaskDescription] = useState('');
+
+  useEffect(() => {
+    if (window.eapi) {
+      window.eapi.setTitle('Scooter Web Recorder: Editor');
+    }
+
+  }, []);
+
   return (
     <div className={styles.wrapper}>
       <nav>
@@ -98,10 +106,10 @@ export default function(props) {
 
       <div className={styles.heading}>
         <h1>
-          <span className={styles.taskPre}>Task:</span> Download Cart from GDC Case ID C3L-01355
+          <span className={styles.taskPre}>Task:</span>&nbsp;
+          <span className={styles.taskName}>Download Cart from GDC Case ID C3L-01355</span>
         </h1>
       </div>
-
 
       <div className={styles.description}>
         <div className="flex flex-column gap-2">
@@ -117,11 +125,8 @@ export default function(props) {
         </div>
       </div>
 
-      <br />
-
-      <div>
+      <div className={styles.steps}>
         <h2>Review Recording Steps</h2>
-        <br />
         {steps.map((step, idx) => (
           <StepRow
             key={`${step.name}-${step.type}-${idx}`}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google"; // TODO ?
 import { PrimeReactProvider } from "primereact/api";
 import "./globals.css";
-// import "primereact/resources/themes/fluent-light/theme.css";
 
 import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
 import "primeicons/primeicons.css";

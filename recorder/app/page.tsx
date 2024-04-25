@@ -47,22 +47,23 @@ export default function Home() {
 
         <br />
 
-        <div>
-          <Button outlined onClick={openFile}>
-            Select File Demo
-          </Button>
-        </div>
-
-        <br />
-
         <nav className={styles.nav}>
           <Link
-            className="p-button font-bold"
+            className="p-button"
+            style={{textDecoration: "none"}}
             href="/editor">
             Editor
           </Link>
           <Button label="Save" />
         </nav>
+
+        <div className={styles.miscDebug}>
+          <section>
+            <Button outlined onClick={openFile}>
+              Select File Demo
+            </Button>
+          </section>
+        </div>
 
       </main>
 
@@ -90,6 +91,7 @@ export default function Home() {
             variant="filled"
             value="https://google.com"
           />
+
         </div>
 
         <webview

@@ -1,17 +1,20 @@
 
 .wrapper {
   // border: 1px dashed orange;
-  // display: flex;
+  display: flex;
+  flex-direction: column;
   flex: 1;
 }
 
 .description {
   width: 25%;
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
 }
 
 .stepCard {
   box-shadow: none;
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--surface-b);
   border-radius: 1rem;
   margin-bottom: 1rem;
   max-width: 765px;
@@ -19,13 +22,28 @@
 
 .heading {
   font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .taskPre {
-  color: var(--gray-200);
+  color: var(--text-color-secondary);
+}
+
+.taskName {
+  color: var(--text-color);
 }
 
 .stepCard {
+}
+
+.steps {
+  color: var(--text-color);
+  flex: 1;
+  overflow-y: auto;
+
+  &>h2 {
+    margin-bottom: 1rem;
+  }
 }
 
 .cardHeader {
@@ -51,7 +69,9 @@
 }
 
 .backLink {
-  color: var(--surface-400);
+  color: var(--primary-400);
+  text-decoration: none;
+  font-size: 1.25rem;
 }
 
 
