@@ -1,10 +1,66 @@
 
 .wrapper {
-  border: 1px dashed orange;
+  // border: 1px dashed orange;
   // display: flex;
   flex: 1;
 }
 
 .description {
   width: 25%;
+}
+
+.stepCard {
+  box-shadow: none;
+  border: 1px solid var(--gray-100);
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  max-width: 765px;
+}
+
+.heading {
+  font-weight: bold;
+}
+
+.taskPre {
+  color: var(--gray-200);
+}
+
+.stepCard {
+}
+
+.cardHeader {
+  // padding: 1rem 0 0 1rem;
+  // border: 1px dashed red;
+  // header={
+  //       <div className={styles.cardHeader}>
+  //       </div>
+  //     }
+}
+
+.cardBody {
+  display: grid;
+  // grid-template-areas:
+  grid-template-columns: 1fr 4fr 4fr;
+  // border: 1px dashed gray;
+  margin-top: -0.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.backLink {
+  color: var(--surface-400);
+}
+
+
+.cardCheckbox {
+  margin-left: 0.5rem;
+}
+
+.cardScreenshot {
+  h4 {
+    margin-bottom: 0.25rem;
+  }
 }

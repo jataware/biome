@@ -11,7 +11,22 @@
   flex: 0 1 20vw;
   height: 100%;
   color: white;
-  padding: 1rem;
+  padding: 0.5rem 1.5rem 1.5rem 1rem;
+  h4 {
+    color: black;
+  }
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.logs {
+  width: 100%;
+  height: 50%;
+  border: 1px solid gray;
+  background: white;
 }
 
 .browser {

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "./page.module.scss";
 import Link from 'next/link';
 import { ButtonGroup } from 'primereact/buttongroup';
 import { Button } from "primereact/button";
@@ -39,21 +39,31 @@ export default function Home() {
 
       <main className={styles.main}>
         {/*Koro log-like widget*/}
-        <nav>
+
+        <h4>Logs</h4>
+        <div className={styles.logs}>
+
+        </div>
+
+        <br />
+
+        <div>
+          <Button outlined onClick={openFile}>
+            Select File Demo
+          </Button>
+        </div>
+
+        <br />
+
+        <nav className={styles.nav}>
           <Link
             className="p-button font-bold"
             href="/editor">
             Editor
           </Link>
+          <Button label="Save" />
         </nav>
 
-        <br />
-
-        <div>
-          <Button onClick={openFile}>
-            Select File Demo
-          </Button>
-        </div>
       </main>
 
       {/*Browser webview area*/}
