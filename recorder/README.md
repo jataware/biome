@@ -11,12 +11,14 @@ npm install
 
 # Running
 
-Web View:
+On two different terminals:
+
+Web View
 ```
 npm run dev
 ```
 
-Electron App:
+Electron App
 ```
 npm start
 ```
@@ -27,3 +29,5 @@ npm start
 There are some guide on this around, it's a matter of addressing it.
 - Check if webview needs to get moved outside of react app. If so, move it outside and then navigate to the react app for the rest of the steps after recording.
 - Prettify app.
+- Configure so running one dev command starts both the react view server and the electron app (couple blog posts on this on the web)
+- Build and test by others.
