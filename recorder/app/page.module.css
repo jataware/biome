@@ -1,0 +1,67 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  flex: 0 1 20vw;
+  height: 100%;
+  color: white;
+  padding: 1rem;
+}
+
+.browser {
+  height: 100%;
+  /* border: 1px dashed blue; */
+  flex: 1;
+}
+
+.browserNav {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+}
+
+.code {
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.logo {
+  position: relative;
+}
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+}
+
+@media (prefers-reduced-motion) {
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo {
+    filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
