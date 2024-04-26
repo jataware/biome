@@ -18,35 +18,46 @@ import styles from "./editor_page.module.scss";
 
 function StepRow({step, index}) {
 
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
 
   return (
     <Card
-      title={`${index}. Event: ${step.type}`}
       className={styles.stepCard}
     >
-
       <div className={styles.cardBody}>
         <Checkbox
           className={styles.cardCheckbox}
           onChange={e => setChecked(e.checked)}
           checked={checked}
-        >
-        </Checkbox>
+        />
 
-        <div className={styles.cardScreenshot}>
-          <h4>Screenshot</h4>
-          <img src={step.image} height={80} />
+        <div className={styles.cardDetails}>
+          <h2>
+            <span>{`${index}.`}</span>&nbsp;
+            {`${step.type}`}
+          </h2>
+
+          <div>
+            <div className={styles.cardScreenshot}>
+              <h4>Screenshot</h4>
+              <img src={step.image} height={40} />
+            </div>
+
+            <div></div>
+
+            <div className={styles.actions}>
+              <h4>Actions</h4>
+              <ButtonGroup>
+                <Button text label="Debug" severity="success" />
+                <Button text label="Retake" severity="warning" />
+                {Boolean(step.params?.length) && (
+                  <Button text label="Params" severity="primary" />
+                )}
+              </ButtonGroup>
+            </div>
+          </div>
+
         </div>
-
-        <div className={styles.actions}>
-          <h4>Actions</h4>
-          <ButtonGroup>
-            <Button text label="Debug" severity="success" />
-            <Button text label="Retake" severity="warning" />
-          </ButtonGroup>
-        </div>
-
 
       </div>
 
@@ -75,7 +86,7 @@ const steps = [
     name: "",
     type: "click",
     image: "controls/share.png",
-    params: [],
+    params: [{image: "controls/view-source.png"}],
     description: "",
     selected: true,
   },
@@ -126,14 +137,18 @@ export default function(props) {
       </div>
 
       <div className={styles.steps}>
+
         <h2>Review Recording Steps</h2>
-        {steps.map((step, idx) => (
-          <StepRow
-            key={`${step.name}-${step.type}-${idx}`}
-            step={step}
-            index={idx}
-          />
-        ))}
+
+        <div>
+          {steps.map((step, idx) => (
+            <StepRow
+              key={`${step.name}-${step.type}-${idx}`}
+              step={step}
+              index={idx}
+            />
+          ))}
+        </div>
       </div>
 
     </div>
