@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kung Fu!</title>
+
+    <style>
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #27272a;
+        border-radius: 0.375rem;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    </style>
+</head>
+
+<body style="-webkit-app-region: drag;">
+  <div
+    id="app"
+    style="border: 1px dashed green; height: 100vh; position: absolute; left: 0; top: 0; bottom: 0; z-index: 0; width: 100vw;">
+    <button id="nav-editor">Editor</button>
+  </div>
+
+  <webview
+    class=""
+    style="position: absolute; top: 4rem; right: 0; border: 1px dashed orange; bottom: 0; width: 70vw; z-index: 1"
+    autosize="on"
+    src="https://hello.com"
+    preload="./preload-view.js"
+    id="local-webview"
+  ></webview>
+
+</body>
+
+</html>

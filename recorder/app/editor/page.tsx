@@ -39,24 +39,25 @@ function StepRow({step, index}) {
 
           <div>
             <div className={styles.cardScreenshot}>
-              <h4>Screenshot</h4>
               <img src={step.image} height={40} />
             </div>
 
-            <div></div>
-
-            <div className={styles.actions}>
-              <h4>Actions</h4>
-              <ButtonGroup>
-                <Button text label="Debug" severity="success" />
-                <Button text label="Retake" severity="warning" />
-                {Boolean(step.params?.length) && (
-                  <Button text label="Params" severity="primary" />
-                )}
-              </ButtonGroup>
-            </div>
           </div>
+        </div>
 
+        <div className={styles.actions}>
+          {/* <h4>Actions</h4> */}
+          <ButtonGroup>
+            <Button
+              onClick={() => {console.log('clicked'); }}
+              text label="Debug" severity="success" />
+            <Button
+              onClick={() => {alert('hi')}}
+              text label="Retake" severity="warning" />
+            {Boolean(step.params?.length) && (
+              <Button text label="Params" severity="primary" />
+            )}
+          </ButtonGroup>
         </div>
 
       </div>
@@ -102,15 +103,22 @@ export default function(props) {
 
   }, []);
 
+  function goToRecorder() {
+    console.log('go to recorder clicked', window.eapi);
+    if (window.eapi) {
+      window.eapi.goToRecorder();
+    }
+  }
+
   return (
     <div className={styles.wrapper}>
       <nav>
-        <Link
+        <Button
+          onClick={goToRecorder}
           className={styles.backLink}
-          href="/"
-        >
-          <i className="pi pi-angle-left" /> Back
-        </Link>
+          icon="pi pi-angle-left"
+          label="Back"
+        />
       </nav>
 
       <br />
@@ -140,6 +148,20 @@ export default function(props) {
 
         <h2>Review Recording Steps</h2>
 
+        <section className={styles.stepsHeaderRow}>
+          <h4>
+            Keep?
+          </h4>
+          <h4>
+            &nbsp;
+            Properties
+          </h4>
+          <h4>
+            Actions
+          </h4>
+        </section>
+
+        <div className={styles.stepList}>
         <div>
           {steps.map((step, idx) => (
             <StepRow
@@ -148,6 +170,7 @@ export default function(props) {
               index={idx}
             />
           ))}
+        </div>
         </div>
       </div>
 

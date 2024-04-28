@@ -11,8 +11,8 @@
 }
 
 .backLink {
-  color: var(--primary-400);
-  text-decoration: none;
+  // color: var(--primary-400);
+  // text-decoration: none;
   font-size: 1.25rem;
   font-weight: 500;
 }
@@ -43,7 +43,6 @@
 .steps {
   color: var(--text-color);
   flex: 1;
-  position: relative;
   max-width: 675px;
 
   &>h2 {
@@ -51,6 +50,12 @@
     opacity: 0.95;
     color: var(--text-color-secondary);
   }
+}
+
+.stepList {
+  position: relative;
+  height: 100%;
+
   &>div {
     overflow-y: auto;
     position: absolute;
@@ -58,6 +63,20 @@
     bottom: 0;
     left: 0;
     right: 0;
+  }
+}
+
+.stepsHeaderRow {
+  // border: 1px dashed green;
+  margin-bottom: 0.5rem;
+  display: grid;
+  grid-template-columns: 2fr 7fr 7fr;
+  padding: 0 0.5rem;
+  &>h4 {
+    // border: 1px dashed orange;
+    &:first-of-type {
+      margin: auto;
+    }
   }
 }
 
@@ -69,15 +88,17 @@
   margin-right: 0.5rem;
 
   &>[class~="p-card-body"] {
-    padding: 1rem 1.75rem 0.5rem 1.25rem;
+    padding: 1.25rem 1.75rem 0.5rem 1.25rem;
   }
 }
 
 .cardBody {
   display: grid;
-  grid-template-columns: 2fr 14fr;
+  grid-template-columns: 2fr 7fr 7fr;
   margin-top: -1rem;
 }
+
+
 
 .cardCheckbox {
   margin-left: 0.5rem;
@@ -103,11 +124,6 @@
   }
   display: flex;
   flex-direction: column;
-
-  &>div {
-    display: grid;
-    grid-template-columns: 10fr 1fr 10fr;
-  }
 }
 
 .cardScreenshot {

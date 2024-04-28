@@ -17,43 +17,68 @@ async function handleFileOpen () {
   return null;
 }
 
+let win;
 function createWindow() {
-  const win = new BrowserWindow({
+   win = new BrowserWindow({
+    titleBarStyle: 'hidden',
     width: 1400,
     height: 1000,
     webPreferences: {
-      nodeIntegration: true, // NOTE ? check
-      preload: path.join(__dirname, 'preload.js'),
+      // nodeIntegration: true, // NOTE only allowed with ctx iso
+      preload: path.join(__dirname, 'preload-local.js'),
       // enable webview...
-      webviewTag: true, // TODO
+      webviewTag: true,
+      contextIsolation: false // for getWebContentsId()
     },
   });
 
-  // mainWindow.loadFile('index.html')
-  win.loadURL('http://localhost:3000'); // Load your React app
+  win.loadFile('index.html');
+  // win.loadURL('http://localhost:3000'); // Load your React app
 }
 
 app.whenReady().then(() => {
-  ipcMain.on('set-title', handleSetTitle);
-
-  ipcMain.on('clientSetWebView', function(webViewReference) {
-    console.log('electron received webview', webViewRerefence);
-  });
-
-  ipcMain.handle('dialog:openFile', handleFileOpen);
-
-  ipcMain.handle('ping', () => 'pong');
 
   createWindow();
 
+  let webview;
+
+  ipcMain.on('set-title', handleSetTitle);
+  // ipcMain.handle('ping', () => 'pong');
+
+  ipcMain.on('local-webview-ready', function(event, webViewID) {
+    console.log('electron received webview', event, webViewID);
+    webview = webContents.fromId(webViewID);
+  });
+
+  ipcMain.on('dialog:openFile', handleFileOpen);
+
+  ipcMain.on('webview:scroll-action', (event, payload) => {
+    console.log("webview:scroll-action", event, payload);
+  });
+
+  ipcMain.on('webview:click-action', (event, payload) => {
+    console.log("webview:click-action", event, payload);
+  });
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
+      console.log('browser windows == 0, recreating');
       createWindow();
+      // createLocalWindow();
     }
+  });
+
+  ipcMain.on('nav-editor', () => {
+    console.log('electron nav to editor');
+    win.loadURL('http://localhost:3000/editor'); // Load your React app
+  });
+
+  ipcMain.on('nav-recorder', () => {
+    win.loadFile('index.html');
   });
 
 });
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') app.quit();
 });

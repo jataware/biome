@@ -1,25 +1,51 @@
 
-const { contextBridge, ipcRenderer } = require('electron');
+const {
+  contextBridge,
+  ipcRenderer
+} = require('electron');
 
 let webview = null;
 
+function inspectWebView() {
+  console.log('inspecting web view in preload');
+
+  console.log('preload: dom loaded, webview:', webview, webview.querySelector, webview.history);
+
+  console.log('webview ready...');
+  console.log('dom loaded, webview location:', webview.location);
+
+  const content = webview.webContent;
+  console.log('content', content);
+
+  // TODO check if devtools open API and in "dev" mode only
+  const webToolsResult = webview.openDevTools();
+
+  console.log('keys', Object.keys(webview));
+  console.log('contents', webview.webcontents);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
+  // TODO get as ref from js to ensure react rendered? (timing!)
   webview = document.getElementById('webview');
-  console.log('dom loaded, webview:', webview);
+  console.log('preload: dom loaded, webview:', webview, webview.querySelector, webview.history);
 
+  console.log('preload: checking if webview');
   if (webview) {
-
-    console.log('dom loaded, webview location:', webview.location);
+    console.log('preload: inside if webview');
 
     webview.addEventListener('dom-ready', () => {
-      console.log('webview ready...');
-      // console.log(webview.getWebContentsId());
-      // ipcRenderer.send('webview-ready', webview.getWebContentsId());
+      console.log('preload: webview dom ready');
+      inspectWebView();
     });
   }
 
 });
+
+// MOCK
+// const contextBridge = {
+//   exposeInMainWorld: () => false
+// };
 
 contextBridge.exposeInMainWorld('eapi', {
   // TODO NOTE invoke vs send...
@@ -34,11 +60,12 @@ contextBridge.exposeInMainWorld('eapi', {
   // navNext: () => ipcRenderer.invoke('next'),
 
   // overrides webview from above...? NOTE dangerous?
-  clientSetWebView: (webViewRerefence) => {
-    console.log('client set web view called but ignoring for now');
-    // webview = webViewRerefence;
-  },
-  getWebView: () => webview
+  // clientSetWebView: (webViewRerefence) => {
+  //   console.log('client set web view called but ignoring for now', webViewRerefence);
+  // webview = webViewRerefence;
+  // },
+  // getWebView: () => webview,
+  // inspectWebView,
 });
 
 // ipcRenderer.send('setWebView', webViewRerefence)

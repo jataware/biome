@@ -11,16 +11,58 @@ export default function Home() {
 
   const webviewRef = useRef(null);
 
+  const [webSource, setWebSource] = useState("https://hello.com");
+
+  const searchBoxRef = useRef(null);
+
   useEffect(() => {
     console.log('mounted..');
     if (window.eapi) {
       window.eapi.setTitle('Scooter Web Recorder');
     }
 
-    if (webviewRef.current) {
-      console.log('webviewRef.current', webviewRef.current);
-    }
   }, []);
+
+  function handleSearchBarKey(event) {
+    if (event.key === "Enter") {
+      console.log('pressed enter');
+      navigateToPage(searchBoxRef.current.value);
+    }
+  }
+
+  function navigateToPage(value) {
+    const urlPattern = /(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+
+    if (urlPattern.test(value)) {
+      if (value.startsWith("http")) {
+        setWebSource(value);
+      } else {
+        setWebSource(`https://${value}`);
+      }
+    }
+    // TODO else http invalid- show an error, dont nav?
+    // or perform a web search instead?
+  }
+
+  function debug() {
+    console.log('debug');
+    // window.eapi.inspectWebView();
+    // window.eapi.clientSetWebView(webviewRef.current);
+    // const retrieved = window.eapi.getWebView();
+    // console.log('eapi get web view res', retrieved);
+
+    if (webviewRef.current) {
+      const view = webviewRef.current;
+      console.log('webviewRef.current', view);
+      // console.log(view.window);
+      // console.log('parent', view.parent) // undefined
+      console.log('view keys', Object.keys(view))
+      const win = view.contentWindow;
+      console.log('win?', win)
+      // cross-origin frame kicks in:
+      console.log('doc?', win.document)
+    }
+  }
 
   const pingpong = async () => {
     // NOTE eapi doesnt have to catch all properties
@@ -40,9 +82,10 @@ export default function Home() {
       <main className={styles.main}>
         {/*Koro log-like widget*/}
 
-        <h4>Logs</h4>
-        <div className={styles.logs}>
+        <h4>Events</h4>
 
+        {/* TODO */}
+        <div className={styles.logs}>
         </div>
 
         <br />
@@ -62,6 +105,7 @@ export default function Home() {
             <Button outlined onClick={openFile}>
               Select File Demo
             </Button>
+            <Button text label="Debug" onClick={debug}/>
           </section>
         </div>
 
@@ -89,7 +133,9 @@ export default function Home() {
           {/*URL Input*/}
           <InputText
             variant="filled"
-            value="https://google.com"
+            onKeyPress={handleSearchBarKey}
+            ref={searchBoxRef}
+            placeholder={webSource}
           />
 
         </div>
@@ -99,8 +145,10 @@ export default function Home() {
           style={{width: "100%", height: "93%", padding: '0', margin: '0'}}
           className="scrollbar"
           autosize="on"
-          src="https://www.google.com/"
+          src={webSource}
           id="webview"
+          disablewebsecurity="true"
+          webpreferences="allowRunningInsecureContent"
         ></webview>
       </div>
     </div>
