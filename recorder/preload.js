@@ -1,52 +1,55 @@
-
 const {
-  contextBridge,
-  ipcRenderer
+  contextBridge,  // To add to website window properties
+  ipcRenderer,    // Communicate back to electron
 } = require('electron');
+
+// This re-runs each time
+// win.loadURL/File is loaded with new path/URL
 
 let webview = null;
 
-function inspectWebView() {
-  console.log('inspecting web view in preload');
-
-  console.log('preload: dom loaded, webview:', webview, webview.querySelector, webview.history);
-
-  console.log('webview ready...');
-  console.log('dom loaded, webview location:', webview.location);
-
-  const content = webview.webContent;
-  console.log('content', content);
-
-  // TODO check if devtools open API and in "dev" mode only
-  const webToolsResult = webview.openDevTools();
-
-  console.log('keys', Object.keys(webview));
-  console.log('contents', webview.webcontents);
-}
+/* Helper Fn to simplify code*/
+const onClick = (element, fn) => {
+  element.addEventListener('click', fn);
+};
+const byId = (idStr) => document.getElementById(idStr);
 
 document.addEventListener("DOMContentLoaded", function () {
 
-  // TODO get as ref from js to ensure react rendered? (timing!)
-  webview = document.getElementById('webview');
-  console.log('preload: dom loaded, webview:', webview, webview.querySelector, webview.history);
+  webview = document.getElementById('local-webview');
 
-  console.log('preload: checking if webview');
   if (webview) {
-    console.log('preload: inside if webview');
+    const navEditorButton = document.getElementById('nav-editor-button');
+      onClick(navEditorButton, () => {
+        ipcRenderer.send('recorder:nav-editor');
+      });
 
-    webview.addEventListener('dom-ready', () => {
-      console.log('preload: webview dom ready');
-      inspectWebView();
+    const inspectButton = document.getElementById('inspect-button');
+      onClick(inspectButton, () => {
+        ipcRenderer.send('webview:devtools');
+      });
+
+    const markPageButton = document.getElementById('mark-button');
+    onClick(markPageButton, () => {
+      ipcRenderer.send('recorder:mark-page');
+    });
+
+    const reloadButton = document.getElementById('reload-button');
+    onClick(reloadButton, () => {
+      ipcRenderer.send('recorder:navigate-webview', 'reload');
     });
   }
 
 });
 
-// MOCK
-// const contextBridge = {
-//   exposeInMainWorld: () => false
+// Without context isolation..
+// window.eapi = {
+//   goToRecorder: () => ipcRenderer.send('editor:nav-recorder'),
+//   setTitle: () => "TODO"
 // };
 
+// Gets exposed to index.html javascripts (<script tag>) or to loadURL() for React App
+// Does not get exposed on webview preload-view.js
 contextBridge.exposeInMainWorld('eapi', {
   // TODO NOTE invoke vs send...
   // send/on for one way from renderer to electron
@@ -56,38 +59,14 @@ contextBridge.exposeInMainWorld('eapi', {
   // NOTE invoke because openFile should return the value
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
   // NOTE invoke because server responds back with pong and client receives that result
-  ping: () => ipcRenderer.invoke('ping'),
-  // navNext: () => ipcRenderer.invoke('next'),
-
-  // overrides webview from above...? NOTE dangerous?
-  // clientSetWebView: (webViewRerefence) => {
-  //   console.log('client set web view called but ignoring for now', webViewRerefence);
-  // webview = webViewRerefence;
-  // },
-  // getWebView: () => webview,
-  // inspectWebView,
+  ping: () => ipcRenderer.invoke('debug:ping'),
+  goToRecorder: () => ipcRenderer.send('editor:nav-recorder'),
+  inspectWebView: () => ipcRenderer.send('webview:devtools')
 });
 
-// ipcRenderer.send('setWebView', webViewRerefence)
-
-// in preload-view on gptV-act, maybe we can use it from elsewhere?
-// ipcRenderer.on('navigate-webview', (event, action, payload) => {
-//     switch (action) {
-//         case 'goBack':
-//             if (window.history.length > 1) {
-//                 window.history.back();
-//             }
-//             break;
-//         case 'goForward':
-//             if (window.history.length > 1) {
-//                 window.history.forward();
-//             }
-//             break;
-//         case 'reload':
-//             window.location.reload();
-//             break;
-//         case 'loadURL':
-//             window.location.href = payload;
-//             break;
-//     }
-// });
+contextBridge.exposeInMainWorld('eapi-versions', {
+  node: () => process.versions.node,
+  chrome: () => process.versions.chrome,
+  electron: () => process.versions.electron
+  // we can also expose variables, not just functions..
+});

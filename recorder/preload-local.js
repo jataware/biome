@@ -1,46 +1,50 @@
-const { ipcRenderer,
+// const { ipcRenderer,
         // contextBridge
-      } = require('electron');
+      // } = require('electron');
 
-console.log('preload-local loaded...');
+// NOTE File Unused for now
+// will delete soon
 
-const onClick = (element, fn) => {
-  element.addEventListener('click', fn);
-};
+// console.log('preload-local loaded...');
 
-document.addEventListener("DOMContentLoaded", function () {
-  // mini-browser setup
+// const onClick = (element, fn) => {
+//   element.addEventListener('click', fn);
+// };
 
-  // const urlInput = document.getElementById('urlInput');
-  const webview = document.getElementById('local-webview');
+// document.addEventListener("DOMContentLoaded", function () {
+//   // mini-browser setup
 
-  if (webview) {
+//   // const urlInput = document.getElementById('urlInput');
+//   const webview = document.getElementById('local-webview');
 
-    webview.addEventListener('dom-ready', () => {
+//   if (webview) {
 
-      // TODO check electron API on how to check if dev tools is openm
-      // TODO only open in "dev" mode, not prod
-      webview.openDevTools();
+//     webview.addEventListener('dom-ready', () => {
 
-      console.log(webview.getWebContentsId);
-      ipcRenderer.send('local-webview-ready', webview.getWebContentsId());
-    });
+//       // TODO check electron API on how to check if dev tools is openm
+//       // TODO only open in "dev" mode, not prod
+//       webview.openDevTools();
 
-    onClick(document.getElementById('nav-editor'), () => {
-      console.log('click nav editor');
-      ipcRenderer.send('nav-editor');
-    });
-  } else {
-    // editor + react app
-    console.log('no webview detected on this page, skipping');
+//       console.log(webview.getWebContentsId);
+//       ipcRenderer.send('local-webview-ready', webview.getWebContentsId());
+//     });
 
-    // preload with contextIsolation disabled
-    window.eapi = {
-      setTitle: (title) => ipcRenderer.send('set-title', title),
-      goToRecorder: () => ipcRenderer.send('nav-recorder'),
-    };
-  }
+//     onClick(document.getElementById('nav-editor'), () => {
+//       console.log('click nav editor');
+//       ipcRenderer.send('nav-editor');
+//     });
+
+//   } else {
+//     // editor + react app
+//     console.log('no webview detected on this page, skipping');
+
+//     // preload with contextIsolation disabled
+//     window.eapi = {
+//       setTitle: (title) => ipcRenderer.send('set-title', title),
+//       goToRecorder: () => ipcRenderer.send('nav-recorder'),
+//     };
+//   }
 
 
-});
+// });
 

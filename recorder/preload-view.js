@@ -1,8 +1,36 @@
 console.log('loaded preload-view.js');
 
-const { ipcRenderer } = require('electron');
+const { ipcRenderer,
+        // contextBridge
+      } = require('electron');
 
 let action_list = [];
+
+ipcRenderer.on('mark-page', (event, state, payload) => {
+  markPage();
+});
+
+ipcRenderer.on('navigate-webview', (event, action, payload) => {
+  console.log('navigate on prelaod-view called');
+    switch (action) {
+        case 'back':
+            if (window.history.length > 1) {
+                window.history.back();
+            }
+            break;
+        case 'forward':
+            if (window.history.length > 1) {
+                window.history.forward();
+            }
+            break;
+        case 'reload':
+            window.location.reload();
+            break;
+        case 'loadURL':
+            window.location.href = payload;
+            break;
+    }
+});
 
 async function handleMouseInteraction(event) {
   // Log the event type and the target element
@@ -17,13 +45,13 @@ async function handleMouseInteraction(event) {
   };
   action_list.push(payload);
 
+  // back to electron
   ipcRenderer.send('webview:click-action', payload);
 }
 
 function get_actions(){
   let jlist = JSON.stringify(action_list);
-  // clean actions?
-  action_list = [];
+  action_list = []; // clean actions?
   return jlist;
 }
 
@@ -37,19 +65,18 @@ async function handleScrollInteraction(event){
 
   action_list.push(payload);
 
+  // back to electron
   ipcRenderer.send('webview:scroll-action', payload);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-
   console.log('DOMContentLoaded for preload-view.js');
-
-  setTimeout(markPage, 2000);
 
   document.addEventListener('click', handleMouseInteraction);
   document.addEventListener('dblclick', handleMouseInteraction);
   document.addEventListener("scrollend", handleScrollInteraction);
 
+  ipcRenderer.send('webview:ready');
 });
 
 
@@ -65,7 +92,9 @@ function unmarkPage() {
   labels = [];
 }
 
+// TODO use vimium's algorithm
 function markPage() {
+  console.log('markpage called');
   unmarkPage();
 
   var bodyRect = document.body.getBoundingClientRect();
@@ -93,7 +122,7 @@ function markPage() {
         ...rect,
         width: rect.right - rect.left,
         height: rect.bottom - rect.top
-      }
+      };
     });
 
     var area = rects.reduce((acc, rect) => acc + rect.width * rect.height, 0);
@@ -172,3 +201,15 @@ function markPage() {
               }))));
 
 }
+
+// NOTE In case we need to send and receive data back from electron
+// contextBridge.exposeInMainWorld('danger-api', {
+//   ping: () => ipcRenderer.invoke('debug:ping'),
+// });
+
+// contextBridge.exposeInMainWorld('electronAPI', {
+//   onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => callback(value)),
+//   counterValue: (value) => ipcRenderer.send('counter-value', value)
+// })
+
+

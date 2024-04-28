@@ -140,6 +140,7 @@ export default function Home() {
 
         </div>
 
+        {/* cant add prelude due to not local, nor access dom due to websecurity */}
         <webview
           ref={webviewRef}
           style={{width: "100%", height: "93%", padding: '0', margin: '0'}}
@@ -147,8 +148,6 @@ export default function Home() {
           autosize="on"
           src={webSource}
           id="webview"
-          disablewebsecurity="true"
-          webpreferences="allowRunningInsecureContent"
         ></webview>
       </div>
     </div>

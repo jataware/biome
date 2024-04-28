@@ -3,6 +3,10 @@ const { app, BrowserWindow, ipcMain, dialog, webContents } = require('electron')
 const path = require('node:path');
 
 
+function eventToWindow(event) {
+  return BrowserWindow.fromWebContents(event.sender);
+}
+
 function handleSetTitle (event, title) {
   const webContents = event.sender;
   // can also use win from local `win` variable (let win; below)
@@ -21,20 +25,20 @@ async function handleFileOpen () {
 let win;
 function createWindow() {
    win = new BrowserWindow({
-    titleBarStyle: 'hidden', // TODO does this work in all OS?
-    autoHideMenuBar: true, // TODO test this
+    // titleBarStyle: 'hidden', // TODO does this work in all OS?
+    autoHideMenuBar: true, // hides linux/window File|Edit|View Menu
     title: 'Koro Web Recorder',
     width: 1400,
     height: 1000,
      // https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions
     webPreferences: {
       // nodeIntegration: true, // NOTE only allowed with ctx iso
-      // nodeIntegrationInSubFrames: false, // enable node in subframes/child wins
+      // nodeIntegrationInSubFrames: true, // enable node in subframes/child wins
       // preload always has access to node APIs where node int is on/off
-      preload: path.join(__dirname, 'preload-local.js'),
+      preload: path.join(__dirname, 'preload.js'),
       zoomFactor: 1.0, // default
       javascript: true,
-      webSecurity: true,// would setting to false allow embedding webview w/o preload
+      webSecurity: true, // would setting to false allow embedding webview w/o preload
       // insec content force to true if webSecurity is false:
       allowRunningInsecureContent: false,
       images: true, // allow showing images
@@ -49,7 +53,7 @@ function createWindow() {
       minimumFontSize: 1, // default=0
       webviewTag: true, // !important
       // The Electron API will only be available in the preload script and not the loaded page. This option should be used when loading potentially untrusted remote content to ensure the loaded content cannot tamper with the preload script and any Electron APIs being used:
-      contextIsolation: false, // for getWebContentsId(); comm with preload-view
+      contextIsolation: true, // for getWebContentsId(); comm with preload-view
       // boolean (optional) - Whether to enable DevTools. If it is set to false, can not use BrowserWindow.webContents.openDevTools() to open DevTools. Default is true.
       devTools: true,
       safeDialogs: false, // default; disable consecutive dialogs from websites
@@ -64,7 +68,9 @@ function createWindow() {
 
   win.loadFile('index.html');
   // All web page related events and operations will be done via webcontents:
-  win.webContents.openDevTools();
+
+  // TODO use on dev only:
+  win.webContents.openDevTools(); // works for index.html contents
 
   // Only works in linux/windows:
   // win.removeMenu(); // TODO check this out if menu is bothersome
@@ -75,17 +81,20 @@ function createWindow() {
 
 app.whenReady().then(() => {
 
+  let webviewContentsHandle = null;
+
   createWindow();
 
-  let webview;
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      console.log('browser windows == 0, recreating');
+      createWindow();
+    }
+  });
 
   ipcMain.on('set-title', handleSetTitle);
-  // ipcMain.handle('ping', () => 'pong');
 
-  ipcMain.on('local-webview-ready', function(event, webViewID) {
-    console.log('electron received webview', event, webViewID);
-    webview = webContents.fromId(webViewID);
-  });
+  ipcMain.handle('debug:ping', () => 'pong');
 
   ipcMain.on('dialog:openFile', handleFileOpen);
 
@@ -97,21 +106,44 @@ app.whenReady().then(() => {
     console.log("webview:click-action", event, payload);
   });
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      console.log('browser windows == 0, recreating');
-      createWindow();
-      // createLocalWindow();
-    }
-  });
-
-  ipcMain.on('nav-editor', () => {
+  ipcMain.on('recorder:nav-editor', () => {
     console.log('electron nav to editor');
     win.loadURL('http://localhost:3000/editor'); // Load your React app
   });
 
-  ipcMain.on('nav-recorder', () => {
+  // Get a permanent handle since it's hard to
+  // know the webview ID by order
+  ipcMain.on('webview:ready', (event, ...more) => {
+    webviewContentsHandle = event.sender;
+  });
+
+  ipcMain.on('recorder:mark-page', () => {
+    webviewContentsHandle.send('mark-page');
+  });
+
+  ipcMain.on('recorder:navigate-webview', (event, payload) => {
+    webviewContentsHandle.send('navigate-webview', payload);
+  });
+
+  ipcMain.on('editor:nav-recorder', () => {
+    console.log('nav recorder');
     win.loadFile('index.html');
+  });
+
+  ipcMain.on('webview:devtools', () => {
+    // mainIndexPage contents in win... ID=1
+    // const contents = win.webContents;
+    // console.log(contents);
+
+    // if getting all contents:
+    // const allContents = webContents.getAllWebContents();
+    // const [webviewContents, mainIndexPage] = allContents;
+    // console.log(allContents);
+
+    // or use webContents.fromId(x) if known IF
+    // mainIndexPage.openDevTools(); // ID 1
+    webviewContentsHandle.openDevTools();
+    // webviewContents.openDevTools(); // ID 2 or 3,4... don't trust the ID No.
   });
 
   // Capture screenshot on rect bounds, by node/electron:
