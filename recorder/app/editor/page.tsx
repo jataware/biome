@@ -55,7 +55,7 @@ function StepRow({step, index}) {
               onClick={() => {alert('hi')}}
               text label="Retake" severity="warning" />
             {Boolean(step.params?.length) && (
-              <Button text label="Params" severity="primary" />
+              <Button text label="Params" />
             )}
           </ButtonGroup>
         </div>
@@ -93,7 +93,13 @@ const steps = [
   },
 ];
 
-export default function(props) {
+declare global {
+  interface Window {
+    eapi:any;
+  }
+}
+
+export default function Editor(props) {
   const [taskDescription, setTaskDescription] = useState('');
 
   useEffect(() => {

@@ -43,6 +43,8 @@
 .steps {
   color: var(--text-color);
   flex: 1;
+  display: flex;
+  flex-direction: column;
   max-width: 675px;
 
   &>h2 {
@@ -54,7 +56,7 @@
 
 .stepList {
   position: relative;
-  height: 100%;
+  flex: 1;
 
   &>div {
     overflow-y: auto;
@@ -67,13 +69,11 @@
 }
 
 .stepsHeaderRow {
-  // border: 1px dashed green;
   margin-bottom: 0.5rem;
   display: grid;
   grid-template-columns: 2fr 7fr 7fr;
   padding: 0 0.5rem;
   &>h4 {
-    // border: 1px dashed orange;
     &:first-of-type {
       margin: auto;
     }
@@ -97,8 +97,6 @@
   grid-template-columns: 2fr 7fr 7fr;
   margin-top: -1rem;
 }
-
-
 
 .cardCheckbox {
   margin-left: 0.5rem;

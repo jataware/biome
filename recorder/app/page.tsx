@@ -9,7 +9,7 @@ import { InputText } from "primereact/inputtext"
 
 export default function Home() {
 
-  const webviewRef = useRef(null);
+  // const webviewRef = useRef(null);
 
   const [webSource, setWebSource] = useState("https://hello.com");
 
@@ -17,9 +17,9 @@ export default function Home() {
 
   useEffect(() => {
     console.log('mounted..');
-    if (window.eapi) {
-      window.eapi.setTitle('Scooter Web Recorder');
-    }
+    // if (window.eapi) {
+    //   window.eapi.setTitle('Scooter Web Recorder');
+    // }
 
   }, []);
 
@@ -50,30 +50,18 @@ export default function Home() {
     // window.eapi.clientSetWebView(webviewRef.current);
     // const retrieved = window.eapi.getWebView();
     // console.log('eapi get web view res', retrieved);
-
-    if (webviewRef.current) {
-      const view = webviewRef.current;
-      console.log('webviewRef.current', view);
-      // console.log(view.window);
-      // console.log('parent', view.parent) // undefined
-      console.log('view keys', Object.keys(view))
-      const win = view.contentWindow;
-      console.log('win?', win)
-      // cross-origin frame kicks in:
-      console.log('doc?', win.document)
-    }
   }
 
-  const pingpong = async () => {
+  // const pingpong = async () => {
     // NOTE eapi doesnt have to catch all properties
-    const response = await window.eapi.ping();
-    console.log(response) // prints out 'pong'
-  };
+    // const response = await window.eapi.ping();
+    // console.log(response) // prints out 'pong'
+  // };
 
-  async function openFile() {
-    pingpong();
-    const filepath = await window.eapi.openFile();
-    console.log('file path', filepath);
+  function openFile() {
+    // pingpong();
+    // const filepath = await window.eapi.openFile();
+    // console.log('file path', filepath);
   }
 
   return (
@@ -142,10 +130,8 @@ export default function Home() {
 
         {/* cant add prelude due to not local, nor access dom due to websecurity */}
         <webview
-          ref={webviewRef}
           style={{width: "100%", height: "93%", padding: '0', margin: '0'}}
           className="scrollbar"
-          autosize="on"
           src={webSource}
           id="webview"
         ></webview>

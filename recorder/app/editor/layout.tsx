@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./editor_layout.module.scss";
 
-export default function ({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;

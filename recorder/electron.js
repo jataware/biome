@@ -22,6 +22,8 @@ async function handleFileOpen () {
   return null;
 }
 
+const isDev = true;
+
 let win;
 function createWindow() {
    win = new BrowserWindow({
@@ -87,28 +89,9 @@ app.whenReady().then(() => {
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
-      console.log('browser windows == 0, recreating');
+      console.log('Browser windows == 0; recreating.');
       createWindow();
     }
-  });
-
-  ipcMain.on('set-title', handleSetTitle);
-
-  ipcMain.handle('debug:ping', () => 'pong');
-
-  ipcMain.on('dialog:openFile', handleFileOpen);
-
-  ipcMain.on('webview:scroll-action', (event, payload) => {
-    console.log("webview:scroll-action", event, payload);
-  });
-
-  ipcMain.on('webview:click-action', (event, payload) => {
-    console.log("webview:click-action", event, payload);
-  });
-
-  ipcMain.on('recorder:nav-editor', () => {
-    console.log('electron nav to editor');
-    win.loadURL('http://localhost:3000/editor'); // Load your React app
   });
 
   // Get a permanent handle since it's hard to
@@ -117,18 +100,61 @@ app.whenReady().then(() => {
     webviewContentsHandle = event.sender;
   });
 
+  ipcMain.on('set-title', handleSetTitle);
+
+  // ----------------------- RECORD STEP ------------------------------------
+
+  ipcMain.on('recorder:nav-editor', () => {
+
+    const startURL = isDev
+          ? 'http://localhost:3000'
+          : `file://${path.join(__dirname, '../build/index.html')}`;
+
+    win.loadURL('http://localhost:3000/editor'); // Loads React app
+  });
+
   ipcMain.on('recorder:mark-page', () => {
     webviewContentsHandle.send('mark-page');
   });
 
+  // payload = 'reload', 'back', 'forward', 'load' (url)
   ipcMain.on('recorder:navigate-webview', (event, payload) => {
     webviewContentsHandle.send('navigate-webview', payload);
   });
 
+  // ------------------- EVENTS FROM WEBVIEW --------------------------------
+
+  // TODO do we handle per event on electron, or do we
+  // capture in browser and send final actions then?
+  // PoC that actions can be send to electron, regardless:
+  ipcMain.on('webview:scroll-action', (event, payload) => {
+    console.log("webview:scroll-action", event, payload);
+  });
+  ipcMain.on('webview:click-action', (event, payload) => {
+    console.log("webview:click-action", event, payload);
+  });
+
+  // ----------------------- EDITOR STEP ------------------------------------
   ipcMain.on('editor:nav-recorder', () => {
     console.log('nav recorder');
     win.loadFile('index.html');
   });
+
+
+  // --------------------------- PENDING -----------------------------------
+
+  // Capture screenshot on rect bounds, by node/electron:
+  ipcMain.on('screenshot', (rect) => {
+    // TODO maybe we can scope this to webviewContentsHandle
+    const promise = win.capturePage(rect);
+    // TODO use promise and check where image is captured
+  });
+
+  // ---------------------------- DEBUG -------------------------------------
+
+  ipcMain.handle('debug:ping', () => 'pong');
+
+  ipcMain.on('dialog:openFile', handleFileOpen);
 
   ipcMain.on('webview:devtools', () => {
     // mainIndexPage contents in win... ID=1
@@ -146,11 +172,6 @@ app.whenReady().then(() => {
     // webviewContents.openDevTools(); // ID 2 or 3,4... don't trust the ID No.
   });
 
-  // Capture screenshot on rect bounds, by node/electron:
-  ipcMain.on('screenshot', (rect) => {
-    const promise = win.capturePage(rect);
-    // TODO use promise and check where image is captured
-  });
 
 });
 

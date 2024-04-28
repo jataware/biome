@@ -1,8 +1,6 @@
-console.log('loaded preload-view.js');
+console.log('Loaded preload-view.js');
 
-const { ipcRenderer,
-        // contextBridge
-      } = require('electron');
+const { ipcRenderer } = require('electron');
 
 let action_list = [];
 
@@ -11,7 +9,6 @@ ipcRenderer.on('mark-page', (event, state, payload) => {
 });
 
 ipcRenderer.on('navigate-webview', (event, action, payload) => {
-  console.log('navigate on prelaod-view called');
     switch (action) {
         case 'back':
             if (window.history.length > 1) {
@@ -26,7 +23,7 @@ ipcRenderer.on('navigate-webview', (event, action, payload) => {
         case 'reload':
             window.location.reload();
             break;
-        case 'loadURL':
+        case 'load':
             window.location.href = payload;
             break;
     }
