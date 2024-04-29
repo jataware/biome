@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { InputText } from 'primereact/inputtext';
-import { classNames } from 'primereact/utils';
+import { useState, useEffect } from "react";
+// import { InputText } from 'primereact/inputtext';
+// import { classNames } from 'primereact/utils';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { FloatLabel } from "primereact/floatlabel";
+// import { FloatLabel } from "primereact/floatlabel";
 import { Card } from 'primereact/card';
 import { Checkbox } from 'primereact/checkbox';
 import { ButtonGroup } from 'primereact/buttongroup';
@@ -94,7 +94,7 @@ declare global {
   }
 }
 
-export default function Editor(props) {
+export default function Editor() {
   const [taskDescription, setTaskDescription] = useState('');
 
   useEffect(() => {

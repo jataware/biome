@@ -6,7 +6,9 @@
   "scripts": {
     "start": "electron .",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build-web": "tsc && vite build",
+    "build-electron": "TODO",
+    "package": "electron-builder build --mac --win -c.extraMetadata.main=build/electron/main.js --publish never",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

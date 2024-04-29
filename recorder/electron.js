@@ -125,12 +125,12 @@ app.whenReady().then(() => {
   ipcMain.on('recorder:nav-editor', () => {
 
     const startURL = isDev
-          ? 'http://localhost:3000'
-          : `file://${path.join(__dirname, './build/index.html')}`;
+          ? 'http://localhost:5173'
+          : `file://${path.join(__dirname, './dist/index.html')}`;
 
     // TODO start React app from / andf use startURL
 
-    win.loadURL('http://localhost:3000/editor'); // Loads React app
+    win.loadURL(startURL); // Loads React app
   });
 
   ipcMain.on('recorder:mark-page', () => {
@@ -196,3 +196,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
+
+
+/*
+  "build-electron": "mkdir build/src && cp -r electron/. build/electron && cp -r src/shared/. build/src/shared"
+ */

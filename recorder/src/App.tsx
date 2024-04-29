@@ -1,12 +1,12 @@
-import { useState } from 'react'
+/* import { useState } from 'react' */
 import './App.scss'
 
-import Editor from 'Editor.tsx';
+import Editor from './Editor.tsx';
 
 function App() {
 
   return (
-    <div>
+    <div className="site-wrapper">
       <Editor />
     </div>
    );
