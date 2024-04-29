@@ -99,13 +99,12 @@ export default function Editor() {
 
   useEffect(() => {
     if (window.eapi) {
-      window.eapi.setTitle('Scooter Web Recorder: Editor');
+      window.eapi.setTitle('Koro: Editor');
     }
 
   }, []);
 
   function goToRecorder() {
-    console.log('go to recorder clicked', window.eapi);
     if (window.eapi) {
       window.eapi.goToRecorder();
     }

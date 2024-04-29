@@ -208,8 +208,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
 });
-
-
-/*
-  "build-electron": "mkdir build/src && cp -r electron/. build/electron && cp -r src/shared/. build/src/shared"
- */
