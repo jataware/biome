@@ -1,6 +1,7 @@
 
 const { app, BrowserWindow, ipcMain, dialog, webContents } = require('electron');
 const path = require('node:path');
+const url = require('url');
 
 // ----------------------------- Helpers ---------------------------------------
 
@@ -40,6 +41,8 @@ const recordingHTML = 'recording-index.html';
 
 console.log('isDev', isDev);
 console.log('isProd', isProd);
+
+console.log('NODE_ENV', process.env.NODE_ENV);
 
 let win;
 
@@ -107,6 +110,7 @@ app.whenReady().then(() => {
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
+  // on macOS it is common to re-create a window even after all windows have been closed
       console.log('Browser windows == 0; recreating.');
       createWindow();
     }
@@ -128,7 +132,13 @@ app.whenReady().then(() => {
           ? 'http://localhost:5173'
           : `file://${path.join(__dirname, './dist/index.html')}`;
 
-    // TODO start React app from / andf use startURL
+    // NOTE another startURL version
+    // export ELECTRON_START_URL=http://localhost:3000 && electron .
+    // const startUrl = process.env.ELECTRON_START_URL || url.format({
+    //   pathname: path.join(__dirname, '../index.html'),
+    //   protocol: 'file:',
+    //   slashes: true,
+    // });
 
     win.loadURL(startURL); // Loads React app
   });

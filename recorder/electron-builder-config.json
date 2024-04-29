@@ -1,0 +1,23 @@
+{
+  "nodeGypRebuild": false,
+  "buildDependenciesFromSource": false,
+
+  "appId": "com.electron.koro",
+
+  "directories": {
+    "output": "electron-dist",
+    "buildResources": "buildResources"
+  },
+  "files": [
+    "dist/**/*",
+    "node_modules/**/*"
+  ],
+
+  "linux": {
+    category: "WebTools"
+  },
+
+  "mac": {
+    category: "WebTools"
+  }
+}

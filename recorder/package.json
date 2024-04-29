@@ -1,5 +1,7 @@
 {
-  "name": "recorder",
+  "name": "koro",
+  "description": "TBD",
+  "author": "Jataware",
   "version": "0.1.0",
   "private": true,
   "main": "electron.js",
@@ -7,8 +9,8 @@
     "start": "electron .",
     "dev": "vite",
     "build-web": "tsc && vite build",
-    "build-electron": "TODO",
-    "package": "electron-builder build --mac --win -c.extraMetadata.main=build/electron/main.js --publish never",
+    "build-electron": "mkdir dist/electron && cp electron.js dist/electron && cp preload.js dist/electron && cp preload-view.js dist/electron && cp recording-index.html dist/electron",
+    "package": "electron-builder build --config electron-builder-config.json --linux --mac -c.extraMetadata.main=dist/electron/electron.js --publish never",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -22,15 +24,16 @@
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "electron": "^30.0.1",
+    "electron-builder": "^24.13.3",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "sass": "^1.75.0",
     "typescript": "^5",
-    "@typescript-eslint/eslint-plugin": "^7.2.0",
-    "@typescript-eslint/parser": "^7.2.0",
-    "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.2.0"
   }
 }
