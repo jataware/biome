@@ -37,12 +37,14 @@ async function handleFileOpen () {
 
 const isDev = !app.isPackaged;
 const isProd = app.isPackaged;
-const recordingHTML = 'recording-index.html';
+const recordingHTML = url.format({
+    pathname: path.join(__dirname, 'recording-index.html'),
+    protocol: 'file:',
+    slashes: true,   // slashes for file://
+  });
 
 console.log('isDev', isDev);
 console.log('isProd', isProd);
-
-console.log('NODE_ENV', process.env.NODE_ENV);
 
 let win;
 
@@ -78,7 +80,7 @@ function createWindow() {
       // The Electron API will only be available in the preload script and not the loaded page. This option should be used when loading potentially untrusted remote content to ensure the loaded content cannot tamper with the preload script and any Electron APIs being used:
       contextIsolation: true, // for getWebContentsId(); comm with preload-view
       // boolean (optional) - Whether to enable DevTools. If it is set to false, can not use BrowserWindow.webContents.openDevTools() to open DevTools. Default is true.
-      devTools: true,         // Eventually eventually only enable on isDev?
+      devTools: true,         // eventually only enable with isDev
       safeDialogs: false,     // default; disable consecutive dialogs from websites
       // if we enable safe dialogs and it triggers:
       safeDialogsMessage: 'More consecutive dialog creation prevented',
@@ -89,7 +91,7 @@ function createWindow() {
     },
   });
 
-  win.loadFile(recordingHTML);
+  win.loadURL(recordingHTML);
   // All web page related events and operations will be done via webcontents:
 
   // TODO use on dev only: (isDev)
@@ -128,19 +130,19 @@ app.whenReady().then(() => {
 
   ipcMain.on('recorder:nav-editor', () => {
 
-    const startURL = isDev
+    const appURL = isDev
           ? 'http://localhost:5173'
-          : `file://${path.join(__dirname, './dist/index.html')}`;
+          : `file://${path.join(__dirname, '../index.html')}`;
 
     // NOTE another startURL version
     // export ELECTRON_START_URL=http://localhost:3000 && electron .
-    // const startUrl = process.env.ELECTRON_START_URL || url.format({
+    // const appUrl = process.env.ELECTRON_START_URL || url.format({
     //   pathname: path.join(__dirname, '../index.html'),
     //   protocol: 'file:',
     //   slashes: true,
     // });
 
-    win.loadURL(startURL); // Loads React app
+    win.loadURL(appURL); // Loads React app
   });
 
   ipcMain.on('recorder:mark-page', () => {
@@ -167,7 +169,7 @@ app.whenReady().then(() => {
   // ----------------------- EDITOR STEP ------------------------------------
   ipcMain.on('editor:nav-recorder', () => {
     console.log('nav recorder');
-    win.loadFile(recordingHTML);
+    win.loadURL(recordingHTML);
   });
 
   // --------------------------- PENDING -----------------------------------

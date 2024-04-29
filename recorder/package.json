@@ -4,13 +4,13 @@
   "author": "Jataware",
   "version": "0.1.0",
   "private": true,
-  "main": "electron.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "vite",
     "build-web": "tsc && vite build",
-    "build-electron": "mkdir dist/electron && cp electron.js dist/electron && cp preload.js dist/electron && cp preload-view.js dist/electron && cp recording-index.html dist/electron",
-    "package": "electron-builder build --config electron-builder-config.json --linux --mac -c.extraMetadata.main=dist/electron/electron.js --publish never",
+    "build-electron": "cp -r electron/. dist/electron",
+    "package": "electron-builder build --config electron-builder-config.json --linux --mac -c.extraMetadata.main=dist/electron/main.js --publish never",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
