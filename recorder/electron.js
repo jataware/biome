@@ -36,6 +36,7 @@ async function handleFileOpen () {
 
 const isDev = !app.isPackaged;
 const isProd = app.isPackaged;
+const recordingHTML = 'recording-index.html';
 
 console.log('isDev', isDev);
 console.log('isProd', isProd);
@@ -85,7 +86,7 @@ function createWindow() {
     },
   });
 
-  win.loadFile('index.html');
+  win.loadFile(recordingHTML);
   // All web page related events and operations will be done via webcontents:
 
   // TODO use on dev only: (isDev)
@@ -156,7 +157,7 @@ app.whenReady().then(() => {
   // ----------------------- EDITOR STEP ------------------------------------
   ipcMain.on('editor:nav-recorder', () => {
     console.log('nav recorder');
-    win.loadFile('index.html');
+    win.loadFile(recordingHTML);
   });
 
   // --------------------------- PENDING -----------------------------------

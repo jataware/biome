@@ -43,6 +43,7 @@ work around limitations on access cross-domain DOMs when embedding external cont
  - Ensure React Editor app is built to known html/js dist/build folder
  - Switch on `main` to decide which editor app to load depending on dev|prod env
  - Run `electron` build command to create executable binaries.
+ - Later: Alternate approach to inject a webview electron tag into a local react app (lab).
 
 ## TODOs
 

@@ -1,15 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import styles from "./page.module.scss";
+// import styles from "./page.module.scss";
 import Link from 'next/link';
 import { ButtonGroup } from 'primereact/buttongroup';
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext"
 
 export default function Home() {
-
-  // const webviewRef = useRef(null);
 
   const [webSource, setWebSource] = useState("https://hello.com");
 
