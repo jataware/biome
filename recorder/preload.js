@@ -3,8 +3,7 @@ const {
   ipcRenderer,    // Communicate back to electron
 } = require('electron');
 
-// This re-runs each time
-// win.loadURL/File is loaded with new path/URL
+// This re-runs each time that win.loadURL/File is loaded with new path/URL
 
 let webview = null;
 

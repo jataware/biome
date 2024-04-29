@@ -2,18 +2,28 @@
 const { app, BrowserWindow, ipcMain, dialog, webContents } = require('electron');
 const path = require('node:path');
 
+// ----------------------------- Helpers ---------------------------------------
 
+/*
+ * Helper fn to get a handle on App Browser Window from event */
 function eventToWindow(event) {
   return BrowserWindow.fromWebContents(event.sender);
 }
 
+/*
+ * Sets the title of the Electron app. If only one Browser Window is open
+ * we can use the main `win` one, but this fn received event just in case.
+ */
 function handleSetTitle (event, title) {
   const webContents = event.sender;
-  // can also use win from local `win` variable (let win; below)
-  const win = BrowserWindow.fromWebContents(webContents);
-  win.setTitle(title);
+  const browserWindow = BrowserWindow.fromWebContents(webContents);
+  browserWindow.setTitle(title);
 }
 
+/*
+ * Opens a _navite_ file open dialog, which may not be necessary since
+ * a browser (chromium) one may be enough. Useful for testing for now.
+ */
 async function handleFileOpen () {
   const { canceled, filePaths } = await dialog.showOpenDialog();
   if (!canceled) {
@@ -22,9 +32,16 @@ async function handleFileOpen () {
   return null;
 }
 
-const isDev = true;
+// ----------------------------- App Code --------------------------------------
+
+const isDev = !app.isPackaged;
+const isProd = app.isPackaged;
+
+console.log('isDev', isDev);
+console.log('isProd', isProd);
 
 let win;
+
 function createWindow() {
    win = new BrowserWindow({
     // titleBarStyle: 'hidden', // TODO does this work in all OS?
@@ -32,46 +49,46 @@ function createWindow() {
     title: 'Koro Web Recorder',
     width: 1400,
     height: 1000,
-     // https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions
+// https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions
     webPreferences: {
       // nodeIntegration: true, // NOTE only allowed with ctx iso
       // nodeIntegrationInSubFrames: true, // enable node in subframes/child wins
-      // preload always has access to node APIs where node int is on/off
+      // preload always has access to node APIs even with node integration off:
       preload: path.join(__dirname, 'preload.js'),
-      zoomFactor: 1.0, // default
+      zoomFactor: 1.0,     // default=1.0
       javascript: true,
-      webSecurity: true, // would setting to false allow embedding webview w/o preload
-      // insec content force to true if webSecurity is false:
+      webSecurity: true,   // would setting to false allow embedding webview w/o preload
+      // note: insecure content is forced to true if webSecurity is false:
       allowRunningInsecureContent: false,
-      images: true, // allow showing images
-      // enable webview...
-      imageAnimationPolicy: 'animate', // default; can disable GIFs animation etc
-      textAreasAreResizable: true, // default; can disable
+      images: true,        // allow showing images
+      imageAnimationPolicy: 'animate', // default;can disable GIFs animation etc
+      textAreasAreResizable: true,     // default; could disable
       webgl: true,
       plugins: false,
       experimentalFeatures: false,
       scrollBounce: false, // default; for macos
       defaultFontSize: 16, // default
-      minimumFontSize: 1, // default=0
-      webviewTag: true, // !important
+      minimumFontSize: 1,  // default=0
+      // enable webview
+      webviewTag: true,    // !important, default=false
       // The Electron API will only be available in the preload script and not the loaded page. This option should be used when loading potentially untrusted remote content to ensure the loaded content cannot tamper with the preload script and any Electron APIs being used:
       contextIsolation: true, // for getWebContentsId(); comm with preload-view
       // boolean (optional) - Whether to enable DevTools. If it is set to false, can not use BrowserWindow.webContents.openDevTools() to open DevTools. Default is true.
-      devTools: true,
-      safeDialogs: false, // default; disable consecutive dialogs from websites
+      devTools: true,         // Eventually eventually only enable on isDev?
+      safeDialogs: false,     // default; disable consecutive dialogs from websites
       // if we enable safe dialogs and it triggers:
       safeDialogsMessage: 'More consecutive dialog creation prevented',
-      disableDialogs: false, // default
+      disableDialogs: false,  // default
       navigateOnDragDrop: false,
-      spellcheck: false, // default=true
-      // titleBarOverlay // see docs; TODO see if this works in linux/OSX
+      spellcheck: false,      // default=true
+      // titleBarOverlay      // see docs; TODO check if this works in linux/OSX
     },
   });
 
   win.loadFile('index.html');
   // All web page related events and operations will be done via webcontents:
 
-  // TODO use on dev only:
+  // TODO use on dev only: (isDev)
   win.webContents.openDevTools(); // works for index.html contents
 
   // Only works in linux/windows:
@@ -108,7 +125,9 @@ app.whenReady().then(() => {
 
     const startURL = isDev
           ? 'http://localhost:3000'
-          : `file://${path.join(__dirname, '../build/index.html')}`;
+          : `file://${path.join(__dirname, './build/index.html')}`;
+
+    // TODO start React app from / andf use startURL
 
     win.loadURL('http://localhost:3000/editor'); // Loads React app
   });
@@ -125,7 +144,7 @@ app.whenReady().then(() => {
   // ------------------- EVENTS FROM WEBVIEW --------------------------------
 
   // TODO do we handle per event on electron, or do we
-  // capture in browser and send final actions then?
+  // capture in browser and send final actions after?
   // PoC that actions can be send to electron, regardless:
   ipcMain.on('webview:scroll-action', (event, payload) => {
     console.log("webview:scroll-action", event, payload);
@@ -139,7 +158,6 @@ app.whenReady().then(() => {
     console.log('nav recorder');
     win.loadFile('index.html');
   });
-
 
   // --------------------------- PENDING -----------------------------------
 
@@ -171,7 +189,6 @@ app.whenReady().then(() => {
     webviewContentsHandle.openDevTools();
     // webviewContents.openDevTools(); // ID 2 or 3,4... don't trust the ID No.
   });
-
 
 });
 
