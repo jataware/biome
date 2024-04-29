@@ -1,46 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Koro</title>
+  <meta charset="UTF-8">
+  <title>Koro</title>
 
-    <style>
+  <link rel="stylesheet" type="text/css" href="./recording.css" />
+  <!-- TODO these two won't work -->
+  <link rel="stylesheet" type="text/css" href="../node_modules/primeicons/primeicons.css" />
+  <link rel="stylesheet" type="text/css" href="../node_modules/primeflex/primeflex.css" />
+
+  <style>
     ::-webkit-scrollbar {
-        width: 0px;
+      width: 0px;
     }
 
     ::-webkit-scrollbar-track {
-        background: transparent;
+      background: transparent;
     }
 
     ::-webkit-scrollbar-thumb {
-        background: #27272a;
-        border-radius: 0.375rem;
+      background: #27272a;
+      border-radius: 0.375rem;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: #555;
+      background: #555;
     }
-    </style>
+
+  </style>
 </head>
+
 
 <body style="-webkit-app-region: drag;">
   <div
-    id="app"
-    style="height: 100vh; position: absolute; left: 0; top: 0; bottom: 0; z-index: 0; width: 100vw;">
-    <button id="nav-editor-button">Editor</button>
-    <button id="inspect-button">Inspect</button>
-    <button id="mark-button">Mark</button>
-    <button id="reload-button">Reload</button>
+    id="app">
+      <nav>
+        <button class="p-button" id="nav-editor-button">Editor</button>
+        <button class="p-button" id="inspect-button">Inspect</button>
+        <button class="p-button" id="mark-button">Mark</button>
+        <button class="p-button" id="reload-button">Reload</button>
+      </nav>
+      <aside class="left-panel">
+        <h4>Event Log</h4>
+        <div class="events">
+          <!-- <textarea style="width: 100%;" /> -->
+        </div>
+      </aside>
   </div>
 
-  <webview
-    style="position: absolute; top: 4rem; right: 0; bottom: 0; width: 70vw; z-index: 1"
-    autosize="on"
-    src="https://hello.com"
-    preload="./preload-view.js"
-    id="local-webview"
-  ></webview>
+  <!-- Browser webview area -->
+  <div class="browser">
+
+    <!-- Browser Nav -->
+    <div class="browser-nav">
+
+      <div class="button-group">
+        <!-- Back Button -->
+        <button class="pi pi-chevron-left p-button" />
+
+        <!-- Forward Button -->
+        <button class="pi pi-chevron-right p-button" />
+
+        <!-- Reload Button -->
+        <button class="pi pi-refresh p-button" />
+      </div>
+
+      &nbsp;
+
+      <!-- URL Input -->
+      <input
+        type="text"
+        placeholder="https://"
+      />
+
+    </div><!-- browser-nav -->
+
+    <webview
+      autosize="on"
+      src="https://hello.com"
+      preload="./preload-view.js"
+      id="local-webview"
+    ></webview>
+  </div><!-- browser -->
 
 </body>
 

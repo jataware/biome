@@ -47,7 +47,6 @@ work around limitations on access cross-domain DOMs when embedding external cont
 
 ## TODOs
 
-- Setup to use dev url (localhost React app) on dev, else use built js assets for viewer on prod.
-There are some guide on this around, it's a matter of addressing it.
 - Build and test by others.
 - Configure so running one dev command starts both the react view server and the electron app (couple blog posts on this on the web)
+- Able to include node_modules links in final version of prod/packaged app.
