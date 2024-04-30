@@ -8,6 +8,7 @@
   <!-- TODO these two won't work -->
   <link rel="stylesheet" type="text/css" href="../node_modules/primeicons/primeicons.css" />
   <link rel="stylesheet" type="text/css" href="../node_modules/primeflex/primeflex.css" />
+  <!-- TODO cp these fonts/css on build-electron to expected location (?) -->
 
   <style>
     ::-webkit-scrollbar {
@@ -38,12 +39,18 @@
         <button class="p-button" id="nav-editor-button">Editor</button>
         <button class="p-button" id="inspect-button">Inspect</button>
         <button class="p-button" id="mark-button">Mark</button>
-        <button class="p-button" id="reload-button">Reload</button>
       </nav>
       <aside class="left-panel">
         <h4>Event Log</h4>
         <div class="events">
-          <!-- <textarea style="width: 100%;" /> -->
+          <ul>
+            <li>click: xpath</li>
+            <li>scroll: xpath</li>
+            <li>click: xpath</li>
+            <li>click: xpath</li>
+            <li>nav: back</li>
+            <li>url: http://sample.com</li>
+          </ul>
         </div>
       </aside>
   </div>
@@ -56,19 +63,29 @@
 
       <div class="button-group">
         <!-- Back Button -->
-        <button class="pi pi-chevron-left p-button" />
+        <button
+          id="back-button"
+          class="pi pi-chevron-left p-button"
+        />
 
         <!-- Forward Button -->
-        <button class="pi pi-chevron-right p-button" />
+        <button
+          id="forward-button"
+          class="pi pi-chevron-right p-button"
+        />
 
         <!-- Reload Button -->
-        <button class="pi pi-refresh p-button" />
+        <button
+          id="reload-button"
+          class="pi pi-refresh p-button"
+        />
       </div>
 
       &nbsp;
 
       <!-- URL Input -->
       <input
+        id="urlInput"
         type="text"
         placeholder="https://"
       />

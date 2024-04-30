@@ -14,7 +14,7 @@ to replay the recordings by the Scooter/Koro runner.
 npm install
 ```
 
-## Running
+## Running for Development
 
 On two different terminals:
 
@@ -38,15 +38,14 @@ work around limitations on access cross-domain DOMs when embedding external cont
 `preload-view.js` is injected into a `webview`, which is a child html tag of the `renderer` content. We call it `webview`, although we could come up with other markup-agnostic terms such as target-website-container, "iframe" (different than webview, but more familiar outside the context of electron), or other names to signify that it is a portal to embed a 3rd party website target to record events to.
 
 ## Building for Production (electron desktop app)
- TODO
- - Set up isDev/isProd flags
- - Ensure React Editor app is built to known html/js dist/build folder
- - Switch on `main` to decide which editor app to load depending on dev|prod env
- - Run `electron` build command to create executable binaries.
- - Later: Alternate approach to inject a webview electron tag into a local react app (lab).
+
+1. Build react webapp: `npm run build-web`
+2. Copy electron assets to `webapp` dist folder: `npm run build-electron`
+3. Create electron packages: `npm run package`
 
 ## TODOs
 
 - Build and test by others.
 - Configure so running one dev command starts both the react view server and the electron app (couple blog posts on this on the web)
 - Able to include node_modules links in final version of prod/packaged app.
+ - Later: Alternate approach to inject a webview electron tag into a local react app (lab).

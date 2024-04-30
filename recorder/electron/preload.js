@@ -7,57 +7,66 @@ const {
 
 let webview = null;
 
-/* Helper Fn to simplify code*/
+/* Helper fns */
 const onClick = (element, fn) => {
   element.addEventListener('click', fn);
 };
 const byId = (idStr) => document.getElementById(idStr);
+
+
+const clickHandler = (buttonId, eventName, args)  => {
+  const button = document.getElementById(buttonId);
+
+  if(!button) {
+    console.log(`Element not found for ${buttonId}. Skipping`);
+    return;
+  }
+  onClick(button, () => {
+    ipcRenderer.send(eventName, args);
+  });
+};
 
 document.addEventListener("DOMContentLoaded", function () {
 
   webview = document.getElementById('local-webview');
 
   if (webview) {
-    const navEditorButton = document.getElementById('nav-editor-button');
-      onClick(navEditorButton, () => {
-        ipcRenderer.send('recorder:nav-editor');
-      });
 
-    const inspectButton = document.getElementById('inspect-button');
-      onClick(inspectButton, () => {
-        ipcRenderer.send('webview:devtools');
-      });
+    clickHandler('nav-editor-button', 'recorder:nav-editor');
 
-    const markPageButton = document.getElementById('mark-button');
-    onClick(markPageButton, () => {
-      ipcRenderer.send('recorder:mark-page');
+    clickHandler('toggle-recording-button', 'recorder:toggle-recording');
+
+    clickHandler('inspect-button', 'webview:devtools');
+
+    clickHandler('mark-button', 'webview:mark-page');
+
+    clickHandler('reload-button', 'recorder:navigate-webview', 'reload');
+
+    clickHandler('back-button', 'recorder:navigate-webview', 'back');
+
+    clickHandler('forward-button', 'recorder:navigate-webview', 'forward');
+
+    const urlInput = document.getElementById('urlInput');
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        console.log('send enter, value:', urlInput.value);
+        ipcRenderer.send('recorder:navigate-webview', 'load', urlInput.value);
+      }
     });
 
-    const reloadButton = document.getElementById('reload-button');
-    onClick(reloadButton, () => {
-      ipcRenderer.send('recorder:navigate-webview', 'reload');
-    });
   }
 
 });
 
-// Without context isolation..
-// window.eapi = {
-//   goToRecorder: () => ipcRenderer.send('editor:nav-recorder'),
-//   setTitle: () => "TODO"
-// };
-
 // Gets exposed to index.html javascripts (<script tag>) or to loadURL() for React App
 // Does not get exposed on webview preload-view.js
 contextBridge.exposeInMainWorld('eapi', {
-  // TODO NOTE invoke vs send...
+  // NOTE invoke vs send...
   // send/on for one way from renderer to electron
   // invoke/handle for 2-way between renderer and electron
-  // TODO setTitle could use send instead of invoke
   setTitle: (title) => ipcRenderer.send('set-title', title),
   // NOTE invoke because openFile should return the value
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
-  // NOTE invoke because server responds back with pong and client receives that result
   ping: () => ipcRenderer.invoke('debug:ping'),
   goToRecorder: () => ipcRenderer.send('editor:nav-recorder'),
   inspectWebView: () => ipcRenderer.send('webview:devtools')

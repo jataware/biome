@@ -2,6 +2,25 @@ console.log('Loaded preload-view.js');
 
 const { ipcRenderer } = require('electron');
 
+const customCSS = `
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #27272a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 0.375rem;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+`;
+
 let action_list = [];
 
 ipcRenderer.on('mark-page', (event, state, payload) => {
@@ -9,6 +28,7 @@ ipcRenderer.on('mark-page', (event, state, payload) => {
 });
 
 ipcRenderer.on('navigate-webview', (event, action, payload) => {
+  console.log('naigate webview', event, action, payload);
     switch (action) {
         case 'back':
             if (window.history.length > 1) {
@@ -24,7 +44,7 @@ ipcRenderer.on('navigate-webview', (event, action, payload) => {
             window.location.reload();
             break;
         case 'load':
-            window.location.href = payload;
+            // window.location.href = payload;
             break;
     }
 });
@@ -67,6 +87,13 @@ async function handleScrollInteraction(event){
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+
+  // Apply customCSS from above
+  // copied from GPT-4V-Act to try it out
+  const styleTag = document.createElement('style');
+  styleTag.textContent = customCSS;
+  document.head.append(styleTag);
+
   console.log('DOMContentLoaded for preload-view.js');
 
   document.addEventListener('click', handleMouseInteraction);

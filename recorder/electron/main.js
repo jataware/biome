@@ -145,13 +145,13 @@ app.whenReady().then(() => {
     win.loadURL(appURL); // Loads React app
   });
 
-  ipcMain.on('recorder:mark-page', () => {
+  ipcMain.on('webview:mark-page', () => {
     webviewContentsHandle.send('mark-page');
   });
 
   // payload = 'reload', 'back', 'forward', 'load' (url)
-  ipcMain.on('recorder:navigate-webview', (event, payload) => {
-    webviewContentsHandle.send('navigate-webview', payload);
+  ipcMain.on('recorder:navigate-webview', (event, payload, params) => {
+    webviewContentsHandle.send('navigate-webview', payload, params);
   });
 
   // ------------------- EVENTS FROM WEBVIEW --------------------------------
