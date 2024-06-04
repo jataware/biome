@@ -84,6 +84,8 @@
 
 .sourceImage {
   height: 3.5rem;
+  // width: 3.5rem; // Add a width to make the image a square
+  object-fit: contain; // Make the image scale while maintaining its aspect ratio
   // background-color: var(--surface-100);
 }
 
@@ -108,4 +110,67 @@
   width: 100%;
   color: var(--text-color-secondary);
   padding-bottom: 0.5rem;
+}
+
+.content {
+  display: flex;
+}
+
+.drawer {
+  flex-shrink: 0;
+  width: 350px; /* adjust as needed */
+  background: #fff;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 5em; /* Adjust this value to match the height of the header */
+}
+
+.drawer.open {
+  transform: translateX(0px);
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.drawerDescription {
+  font-size: 0.8em;
+}
+
+.searchBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative; // Add this line
+  margin-top: 1rem;
+}
+
+.searchInput {
+  flex-grow: 1;
+  margin-right: 1rem;
+  border-radius: 4px 0 0 4px;
+  border: 1px solid #ccc; // Add this line
+}
+
+.enterButton {
+  padding: 0.3rem;
+  font-size: 0.8rem;
+  background-color: #ccc; // Change color to grey
+  color: white;
+  border: none;
+  cursor: pointer;
+  position: absolute; // Add this line
+  right: 0; // Add this line
+  border-radius: 0 4px 4px 0; // Add this line
+}
+
+.searchInput, .enterButton {
+  box-sizing: border-box; // Add this line
 }

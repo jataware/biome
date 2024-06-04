@@ -14,6 +14,7 @@ import { ScrollTop } from 'primereact/scrolltop';
 // import Image from 'next/image';
 
 import s from './sources.module.scss';
+import { Panel } from 'primereact/panel';
 
 function lower(s: string) {
   return s ? s.toLowerCase() : null;
@@ -60,7 +61,13 @@ const AvailableUrls = ({ urlObj }) => {
 }
 
 const Sources = ({ category = { name: 'all' }, sources }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedSource, setSelectedSource] = useState(null);
 
+  const onSourceClick = (source) => {
+    setSelectedSource(source);
+    setIsDrawerOpen(true);
+  };
   // const [sources, setFilteredSources] = useState([]);
   const [layout, setLayout] = useState('grid');
 
@@ -121,7 +128,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   const listItem = (source, index) => {
     return (
 
-      <div className="col-12" key={source.id}>
+      <div className="col-12" key={source.id} onClick={() => onSourceClick(source)}>
         <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-3 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
           <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`https://primefaces.org/cdn/primereact/images/products/${source.image}`} alt={source.name} />
           <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
@@ -173,7 +180,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     // )}
 
     return (
-      <div className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard)}>
+      <div className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard)} onClick={() => onSourceClick(source)}>
         <div
           className={classNames("p-3 border-1 surface-border surface-card border-round", s.cardContents)}
         >
@@ -256,14 +263,14 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
 
   const header = () => {
     return (
-      <div className="flex justify-content-between">
+      <div className="flex">
         <Dropdown
           options={sortOptions}
           value={sortKey}
           optionLabel="label"
           placeholder="Sort By Name"
           onChange={onSortChange}
-          className="w-full sm:w-14rem"
+          className="w-full sm:w-14rem mr-4"
         />
         <DataViewLayoutOptions
           layout={layout}
@@ -276,16 +283,39 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   return (
     <div className={s.root}>
       <h4>Sources</h4>
-
-      <DataView
-        className={s.dataview}
-        value={sources}
-        listTemplate={listTemplate}
-        layout={'grid'}
-        header={header()}
-        sortField={sortField}
-        sortOrder={sortOrder}
-      />
+  
+      <div className={s.content}>
+        <DataView
+          className={s.dataview}
+          value={sources}
+          listTemplate={listTemplate}
+          layout={'grid'}
+          header={header()}
+          sortField={sortField}
+          sortOrder={sortOrder}
+        />
+  
+        {isDrawerOpen && (
+          <aside className={`${s.drawer} ${isDrawerOpen ? s.open : ''}`}>
+            <Panel header="Source Details">
+              <button className={s.closeButton} onClick={() => setIsDrawerOpen(false)}>
+                ×
+              </button>
+              {selectedSource && (
+                <div>
+                  <h3>{selectedSource.name}</h3>
+                  <p className={s.drawerDescription}>{selectedSource.description}</p>
+                </div>
+              )}
+              <div className={s.searchBar}> {/* Add this line */}
+                <input type="text" className={s.searchInput} placeholder="Search datasource..." />
+                <button className={s.enterButton}>⏎</button> {/* Add this line */}
+              </div>
+            </Panel>
+          </aside>
+        )}
+      </div>
+  
       <ScrollTop />
     </div>
   )
