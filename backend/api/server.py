@@ -78,6 +78,8 @@ class ScanArguments(BaseModel):
     uris: list[str]
     name: str
 
+class SearchArguments(BaseModel):
+    query: str
 
 @app.post("/scan")
 def gpt_scan_uri(payload: list[ScanArguments]):
@@ -146,3 +148,27 @@ async def add_source_from_payload(request: Request):
     es_client.index(index="datasources", body=body)
 
     return {"success": True}
+
+
+@app.post("/search")
+def search_sources(payload: SearchArguments):
+    logger.info(f"Searching sources with query: {payload.query}")
+
+    q = {
+        "query": {
+            "multi_match": {
+                "query": payload.query,
+                "fields": ["name", "description", "tags", "uris", "source_type"]
+            }
+        }
+    }
+
+    try:
+        results = es_client.search(index="datasources", body=q)
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status_code=500, detail="Error occurred while searching")
+
+    formatted_results = [format_source(hit) for hit in results["hits"]["hits"]]
+
+    return formatted_results
