@@ -78,19 +78,45 @@ export default function Home() {
       });
   }
 
+  function searchSources(query) {
+    if (query === '') {
+      fetchSources();
+    } else {
+      fetch('http://localhost:8001/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setSourceList(data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  }
+
   useEffect(() => {
     fetchSources();
   }, []);
 
 
   const startContent = (
-    <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" shape="circle" />
+    <Avatar shape="circle" />
   );
 
   const centerContent = (
     <span className="p-input-icon-left">
       <i className="pi pi-search" />
-      <InputText placeholder="Search" />
+      <InputText placeholder="Search" onChange={(e) => searchSources(e.target.value)} />
     </span>
   );
 
@@ -139,8 +165,8 @@ export default function Home() {
         <main className={styles.main}>
           <Sources category={category} sources={sourceList} />
         </main>
-        <footer className={styles.footer}>
-        </footer>
+        {/* <footer className={styles.footer}>
+        </footer> */}
       </div>
     </div>
   );
