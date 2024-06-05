@@ -180,7 +180,11 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     // )}
 
     return (
-      <div className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard)} onClick={() => onSourceClick(source)}>
+        <div 
+          className={classNames("col-12 sm:col-12 lg:col-6 xl:col-3 p-2", s.squareCard, 
+            { [s.highlight]: source.id === selectedSource?.id })} 
+          onClick={() => onSourceClick(source)}
+        >
         <div
           className={classNames("p-3 border-1 surface-border surface-card border-round", s.cardContents)}
         >
@@ -233,13 +237,13 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
               <AvailableUrls urlObj={source.urls} />
             )}
 
-            <div className={s.accessType}>
+            {/* <div className={s.accessType}>
               <h4>Data Access:</h4>
               &nbsp;
               <span>
                 {source.access_type}
               </span>
-            </div>
+            </div> */}
 
           </div>
 
@@ -284,7 +288,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     <div className={s.root}>
       <h4>Sources</h4>
   
-      <div className={s.content}>
+      <div className={`${s.content} ${isDrawerOpen ? s.withDrawer : ''}`}>
         <DataView
           className={s.dataview}
           value={sources}
@@ -298,19 +302,19 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
         {isDrawerOpen && (
           <aside className={`${s.drawer} ${isDrawerOpen ? s.open : ''}`}>
             <Panel header="Source Details">
-              <button className={s.closeButton} onClick={() => setIsDrawerOpen(false)}>
-                ×
-              </button>
-              {selectedSource && (
-                <div>
-                  <h3>{selectedSource.name}</h3>
-                  <p className={s.drawerDescription}>{selectedSource.description}</p>
-                </div>
-              )}
-              <div className={s.searchBar}> {/* Add this line */}
-                <input type="text" className={s.searchInput} placeholder="Search datasource..." />
-                <button className={s.enterButton}>⏎</button> {/* Add this line */}
-              </div>
+                  <button className={s.closeButton} onClick={() => setIsDrawerOpen(false)}>
+                    ×
+                  </button>
+                  {selectedSource && (
+                    <div>
+                      <h3>{selectedSource.name}</h3>
+                      <p className={s.drawerDescription}>{selectedSource.description}</p>
+                    </div>
+                  )}
+                  <div className={s.searchBar}> {/* Add this line */}
+                    <input type="text" className={s.searchInput} placeholder="Search datasource..." />
+                    <button className={s.enterButton}>⏎</button> {/* Add this line */}
+                  </div>
             </Panel>
           </aside>
         )}

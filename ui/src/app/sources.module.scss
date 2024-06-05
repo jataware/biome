@@ -114,20 +114,28 @@
 
 .content {
   display: flex;
+  transition: width 0.3s ease-in-out; // Add this line
 }
 
+.content.withDrawer {
+  width: calc(100% - 400px); // Add this line
+}
+
+
 .drawer {
-  flex-shrink: 0;
-  width: 350px; /* adjust as needed */
-  background: #fff;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 60px; // Adjust this line to the height of your header
+  bottom: 0;
+  right: 0;
+  width: 400px;
   overflow-y: auto;
   transition: transform 0.3s ease-in-out;
-  margin-top: 5em; /* Adjust this value to match the height of the header */
+  transform: translateX(100%);
+  background-color: white;
 }
 
 .drawer.open {
-  transform: translateX(0px);
+  transform: translateX(0); // Add this line
 }
 
 .closeButton {
@@ -138,6 +146,8 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
+  color: black;
+  z-index: 10; // Add this line
 }
 
 .drawerDescription {
@@ -173,4 +183,8 @@
 
 .searchInput, .enterButton {
   box-sizing: border-box; // Add this line
+}
+
+.highlight {
+  background-color: rgb(255, 255, 214); 
 }
