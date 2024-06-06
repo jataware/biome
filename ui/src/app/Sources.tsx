@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductService } from "./mock_product_data";
 import { Button } from "primereact/button";
 // import { Avatar } from "primereact/avatar";
@@ -11,6 +11,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 
 import { ScrollTop } from 'primereact/scrolltop';
+import { Carousel } from 'primereact/carousel';
+
 // import Image from 'next/image';
 
 import s from './sources.module.scss';
@@ -60,9 +62,17 @@ const AvailableUrls = ({ urlObj }) => {
   );
 }
 
+
 const Sources = ({ category = { name: 'all' }, sources }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedSource, setSelectedSource] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const [panelWidth, setPanelWidth] = useState("20%");
+  const [showGrids, setShowGrids] = useState(true);
+
+  const [jobId, setJobId] = useState(null);
+  const [logs, setLogs] = useState([]);
 
   const onSourceClick = (source) => {
     setSelectedSource(source);
@@ -124,6 +134,87 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
       setSortKey(value);
     }
   };
+
+  const runJvoyJob = async (event) => {
+    // Prevent the form from being submitted in the default way
+    if (event.type === 'submit') {
+      event.preventDefault();
+    }
+
+    const firstUrlKey = Object.keys(selectedSource.urls)[0];
+    const firstUrl = selectedSource.urls[firstUrlKey];
+
+    const response = await fetch('/api/jvoy/run_task', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_task: searchTerm,
+        start_page: firstUrl
+      })
+    });
+  
+    if (!response.ok) {
+      // Handle error
+      console.error('Failed to run jvoy job');
+      return;
+    }
+  
+    // Set the Panel width and hide the grids
+    setPanelWidth("100%");
+    setShowGrids(false);
+
+    const data = await response.json();
+    console.log('Job ID:', data.job_id);
+
+    // Set the job ID
+    setJobId(data.job_id);    
+  };
+
+  useEffect(() => {
+    if (!jobId) {
+      return;
+    }
+  
+    const timeoutId = setTimeout(() => {
+      const intervalId = setInterval(async () => {
+        // Fetch the job status
+        const statusResponse = await fetch(`/api/lib/status?job_id=${jobId}`);
+  
+        if (!statusResponse.ok) {
+          // Handle error
+          console.error('Failed to fetch job status');
+          return;
+        }
+  
+        const statusData = await statusResponse.json();
+  
+        // If the job is not running/started, stop polling
+        if (statusData.job.status !== 'running' && statusData.job.status !== 'started') {
+          clearInterval(intervalId);
+          return;
+        }
+  
+        // Fetch the logs
+        const logsResponse = await fetch(`/api/jvoy/logs/${jobId}`);
+  
+        if (!logsResponse.ok) {
+          // Handle error
+          console.error('Failed to fetch logs');
+          return;
+        }
+  
+        const newLogs = await logsResponse.json();
+        setLogs(newLogs);
+      }, 5000);  // Poll every 5 seconds
+  
+      return () => clearInterval(intervalId);
+    }, 1000);  // Start polling after 10 seconds
+  
+    return () => clearTimeout(timeoutId);
+  }, [jobId]);
+
 
   const listItem = (source, index) => {
     return (
@@ -284,25 +375,43 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     );
   };
 
+  const logsCarouselTemplate = (log) => {
+    const logLines = log.split('\n');
+    return (
+      <div className="carousel-item-content">
+        {logLines.map((line, i) => {
+          const lineHtml = line.trim();
+          if (lineHtml.startsWith('<img')) {
+            return <div className="carousel-item-image" key={i} dangerouslySetInnerHTML={{ __html: lineHtml }} />;
+          } else {
+            return <p key={i} dangerouslySetInnerHTML={{ __html: lineHtml }} />;
+          }
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className={s.root}>
       <h4>Sources</h4>
   
       <div className={`${s.content} ${isDrawerOpen ? s.withDrawer : ''}`}>
-        <DataView
-          className={s.dataview}
-          value={sources}
-          listTemplate={listTemplate}
-          layout={'grid'}
-          header={header()}
-          sortField={sortField}
-          sortOrder={sortOrder}
-        />
+    {showGrids && (
+          <DataView
+            className={s.dataview}
+            value={sources}
+            listTemplate={listTemplate}
+            layout={'grid'}
+            header={header()}
+            sortField={sortField}
+            sortOrder={sortOrder}
+          />
+      )}
   
         {isDrawerOpen && (
-          <aside className={`${s.drawer} ${isDrawerOpen ? s.open : ''}`}>
+          <aside className={`${s.drawer} ${isDrawerOpen ? s.open : ''}`} style={{ width: panelWidth }}>
             <Panel header="Source Details">
-                  <button className={s.closeButton} onClick={() => setIsDrawerOpen(false)}>
+                  <button className={s.closeButton} onClick={() => {setIsDrawerOpen(false); setShowGrids(true);}}>
                     ×
                   </button>
                   {selectedSource && (
@@ -311,10 +420,21 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                       <p className={s.drawerDescription}>{selectedSource.description}</p>
                     </div>
                   )}
-                  <div className={s.searchBar}> {/* Add this line */}
-                    <input type="text" className={s.searchInput} placeholder="Search datasource..." />
-                    <button className={s.enterButton}>⏎</button> {/* Add this line */}
+                  <div className={s.searchBar}>
+                    <form onSubmit={runJvoyJob} className={s.searchBar}>
+                      <textarea 
+                          className={s.searchInput} 
+                          placeholder="Search datasource..." 
+                          value={searchTerm}
+                          onChange={e => setSearchTerm(e.target.value)}
+                      />
+                      <button type="submit" className={s.enterButton}>⏎</button>
+                    </form>
                   </div>
+
+                  <div className={s.logContainer}>
+                  <Carousel value={logs} itemTemplate={logsCarouselTemplate} numVisible={1} numScroll={1} className="custom-carousel" circular={false} />
+                  </div>               
             </Panel>
           </aside>
         )}

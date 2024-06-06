@@ -160,18 +160,22 @@
   align-items: center;
   position: relative; // Add this line
   margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .searchInput {
   flex-grow: 1;
-  margin-right: 1rem;
+  width: 100%; // Set the width to 100% of the parent container
+  margin-right: 3rem;
   border-radius: 4px 0 0 4px;
-  border: 1px solid #ccc; // Add this line
+  border: 1px solid #ccc;
+  resize: none; // Prevent the textarea from being manually resized
 }
 
 .enterButton {
   padding: 0.3rem;
-  font-size: 0.8rem;
+  font-size: 1.9rem;
   background-color: #ccc; // Change color to grey
   color: white;
   border: none;
@@ -187,4 +191,21 @@
 
 .highlight {
   background-color: rgb(255, 255, 214); 
+}
+
+.carousel-item-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #000; /* Change this to the color and width you want */
+  padding: 10px; /* Add some padding so the content isn't right against the border */
+  height: 100%; /* Make the div take up the full height of the carousel item */
+}
+
+.carousel-item-content .carousel-item-image {
+  flex: 0 0 auto !important;
+  max-width: 200px !important; // Adjust this value as needed
+  max-height: 200px !important; // Adjust this value as needed
+  margin: 10px !important;
 }
