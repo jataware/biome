@@ -67,6 +67,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedSource, setSelectedSource] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchStarted, setIsSearchStarted] = useState(false);
   
   const [panelWidth, setPanelWidth] = useState("20%");
   const [showGrids, setShowGrids] = useState(true);
@@ -421,7 +422,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                     </div>
                   )}
                   <div className={s.searchBar}>
-                    <form onSubmit={runJvoyJob} className={s.searchBar}>
+                  <form onSubmit={(e) => { runJvoyJob(e); setIsSearchStarted(true); }} className={s.searchBar}>
                       <textarea 
                           className={s.searchInput} 
                           placeholder="Search datasource..." 
@@ -431,10 +432,20 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                       <button type="submit" className={s.enterButton}>⏎</button>
                     </form>
                   </div>
-
-                  <div className={s.logContainer}>
-                  <Carousel value={logs} itemTemplate={logsCarouselTemplate} numVisible={1} numScroll={1} className="custom-carousel" circular={false} />
-                  </div>               
+                  {isSearchStarted && (
+                    <div className={s.logContainer}>
+                      <Carousel 
+                          value={logs} 
+                          itemTemplate={logsCarouselTemplate} 
+                          numVisible={2} 
+                          numScroll={1} 
+                          className="custom-carousel" 
+                          circular={false} 
+                          showThumbs={false} 
+                          showStatus={false}
+                        />
+                    </div>
+                  )}      
             </Panel>
           </aside>
         )}

@@ -45,6 +45,7 @@ def run_jvoy_task(
     )
     return {"queued": True, "job_id": job.id}
 
+
 @router.get("/logs/{job_id}", response_model=List[str])
 def get_logs(request: Request, job_id: str):
     # get redis connection
@@ -56,9 +57,6 @@ def get_logs(request: Request, job_id: str):
     # Convert the logs from bytes to strings
     logs = [log.decode('utf-8') for log in logs]
 
-    # Invert the list
-    # logs.reverse()
-
     # Remove elements that begin with "Element Labels" or "![log image"
     logs = [
         log for log in logs 
@@ -67,7 +65,6 @@ def get_logs(request: Request, job_id: str):
     ]
 
     # Split the logs into chunks based on the "## Observation:" string
-    # so each chunk is an observation and agent response
     chunks = []
     chunk = []
     for log in logs:
@@ -81,29 +78,36 @@ def get_logs(request: Request, job_id: str):
         chunks.append(chunk)
 
     # Process markdown and base64 encoded images
-    img_counter = 0
     for chunk in chunks:
-        # added this image included checker to filter for just the first image
-        # so that things are more readable in the UI
-        # and the multiple JVoy scrolled screenshots are not included
-        # image_included = False
+        image_added = False
         for i, log in enumerate(chunk):
-            if log.startswith('base64 image:'):
+            if log.startswith('base64 image:') and not image_added:
                 base64_str = log.replace('base64 image: ', '')
                 img_data = base64.b64decode(base64_str)
-                img = Image.open(BytesIO(img_data))
-                img_path = f'static/images/{job_id}_{img_counter}.png'
-                img_counter += 1
 
-                # Ensure image directory exists
-                if not os.path.exists("static/images"):
-                    os.makedirs("static/images")
+                # Create a hash of the image data
+                img_hash = hashlib.sha256(img_data).hexdigest()
+                img_path = f'static/images/{job_id}_{img_hash}.png'
 
-                img.save(img_path)
-                chunk[i] = f'<img src="/api/{img_path}" style="width:40%; margin-bottom:2rem;"/>'
-                # image_included = True
+                # Check if the hash already exists in Redis
+                if not r.sismember(f'img_hashes:{job_id}', img_hash):
+                    # If the hash doesn't exist, save the image and add the hash to Redis
+                    img = Image.open(BytesIO(img_data))
+
+                    # Ensure image directory exists
+                    if not os.path.exists("static/images"):
+                        os.makedirs("static/images")
+
+                    img.save(img_path)
+
+                    # Add the hash to the 'img_hashes' set in Redis
+                    r.sadd(f'img_hashes:{job_id}', img_hash)
+
+                # even if the image is already saved, we still need to update the log chunk with the image tag
+                chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}" style="width:90%; margin-bottom:2rem;"/></a>'
+                image_added = True
             elif log.startswith('base64 image:'):
-                chunk[i] = ''  # Remove subsequent images from the chunk
+                chunk[i] = '' 
             else:
                 chunk[i] = markdown(log)
 
