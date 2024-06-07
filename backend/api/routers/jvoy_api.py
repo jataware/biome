@@ -64,6 +64,9 @@ def get_logs(request: Request, job_id: str):
         and not log.startswith('![log image')
     ]
 
+    # Reverse the logs to get them back in the correct order
+    logs.reverse()
+
     # Split the logs into chunks based on the "## Observation:" string
     chunks = []
     chunk = []
@@ -104,11 +107,23 @@ def get_logs(request: Request, job_id: str):
                     r.sadd(f'img_hashes:{job_id}', img_hash)
 
                 # even if the image is already saved, we still need to update the log chunk with the image tag
-                chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}" style="width:90%; margin-bottom:2rem;"/></a>'
+                chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'
                 image_added = True
             elif log.startswith('base64 image:'):
                 chunk[i] = '' 
             else:
+                # this is a regular (text) log entry
+                # Make 'Action:' and 'Thought:' bold, etc
+                log = log.replace('ANSWER;', '<b>ANSWER:</b>')
+                log = log.replace('Action:', '<b>Action:</b>')
+                log = log.replace('Thought:', '<b>Thought:</b>')
+                log = log.replace('State:', '<b>Action:</b>')
+                log = log.replace('Plan:', '<b>Thought:</b>')
+
+                # Find URLs and replace them with <a> tags
+                url_pattern = r'(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)'
+                log = re.sub(url_pattern, r'<a href="\1" target="_blank">\1</a>', log)
+
                 chunk[i] = markdown(log)
 
     # Convert each chunk to an HTML string

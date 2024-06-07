@@ -92,10 +92,10 @@ services:
         condition: service_healthy
     container_name: sources_workers_jvoy
     # restart: always
-    # volumes:
-    # - type: bind
-    #   source: ./backend/
-    #   target: /backend
+    volumes:
+    - type: bind
+      source: ./jvoy-results/
+      target: /jvoy/jvoy/results
     networks:
       sources: null
     command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings jvoy"]

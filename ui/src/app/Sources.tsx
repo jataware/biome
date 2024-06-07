@@ -434,18 +434,12 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                   </div>
                   {isSearchStarted && (
                     <div className={s.logContainer}>
-                      <Carousel 
-                          value={logs} 
-                          itemTemplate={logsCarouselTemplate} 
-                          numVisible={2} 
-                          numScroll={1} 
-                          className="custom-carousel" 
-                          circular={false} 
-                          showThumbs={false} 
-                          showStatus={false}
-                        />
+                      {logs.map((log, index) => (
+                        <div key={index} className={s.logChunk} dangerouslySetInnerHTML={{ __html: log }}>
+                        </div>
+                      ))}
                     </div>
-                  )}      
+                  )}
             </Panel>
           </aside>
         )}
