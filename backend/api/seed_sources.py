@@ -165,6 +165,74 @@ starting_sources = [
         "contact": {"email": "PDCHelpDesk@mail.nih.gov"},
         "metadata": {"scanned_uris": ["https://pdc.cancer.gov/pdc/about"]},
     },
+    {
+    "name":"CDC Open Data",
+    "initials": None,
+    "description":"Centers for Disease Control and Prevention's open data portal providing various datasets, including COVID-19 datasets, disability status and types data, and state-based motor vehicle data.",
+    "logo_url":"https://data.cdc.gov/api/assets/471B2483-2373-4083-B711-051170D91D8B",
+    "datasets":[
+        "COVID-19 Public Data Sets",
+        "Disability Status and Types Data",
+        "State-based Motor Vehicle Data"
+    ],
+    "categories":[
+        "clinical"
+    ],
+    "tags":[
+        "human"
+    ],
+    "urls":{
+        "home_page":"https://data.cdc.gov/",
+        "git_repository":"https://github.com/CDCgov"
+    },
+    "use_cases":[
+        
+    ],
+    "documentation":[
+        {
+            "name":"BACTFACTS Interactive Dashboard",
+            "url":"https://www.cdc.gov/abcs/bact-facts-interactive-dashboard.html"
+        },
+        {
+            "name":"HAICViz",
+            "url":"https://www.cdc.gov/hai/eip/haicviz.html"
+        },
+        {
+            "name":"NCHHSTP AtlasPlus",
+            "url":"https://www.cdc.gov/nchhstp/atlas/index.htm"
+        },
+        {
+            "name":"CDC COVID-19 Data Tracker Vaccination Data",
+            "url":"https://data.cdc.gov/browse?q=izdl&sortBy=relevance"
+        }
+    ],
+    "collections":[
+        
+    ],
+    "data_categories":[
+        
+    ],
+    "data_types":[
+        "data sets"
+    ],
+    "file_formats":[
+        
+    ],
+    "external_references":[
+        
+    ],
+    "access_type":"open",
+    "capabilities":[
+        "ui_case_search"
+    ],
+    "oms_methods":[
+        
+    ],
+    "contact":{
+        "email": None
+    },
+    "source_url":"https://data.cdc.gov/"
+    },
 ]
 
 

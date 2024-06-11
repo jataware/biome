@@ -1,0 +1,22 @@
+from --platform=linux/amd64 python:3.11.6-bookworm
+
+# Install dependencies
+RUN apt update && \
+    apt install -y git chromium pandoc texlive-latex-base texlive-latex-recommended 
+
+# Clone jvoy (note special branch)
+WORKDIR /
+RUN git clone https://github.com/jataware/jvoy.git
+WORKDIR /jvoy
+
+# Install jvoy
+RUN pip install --upgrade pip poetry
+RUN useradd -ms /bin/bash unprivileged
+RUN chown -R unprivileged /jvoy
+USER unprivileged
+RUN poetry install --no-root
+
+COPY ./worker/ /jvoy/worker
+
+ENV JVOY_DOCKER=1
+ENV DISPLAY=:99

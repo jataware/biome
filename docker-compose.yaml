@@ -19,8 +19,8 @@ services:
       protocol: tcp
     # restart: always
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+      - ES_HOST=${ES_HOST}
+      - ES_PORT=${ES_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
     volumes:
@@ -54,8 +54,8 @@ services:
     # - host.docker.internal:host-gateway
   sources_workers:
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
-      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT}
+      - ES_HOST=${ES_HOST}
+      - ES_PORT=${ES_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
     working_dir: /backend
@@ -76,6 +76,30 @@ services:
     networks:
       sources: null
     command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings"]
+  sources_jvoy_workers:
+    environment:
+      - ES_HOST=${ES_HOST}
+      - ES_PORT=${ES_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - REDIS_HOST=sources_rq_redis
+    # working_dir: /backend
+    build:
+      context: ./backend/
+      dockerfile: ./docker/workers/Dockerfile.jvoy
+    depends_on:
+      sources_rq_redis:
+        condition: service_healthy
+    container_name: sources_workers_jvoy
+    # restart: always
+    volumes:
+    - type: bind
+      source: ./jvoy-results/
+      target: /jvoy/jvoy/results
+    networks:
+      sources: null
+    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings jvoy"]
+
 
     # deploy:
     #   resources:
@@ -317,34 +341,34 @@ services:
     profiles:
       - dev
 
-  beaker:
-    build:
-      context: ./dev/dockerfiles/beaker
+  # beaker:
+  #   build:
+  #     context: ./dev/dockerfiles/beaker
 
-    ports:
-      - "8888:8888"
-    environment:
-      - JUPYTER_SERVER=http://beaker:8888
-      - JUPYTER_TOKEN=89f73481102c46c0bc13b2998f9a4fce
-      - ENABLE_USER_PROMPT=true
-      - OPENAI_API_KEY
-      - PYTHONPATH=/jupyter
-    networks:
-      sources: null
-    command: ["python", "-m", "beaker_kernel.server.main", "--debug", "--ip", "0.0.0.0"]
+  #   ports:
+  #     - "8888:8888"
+  #   environment:
+  #     - JUPYTER_SERVER=http://beaker:8888
+  #     - JUPYTER_TOKEN=89f73481102c46c0bc13b2998f9a4fce
+  #     - ENABLE_USER_PROMPT=true
+  #     - OPENAI_API_KEY
+  #     - PYTHONPATH=/jupyter
+  #   networks:
+  #     sources: null
+  #   command: ["python", "-m", "beaker_kernel.server.main", "--debug", "--ip", "0.0.0.0"]
 
 
-  notebook:
-    image: node:20
-    user: node
-    volumes:
-      - ./notebook:/ui
-    working_dir: "/ui"
-    ports:
-      - "8080:8080"
-    command: ["npm", "run", "serve"]
-    networks:
-      sources: null
+  # notebook:
+  #   image: node:20
+  #   user: node
+  #   volumes:
+  #     - ./notebook:/ui
+  #   working_dir: "/ui"
+  #   ports:
+  #     - "8080:8080"
+  #   command: ["npm", "run", "serve"]
+  #   networks:
+  #     sources: null
 
 
 

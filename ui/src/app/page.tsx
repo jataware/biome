@@ -5,6 +5,7 @@ import styles from "./page.module.scss";
 import { Toolbar } from "primereact/toolbar";
 import { Avatar } from "primereact/avatar";
 import { InputText } from "primereact/inputtext";
+import { Panel } from 'primereact/panel';
 
 import { Checkbox } from "primereact/checkbox";
 // import Image from "next/image";
@@ -60,9 +61,9 @@ export default function Home() {
   const [category, setCategory] = useState({ name: 'all', code: 'all' });
 
   const [sourceList, setSourceList] = useState([]);
-
+    
   function fetchSources() {
-    fetch('http://localhost:8001/api/sources')
+    fetch('/api/sources')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -82,7 +83,7 @@ export default function Home() {
     if (query === '') {
       fetchSources();
     } else {
-      fetch('http://localhost:8001/api/search', {
+      fetch('/api/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -163,7 +164,14 @@ export default function Home() {
 
         </aside>
         <main className={styles.main}>
-          <Sources category={category} sources={sourceList} />
+            <Sources 
+              category={category} 
+              sources={sourceList} 
+              onSourceClick={(source) => {
+                setSelectedSource(source);
+                setIsDrawerOpen(true);
+              }}
+            />
         </main>
         {/* <footer className={styles.footer}>
         </footer> */}

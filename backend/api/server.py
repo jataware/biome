@@ -1,4 +1,5 @@
 from fastapi import FastAPI, exceptions, Request  # HttpException, status
+from fastapi.staticfiles import StaticFiles
 import logging
 from pydantic import BaseModel
 import os
@@ -12,6 +13,12 @@ from lib.job_queue import get_job_status
 from lib.gpt_scraper.websource import WebSource
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
+from contextlib import asynccontextmanager
+
+from .routers import jvoy_api, koro_api, lib_api
+from .globalState import GlobalState
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +49,27 @@ def setup_elasticsearch_indexes():
 
     seed(es_client, "datasources")
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code goes here
+    app.state.global_state = GlobalState()
+    setup_elasticsearch_indexes()
+    yield
+    # Shutdown code goes here
 
-app = FastAPI(docs_url="/")
+app = FastAPI(docs_url="/", lifespan=lifespan)
+
+# Ensure static directory exists
+if not os.path.exists("static"):
+    os.makedirs("static")
+
+# Mount static files server
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.include_router(lib_api.router)
+app.include_router(jvoy_api.router)
+app.include_router(koro_api.router)
 
 origins = ["*"]
 
@@ -64,9 +90,9 @@ app.add_middleware(
 #     return JSONResponse({"detail": exc_json}, status_code=422)
 
 
-@app.on_event("startup")
-async def startup_event() -> None:
-    setup_elasticsearch_indexes()
+# @app.on_event("startup")
+# async def startup_event() -> None:
+#     setup_elasticsearch_indexes()
 
 
 @app.get("/status")

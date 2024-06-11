@@ -15,6 +15,8 @@ uvicorn = "^0.24.0.post1"
 requests = "^2.31.0"
 python-dotenv = "^1.0.1"
 elasticsearch = "^8.13.0"
+markdown = "^3.6"
+pillow = "^10.3.0"
 
 [tool.poetry.group.workers.dependencies]
 selenium = "^4.18.1"
