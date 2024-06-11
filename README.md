@@ -28,7 +28,9 @@ which you may encrypt on disk.
 
 One the Initial project setup is completed,
 
-Backend:
+`mkdir jvoy-results` 
+
+then:
 `docker compose --profile deploy --profile dev up -d`
 
 
