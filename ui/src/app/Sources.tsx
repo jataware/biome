@@ -181,7 +181,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     const timeoutId = setTimeout(() => {
       const intervalId = setInterval(async () => {
         // Fetch the job status
-        const statusResponse = await fetch(`/api/lib/status?job_id=${jobId}`);
+        const statusResponse = await fetch(`http://localhost:8001/api/lib/status?job_id=${jobId}`);
   
         if (!statusResponse.ok) {
           // Handle error

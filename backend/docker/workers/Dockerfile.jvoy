@@ -6,7 +6,7 @@ RUN apt update && \
 
 # Clone jvoy (note special branch)
 WORKDIR /
-RUN git clone --branch scooter-integration https://github.com/jataware/jvoy.git
+RUN git clone https://github.com/jataware/jvoy.git
 WORKDIR /jvoy
 
 # Install jvoy

@@ -63,7 +63,7 @@ export default function Home() {
   const [sourceList, setSourceList] = useState([]);
     
   function fetchSources() {
-    fetch('http://localhost:8001/api/sources')
+    fetch('/api/sources')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -83,7 +83,7 @@ export default function Home() {
     if (query === '') {
       fetchSources();
     } else {
-      fetch('http://localhost:8001/api/search', {
+      fetch('/api/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
