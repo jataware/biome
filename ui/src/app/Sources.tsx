@@ -145,7 +145,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     const firstUrlKey = Object.keys(selectedSource.urls)[0];
     const firstUrl = selectedSource.urls[firstUrlKey];
 
-    const response = await fetch('/api/jvoy/run_task', {
+    const response = await fetch('http://localhost:8001/api/jvoy/run_task', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -198,7 +198,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
         }
   
         // Fetch the logs
-        const logsResponse = await fetch(`/api/jvoy/logs/${jobId}`);
+        const logsResponse = await fetch(`http://localhost:8001/api/jvoy/logs/${jobId}`);
   
         if (!logsResponse.ok) {
           // Handle error
@@ -448,10 +448,6 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
       <ScrollTop />
     </div>
   )
-
-  // paginator
-  // rows={5}
-
 }
 
 export default Sources;
