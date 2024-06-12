@@ -1,9 +1,11 @@
 import logging
 import json
+from pathlib import Path
 
 from jvoy.profiler import WebPageProfiler
+from jvoy.driver import JvoyDriver
 
-from lib.models import WebSource
+from lib.models import WebSource, QueryArguments
 from lib import api_clients
 
 
@@ -23,4 +25,19 @@ def scan(sources: list[WebSource]):
         results = profiler.run()
         body = json.dumps(results)
         elastic.index(index="datasources", body=body)
+    return {}
+
+
+def query(args: QueryArguments, job_id):
+    driver = JvoyDriver(
+        url=args["url"],
+        supporting_docs=args["supporting_docs"],
+        results_dir=Path("/tmp/results"),
+        timeout=20,
+        #adblock=False,
+        #port=8080,
+        job_id=job_id,
+    )
+    driver.run(args["user_task"])
+    driver.end()
     return {}

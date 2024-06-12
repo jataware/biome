@@ -116,15 +116,14 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     }
   };
 
-  const runJvoyJob = async (event) => {
+  const querySource = async (event) => {
     if (event.type === 'submit') {
       event.preventDefault();
     }
 
-    const firstUrlKey = Object.keys(selectedSource.urls)[0];
-    const firstUrl = selectedSource.urls[firstUrlKey];
+    const firstUrl = Object.keys(selectedSource.content["Information on Links on Web Page"])[0];
 
-    const response = await fetch('http://localhost:8001/api/jvoy/query', {
+    const response = await fetch('http://localhost:8001/api/query', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -156,7 +155,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   
     const timeoutId = setTimeout(() => {
       const intervalId = setInterval(async () => {
-        const statusResponse = await fetch(`http://localhost:8001/api/lib/status?job_id=${jobId}`);
+        const statusResponse = await fetch(`http://localhost:8001/api/status/${jobId}`);
   
         if (!statusResponse.ok) {
           console.error('Failed to fetch job status');
@@ -171,7 +170,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
           return;
         }
   
-        const logsResponse = await fetch(`http://localhost:8001/api/jvoy/logs/${jobId}`);
+        const logsResponse = await fetch(`http://localhost:8001/api/logs/${jobId}`);
   
         if (!logsResponse.ok) {
           console.error('Failed to fetch logs');
@@ -348,7 +347,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                     </div>
                   )}
                   <div className={s.searchBar}>
-                  <form onSubmit={(e) => { runJvoyJob(e); setIsSearchStarted(true); }} className={s.searchBar}>
+                  <form onSubmit={(e) => { querySource(e); setIsSearchStarted(true); }} className={s.searchBar}>
                       <textarea 
                           className={s.searchInput} 
                           placeholder="Search datasource..." 

@@ -57,7 +57,7 @@ class Replay(BaseModel):
     record: list[ReplayStep]
 
 
-class JvoyQueryArguments(BaseModel):
+class QueryArguments(BaseModel):
     user_task: str
     supporting_docs: dict[str, Any] | None = None
     url: str = "https://www.google.com"

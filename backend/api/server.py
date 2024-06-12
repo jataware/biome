@@ -1,21 +1,28 @@
-from fastapi import FastAPI, exceptions, Request  # HttpException, status
+from fastapi import FastAPI, exceptions, Request, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 import logging
 from pydantic import BaseModel
 import os
 import json
+from datetime import datetime
 from rq import Queue, Retry
+from rq.job import Job
 from redis import Redis
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from PIL import Image
+from io import BytesIO
+from markdown import markdown
+import base64
+import hashlib
+from lib.browser_pool import active_clients
 from lib.job_queue import get_job_status
-from lib.models import WebSource
+from lib.models import WebSource, QueryArguments
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
 from contextlib import asynccontextmanager
 
-from .routers import jvoy_api, koro_api, lib_api
 from .globalState import GlobalState
 
 
@@ -68,9 +75,6 @@ if not os.path.exists("static"):
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.include_router(lib_api.router)
-app.include_router(jvoy_api.router)
-app.include_router(koro_api.router)
 
 origins = ["*"]
 
@@ -96,7 +100,7 @@ app.add_middleware(
 #     setup_elasticsearch_indexes()
 
 
-@app.get("/status")
+@app.get("/status/job_id")
 def status(job_id: str):
     return get_job_status(job_id, redis)
 
@@ -109,7 +113,7 @@ class SearchArguments(BaseModel):
     query: str
 
 @app.post("/scan")
-def gpt_scan_uri(payload: list[ScanArguments]):
+def scan_uri(payload: list[ScanArguments]):
     logger.info(f"Queueing scan fn, uris: {payload}")
     sources = [WebSource(name=source.name, uris=source.uris).dict() for source in payload]
     job = job_queue.enqueue_call(
@@ -122,6 +126,24 @@ def gpt_scan_uri(payload: list[ScanArguments]):
     # poll here but stream to client as things are ready..
 
     return {"queued": True, "job_id": job.id}
+
+@app.post("/query")
+def query(payload: QueryArguments):
+    logger.info(f"Queueing scan fn, uris: {payload}")
+    data = f'{datetime.now().isoformat()}'
+    job_id = hashlib.sha256(data.encode()).hexdigest()
+    job = job_queue.enqueue_call(
+        job_id=job_id,
+        func="worker.jobs.query",
+        args=[payload.dict(), job_id],
+        retry=Retry(max=3, interval=[10, 30, 60]),
+    )
+
+    # TODO instead of returning ID, maybe start stream and
+    # poll here but stream to client as things are ready..
+
+    return {"queued": True, "job_id": job.id}
+
 
 
 def add_id(hit):
@@ -199,3 +221,91 @@ def search_sources(payload: SearchArguments):
     formatted_results = [format_source(hit) for hit in results["hits"]["hits"]]
 
     return formatted_results
+
+
+@app.get("/displays")
+def displays():
+    return active_clients()
+
+@app.get("/kill/{job_id}")
+def kill_job(job_id: str):
+    job = Job.fetch(job_id, connection=redis)
+    return job.kill()
+
+
+@app.get("/logs/{job_id}", response_model=list[str])
+def get_logs(job_id: str):
+    # Get the logs from the 'logs' list in Redis
+    logs = redis.lrange(f'logs:{job_id}', 0, -1)
+
+    logs = [log.decode('utf-8') for log in logs]
+
+    logs = [
+        log for log in logs 
+        if not log.startswith('Element Labels') 
+        and not log.startswith('![log image')
+    ]
+
+    logs.reverse()
+
+    chunks = []
+    chunk = []
+    for log in logs:
+        if log.startswith('## Observation:'):
+            if chunk:
+                chunks.append(chunk)
+            chunk = [log]
+        else:
+            chunk.append(log)
+    if chunk:
+        chunks.append(chunk)
+
+    for chunk in chunks:
+        image_added = False
+        for i, log in enumerate(chunk):
+            if log.startswith('base64 image:') and not image_added:
+                base64_str = log.replace('base64 image: ', '')
+                img_data = base64.b64decode(base64_str)
+
+                # Create a hash of the image data
+                img_hash = hashlib.sha256(img_data).hexdigest()
+                img_path = f'static/images/{job_id}_{img_hash}.png'
+
+                # Check if the hash already exists in Redis
+                if not r.sismember(f'img_hashes:{job_id}', img_hash):
+                    # If the hash doesn't exist, save the image and add the hash to Redis
+                    img = Image.open(BytesIO(img_data))
+
+                    # Ensure image directory exists
+                    if not os.path.exists("static/images"):
+                        os.makedirs("static/images")
+
+                    img.save(img_path)
+
+                    # Add the hash to the 'img_hashes' set in Redis
+                    redis.sadd(f'img_hashes:{job_id}', img_hash)
+
+                # even if the image is already saved, we still need to update the log chunk with the image tag
+                chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'
+                image_added = True
+            elif log.startswith('base64 image:'):
+                chunk[i] = '' 
+            else:
+                # this is a regular (text) log entry
+                # Make 'Action:' and 'Thought:' bold, etc
+                log = log.replace('ANSWER;', '<b>ANSWER:</b>')
+                log = log.replace('Action:', '<b>Action:</b>')
+                log = log.replace('Thought:', '<b>Thought:</b>')
+                log = log.replace('State:', '<b>Action:</b>')
+                log = log.replace('Plan:', '<b>Thought:</b>')
+
+                # Find URLs and replace them with <a> tags
+                url_pattern = r'(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)'
+                log = re.sub(url_pattern, r'<a href="\1" target="_blank">\1</a>', log)
+
+                chunk[i] = markdown(log)
+
+    # Convert each chunk to an HTML string
+    chunks = ['\n'.join(chunk) for chunk in chunks]
+
+    return chunks

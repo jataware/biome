@@ -79,38 +79,6 @@ services:
     command: > 
       bash -c  "poetry install 
       && poetry run rq worker --with-scheduler -c worker.settings"
-  sources_jvoy_workers:
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-      - REDIS_HOST=sources_rq_redis
-    # working_dir: /backend
-    build:
-      context: ./backend/
-      dockerfile: ./docker/Dockerfile.jvoy
-    depends_on:
-      sources_rq_redis:
-        condition: service_healthy
-    container_name: sources_workers_jvoy
-    # restart: always
-    volumes:
-    - type: bind
-      source: ./jvoy-results/
-      target: /jvoy/jvoy/results
-    networks:
-      sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings jvoy"]
-
-
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
   sources_router:
     image: caddy
     hostname: sources_router.sources
