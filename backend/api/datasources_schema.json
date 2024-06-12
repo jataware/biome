@@ -1,0 +1,35 @@
+{
+    "mappings": {
+      "properties": {
+        "content": {
+          "properties": {
+            "Web Page Descriptions": {
+              "properties": {
+                "name": {
+                  "type": "text"
+                },
+                "initials": {
+                  "type": "text"
+                },
+                "actions": {
+                  "type": "text"
+                },
+                "sections": {
+                  "type": "text"
+                }
+              }
+            },
+            "Information on Links on Web Page": {
+              "type": "flattened"
+            },
+            "Information on options on web page": {
+              "type": "flattened"
+            }
+          }
+        },
+        "summary": {
+          "type": "text"
+        }
+      }
+    }
+  }

@@ -45,7 +45,8 @@ def setup_elasticsearch_indexes():
     for idx, config in indices.items():
         if not es_client.indices.exists(index=idx):
             logger.info(f"Creating index {idx}")
-            es_client.indices.create(index=idx, body=config)
+            mappings = json.load(open(f"/backend/api/datasources_schema.json"))["mappings"]
+            es_client.indices.create(index=idx, body=config, mappings=mappings)   
 
     seed(es_client, "datasources")
 
