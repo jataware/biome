@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "api"
+name = "service"
 version = "0.0.1"
 description = "FASTAPI server that hosts api and manages queue/worker job start."
 authors = ["Team Jataware <joel@jataware.com>"]
 readme = "README.md"
+packages = [{include = "api"}, {include="lib"}, {include="worker"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 fastapi = "^0.104.1"
 pydantic-settings = "^2.1.0"
 openai = "^1.14.2"
@@ -20,9 +21,9 @@ pillow = "^10.3.0"
 
 [tool.poetry.group.workers.dependencies]
 selenium = "^4.18.1"
+jvoy = { git = "https://github.com/jataware/jvoy.git", branch = "profiler" }
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.3"
 black = "^23.12.0"
 
 [build-system]

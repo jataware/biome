@@ -1,7 +1,7 @@
 import subprocess
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
-from lib.models import JvoyTaskArguments
+from lib.models import JvoyQueryArguments, JvoyPageanalyzerArguments
 from typing import List
 import hashlib
 from datetime import datetime
@@ -19,22 +19,19 @@ router = APIRouter(
     responses={404: {"description": "Not Found"}}
 )
 
-@router.post("/run_task")
-def run_jvoy_task(
-    payload: JvoyTaskArguments,
+@router.post("/query")
+def jvoy_query(
+    payload: JvoyQueryArguments,
     request: Request
     ):
 
-    # Create a string from the user task and the current date
     data = f'{payload.user_task}{datetime.now().isoformat()}'
 
-    # Create a hash from the string
     job_id = hashlib.sha256(data.encode()).hexdigest()
 
-    # Build the shell command
     # TODO: add support for the supporting docs--eg. coming from ES from the initial profiling
     # of the data source
-    cmd = f'poetry run python -m jvoy.run -o "{payload.user_task}" -p "{payload.start_page}" -i "{job_id}"'
+    cmd = f'poetry run python -m jvoy.run -o "{payload.user_task}" -p "{payload.url}" -i "{job_id}"'
     
     job = request.app.state.global_state.job_queue.enqueue_call(
         func=subprocess.run,

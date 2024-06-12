@@ -4,13 +4,14 @@ services:
     working_dir: /backend
     build:
       context: ./backend
-      dockerfile: ./docker/api/Dockerfile
+      dockerfile: ./docker/Dockerfile.api
     depends_on:
       sources_es:
         condition: service_healthy
       sources_rq_redis:
         condition: service_healthy
-    command: ["bash", "-c", "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
+    command: > 
+      bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
     container_name: sources_api
     ports:
     - mode: ingress
@@ -61,7 +62,7 @@ services:
     working_dir: /backend
     build:
       context: ./backend/
-      dockerfile: ./docker/workers/Dockerfile
+      dockerfile: ./docker/Dockerfile.worker
     depends_on:
       sources_rq_redis:
         condition: service_healthy
@@ -75,7 +76,9 @@ services:
       target: /backend
     networks:
       sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings"]
+    command: > 
+      bash -c  "poetry install 
+      && poetry run rq worker --with-scheduler -c worker.settings"
   sources_jvoy_workers:
     environment:
       - ES_HOST=${ES_HOST}
@@ -86,7 +89,7 @@ services:
     # working_dir: /backend
     build:
       context: ./backend/
-      dockerfile: ./docker/workers/Dockerfile.jvoy
+      dockerfile: ./docker/Dockerfile.jvoy
     depends_on:
       sources_rq_redis:
         condition: service_healthy

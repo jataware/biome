@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from lib.job_queue import get_job_status
-from lib.gpt_scraper.websource import WebSource
+from lib.models import WebSource
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
 from contextlib import asynccontextmanager
@@ -111,9 +111,9 @@ class SearchArguments(BaseModel):
 @app.post("/scan")
 def gpt_scan_uri(payload: list[ScanArguments]):
     logger.info(f"Queueing scan fn, uris: {payload}")
-    sources = [WebSource(source.name, source.uris) for source in payload]
+    sources = [WebSource(name=source.name, uris=source.uris).dict() for source in payload]
     job = job_queue.enqueue_call(
-        func="worker.jobs.scrape.scrape_sources",
+        func="worker.jobs.scan",
         args=[sources],
         retry=Retry(max=3, interval=[10, 30, 60]),
     )

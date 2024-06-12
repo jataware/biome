@@ -124,14 +124,14 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     const firstUrlKey = Object.keys(selectedSource.urls)[0];
     const firstUrl = selectedSource.urls[firstUrlKey];
 
-    const response = await fetch('http://localhost:8001/api/jvoy/run_task', {
+    const response = await fetch('http://localhost:8001/api/jvoy/query', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         user_task: searchTerm,
-        start_page: firstUrl
+        url: firstUrl
       })
     });
   
