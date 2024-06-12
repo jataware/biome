@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { ProductService } from "./mock_product_data";
 import { Button } from "primereact/button";
-// import { Avatar } from "primereact/avatar";
 import { DataView, DataViewLayoutOptions } from "primereact/dataview";
 import { Rating } from 'primereact/rating';
 import { Tag } from 'primereact/tag';
@@ -12,8 +11,6 @@ import { classNames } from 'primereact/utils';
 
 import { ScrollTop } from 'primereact/scrolltop';
 import { Carousel } from 'primereact/carousel';
-
-// import Image from 'next/image';
 
 import s from './sources.module.scss';
 import { Panel } from 'primereact/panel';
@@ -27,7 +24,6 @@ interface CategoryModel {
   name: string,
   code: string,
   image: string,
-  // category: string,
   categories: [string]
 }
 
@@ -41,7 +37,7 @@ const AvailableUrls = ({ urlObj }) => {
   return (
     <div className={s.availableUrls}>
       <div>
-        {['home_page', 'data_landing'].map((uriName) => urlObj[uriName] && (
+        {['home_page'].map((uriName) => urlObj[0] && (
           <a
             key={uriName}
             target="_blank"
@@ -79,7 +75,6 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     setSelectedSource(source);
     setIsDrawerOpen(true);
   };
-  // const [sources, setFilteredSources] = useState([]);
   const [layout, setLayout] = useState('grid');
 
   const [sortKey, setSortKey] = useState('');
@@ -89,21 +84,6 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     { label: 'Desc', value: '!name' },
     { label: 'Asc', value: 'name' }
   ];
-
-  // TODO filter items on category changes with
-  //  useState and such
-    // ProductService
-    //   .getProducts()
-    //   .then((data) => {
-    //     let filtered = data.slice(0, 13);
-    //     if (!['all', undefined, null].includes(category.name)) {
-    //       filtered = data.filter((item: CategoryModel) => {
-    //         const selectedCategoryName = lower(category?.name);
-    //         return (item?.categories || []).map(i => i.toLowerCase()).includes(selectedCategoryName);
-    //       });
-    //     }
-    //     setFilteredSources(filtered);
-    //   });
 
   const getSeverity = (source) => {
     switch (source.inventoryStatus) {
@@ -137,7 +117,6 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   };
 
   const runJvoyJob = async (event) => {
-    // Prevent the form from being submitted in the default way
     if (event.type === 'submit') {
       event.preventDefault();
     }
@@ -157,19 +136,16 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     });
   
     if (!response.ok) {
-      // Handle error
       console.error('Failed to run jvoy job');
       return;
     }
   
-    // Set the Panel width and hide the grids
     setPanelWidth("100%");
     setShowGrids(false);
 
     const data = await response.json();
     console.log('Job ID:', data.job_id);
 
-    // Set the job ID
     setJobId(data.job_id);    
   };
 
@@ -180,11 +156,9 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   
     const timeoutId = setTimeout(() => {
       const intervalId = setInterval(async () => {
-        // Fetch the job status
         const statusResponse = await fetch(`http://localhost:8001/api/lib/status?job_id=${jobId}`);
   
         if (!statusResponse.ok) {
-          // Handle error
           console.error('Failed to fetch job status');
           return;
         }
@@ -197,11 +171,9 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
           return;
         }
   
-        // Fetch the logs
         const logsResponse = await fetch(`http://localhost:8001/api/jvoy/logs/${jobId}`);
   
         if (!logsResponse.ok) {
-          // Handle error
           console.error('Failed to fetch logs');
           return;
         }
@@ -245,13 +217,6 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
     );
   };
 
-  // <Avatar 
-  //   icon={`pi pi-${source.icon}`} 
-  //   size="normal"
-  //    shape="circle"
-  //    style={{ backgroundColor: colors[index] || randomColor }}
-  //   />
-
   const gridItem = (source, index) => {
     const colors = ["#ff1744", "#2979ff", "#f50057", "#d500f9", "#651fff", "#1de9b6", "#ffea00", "#76ff03"];
 
@@ -259,17 +224,9 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
 
     const logoUrl = Boolean(source.logo_url) && source.logo_url.includes('http') && source.logo_url;
 
-    // <>
-    // className={s.actionIcons}
-    //   <Button rounded icon={`pi pi-${source.icon}`} style={{ backgroundColor: colors[index] || randomColor, border: 'none' }} />
-    //   <Button text size="large" icon="pi pi-bookmark" style={{ fontSize: '1.5rem', padding: 0 }} />
-    // </>
+    const descriptions = source.content["Web Page Descriptions"];
 
-    // {!logoUrl && (
-    //   <div className={classNames("font-bold text-xl line-height-2", s.sourceName)}>
-    //     {source.name}
-    //   </div>
-    // )}
+    const sourceUrls = Object.keys(source.content["Information on Links on Web Page"]);
 
     return (
         <div 
@@ -286,12 +243,12 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
               <img src={logoUrl}
                 // height={45}
                 className={s.sourceImage}
-                title={`Logo for ${source.name}`}
-                alt={`Logo for ${source.name}`}
+                title={`Logo for ${descriptions.name}`}
+                alt={`Logo for ${descriptions.name}`}
               />
             ) : (
               <div>
-                {source.name} {source.initials && `(${source.initials})`}
+                {descriptions.name} {descriptions.initials && `(${descriptions.initials})`}
               </div>
             )}
           </div>
@@ -299,43 +256,12 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
           <div className="flex flex-column align-items-center py-1">
 
             <span className={s.description}>
-              {source.description}
+              {descriptions.purpose}
             </span>
 
-            <div className={classNames(s.categories, 'w-full p-1')}>
-              {Boolean(source?.categories?.length) && (
-                source.categories.map((cat: string) => (
-                  <Tag
-                    key={cat}
-                    className={s.category}
-                    rounded
-                    value={cat}
-                  />
-                ))
-              )}
-              {Boolean(source?.tags?.length) && (
-                source.tags.map((tag: string) => (
-                  <Tag
-                    key={tag}
-                    className={s.tag}
-                    rounded
-                    value={tag}
-                  />
-                ))
-              )}
-            </div>
-
-            {Boolean(Object.keys(source?.urls || {}).length) && (
-              <AvailableUrls urlObj={source.urls} />
+            {Boolean(sourceUrls.length) && (
+              <AvailableUrls urlObj={sourceUrls} />
             )}
-
-            {/* <div className={s.accessType}>
-              <h4>Data Access:</h4>
-              &nbsp;
-              <span>
-                {source.access_type}
-              </span>
-            </div> */}
 
           </div>
 

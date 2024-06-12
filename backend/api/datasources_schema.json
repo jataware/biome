@@ -11,7 +11,10 @@
                 "initials": {
                   "type": "text"
                 },
-                "actions": {
+                "purpose": {
+                  "type": "text"
+                },
+                 "actions": {
                   "type": "text"
                 },
                 "sections": {
