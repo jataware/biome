@@ -4,6 +4,7 @@ import logging
 from pydantic import BaseModel
 import os
 import json
+import re
 from datetime import datetime
 from rq import Queue, Retry
 from rq.job import Job
@@ -22,10 +23,6 @@ from lib.models import WebSource, QueryArguments
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
 from contextlib import asynccontextmanager
-
-from .globalState import GlobalState
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +57,6 @@ def setup_elasticsearch_indexes():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup code goes here
-    app.state.global_state = GlobalState()
     setup_elasticsearch_indexes()
     yield
     # Shutdown code goes here
@@ -86,21 +82,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# @app.exception_handler(exceptions.RequestValidationError)
-# @app.exception_handler(ValidationError)
-# async def validation_exception_handler(request, exc):
-#     logger.info(f"Request or Response validation failed!: {exc}")
-#     exc_json = json.loads(exc.json())
-#     return JSONResponse({"detail": exc_json}, status_code=422)
-
-
-# @app.on_event("startup")
-# async def startup_event() -> None:
-#     setup_elasticsearch_indexes()
-
-
-@app.get("/status/job_id")
+@app.get("/status/{job_id}")
 def status(job_id: str):
     return get_job_status(job_id, redis)
 
@@ -109,8 +91,6 @@ class ScanArguments(BaseModel):
     uris: list[str]
     name: str
 
-class SearchArguments(BaseModel):
-    query: str
 
 @app.post("/scan")
 def scan_uri(payload: list[ScanArguments]):
@@ -129,7 +109,7 @@ def scan_uri(payload: list[ScanArguments]):
 
 @app.post("/query")
 def query(payload: QueryArguments):
-    logger.info(f"Queueing scan fn, uris: {payload}")
+    logger.info(f"Queueing query: {payload}")
     data = f'{datetime.now().isoformat()}'
     job_id = hashlib.sha256(data.encode()).hexdigest()
     job = job_queue.enqueue_call(
@@ -199,6 +179,9 @@ async def add_source_from_payload(request: Request):
     return {"success": True}
 
 
+class SearchArguments(BaseModel):
+    query: str
+
 @app.post("/search")
 def search_sources(payload: SearchArguments):
     logger.info(f"Searching sources with query: {payload.query}")
@@ -235,7 +218,6 @@ def kill_job(job_id: str):
 
 @app.get("/logs/{job_id}", response_model=list[str])
 def get_logs(job_id: str):
-    # Get the logs from the 'logs' list in Redis
     logs = redis.lrange(f'logs:{job_id}', 0, -1)
 
     logs = [log.decode('utf-8') for log in logs]
@@ -272,7 +254,7 @@ def get_logs(job_id: str):
                 img_path = f'static/images/{job_id}_{img_hash}.png'
 
                 # Check if the hash already exists in Redis
-                if not r.sismember(f'img_hashes:{job_id}', img_hash):
+                if not redis.sismember(f'img_hashes:{job_id}', img_hash):
                     # If the hash doesn't exist, save the image and add the hash to Redis
                     img = Image.open(BytesIO(img_data))
 

@@ -2,6 +2,7 @@ import logging
 import json
 from pathlib import Path
 
+
 from jvoy.profiler import WebPageProfiler
 from jvoy.driver import JvoyDriver
 
@@ -32,7 +33,7 @@ def query(args: QueryArguments, job_id):
     driver = JvoyDriver(
         url=args["url"],
         supporting_docs=args["supporting_docs"],
-        results_dir=Path("/tmp/results"),
+        results_dir=Path('/jvoy/results'),
         timeout=20,
         #adblock=False,
         #port=8080,

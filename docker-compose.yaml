@@ -59,6 +59,7 @@ services:
       - ES_PORT=${ES_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - REDIS_HOST=sources_rq_redis
     working_dir: /backend
     build:
       context: ./backend/
@@ -74,6 +75,9 @@ services:
     - type: bind
       source: ./backend/
       target: /backend
+    - type: bind
+      source: ./jvoy-results/
+      target: /jvoy/results
     networks:
       sources: null
     command: > 

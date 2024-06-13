@@ -165,7 +165,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
         const statusData = await statusResponse.json();
   
         // If the job is not running/started, stop polling
-        if (statusData.job.status !== 'running' && statusData.job.status !== 'started') {
+        if (statusData.status !== 'running' && statusData.status !== 'started') {
           clearInterval(intervalId);
           return;
         }
@@ -178,6 +178,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
         }
   
         const newLogs = await logsResponse.json();
+        console.log(newLogs)
         setLogs(newLogs);
       }, 5000);  // Poll every 5 seconds
   
