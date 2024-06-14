@@ -82,7 +82,7 @@ services:
       sources: null
     command: > 
       bash -c  "poetry install 
-      && poetry run rq worker --with-scheduler -c worker.settings"
+      && poetry run rq worker --with-scheduler -c worker.rq_configuration"
   sources_router:
     image: caddy
     hostname: sources_router.sources

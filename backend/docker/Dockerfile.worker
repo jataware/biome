@@ -9,7 +9,7 @@ RUN pip install --upgrade pip poetry
 COPY ./pyproject.toml /backend/
 COPY ./README.md /backend/README.md
 
-RUN poetry install --with workers --no-root
+RUN poetry install --with worker --no-root
 
 ENV JVOY_DOCKER=1
 # set display port to avoid crash. TODO Needed?

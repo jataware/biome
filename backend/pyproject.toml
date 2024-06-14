@@ -19,7 +19,7 @@ elasticsearch = "^8.13.0"
 markdown = "^3.6"
 pillow = "^10.3.0"
 
-[tool.poetry.group.workers.dependencies]
+[tool.poetry.group.worker.dependencies]
 selenium = "^4.18.1"
 jvoy = { git = "https://github.com/jataware/jvoy.git", branch = "profiler" }
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 import os
 import json
 import re
+from typing import Any
 from datetime import datetime
 from rq import Queue, Retry
 from rq.job import Job
@@ -19,7 +20,6 @@ import base64
 import hashlib
 from lib.browser_pool import active_clients
 from lib.job_queue import get_job_status
-from lib.models import WebSource, QueryArguments
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
 from contextlib import asynccontextmanager
@@ -86,6 +86,15 @@ app.add_middleware(
 def status(job_id: str):
     return get_job_status(job_id, redis)
 
+@app.get("/displays")
+def displays():
+    return active_clients()
+
+@app.get("/kill/{job_id}")
+def kill_job(job_id: str):
+    job = Job.fetch(job_id, connection=redis)
+    return job.kill()
+
 
 class ScanArguments(BaseModel):
     uris: list[str]
@@ -95,7 +104,7 @@ class ScanArguments(BaseModel):
 @app.post("/scan")
 def scan_uri(payload: list[ScanArguments]):
     logger.info(f"Queueing scan fn, uris: {payload}")
-    sources = [WebSource(name=source.name, uris=source.uris).dict() for source in payload]
+    sources = [source.uris for source in payload]
     job = job_queue.enqueue_call(
         func="worker.jobs.scan",
         args=[sources],
@@ -107,6 +116,11 @@ def scan_uri(payload: list[ScanArguments]):
 
     return {"queued": True, "job_id": job.id}
 
+class QueryArguments(BaseModel):
+    user_task: str
+    supporting_docs: dict[str, Any] | None = None
+    url: str = "https://www.google.com"
+
 @app.post("/query")
 def query(payload: QueryArguments):
     logger.info(f"Queueing query: {payload}")
@@ -115,7 +129,7 @@ def query(payload: QueryArguments):
     job = job_queue.enqueue_call(
         job_id=job_id,
         func="worker.jobs.query",
-        args=[payload.dict(), job_id],
+        args={"job_id": job_id, **payload.dict()},
         retry=Retry(max=3, interval=[10, 30, 60]),
     )
 
@@ -125,12 +139,11 @@ def query(payload: QueryArguments):
     return {"queued": True, "job_id": job.id}
 
 
-
-def add_id(hit):
-    return {**hit["_source"], "id": hit["_id"]}
-
-def format_source(source_obj):
-    return add_id(source_obj)
+def format_results(results):
+    return [
+        {**hit["_source"], "id": hit["_id"]}
+        for hit in results["hits"]["hits"] 
+    ]
 
 
 @app.get("/sources")
@@ -159,7 +172,7 @@ def list_sources():
     return {
         "count": results["hits"]["total"]["value"],
         "items_in_page": totalDocsInPage,
-        "sources": [format_source(i) for i in results["hits"]["hits"]],
+        "sources": format_results(results),
         "scroll_id": scroll_id,
     }
 
@@ -179,17 +192,14 @@ async def add_source_from_payload(request: Request):
     return {"success": True}
 
 
-class SearchArguments(BaseModel):
-    query: str
-
 @app.post("/search")
-def search_sources(payload: SearchArguments):
-    logger.info(f"Searching sources with query: {payload.query}")
+def search_sources(query: str):
+    logger.info(f"Searching sources with query: {query}")
 
     q = {
         "query": {
             "multi_match": {
-                "query": payload.query,
+                "query": query,
                 "fields": ["name", "description", "tags", "uris", "source_type"]
             }
         }
@@ -201,22 +211,10 @@ def search_sources(payload: SearchArguments):
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Error occurred while searching")
 
-    formatted_results = [format_source(hit) for hit in results["hits"]["hits"]]
-
-    return formatted_results
+    return format_results(results)
 
 
-@app.get("/displays")
-def displays():
-    return active_clients()
-
-@app.get("/kill/{job_id}")
-def kill_job(job_id: str):
-    job = Job.fetch(job_id, connection=redis)
-    return job.kill()
-
-
-@app.get("/logs/{job_id}", response_model=list[str])
+@app.get("/query/logs/{job_id}", response_model=list[str])
 def get_logs(job_id: str):
     logs = redis.lrange(f'logs:{job_id}', 0, -1)
 

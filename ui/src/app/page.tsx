@@ -83,12 +83,12 @@ export default function Home() {
     if (query === '') {
       fetchSources();
     } else {
-      fetch('/api/search', {
+      const params = new URLSearchParams({ query }).toString();
+      fetch('/api/search?' + params, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ query })
       })
         .then(response => {
           if (!response.ok) {
