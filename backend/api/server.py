@@ -200,7 +200,7 @@ def search_sources(query: str):
         "query": {
             "multi_match": {
                 "query": query,
-                "fields": ["name", "description", "tags", "uris", "source_type"]
+                "fields": ["Web Page Description", "summary"]
             }
         }
     }
