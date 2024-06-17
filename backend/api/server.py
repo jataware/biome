@@ -110,10 +110,6 @@ def scan_uri(payload: list[ScanArguments]):
         args=[sources],
         retry=Retry(max=3, interval=[10, 30, 60]),
     )
-
-    # TODO instead of returning ID, maybe start stream and
-    # poll here but stream to client as things are ready..
-
     return {"queued": True, "job_id": job.id}
 
 class QueryArguments(BaseModel):
@@ -124,18 +120,11 @@ class QueryArguments(BaseModel):
 @app.post("/query")
 def query(payload: QueryArguments):
     logger.info(f"Queueing query: {payload}")
-    data = f'{datetime.now().isoformat()}'
-    job_id = hashlib.sha256(data.encode()).hexdigest()
     job = job_queue.enqueue_call(
-        job_id=job_id,
         func="worker.jobs.query",
-        args={"job_id": job_id, **payload.dict()},
+        kwargs=payload.model_dump(),
         retry=Retry(max=3, interval=[10, 30, 60]),
     )
-
-    # TODO instead of returning ID, maybe start stream and
-    # poll here but stream to client as things are ready..
-
     return {"queued": True, "job_id": job.id}
 
 
@@ -214,11 +203,16 @@ def search_sources(query: str):
     return format_results(results)
 
 
-@app.get("/query/logs/{job_id}", response_model=list[str])
-def get_logs(job_id: str):
+# TODO: Come up with a better way to bubble up status
+# We may want to rethink how progress is handled in the future
+# as discussed in `/backend/worker/jobs.py`.
+@app.get("/query/{job_id}/logs", response_model=list[str])
+def get_query_progress(job_id: str):
     logs = redis.lrange(f'logs:{job_id}', 0, -1)
 
     logs = [log.decode('utf-8') for log in logs]
+    
+    logger.error(f"\n\n\n{logs}\n\n\n")
 
     logs = [
         log for log in logs 
@@ -226,7 +220,7 @@ def get_logs(job_id: str):
         and not log.startswith('![log image')
     ]
 
-    logs.reverse()
+    # logs.reverse()
 
     chunks = []
     chunk = []

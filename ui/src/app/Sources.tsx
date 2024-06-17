@@ -170,7 +170,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
           return;
         }
   
-        const logsResponse = await fetch(`http://localhost:8001/api/query/logs/${jobId}`);
+        const logsResponse = await fetch(`http://localhost:8001/api/query/${jobId}/logs`);
   
         if (!logsResponse.ok) {
           console.error('Failed to fetch logs');
