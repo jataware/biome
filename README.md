@@ -28,7 +28,10 @@ which you may encrypt on disk.
 
 One the Initial project setup is completed,
 
-`mkdir jvoy-results` 
+`./init-biome.sh` 
+
+Make sure to give the generated `.ssh/id_rsa` permission to read the 
+Jvoy repo.
 
 then:
 `docker compose --profile deploy --profile dev up -d`
