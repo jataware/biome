@@ -159,3 +159,5 @@ cython_debug/
 
 backend/static/images
 .npm-global-cache
+ssh
+.ssh

@@ -5,8 +5,8 @@ from base64 import b64encode
 
 from rq import get_current_job
 from jvoy.profiler import WebPageProfiler
-from jvoy.driver import JvoyDriver, LogAction
-from jvoy.log import LogType
+from jvoy.driver import JvoyDriver
+from jvoy.record import RecordType, ActionRecord, ScreenshotRecord
 
 from lib import api_clients
 
@@ -31,38 +31,32 @@ def scan(sources: list[list[str]]):
 
 def query(url, supporting_docs, user_task):
     ##### Callback #####
-    # TODO: Log messages to a service that's not Redis
+    # TODO: Log messages to a service that's not Redis and not Markdown
     # This current logic was copy-pasted from jvoy with very little
     # modification. We should consider a more robust logging solution
-    # in the long term.
+    # in the long term. We are currently generated markdown and writing
+    # it to Redis. Then, the markdown is read from Redis and compiled
+    # HTML. Instead, we should just pass data and let the UI decide
+    # how to render it.
     job_id = get_current_job().id
     redis = api_clients.get_redis()
     logs = f"logs:{job_id}"
-    
 
-    def callback(action: LogAction):
-        log, log_type = action.data, action.log_type
-
-        logger.error(f"\n\n{log_type} - {redis.lrange(f'logs:{job_id}', 0, -1)}\n\n")
-
-        def write_message(log):
-            logger.error("write message")
-            redis.rpush(logs, log)
-
-        def write_image(log):
-            logger.error("write image")
-            encoded_image = b64encode(log).decode('utf-8')
-            redis.rpush(logs, f'base64 image: {encoded_image}\n\n')
-        
-        def write_undefined(log):
-            logger.error(f"Unknown log type: {log_type}")
-
-        log_type_map = {
-            LogType.MESSAGE : write_message,
-            LogType.IMAGE : write_image,
-        }
-
-        log_type_map.get(log_type, write_undefined)(log)
+    def report(record: RecordType):
+        match record:
+            case ActionRecord(title, text):
+                if "Element Labels" in title:
+                    return
+                message = f'## {title}\n{text}\n\n'
+                message = message.replace('<', '&lt;').replace('>', '&gt;')
+                message += "\n\n"
+                redis.rpush(logs, message)
+            case ScreenshotRecord(data, ext):
+                encoded_image = b64encode(data).decode('utf-8')
+                redis.rpush(logs, f'base64 image: {encoded_image}\n\n')
+            # Ignore remaining record types
+            case _:
+                pass
 
 
     ##### Job #####
@@ -73,8 +67,11 @@ def query(url, supporting_docs, user_task):
         timeout=20,
         #adblock=False,
         #port=8080,
-        logger_callback=callback,
+        record_callback=report,
     )
-    driver.run(user_task)
+    answer = driver.run(user_task)
+    report(ActionRecord("Answer", answer))
+    import time
+    time.sleep(6)
     driver.end()
     return {}

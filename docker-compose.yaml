@@ -3,8 +3,8 @@ services:
   sources_api:
     working_dir: /backend
     build:
-      context: ./backend
-      dockerfile: ./docker/Dockerfile.api
+      context: .
+      dockerfile: ./backend/docker/Dockerfile.api
     depends_on:
       sources_es:
         condition: service_healthy
@@ -62,8 +62,8 @@ services:
       - REDIS_HOST=sources_rq_redis
     working_dir: /backend
     build:
-      context: ./backend/
-      dockerfile: ./docker/Dockerfile.worker
+      context: .
+      dockerfile: ./backend/docker/Dockerfile.worker
     depends_on:
       sources_rq_redis:
         condition: service_healthy
