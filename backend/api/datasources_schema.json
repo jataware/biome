@@ -1,38 +1,47 @@
 {
     "mappings": {
-      "properties": {
-        "content": {
-          "properties": {
-            "Web Page Descriptions": {
-              "properties": {
-                "name": {
-                  "type": "text"
-                },
-                "initials": {
-                  "type": "text"
-                },
-                "purpose": {
-                  "type": "text"
-                },
-                 "actions": {
-                  "type": "text"
-                },
-                "sections": {
-                  "type": "text"
+        "properties": {
+            "content": {
+                "properties": {
+                    "Web Page Descriptions": {
+                        "properties": {
+                            "name": {
+                                "type": "text"
+                            },
+                            "initials": {
+                                "type": "text"
+                            },
+                            "purpose": {
+                                "type": "text"
+                            },
+                            "actions": {
+                                "type": "text"
+                            },
+                            "sections": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "Information on Links on Web Page": {
+                        "type": "flattened"
+                    },
+                    "Information on options on web page": {
+                        "type": "flattened"
+                    },
+                    "documentation": {
+                        "type": "text"
+                    },
+                    "openapi_spec": {
+                        "type": "text"
+                    }
                 }
-              }
             },
-            "Information on Links on Web Page": {
-              "type": "flattened"
+            "summary": {
+                "type": "text"
             },
-            "Information on options on web page": {
-              "type": "flattened"
+            "logo": {
+                "type": "text"
             }
-          }
-        },
-        "summary": {
-          "type": "text"
         }
-      }
     }
-  }
+}

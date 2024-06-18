@@ -222,7 +222,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
 
     const randomColor = "#000000".replace(/0/g, function() { return (~~(Math.random() * 16)).toString(16); });
 
-    const logoUrl = Boolean(source.logo_url) && source.logo_url.includes('http') && source.logo_url;
+    const logoUrl = `data:image/png;base64,${source.logo}`;
 
     const descriptions = source.content["Web Page Descriptions"];
 

@@ -781,8 +781,8 @@ urlextract = "1.9.0"
 [package.source]
 type = "git"
 url = "git+ssh://git@github.com/jataware/jvoy.git"
-reference = "feat/generic-logger"
-resolved_reference = "b583bb3e374834ffb8d37373704113fb821e1aa2"
+reference = "profiler"
+resolved_reference = "4032a0bf344ebe356a51936a83bc01697bfce9ef"
 
 [[package]]
 name = "kiwisolver"
@@ -2617,4 +2617,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "cb6207c1adb1fb779f55c5b71b31531054d8457c1d538b12f9058f92183c9c14"
+content-hash = "66dafd521073650508bda4a37759f6a9a887d7c5570d5abdac5ed7c2e4eb6e31"
