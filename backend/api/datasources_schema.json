@@ -41,6 +41,9 @@
             },
             "logo": {
                 "type": "text"
+            },
+            "base_url":{
+                "type": "text"
             }
         }
     }
