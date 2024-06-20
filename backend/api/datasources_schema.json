@@ -1,4 +1,12 @@
 {
+    "settings": {
+        "analyzer": {
+            "std_english": { 
+              "type":      "standard",
+              "stopwords": "_english_"
+            }
+        }
+    },
     "mappings": {
         "properties": {
             "content": {
