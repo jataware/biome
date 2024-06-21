@@ -259,10 +259,23 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
               {descriptions.purpose}
             </span>
 
-            {Boolean(sourceUrls.length) && (
-              <AvailableUrls urlObj={sourceUrls} />
-            )}
 
+          <div>
+              <a
+                key="home_page"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={source.base_url}
+              >
+                <Button
+                  icon="pi pi-external-link"
+                  severity="info"
+                  text
+                  size="small"
+                  label={"Website"}
+                />
+              </a>
+          </div>
           </div>
 
         </div>
@@ -343,8 +356,11 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                   </button>
                   {selectedSource && (
                     <div>
-                      <h3>{selectedSource.name}</h3>
-                      <p className={s.drawerDescription}>{selectedSource.description}</p>
+                      <h3>{selectedSource.content["Web Page Descriptions"].name}</h3>
+                      <h4>Summary</h4>
+                      <p className={s.drawerDescription}>{selectedSource.summary.summary}</p>
+                      <h4>Purpose</h4>
+                      <p className={s.drawerDescription}>{selectedSource.content["Web Page Descriptions"].purpose}</p>
                     </div>
                   )}
                   <div className={s.searchBar}>
