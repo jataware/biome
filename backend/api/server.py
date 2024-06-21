@@ -18,8 +18,8 @@ from io import BytesIO
 from markdown import markdown
 import base64
 import hashlib
-from lib.browser_pool import active_clients
 from lib.job_queue import get_job_status
+from lib.settings import Settings
 from lib.api_clients import get_elasticsearch
 from .seed_sources import seed
 from contextlib import asynccontextmanager
@@ -27,8 +27,7 @@ from contextlib import asynccontextmanager
 logger = logging.getLogger(__name__)
 
 redis = Redis(
-    host=os.environ.get("REDIS_HOST", "sources_rq_redis.sources"),
-    port=int(os.environ.get("REDIS_PORT", 6379)),
+    host=Settings.REDIS_HOST,
 )
 job_queue = Queue(connection=redis, default_timeout=-1)
 
@@ -85,10 +84,6 @@ app.add_middleware(
 @app.get("/status/{job_id}")
 def status(job_id: str):
     return get_job_status(job_id, redis)
-
-@app.get("/displays")
-def displays():
-    return active_clients()
 
 @app.get("/kill/{job_id}")
 def kill_job(job_id: str):

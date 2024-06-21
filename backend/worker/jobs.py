@@ -9,6 +9,7 @@ from jvoy.driver import JvoyDriver
 from jvoy.record import RecordType, ActionRecord, ScreenshotRecord
 
 from lib import api_clients
+from lib.settings import Settings
 
 
 logging.basicConfig()
@@ -39,7 +40,9 @@ def query(url, supporting_docs, user_task):
     # HTML. Instead, we should just pass data and let the UI decide
     # how to render it.
     job_id = get_current_job().id
-    redis = api_clients.get_redis()
+    redis = Redis(
+        host=Settings.REDIS_HOST,
+    )
     logs = f"logs:{job_id}"
 
     def report(record: RecordType):

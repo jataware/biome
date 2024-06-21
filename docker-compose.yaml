@@ -59,7 +59,6 @@ services:
       - ES_PORT=${ES_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-      - REDIS_HOST=sources_rq_redis
     working_dir: /backend
     build:
       context: .
@@ -101,78 +100,6 @@ services:
         max-file: "5"
     profiles:
       - deploy
-
-  # In case we wish to set up separate images for browser
-  # sources_chrome:
-  #   image: selenium/standalone-chrome:latest
-  #   container_name: sources_chrome
-  #   # TODO use docker networking to connect
-  #   networks:
-  #     - sources
-  #   hostname: chrome
-  #   ports:
-  #     - "5900:5900"
-  #     - "7900:7900"
-  #     - "4444:4444"
-  #   privileged: true
-  #   shm_size: 2g
-
-  # For Prod with SSL/security, needed to set up nodes
-  # setup:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-  #   volumes:
-  #     - certs:/usr/share/elasticsearch/config/certs
-  #   user: "0"
-  #   command: >
-  #     bash -c '
-  #       if [ x${ELASTIC_PASSWORD} == x ]; then
-  #         echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-  #         exit 1;
-  #       elif [ x${KIBANA_PASSWORD} == x ]; then
-  #         echo "Set the KIBANA_PASSWORD environment variable in the .env file";
-  #         exit 1;
-  #       fi;
-  #       if [ ! -f config/certs/ca.zip ]; then
-  #         echo "Creating CA";
-  #         bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
-  #         unzip config/certs/ca.zip -d config/certs;
-  #       fi;
-  #       if [ ! -f config/certs/certs.zip ]; then
-  #         echo "Creating certs";
-  #         echo -ne \
-  #         "instances:\n"\
-  #         "  - name: es01\n"\
-  #         "    dns:\n"\
-  #         "      - es01\n"\
-  #         "      - localhost\n"\
-  #         "    ip:\n"\
-  #         "      - 127.0.0.1\n"\
-  #         "  - name: kibana\n"\
-  #         "    dns:\n"\
-  #         "      - kibana\n"\
-  #         "      - localhost\n"\
-  #         "    ip:\n"\
-  #         "      - 127.0.0.1\n"\
-  #         > config/certs/instances.yml;
-  #         bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
-  #         unzip config/certs/certs.zip -d config/certs;
-  #       fi;
-  #       echo "Setting file permissions"
-  #       chown -R root:root config/certs;
-  #       find . -type d -exec chmod 750 \{\} \;;
-  #       find . -type f -exec chmod 640 \{\} \;;
-  #       echo "Waiting for Elasticsearch availability";
-  #       until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
-  #       echo "Setting kibana_system password";
-  #       until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
-  #       echo "All done!";
-  #     '
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 120
-
   sources_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: sources_es
