@@ -260,21 +260,23 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
             </span>
 
 
-          <div>
-              <a
-                key="home_page"
-                target="_blank"
-                rel="noopener noreferrer"
-                href={source.base_url}
-              >
-                <Button
-                  icon="pi pi-external-link"
-                  severity="info"
-                  text
-                  size="small"
-                  label={"Website"}
-                />
-              </a>
+          <div className={s.availableUrls}>          
+            <div>
+                <a
+                  key="home_page"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={source.base_url}
+                >
+                  <Button
+                    icon="pi pi-external-link"
+                    severity="info"
+                    text
+                    size="small"
+                    label={"Website"}
+                  />
+                </a>
+            </div>
           </div>
           </div>
 
