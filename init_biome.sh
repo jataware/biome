@@ -14,7 +14,7 @@ then
 else
     echo "SSH Key already exists"
 fi
-echo "NOTICE: MAKE SURE TO GIVE THE GENERATED KEY GITHUB READ ACCESS TO JVOY!"
+echo "NOTICE: MAKE SURE TO GIVE THE GENERATED **PUBLIC** KEY GITHUB READ ACCESS TO JVOY!"
 
 echo "
 Host github.com
