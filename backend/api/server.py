@@ -225,7 +225,7 @@ def get_query_progress(job_id: str):
     chunks = []
     chunk = []
     for log in logs:
-        if log.startswith('## Observation:'):
+        if log.startswith('## Observation'):
             if chunk:
                 chunks.append(chunk)
             chunk = [log]

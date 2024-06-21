@@ -359,8 +359,10 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
                   {selectedSource && (
                     <div>
                       <h3>{selectedSource.content["Web Page Descriptions"].name}</h3>
+                      <br></br>
                       <h4>Summary</h4>
                       <p className={s.drawerDescription}>{selectedSource.summary.summary}</p>
+                      <br></br>
                       <h4>Purpose</h4>
                       <p className={s.drawerDescription}>{selectedSource.content["Web Page Descriptions"].purpose}</p>
                     </div>
