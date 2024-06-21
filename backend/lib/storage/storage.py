@@ -1,5 +1,7 @@
 import json
 import logging
+from typing import Callable
+from dataclasses import dataclass
 
 from elasticsearch import Elasticsearch
 from openai import OpenAI
@@ -14,13 +16,27 @@ RESULT_MAX_SIZE = 20
 
 logger = logging.getLogger(__name__)
 
+@dataclass
+class SearchResult:
+    total : int
+    sources : list[dict]
+    scroll : Callable[[], "SearchResult"] | None
+
 class DataSourceStorage:
     """
     Data Source Storage class to store and search over datasources.
+
+    Storage acts as a singleton across the entire application. The
+    expectation is that initializing this class will create a connection,
+    therefore
     """
 
     def __init__(self):
-        # Environment variables ES_USER and ES_PASS are implicitly used here
+        """
+        Initializes a connection to storage and will create and seed the
+        necessary data if it does not already exist.
+        """
+        # NOTE: Environment variables ES_USER and ES_PASS are implicitly used here
         self.es =  Elasticsearch(
             [
                 {
@@ -31,6 +47,7 @@ class DataSourceStorage:
             ]
         )
 
+        ### Elasticsearch Index Initialization ###
         if not self.es.indices.exists(index=PRIMARY_INDEX):
             logger.info(f"Creating index {PRIMARY_INDEX}")
             mappings = json.load(open(PRIMARY_INDEX_SCHEMA))["mappings"]
@@ -55,7 +72,21 @@ class DataSourceStorage:
         body = json.dumps(source)
         self.es.index(index=PRIMARY_INDEX, body=body)
     
-    def _process_results(self, results):
+    def search(self, query: str | None = None) -> SearchResult:
+        es_query = {
+            "query": {
+                "match_all": {}
+            } if query is None else {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["Web Page Description", "summary"]
+                }
+            }
+        }
+        results = self.es.search(index=PRIMARY_INDEX, body=es_query, scroll="2m", size=RESULT_MAX_SIZE)
+        return self._process_results(results)
+ 
+    def _process_results(self, results) -> SearchResult:
         total_docs_in_page = len(results["hits"]["hits"])
 
         logger.info(f"Got {total_docs_in_page} results")
@@ -80,17 +111,3 @@ class DataSourceStorage:
         }
 
     
-    def search(self, query: str | None = None):
-        es_query = {
-            "query": {
-                "match_all": {}
-            } if query is None else {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["Web Page Description", "summary"]
-                }
-            }
-        }
-        results = self.es.search(index=PRIMARY_INDEX, body=es_query, scroll="2m", size=RESULT_MAX_SIZE)
-        return self._process_results(results)
-  

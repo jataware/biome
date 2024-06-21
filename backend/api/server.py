@@ -1,11 +1,11 @@
-from fastapi import FastAPI, exceptions, Request, HTTPException, status
+from fastapi import FastAPI, exceptions, Request, HTTPException, Depends, status
 from fastapi.staticfiles import StaticFiles
 import logging
-from pydantic import BaseModel
+from dataclasses import dataclass
 import os
 import json
 import re
-from typing import Any
+from typing import Any, Annotated
 from datetime import datetime
 from rq import Queue, Retry
 from rq.job import Job
@@ -19,48 +19,19 @@ from markdown import markdown
 import base64
 import hashlib
 from lib.job_queue import get_job_status
-from lib.settings import Settings
-from lib.api_clients import get_elasticsearch
-from .seed_sources import seed
-from contextlib import asynccontextmanager
+from lib.settings import settings
+from lib.storage import DataSourceStorage
 
 logger = logging.getLogger(__name__)
 
 redis = Redis(
-    host=Settings.REDIS_HOST,
+    host=settings.REDIS_HOST,
 )
 job_queue = Queue(connection=redis, default_timeout=-1)
 
-es_client = get_elasticsearch()
+Storage = Annotated[DataSourceStorage, Depends(DataSourceStorage)]
 
-
-def setup_elasticsearch_indexes():
-    """
-    Creates any indexes not present on the connected elasticsearch database.
-    Won't deeply merge or overwrite existing index/properties- only creates
-    missing indeces.
-    Config should match keyword args on:
-    https://elasticsearch-py.readthedocs.io/en/v8.3.2/api.html#elasticsearch.client.IndicesClient.create
-    """
-    indices = {
-        "datasources": {},
-    }
-    for idx, config in indices.items():
-        if not es_client.indices.exists(index=idx):
-            logger.info(f"Creating index {idx}")
-            mappings = json.load(open(f"/backend/api/datasources_schema.json"))["mappings"]
-            es_client.indices.create(index=idx, body=config, mappings=mappings)   
-
-    seed(es_client, "datasources")
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup code goes here
-    setup_elasticsearch_indexes()
-    yield
-    # Shutdown code goes here
-
-app = FastAPI(docs_url="/", lifespan=lifespan)
+app = FastAPI(docs_url="/")
 
 # Ensure static directory exists
 if not os.path.exists("static"):
@@ -81,22 +52,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/status/{job_id}")
-def status(job_id: str):
-    return get_job_status(job_id, redis)
+##### SOURCES #####
 
-@app.get("/kill/{job_id}")
-def kill_job(job_id: str):
-    job = Job.fetch(job_id, connection=redis)
-    return job.kill()
+# TODO: Enable scrolling
+@app.get("/sources")
+def search_sources(storage: Storage, query: str | None = None):
+    if query is None:
+        logger.info("Getting all registered sources")
+    else:
+        logger.info(f"Searching sources with query: {query}")
+    result = storage.search(query)
+    return {
+        "total": result.total,
+        "sources": result.sources,
+    }
 
 
-class ScanArguments(BaseModel):
+@app.post("/sources")
+async def add_source_from_payload(request: Request, storage: Storage):
+    """
+    Escape hatch to register sources by pushing a known or manual-built json
+    for the datasource instead of scanning the web portal.
+    """
+    json_req = await request.json()
+    storage.store(json_req)
+    return {"success": True}
+
+
+##### TASKS #####
+
+@dataclass
+class ScanArguments:
     uris: list[str]
     name: str
 
 
-@app.post("/scan")
+@app.post("/tasks/scan")
 def scan_uri(payload: list[ScanArguments]):
     logger.info(f"Queueing scan fn, uris: {payload}")
     sources = [source.uris for source in payload]
@@ -107,12 +98,13 @@ def scan_uri(payload: list[ScanArguments]):
     )
     return {"queued": True, "job_id": job.id}
 
-class QueryArguments(BaseModel):
+@dataclass
+class QueryArguments:
     user_task: str
     supporting_docs: dict[str, Any] | None = None
     url: str = "https://www.google.com"
 
-@app.post("/query")
+@app.post("/tasks/query")
 def query(payload: QueryArguments):
     logger.info(f"Queueing query: {payload}")
     job = job_queue.enqueue_call(
@@ -122,93 +114,25 @@ def query(payload: QueryArguments):
     )
     return {"queued": True, "job_id": job.id}
 
+@app.get("/tasks/{job_id}")
+def status(job_id: str):
+    return get_job_status(job_id, redis)
 
-def format_results(results):
-    return [
-        {**hit["_source"], "id": hit["_id"]}
-        for hit in results["hits"]["hits"] 
-    ]
-
-
-@app.get("/sources")
-def list_sources():
-    logger.info("Getting all registered sources")
-
-    q = {"query": {"match_all": {}}}
-
-    size = 20  # for now hardcoded
-
-    try:
-        results = es_client.search(index="datasources", body=q, scroll="2m", size=size)
-    except Exception as e:
-        logger.exception(e)
-        raise e
-
-    totalDocsInPage = len(results["hits"]["hits"])
-
-    logger.info(f"Got {totalDocsInPage} results")
-
-    if totalDocsInPage < size:
-        scroll_id = None
-    else:
-        scroll_id = results.get("_scroll_id", None)
-
-    return {
-        "count": results["hits"]["total"]["value"],
-        "items_in_page": totalDocsInPage,
-        "sources": format_results(results),
-        "scroll_id": scroll_id,
-    }
-
-
-@app.post("/add-force-source")
-async def add_source_from_payload(request: Request):
-    """
-    Escape hatch to register sources by pushing a known or manual-built json
-    for the datasource instead of scanning the web portal.
-    """
-    json_req = await request.json()
-
-    body = json.dumps(json_req)
-
-    es_client.index(index="datasources", body=body)
-
-    return {"success": True}
-
-
-@app.post("/search")
-def search_sources(query: str):
-    logger.info(f"Searching sources with query: {query}")
-
-    q = {
-        "query": {
-            "multi_match": {
-                "query": query,
-                "fields": ["Web Page Description", "summary.summary"]
-            }
-        }
-    }
-
-    try:
-        results = es_client.search(index="datasources", body=q)
-    except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail="Error occurred while searching")
-
-    return format_results(results)
-
+@app.delete("/tasks/{job_id}")
+def kill_job(job_id: str):
+    job = Job.fetch(job_id, connection=redis)
+    return job.kill()
 
 # TODO: Come up with a better way to bubble up status
 # We may want to rethink how progress is handled in the future
 # as discussed in `/backend/worker/jobs.py`.
-@app.get("/query/{job_id}/logs", response_model=list[str])
+# TODO: Make this work for any task. Not just 'query'
+@app.get("/tasks/{job_id}/logs", response_model=list[str])
 def get_query_progress(job_id: str):
     logs = redis.lrange(f'logs:{job_id}', 0, -1)
 
     logs = [log.decode('utf-8') for log in logs]
     
-    logger.error(f"\n\n\n{logs}\n\n\n")
-
     logs = [
         log for log in logs 
         if not log.startswith('Element Labels') 
@@ -278,3 +202,5 @@ def get_query_progress(job_id: str):
     chunks = ['\n'.join(chunk) for chunk in chunks]
 
     return chunks
+
+

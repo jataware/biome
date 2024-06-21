@@ -3,13 +3,14 @@ import json
 from pathlib import Path
 from base64 import b64encode
 
+from redis import Redis
 from rq import get_current_job
 from jvoy.profiler import WebPageProfiler
 from jvoy.driver import JvoyDriver
 from jvoy.record import RecordType, ActionRecord, ScreenshotRecord
 
-from lib import api_clients
-from lib.settings import Settings
+from lib.storage import DataSourceStorage
+from lib.settings import settings
 
 
 logging.basicConfig()
@@ -17,7 +18,7 @@ logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 def scan(sources: list[list[str]]):
-    elastic = api_clients.get_elasticsearch()
+    storage = DataSourceStorage()
     for uris in sources:
         # TODO hardcoded to 1st item... accepts multiple URIs
         # but we'll accept one for now, until we merge the
@@ -25,8 +26,7 @@ def scan(sources: list[list[str]]):
         # change if doing a spider crawl from 1 URL
         profiler = WebPageProfiler(uris[0], "dump")
         results = profiler.run()
-        body = json.dumps(results)
-        elastic.index(index="datasources", body=body)
+        storage.store(results)
     return {}
 
 
@@ -41,7 +41,7 @@ def query(url, supporting_docs, user_task):
     # how to render it.
     job_id = get_current_job().id
     redis = Redis(
-        host=Settings.REDIS_HOST,
+        host=settings.REDIS_HOST,
     )
     logs = f"logs:{job_id}"
 

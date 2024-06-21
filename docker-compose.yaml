@@ -1,18 +1,18 @@
-name: sources
+name: biome
 services:
-  sources_api:
+  biome_api:
     working_dir: /backend
     build:
       context: .
       dockerfile: ./backend/docker/Dockerfile.api
     depends_on:
-      sources_es:
+      biome_es:
         condition: service_healthy
-      sources_rq_redis:
+      biome_redis:
         condition: service_healthy
     command: > 
       bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
-    container_name: sources_api
+    container_name: biome_api
     ports:
     - mode: ingress
       target: 8082
@@ -29,13 +29,13 @@ services:
       source: ./backend
       target: /backend
     networks:
-      sources: null
-  sources_rq_redis:
-    container_name: sources_rq_redis
+      - biome
+  biome_redis:
+    container_name: biome_redis
     # restart: always
     image: redis
     networks:
-      sources: null
+      - biome
     ports:
     - mode: ingress
       target: 6379
@@ -53,7 +53,7 @@ services:
       retries: 50
     # extra_hosts:
     # - host.docker.internal:host-gateway
-  sources_workers:
+  biome_worker:
     environment:
       - ES_HOST=${ES_HOST}
       - ES_PORT=${ES_PORT}
@@ -64,11 +64,11 @@ services:
       context: .
       dockerfile: ./backend/docker/Dockerfile.worker
     depends_on:
-      sources_rq_redis:
+      biome_redis:
         condition: service_healthy
-      sources_es:
+      biome_es:
         condition: service_healthy
-    container_name: sources_workers
+    container_name: biome_worker
     # restart: always
     volumes:
     - type: bind
@@ -78,20 +78,20 @@ services:
       source: ./jvoy-results/
       target: /jvoy/results
     networks:
-      sources: null
+      - biome
     command: > 
       bash -c  "poetry install 
       && poetry run rq worker --with-scheduler -c worker.rq_configuration"
-  sources_router:
+  biome_router:
     image: caddy
-    hostname: sources_router.sources
+    hostname: biome_router.biome
     networks:
-      - sources
-    container_name: sources_router
+      - biome
+    container_name: biome_router
     ports:
       - 8001:8001
     configs:
-      - source: sources_router_Caddyfile
+      - source: biome_router_Caddyfile
         target: /etc/caddy/Caddyfile
     logging:
       driver: json-file
@@ -100,11 +100,11 @@ services:
         max-file: "5"
     profiles:
       - deploy
-  sources_es:
+  biome_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: sources_es
+    container_name: biome_es
     networks:
-      - sources
+      - biome
     labels:
       co.elastic.logs/module: elasticsearch
     ports:
@@ -126,7 +126,7 @@ services:
       interval: 5s
       retries: 20
     volumes:
-      - sources_esdata:/usr/share/elasticsearch/data
+      - biome_esdata:/usr/share/elasticsearch/data
 
   # For Prod with https and security, depends on setup
   # es01:
@@ -135,7 +135,7 @@ services:
   #       condition: service_healthy
   #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
   #   networks:
-  #     - sources
+  #     - biome
   #   labels:
   #     co.elastic.logs/module: elasticsearch
   #   ports:
@@ -180,14 +180,14 @@ services:
   #     - certs:/usr/share/elasticsearch/config/certs
   #     - esdata01:/usr/share/elasticsearch/data
 
-  sources_kibana:
-    container_name: sources_kibana
+  biome_kibana:
+    container_name: biome_kibana
     depends_on:
-      sources_es:
+      biome_es:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     networks:
-      - sources
+      - biome
     labels:
       co.elastic.logs/module: kibana
     volumes:
@@ -197,7 +197,7 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://sources_es.sources:9200
+      - ELASTICSEARCH_HOSTS=http://biome_es.biome:9200
       # - ELASTICSEARCH_USERNAME=kibana_system
       # - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -216,11 +216,11 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-  sources_ui:
+  biome_ui:
     image: node:20
-    container_name: sources_ui
+    container_name: biome_ui
     networks:
-      - sources
+      - biome
     volumes:
       - ./ui:/ui
     working_dir: "/ui"
@@ -229,16 +229,16 @@ services:
     command: ["npm", "run", "dev"]
     profiles:
       - dev
-  sources_rq_dashboard:
-    container_name: sources_rq_dashboard
+  biome_rq_dashboard:
+    container_name: biome_rq_dashboard
     build:
       context: ./dev/dockerfiles/rq-dashboard
     ports:
       - '9181:9181'
     networks:
-      - sources
+      - biome
     environment:
-      RQ_DASHBOARD_REDIS_URL: redis://sources_rq_redis.sources:6379
+      RQ_DASHBOARD_REDIS_URL: redis://biome_redis.biome:6379
     command: ["bash", "-c", "rq-dashboard"]
     profiles:
       - dev
@@ -256,7 +256,7 @@ services:
   #     - OPENAI_API_KEY
   #     - PYTHONPATH=/jupyter
   #   networks:
-  #     sources: null
+  #     - biome
   #   command: ["python", "-m", "beaker_kernel.server.main", "--debug", "--ip", "0.0.0.0"]
 
 
@@ -270,16 +270,16 @@ services:
   #     - "8080:8080"
   #   command: ["npm", "run", "serve"]
   #   networks:
-  #     sources: null
+  #     - biome
 
 
 
 configs:
-  sources_router_Caddyfile:
+  biome_router_Caddyfile:
     file: Caddyfile
 networks:
-  sources:
-    name: sources
+  biome:
+    name: biome
     driver: bridge
 volumes:
   # For setting up es in prod
@@ -289,5 +289,5 @@ volumes:
   #   driver: local
   kibanadata:
     driver: local
-  sources_esdata:
+  biome_esdata:
     driver: local

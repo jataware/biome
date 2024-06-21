@@ -1,6 +1,6 @@
 # Datasource Browser
 
-Codename: `Sources`
+Codename: `Biome`
 
 Web project to manage registering, browsing, tuning datasources.
 - Frontend: Javascript with Nextjs / Reactjs

@@ -1,1 +1,1 @@
-from .storage import DataSourceStorage
+from .storage import DataSourceStorage, SearchResult
