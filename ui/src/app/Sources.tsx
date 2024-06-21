@@ -121,7 +121,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
       event.preventDefault();
     }
 
-    const firstUrl = Object.keys(selectedSource.content["Information on Links on Web Page"])[0];
+    const firstUrl = selectedSource.base_url;
 
     const response = await fetch('http://localhost:8001/api/query', {
       method: 'POST',

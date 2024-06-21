@@ -37,7 +37,10 @@
                 }
             },
             "summary": {
-                "type": "text"
+                "properties": {
+                    "reasoning": { "type": "text" },
+                    "summary": { "type": "text" }
+                }
             },
             "logo": {
                 "type": "text"
