@@ -3,14 +3,15 @@ services:
   sources_api:
     working_dir: /backend
     build:
-      context: ./backend
-      dockerfile: ./docker/api/Dockerfile
+      context: .
+      dockerfile: ./backend/docker/Dockerfile.api
     depends_on:
       sources_es:
         condition: service_healthy
       sources_rq_redis:
         condition: service_healthy
-    command: ["bash", "-c", "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"]
+    command: > 
+      bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
     container_name: sources_api
     ports:
     - mode: ingress
@@ -58,10 +59,11 @@ services:
       - ES_PORT=${ES_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - REDIS_HOST=sources_rq_redis
     working_dir: /backend
     build:
-      context: ./backend/
-      dockerfile: ./docker/workers/Dockerfile
+      context: .
+      dockerfile: ./backend/docker/Dockerfile.worker
     depends_on:
       sources_rq_redis:
         condition: service_healthy
@@ -73,41 +75,14 @@ services:
     - type: bind
       source: ./backend/
       target: /backend
-    networks:
-      sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings"]
-  sources_jvoy_workers:
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-      - REDIS_HOST=sources_rq_redis
-    # working_dir: /backend
-    build:
-      context: ./backend/
-      dockerfile: ./docker/workers/Dockerfile.jvoy
-    depends_on:
-      sources_rq_redis:
-        condition: service_healthy
-    container_name: sources_workers_jvoy
-    # restart: always
-    volumes:
     - type: bind
       source: ./jvoy-results/
-      target: /jvoy/jvoy/results
+      target: /jvoy/results
     networks:
       sources: null
-    command: ["bash", "-c", "poetry run rq worker --with-scheduler -c worker.settings jvoy"]
-
-
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+    command: > 
+      bash -c  "poetry install 
+      && poetry run rq worker --with-scheduler -c worker.rq_configuration"
   sources_router:
     image: caddy
     hostname: sources_router.sources

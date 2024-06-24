@@ -18,6 +18,7 @@ import { Divider } from 'primereact/divider';
 import { ScrollPanel } from 'primereact/scrollpanel';
 
 enum Step {
+  queue = "queue",
   url = "url",
   scan = "scan",
   review = "review",
@@ -25,46 +26,63 @@ enum Step {
 }
 
 enum ScanStep {
-  inputUri,
-  reviewLinks,
-  scanningBest,
-  generating,
+  queue,
+  url,
+  logo,
+  api,
+  docs,
+  generating, 
   done
 }
 
 const AnimatedTimeline = ({onDone}) => {
 
-  const [loadingScanStep, setLoadingScanStep] = useState(ScanStep.inputUri);
+  const [loadingScanStep, setLoadingScanStep] = useState(ScanStep.queue);
 
   const rawEvents = [
     {
-      status: 'Scanning Input URL',
+      status: 'Queueing Scan',
       date: '10:00',
-      color: '#9C27B0',
+      color: '#FF9800',
+
       // image: 'game-controller.jpg', // TODO?
-      index: ScanStep.inputUri
+      index: ScanStep.queue
     },
     {
-      status: 'Reviewing Links',
+      status: 'Scanning initial URL',
       date: '14:00',
       // icon: 'pi pi-cog',
-      color: '#673AB7',
-      index: ScanStep.reviewLinks
+      color: '#9C27B0',
+      index: ScanStep.url
     },
     {
-      status: 'Extracting Information',
+      status: 'Fetching logo',
       date: '16:00',
       // icon: 'pi pi-shopping-cart',
-      color: '#FF9800',
-      index: ScanStep.scanningBest
+      color: '#9C27B0',
+      index: ScanStep.logo
     },
     {
-      status: 'Generating Metadata',
+      status: 'Fetching API specification',
       date: '18:00',
+      // icon: 'pi pi-check',
+      color: '#9C27B0',
+      index: ScanStep.api
+    },
+    {
+      status: 'Fetching documentation',
+      date: '20:00',
+      // icon: 'pi pi-check',
+      color: '#9C27B0',
+      index: ScanStep.docs
+    },
+    {
+      status: 'Generating data source',
+      date: '22:00',
       // icon: 'pi pi-check',
       color: '#607D8B',
       index: ScanStep.generating
-    }
+    }    
   ];
 
   const [events, setEvents] = useState([rawEvents[0]]);
@@ -72,7 +90,7 @@ const AnimatedTimeline = ({onDone}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setEvents(current => {
-        if (current.length > 3) {
+        if (current.length >= 6) {
           setLoadingScanStep(ScanStep.done);
           onDone();
           return current;
@@ -99,12 +117,6 @@ const AnimatedTimeline = ({onDone}) => {
       </span>
     );
   };
-
-  // These were inside customizeContent: Card
-  // {
-  //   item.image && <img src={`https://primefaces.org/cdn/primereact/images/product/${item.image}`} alt={item.name} width={200} className="shadow-1" />
-  // }
-  // subTitle={item.date}
 
   const customizedContent = (item) => {
     return (
@@ -147,14 +159,14 @@ export default function AddSource({onRegisterDone}) {
   const randomColor = "#000000".replace(/0/g, function() { return (~~(Math.random() * 16)).toString(16); });
 
   const [visible, setVisible] = useState(false);
-  const [step, setStep] = useState(Step.url);
+  const [step, setStep] = useState(Step.queue);
   // const [color, setColor] = useState(randomColor);
   const [sourceUri, setSourceUri] = useState('');
 
   // const sourceUriInputRef = useRef(null);
 
   function closeAndReset() {
-    setStep(Step.url);
+    setStep(Step.queue);
     setVisible(false);
   }
 
@@ -204,12 +216,12 @@ export default function AddSource({onRegisterDone}) {
         header="Add New Source"
         modal={false}
         visible={visible}
-        closeOnEscape={step === Step.url}
+        closeOnEscape={step === Step.queue}
         maximizable
         className={classNames(s.dialogWrapper, s[step])}
         onHide={closeAndReset}
       >
-        {step === Step.url && (
+        {step === Step.queue && (
           <div
             className="flex flex-column align-items-end"
           >

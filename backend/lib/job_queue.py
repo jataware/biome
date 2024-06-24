@@ -3,21 +3,10 @@ from enum import Enum
 from typing import Dict
 from redis import Redis
 from rq.exceptions import NoSuchJobError
-from rq.job import Job
+from rq.job import Job, JobStatus
 from fastapi import status
 from pydantic import BaseModel
 import subprocess
-
-
-class Status(Enum):
-    started = "started"
-    finished = "finished"
-    cancelled = "cancelled"
-    complete = "complete"
-    error = "error"
-    queued = "queued"
-    running = "running"
-    failed = "failed"
 
 
 class Result(BaseModel):
@@ -30,7 +19,7 @@ class Result(BaseModel):
 
 class SliceJob(BaseModel):
     id: str
-    status: Status
+    status: JobStatus
     result: Result | None
 
 

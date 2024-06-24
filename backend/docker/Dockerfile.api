@@ -1,0 +1,26 @@
+FROM --platform=linux/amd64 python:3.11.6-bookworm
+
+WORKDIR /backend
+RUN apt update && \
+    apt install -y \ 
+        git \
+        # Poetry has a private dependency
+        openssh-client \
+    && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+COPY ./.ssh /root/ssh
+ENV GIT_SSH_COMMAND="ssh -i /root/ssh/id_rsa -o IdentitiesOnly=yes -F /dev/null"
+
+
+
+RUN pip install --upgrade pip poetry
+COPY ./backend/pyproject.toml /backend/
+
+COPY ./backend/README.md /backend/README.md
+
+RUN poetry install --no-root -vvv
+
+# set display port to avoid crash. TODO Needed?
+ENV DISPLAY=:99
