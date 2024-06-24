@@ -47,6 +47,9 @@
             },
             "base_url":{
                 "type": "text"
+            },
+            "embedding": {
+                "type": "dense_vector"
             }
         }
     }

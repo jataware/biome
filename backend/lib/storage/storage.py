@@ -16,8 +16,19 @@ RESULT_MAX_SIZE = 20
 
 logger = logging.getLogger(__name__)
 
+def get_embedding(text: str) -> list[float]:
+    cleaned_text = text.replace("\n", " ")
+    client_response = OpenAI().embeddings.create(
+        input=cleaned_text, 
+        model="text-embedding-3-small"
+    )
+    return client_response.data[0].embedding
+
 @dataclass
 class SearchResult:
+    """
+    SearchResult class to store and scroll search results.
+    """
     total : int
     sources : list[dict]
     scroll : Callable[[], "SearchResult"] | None
@@ -28,13 +39,17 @@ class DataSourceStorage:
 
     Storage acts as a singleton across the entire application. The
     expectation is that initializing this class will create a connection,
-    therefore
+    therefore, creating a new instance in a separate runtime or container
+    is trivial.
     """
 
     def __init__(self):
         """
         Initializes a connection to storage and will create and seed the
         necessary data if it does not already exist.
+
+        Side effects:
+            - Seeds data.
         """
         # NOTE: Environment variables ES_USER and ES_PASS are implicitly used here
         self.es =  Elasticsearch(
@@ -52,37 +67,61 @@ class DataSourceStorage:
             logger.info(f"Creating index {PRIMARY_INDEX}")
             mappings = json.load(open(PRIMARY_INDEX_SCHEMA))["mappings"]
             self.es.indices.create(index=PRIMARY_INDEX, body={}, mappings=mappings)   
-        
-        logger.info(f"Checking if {PRIMARY_INDEX} should be seeded.")
-        all_query = {"query": {"match_all": {}}}
-
-        results = self.es.search(index=PRIMARY_INDEX, body=all_query)
-        count = results["hits"]["total"]["value"]
-
-        if count == 0:
-            logger.info("Need to seed index as it is empty.")
             logger.info("Seeding datasources")
             for source in json.load(open(PRIMARY_INDEX_SEEDS)):
                 self.store(source)
-        else:
-            logger.info("No need to seed as it is not empty.")
 
 
     def store(self, source):
+        """
+        Store data source in the storage.
+
+        Side effects:
+         - Adds new source to DB.
+         - Adds new elements `source` input with new key 'embedding'.
+
+        Args:
+            source (dict): The data source to store in the storage.
+        """
+        text = source["summary"]["summary"]
+        embedding = get_embedding(text)
+        source["embedding"] = embedding
         body = json.dumps(source)
         self.es.index(index=PRIMARY_INDEX, body=body)
+
     
     def search(self, query: str | None = None) -> SearchResult:
-        es_query = {
-            "query": {
-                "match_all": {}
-            } if query is None else {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["Web Page Description", "summary"]
+        """
+        Search data sources
+
+        Args:
+            query (str): The query to search for. If None, will return all data sources.
+        
+        Returns:
+            SearchResult: The search result containing the total number of results and the sources.
+        """
+        if query is None:
+            es_query = {
+                "query": {
+                    "match_all": {}
+                } 
+            }
+        else:
+            embedded_query = get_embedding(query)
+            es_query = {
+                "query": {
+                    "script_score": {
+                    "query": {"match_all": {}},
+                    "script": {
+                        "source": "Math.max(cosineSimilarity(params.query_vector, doc['embedding'].value), 0)",
+                        "params": {
+                            "query_vector": embedded_query
+                        }
+                    }
+                    }
                 }
             }
-        }
+        
         results = self.es.search(index=PRIMARY_INDEX, body=es_query, scroll="2m", size=RESULT_MAX_SIZE)
         return self._process_results(results)
  
@@ -110,4 +149,3 @@ class DataSourceStorage:
             scroll = scroll,
         )
 
-    
