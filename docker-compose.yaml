@@ -126,7 +126,7 @@ services:
       interval: 5s
       retries: 20
     volumes:
-      - biome_esdata:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
 
   # For Prod with https and security, depends on setup
   # es01:
@@ -289,5 +289,5 @@ volumes:
   #   driver: local
   kibanadata:
     driver: local
-  biome_esdata:
+  esdata:
     driver: local

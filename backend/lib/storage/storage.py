@@ -104,10 +104,10 @@ class DataSourceStorage:
             for hit in results["hits"]["hits"] 
         ]
 
-        return {
-            "total": results["hits"]["total"]["value"],
-            "sources": sources,
-            "scroll": scroll,
-        }
+        return SearchResult(
+            total = results["hits"]["total"]["value"],
+            sources = sources,
+            scroll = scroll,
+        )
 
     

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, exceptions, Request, HTTPException, Depends, status
 from fastapi.staticfiles import StaticFiles
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import os
 import json
 import re
@@ -109,7 +109,7 @@ def query(payload: QueryArguments):
     logger.info(f"Queueing query: {payload}")
     job = job_queue.enqueue_call(
         func="worker.jobs.query",
-        kwargs=payload.model_dump(),
+        kwargs=asdict(payload),
         retry=Retry(max=3, interval=[10, 30, 60]),
     )
     return {"queued": True, "job_id": job.id}

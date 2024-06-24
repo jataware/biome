@@ -94,7 +94,7 @@ export default function Home() {
           return response.json();
         })
         .then(data => {
-          setSourceList(data);
+          setSourceList(data.sources);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
