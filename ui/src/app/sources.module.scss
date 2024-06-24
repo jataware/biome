@@ -223,6 +223,7 @@
   padding: 10px; /* Add some padding */
   margin-bottom: 10px; /* Add some space between log chunks */
   background-color: #f9f9f9; /* Add a background color */
+  overflow-wrap: break-word;
 
   p {
     font-size: 0.9em;
