@@ -113,7 +113,7 @@ class DataSourceStorage:
                     "script_score": {
                     "query": {"match_all": {}},
                     "script": {
-                        "source": "Math.max(cosineSimilarity(params.query_vector, doc['embedding'].value), 0)",
+                        "source": "return Math.max(cosineSimilarity(params.query_vector, 'embedding'), 0)",
                         "params": {
                             "query_vector": embedded_query
                         }
