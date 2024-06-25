@@ -12,7 +12,7 @@ PRIMARY_INDEX = "datasources"
 PRIMARY_INDEX_SCHEMA = "/backend/lib/storage/datasources_schema.json"
 PRIMARY_INDEX_SEEDS = "/backend/api/seeds.json"
 CACHE_INDEX = "cache"
-RESULT_MAX_SIZE = 20
+RESULT_MAX_SIZE = 100
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +83,10 @@ class DataSourceStorage:
         Args:
             source (dict): The data source to store in the storage.
         """
+        # TODO: Remove workaround once upstream is fixed
+        if isinstance(source["summary"], str):
+            source["summary"] = json.loads(source["summary"])
+
         text = source["summary"]["summary"]
         embedding = get_embedding(text)
         source["embedding"] = embedding
