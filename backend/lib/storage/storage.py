@@ -114,14 +114,33 @@ class DataSourceStorage:
             embedded_query = get_embedding(query)
             es_query = {
                 "query": {
-                    "script_score": {
-                    "query": {"match_all": {}},
-                    "script": {
-                        "source": "return Math.max(cosineSimilarity(params.query_vector, 'embedding'), 0)",
-                        "params": {
-                            "query_vector": embedded_query
-                        }
-                    }
+                    "bool": {
+                        "should": [
+                            {
+                                "script_score": {
+                                    "query": {"match_all": {}},
+                                    "script": {
+                                        "source": "return Math.max(cosineSimilarity(params.query_vector, 'embedding'), 0)",
+                                        "params": {
+                                            "query_vector": embedded_query
+                                        }
+                                    },
+                                },
+                            },
+                            {
+                                "constant_score": {
+                                    "filter": {
+                                        "match": {
+                                            "summary.summary": {
+                                                "query": query,
+                                                "fuzziness": 2
+                                            }
+                                        }
+                                    },
+                                    "boost": 1
+                                }
+                            },
+                        ]
                     }
                 }
             }
