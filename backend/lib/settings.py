@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     ES_PASS: str | None = environ.get("ES_PASS", None)
     ES_HOST: str | None = environ.get("ES_HOST", "http://localhost")
     ES_PORT: int | None = environ.get("ES_PORT", 9200)
+    REDIS_HOST: str | None = environ.get("REDIS_HOST", "biome_redis")
+    
+
 
 
 settings = Settings()

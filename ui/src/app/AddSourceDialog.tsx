@@ -176,7 +176,7 @@ export default function AddSource({onRegisterDone}) {
   }
 
   function gotoScan() {
-    fetch('http://localhost:8001/api/scan', {
+    fetch('http://localhost:8001/api/tasks/scan', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

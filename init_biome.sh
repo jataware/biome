@@ -2,10 +2,6 @@
 
 set -e
 
-# Generate jvoy-results
-# TODO: Do we even need this volume??
-mkdir -p jvoy-results
-
 # Generate SSH Keys
 mkdir -p ./.ssh
 if [ ! -f ./.ssh/id_rsa ]; 

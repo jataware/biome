@@ -84,11 +84,8 @@ export default function Home() {
       fetchSources();
     } else {
       const params = new URLSearchParams({ query }).toString();
-      fetch('/api/search?' + params, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+      fetch('/api/sources?' + params, {
+        method: 'GET',
       })
         .then(response => {
           if (!response.ok) {
@@ -97,7 +94,7 @@ export default function Home() {
           return response.json();
         })
         .then(data => {
-          setSourceList(data);
+          setSourceList(data.sources);
         })
         .catch(error => {
           console.error('Error fetching data:', error);

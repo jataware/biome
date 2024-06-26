@@ -14,10 +14,10 @@
   import common
 
  handle_path /api* {
-   reverse_proxy sources_api.sources:8082
+   reverse_proxy biome_api.biome:8082
  }
  handle_path /* {
-   reverse_proxy sources_ui.sources:3000
+   reverse_proxy biome_ui.biome:3000
  }
 
   handle_errors {
