@@ -9,7 +9,7 @@ from openai import OpenAI
 from lib.settings import settings
 
 PRIMARY_INDEX = "datasources"
-PRIMARY_INDEX_SCHEMA = "/backend/lib/storage/datasources_schema.json"
+PRIMARY_INDEX_SCHEMA = "/backend/lib/sources_db/datasources_schema.json"
 PRIMARY_INDEX_SEEDS = "/backend/api/seeds.json"
 CACHE_INDEX = "cache"
 RESULT_MAX_SIZE = 100
@@ -33,7 +33,7 @@ class SearchResult:
     sources : list[dict]
     scroll : Callable[[], "SearchResult"] | None
 
-class DataSourceStorage:
+class SourcesDatabase:
     """
     Data Source Storage class to store and search over datasources.
 
@@ -78,7 +78,7 @@ class DataSourceStorage:
 
         Side effects:
          - Adds new source to DB.
-         - Adds new elements `source` input with new key 'embedding'.
+         - Adds new elements `source` input with new key 'embedded_summary'.
 
         Args:
             source (dict): The data source to store in the storage.
@@ -88,8 +88,8 @@ class DataSourceStorage:
             source["summary"] = json.loads(source["summary"])
 
         text = source["summary"]["summary"]
-        embedding = get_embedding(text)
-        source["embedding"] = embedding
+        embedded_summary = get_embedding(text)
+        source["embedded_summary"] = embedded_summary
         body = json.dumps(source)
         self.es.index(index=PRIMARY_INDEX, body=body)
 
@@ -120,7 +120,7 @@ class DataSourceStorage:
                                 "script_score": {
                                     "query": {"match_all": {}},
                                     "script": {
-                                        "source": "return Math.max(cosineSimilarity(params.query_vector, 'embedding'), 0)",
+                                        "source": "return Math.max(cosineSimilarity(params.query_vector, 'embedded_summary'), 0)",
                                         "params": {
                                             "query_vector": embedded_query
                                         }

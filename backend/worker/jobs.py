@@ -9,7 +9,7 @@ from jvoy.profiler import WebPageProfiler
 from jvoy.driver import JvoyDriver
 from jvoy.record import RecordType, ActionRecord, ScreenshotRecord
 
-from lib.storage import DataSourceStorage
+from lib.sources_db import SourcesDatabase
 from lib.settings import settings
 
 
@@ -18,7 +18,7 @@ logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 def scan(sources: list[list[str]]):
-    storage = DataSourceStorage()
+    db = SourcesDatabase()
     for uris in sources:
         # TODO hardcoded to 1st item... accepts multiple URIs
         # but we'll accept one for now, until we merge the
@@ -26,7 +26,7 @@ def scan(sources: list[list[str]]):
         # change if doing a spider crawl from 1 URL
         profiler = WebPageProfiler(uris[0], "dump")
         results = profiler.run()
-        storage.store(results)
+        db.store(results)
     return {}
 
 

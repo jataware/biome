@@ -20,7 +20,7 @@ import base64
 import hashlib
 from lib.job_queue import get_job_status
 from lib.settings import settings
-from lib.storage import DataSourceStorage
+from lib.sources_db import SourcesDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ redis = Redis(
 )
 job_queue = Queue(connection=redis, default_timeout=-1)
 
-Storage = Annotated[DataSourceStorage, Depends(DataSourceStorage)]
+SourcesDB = Annotated[SourcesDatabase, Depends(SourcesDatabase)]
 
 app = FastAPI(docs_url="/")
 
@@ -56,12 +56,12 @@ app.add_middleware(
 
 # TODO: Enable scrolling
 @app.get("/sources")
-def search_sources(storage: Storage, query: str | None = None):
+def search_sources(db: SourcesDB, query: str | None = None):
     if query is None:
         logger.info("Getting all registered sources")
     else:
         logger.info(f"Searching sources with query: {query}")
-    result = storage.search(query)
+    result = db.search(query)
     return {
         "total": result.total,
         "sources": result.sources,
@@ -69,13 +69,13 @@ def search_sources(storage: Storage, query: str | None = None):
 
 
 @app.post("/sources")
-async def add_source_from_payload(request: Request, storage: Storage):
+async def add_source_from_payload(request: Request, db: SourcesDB):
     """
     Escape hatch to register sources by pushing a known or manual-built json
     for the datasource instead of scanning the web portal.
     """
     json_req = await request.json()
-    storage.store(json_req)
+    db.store(json_req)
     return {"success": True}
 
 
