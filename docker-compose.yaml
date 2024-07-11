@@ -30,6 +30,7 @@ services:
       target: /backend
     networks:
       - biome
+      - biome-beaker
   biome_redis:
     container_name: biome_redis
     # restart: always
@@ -280,6 +281,9 @@ configs:
 networks:
   biome:
     name: biome
+    driver: bridge
+  biome-beaker:
+    name: biome-beaker
     driver: bridge
 volumes:
   # For setting up es in prod
