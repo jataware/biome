@@ -2,6 +2,7 @@ import logging
 import json
 from pathlib import Path
 from base64 import b64encode
+import shutil
 
 from redis import Redis
 from rq import get_current_job
@@ -74,10 +75,11 @@ def query(url, supporting_docs, user_task):
     driver = JvoyDriver(
         url=url,
         supporting_docs=supporting_docs,
-        results_dir=Path('/jvoy/results'),
+        results_dir=Path('/results'),
         timeout=20,
-        #adblock=False,
-        #port=8080,
+        # TODO: Uncomment once we depend off of Jvoy master branch
+        # adblock=False,
+        # port=8080, 
         record_callback=report,
     )
     driver.run(user_task)
@@ -90,6 +92,10 @@ def query(url, supporting_docs, user_task):
     time.sleep(6)
 
     driver.end()
+
+    for path in driver.download_tracker.get_all_downloads():
+        shutil.move(path, "/results")
+    shutil.rmtree(str(driver.download_tracker.downloads_dir))
 
     assert final_answer is not None, "Final answer not found"
     return {

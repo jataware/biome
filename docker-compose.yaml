@@ -1,4 +1,6 @@
 name: biome
+include:
+  - analyst-ui/docker-compose.yaml
 services:
   biome_api:
     working_dir: /backend
@@ -30,7 +32,7 @@ services:
       target: /backend
     networks:
       - biome
-      - biome-beaker
+      - beaker
   biome_redis:
     container_name: biome_redis
     # restart: always
@@ -75,9 +77,12 @@ services:
     - type: bind
       source: ./backend/
       target: /backend
+    # This has to match beaker's use of the volume EXACTLY.
+    # File copying after tasks pass a `download_dir` parameter around and we
+    # have to guarantee it matches up.
     - type: bind
-      source: ./jvoy-results/
-      target: /jvoy/results
+      source: ./analyst-ui/
+      target: /results
     networks:
       - biome
     command: > 
@@ -99,8 +104,6 @@ services:
       options:
         max-size: 100m
         max-file: "5"
-    profiles:
-      - deploy
   biome_es:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: biome_es
@@ -228,8 +231,6 @@ services:
     ports:
       - "3000:3000"
     command: ["npm", "run", "dev"]
-    profiles:
-      - dev
   biome_rq_dashboard:
     container_name: biome_rq_dashboard
     build:
@@ -241,8 +242,6 @@ services:
     environment:
       RQ_DASHBOARD_REDIS_URL: redis://biome_redis.biome:6379
     command: ["bash", "-c", "rq-dashboard"]
-    profiles:
-      - dev
 
   # beaker:
   #   build:
@@ -281,9 +280,6 @@ configs:
 networks:
   biome:
     name: biome
-    driver: bridge
-  biome-beaker:
-    name: biome-beaker
     driver: bridge
 volumes:
   # For setting up es in prod
