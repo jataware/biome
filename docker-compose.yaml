@@ -81,7 +81,7 @@ services:
       - biome
     command: > 
       bash -c  "poetry install 
-      && poetry run rq worker --with-scheduler -c worker.rq_configuration"
+      && poetry run rq worker --with-scheduler -c lib.job_handler.rq_configuration"
   biome_router:
     image: caddy
     hostname: biome_router.biome
