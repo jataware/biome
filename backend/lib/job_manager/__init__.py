@@ -1,2 +1,2 @@
-from .job_manager import JobManager
+from .job_runner import JobRunner
 import rq_configuration

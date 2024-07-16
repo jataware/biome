@@ -1,137 +1,201 @@
 """
 Jobs
 """
+from dataclasses import dataclass
+from uuid import uuid4
 from enum import Enum
 from redis import Redis
 from rq import Queue, Retry
 import rq.job as rq_job
 from rq.exceptions import NoSuchJobError
 
-
-
 from lib.settings import settings
 
-### START FROM `job_queue.py`
-class Result(BaseModel):
+@dataclass
+class Job:
+    """
+    Job contains its session, result (if it is complete),
+    its status along with some metadata.
+
+    This object represents the state of the Job on return.
+    """
+    id: str
+    session_id: str
+    status: JobStatus
+    result: Dict | None
+    error: str | None
+    messages: list[str]
     created_at: datetime
     enqueued_at: datetime
     started_at: datetime | None
-    job_result: Dict | None
-    job_error: str | None
 
-
-class SliceJob(BaseModel):
-    id: str
-    status: JobStatus
-    result: Result | None
-
-
-### END
-
-# TODO: HOW DO I SPECIFY THE JOB INTERFACE
-class JobType(Enum):
+class Operation(Enum):
     SCAN = "worker.jobs.scan"
     QUERY = "worker.jobs.query"
 
-class JobManager:
+class JobRunner:
     """
     Starts long running, asynchronous jobs and handles their output.
-    Jobs can optionally be given a session which is simply a collection 
+    Jobs can optionally be given a session which is simply a collection.
+
+    All pre-existing sessions are cleaned up on start. 
     """
 
     def __init__(self):
         """
-        Initializes queue and connection to Redis
-            
+        Initializes job queue and external connections.
         """
         self._redis = Redis(host=settings.REDIS_HOST)
         self._queue = Queue(connection=self._redis, default_timeout=-1)
 
-    def init_session(self) -> str:
+        for session_id in self.list_sessions: delete_session(session_id)
+
+
+    def create_session(self) -> str:
         """
+        Generate a new 'session' and return the ID to the user.
+
+        A session is simply a collection of jobs.
 
         Returns
-            str: The session id
+            str: ID of the newly created session
         """
-        raise NotImplemented
-        
+        session_id = str(uuid4())        
+        self._redis.rpush("sessions", session_id)
+        return session_id
+
+
+    def list_sessions(self) -> list[str]:
+        """
+        List all sessions that currently exists.
+            
+        Returns
+            list[str]: List of all session IDs.
+        """
+        session_ids = self._redis.lrange('sessions', 0, -1)
+        return [session_id.decode('utf-8') for session_id in session_ids]
+
+
+    def delete_session(self):
+        """
+        Delete session and associated jobs. 
+        """
+        job_ids = self.list_jobs(session_id)
+        for job_id in job_ids:
+            self._redis.delete(f"messages:{job_id}")
+            try:
+                rq_job.Job.fetch(f"{session_id}:{job_id}").delete()
+            except NoSuchJobError:
+                continue
+        self._redis.delete(f"session:{session_id}")
+        self._redis.lrem("session", session_id)
+
 
     def list_jobs(self, session_id: str) -> list[str]:
         """
-        List all jobs associated with a given session
+        List all jobs associated with a given session.
             
         Args:
-            session_id (str): ID for the session to look up
+            session_id (str): ID for the session to look up.
         
         Returns
-            list[str]: List of Job IDs for a given session
+            list[str]: List of Job IDs for a given session.
         """
-        raise NotImplemented
 
-    def exec(self):
+        if session_id not in session_ids:
+            redis.rpush("sessions", session_id)
+        redis.rpush("sessions", session_id) # PROBLEM
+        job_ids = redis.lrange(f'sessions:{sessions}', 0, -1)
+        return [session_id.decode('utf-8') for session_id in session_ids]
+
+
+    def exec(self, operation: Operation, args: dict, session_id: str) -> str:
         """
+        Kick off operation by creating a new job within the provided session.
             
+        Args:
+            operation (Operation): Function to run as job.
+            args (dict): Arguments to pass to operation. Please look at the available 
+                         args in `workers/jobs.py`.
+            session_id (str): Session the created job belongs to.
+            
+        Returns:
+            str: The newly created job ID
         """
-        # ENQUEUE JOB
-        # job = job_queue.enqueue_call(
-        #     func="worker.jobs.scan",
-        #     args=[sources],
-        #     retry=Retry(max=3, interval=[10, 30, 60]),
-        # )
-        raise NotImplemented
-        
+        if session_id not in session_ids:
+            redis.rpush("sessions", session_id)
+        job_id = str(uuid4())
+        self._queue.enqueue_call(
+            id=f"{session_id}:{job_id}",
+            func=operation,
+            args=args,
+            retry=Retry(max=3, interval=[10, 30, 60]),
+            # Results are deleted when sessions are closed
+            result_ttl=-1,
+        )
+        return job_id
 
     
     def write_message(self, job_id: str, message: str):
         """
+        Write a message/log to the job. This is used to communicate
+        with the client that started the job while the job is
+        still running.
 
         Args:
             job_id (str):
             message (str): Message to write to Job.
-
         """
-        # logs = f"logs:{job_id}"
-        # job_id = get_current_job().id
-        raise NotImplemented
+        messages_key = f"messages:{job_id}"
+        self._redis.rpush(messages_key, message)
 
-    def get_messages(self, job_id: str) -> list[str]:
+
+    def get_job(self, job_id: str | None = None) -> Result | None:
         """
+        Get current state of the running job. ID defaults to the
+        job the callee of this function is running in.
             
         Args:
-            job_id (str): ID of job to read messages from.
+            job_id (str | None): ID of Job to get status of. If no ID is 
+                                 given, the caller will get the Job it
+                                 is running in.
 
         Returns:
-            list[str]: Job Messages in insertion order
+            Job | None: Current results of the Job if it exists
         """
-        logs = redis.lrange(f'messages:{job_id}', 0, -1)
-        return [log.decode('utf-8') for log in logs]
-    
-
-    def status(self, job_id: str) -> SliceJob | None:
-        """
-            
-        """
+        if job_id is None:
+            session_id, job_id = self._redis.get_current_job.id.split(":")
+        else:
+            _, keys = self._redis.scan(cursor=0, match=f'*:{job_id}')
+            session_id = keys[0].split(":")[0]
+        
         try:
             job = rq_job.Job.fetch(job_id, connection=self._redis)
-            result = {
-                "created_at": job.created_at,
-                "enqueued_at": job.enqueued_at,
-                "started_at": job.started_at,
-                "job_error": job.exc_info,
-                "job_result": {
-                #     "args": job.return_value.args,
-                #     "returncode": job.return_value.returncode,
-                #     "stdout": job.return_value.stdout,
-                #     "stderr": job.return_value.stderr,
-                },
-            }
-            return SliceJob(id=job_id, status=job.get_status(), result=result)
         except NoSuchJobError:
             return
 
+        messages = [
+            raw_msg.decode('utf-8')            
+            for raw_msg in self._redis.lrange(f'messages:{job_id}', 0, -1)
+        ]
+        
+        return Job(
+            id = job_id,
+            session_id = session_id,
+            status = job.get_status(),
+            result = job.return_value,
+            error = job.exc_info,
+            messages = messages,
+            created_at = job.created_at,
+            enqueued_at = job.enqueued_at,
+            started_at = job.started_at,
+            redis=self._redis,
+        )
+
+
     def kill(self, job_id: str):
         """
-        Kill job if it exists
+        Kill job if it exists.
 
         Args:
             job_id (str): ID of job to kill
