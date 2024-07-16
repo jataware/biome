@@ -7,9 +7,6 @@ import json
 import re
 from typing import Any, Annotated
 from datetime import datetime
-from rq import Queue, Retry
-from rq.job import Job
-from redis import Redis
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -18,18 +15,14 @@ from io import BytesIO
 from markdown import markdown
 import base64
 import hashlib
-from lib.job_queue import get_job_status
 from lib.settings import settings
 from lib.sources_db import SourcesDatabase
+from lib.job_runner import JobRunner, Operation
 
 logger = logging.getLogger(__name__)
 
-redis = Redis(
-    host=settings.REDIS_HOST,
-)
-job_queue = Queue(connection=redis, default_timeout=-1)
-
 SourcesDB = Annotated[SourcesDatabase, Depends(SourcesDatabase)]
+Runner = Annotated[JobRunner, Depends(JobRunner)]
 
 app = FastAPI(docs_url="/")
 
@@ -79,67 +72,81 @@ async def add_source_from_payload(request: Request, db: SourcesDB):
     return {"success": True}
 
 
-##### TASKS #####
+##### JOBS #####
 
 @dataclass
-class ScanArguments:
+class ScanTarget:
     uris: list[str]
     name: str
 
+@dataclass
+class ScanArguments:
+    targets: list[ScanTarget]
+    session_id: str | None = None
 
-@app.post("/tasks/scan")
-def scan_uri(payload: list[ScanArguments]):
+    def __post_init__(self):
+        if self.session_id is None:
+            self.session_id = "default"
+
+
+@app.post("/jobs/scan")
+def scan_uri(payload: ScanArguments, runner: Runner):
     logger.info(f"Queueing scan fn, uris: {payload}")
-    sources = [source.uris for source in payload]
-    job = job_queue.enqueue_call(
-        func="worker.jobs.scan",
+    sources = [source.uris for source in payload.targets]
+    job = runner.exec(
+        operation=Operation.SCAN,
         args=[sources],
-        retry=Retry(max=3, interval=[10, 30, 60]),
+        session_id=payload.session_id,
     )
     return {"queued": True, "job_id": job.id}
+
 
 @dataclass
 class QueryArguments:
     user_task: str
     supporting_docs: dict[str, Any] | None = None
     url: str = "https://www.google.com"
+    session_id: str | None = None
 
-@app.post("/tasks/query")
-def query(payload: QueryArguments):
+    def __post_init__(self):
+        if self.session_id is None:
+            self.session_id = "default"
+
+
+@app.post("/jobs/query")
+def query(payload: QueryArguments, runner: Runner):
     logger.info(f"Queueing query: {payload}")
-    job = job_queue.enqueue_call(
-        func="worker.jobs.query",
-        kwargs=asdict(payload),
-        retry=Retry(max=3, interval=[10, 30, 60]),
+    job = runner.exec(
+        operation=Operation.QUERY,
+        args={ k:v for k,v in asdict(payload) if k != "session_id" },
+        session_id=payload.session_id,
     )
+    
     return {"queued": True, "job_id": job.id}
 
-@app.get("/tasks/{job_id}")
-def status(job_id: str):
-    return get_job_status(job_id, redis)
 
-@app.delete("/tasks/{job_id}")
-def kill_job(job_id: str):
-    job = Job.fetch(job_id, connection=redis)
-    return job.kill()
+@app.get("/jobs/{job_id}")
+def status(job_id: str, runner: Runner):
+    return runner.get_job(job_id)
 
-# TODO: Come up with a better way to bubble up status
+
+@app.delete("/jobs/{job_id}")
+def kill_job(job_id: str, runner: Runner):
+    return runner.kill_job(job_id)
+
+# TODO(DESIGN): Come up with a better way to bubble up status
 # We may want to rethink how progress is handled in the future
 # as discussed in `/backend/worker/jobs.py`.
-# TODO: Make this work for any task. Not just 'query'
-@app.get("/tasks/{job_id}/logs", response_model=list[str])
+# TODO(DESIGN): Make this work for any task. Not just 'query'
+@app.get("/jobs/{job_id}/logs", response_model=list[str])
 def get_query_progress(job_id: str):
-    logs = redis.lrange(f'logs:{job_id}', 0, -1)
-
-    logs = [log.decode('utf-8') for log in logs]
+    job = get_job(job_id)
     
     logs = [
-        log for log in logs 
+        log for log in job.messages 
         if not log.startswith('Element Labels') 
         and not log.startswith('![log image')
     ]
-
-    # logs.reverse()
 
     chunks = []
     chunk = []
@@ -165,18 +172,18 @@ def get_query_progress(job_id: str):
                 img_path = f'static/images/{job_id}_{img_hash}.png'
 
                 # Check if the hash already exists in Redis
-                if not redis.sismember(f'img_hashes:{job_id}', img_hash):
-                    # If the hash doesn't exist, save the image and add the hash to Redis
-                    img = Image.open(BytesIO(img_data))
+                # if not redis.sismember(f'img_hashes:{job_id}', img_hash):
+                #     # If the hash doesn't exist, save the image and add the hash to Redis
+                #     img = Image.open(BytesIO(img_data))
 
-                    # Ensure image directory exists
-                    if not os.path.exists("static/images"):
-                        os.makedirs("static/images")
+                #     # Ensure image directory exists
+                #     if not os.path.exists("static/images"):
+                #         os.makedirs("static/images")
 
-                    img.save(img_path)
+                #     img.save(img_path)
 
-                    # Add the hash to the 'img_hashes' set in Redis
-                    redis.sadd(f'img_hashes:{job_id}', img_hash)
+                #     # Add the hash to the 'img_hashes' set in Redis
+                #     redis.sadd(f'img_hashes:{job_id}', img_hash)
 
                 # even if the image is already saved, we still need to update the log chunk with the image tag
                 chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'

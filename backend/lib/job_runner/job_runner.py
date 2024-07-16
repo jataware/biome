@@ -2,10 +2,12 @@
 Jobs
 """
 from dataclasses import dataclass
+from typing import Any
 from uuid import uuid4
 from enum import Enum
+from datetime import datetime
 from redis import Redis
-from rq import Queue, Retry
+from rq import Queue, Retry, get_current_job
 import rq.job as rq_job
 from rq.exceptions import NoSuchJobError
 
@@ -21,14 +23,15 @@ class Job:
     """
     id: str
     session_id: str
-    status: JobStatus
-    result: Dict | None
+    status: rq_job.JobStatus
+    result: Any
     error: str | None
     messages: list[str]
     created_at: datetime
     enqueued_at: datetime
     started_at: datetime | None
 
+# TODO(DESIGN): Is there a better way to expose this?
 class Operation(Enum):
     SCAN = "worker.jobs.scan"
     QUERY = "worker.jobs.query"
@@ -37,8 +40,6 @@ class JobRunner:
     """
     Starts long running, asynchronous jobs and handles their output.
     Jobs can optionally be given a session which is simply a collection.
-
-    All pre-existing sessions are cleaned up on start. 
     """
 
     def __init__(self):
@@ -47,8 +48,6 @@ class JobRunner:
         """
         self._redis = Redis(host=settings.REDIS_HOST)
         self._queue = Queue(connection=self._redis, default_timeout=-1)
-
-        for session_id in self.list_sessions: delete_session(session_id)
 
 
     def create_session(self) -> str:
@@ -103,37 +102,37 @@ class JobRunner:
         """
 
         if session_id not in session_ids:
-            redis.rpush("sessions", session_id)
-        redis.rpush("sessions", session_id) # PROBLEM
+            self._redis.rpush("sessions", session_id)
         job_ids = redis.lrange(f'sessions:{sessions}', 0, -1)
         return [session_id.decode('utf-8') for session_id in session_ids]
 
 
-    def exec(self, operation: Operation, args: dict, session_id: str) -> str:
+    def exec(self, operation: Operation, args: list | dict, session_id: str) -> str:
         """
         Kick off operation by creating a new job within the provided session.
             
         Args:
             operation (Operation): Function to run as job.
-            args (dict): Arguments to pass to operation. Please look at the available 
-                         args in `workers/jobs.py`.
+            args (list | dict): Arguments to pass to operation. Please look at the available 
+                                args in `workers/jobs.py`.
             session_id (str): Session the created job belongs to.
             
         Returns:
             str: The newly created job ID
         """
-        if session_id not in session_ids:
-            redis.rpush("sessions", session_id)
+        if session_id not in self.list_sessions():
+            self._redis.rpush("sessions", session_id)
         job_id = str(uuid4())
+        self._redis.rpush(f"sessions:{session_id}", job_id)
         self._queue.enqueue_call(
-            id=f"{session_id}:{job_id}",
-            func=operation,
-            args=args,
+            job_id=f"{session_id}:{job_id}",
+            func=operation.value,
             retry=Retry(max=3, interval=[10, 30, 60]),
             # Results are deleted when sessions are closed
             result_ttl=-1,
+            **{('kwargs' if isinstance(args, dict) else 'args') : args}
         )
-        return job_id
+        return self.get_job(job_id)
 
     
     def write_message(self, job_id: str, message: str):
@@ -150,7 +149,7 @@ class JobRunner:
         self._redis.rpush(messages_key, message)
 
 
-    def get_job(self, job_id: str | None = None) -> Result | None:
+    def get_job(self, job_id: str | None = None) -> Job | None:
         """
         Get current state of the running job. ID defaults to the
         job the callee of this function is running in.
@@ -163,11 +162,19 @@ class JobRunner:
         Returns:
             Job | None: Current results of the Job if it exists
         """
-        if job_id is None:
-            session_id, job_id = self._redis.get_current_job.id.split(":")
-        else:
+
+
+        if job_id is not None:
             _, keys = self._redis.scan(cursor=0, match=f'*:{job_id}')
-            session_id = keys[0].split(":")[0]
+            if len(keys) != 0:
+                session_id = keys[0].decode('utf-8').split(":")[0]
+            else:
+                session_id = None
+        else:
+            session_id = None
+
+        if session_id is None:
+            session_id, job_id = get_current_job.id.split(":")
         
         try:
             job = rq_job.Job.fetch(job_id, connection=self._redis)

@@ -123,7 +123,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
 
     const firstUrl = selectedSource.base_url;
 
-    const response = await fetch('http://localhost:8001/api/tasks/query', {
+    const response = await fetch('http://localhost:8001/api/jobs/query', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -155,7 +155,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
   
     const timeoutId = setTimeout(() => {
       const intervalId = setInterval(async () => {
-        const statusResponse = await fetch(`http://localhost:8001/api/tasks/${jobId}`);
+        const statusResponse = await fetch(`http://localhost:8001/api/jobs/${jobId}`);
   
         if (!statusResponse.ok) {
           console.error('Failed to fetch job status');
@@ -170,7 +170,7 @@ const Sources = ({ category = { name: 'all' }, sources }) => {
           return;
         }
   
-        const logsResponse = await fetch(`http://localhost:8001/api/tasks/${jobId}/logs`);
+        const logsResponse = await fetch(`http://localhost:8001/api/jobs/${jobId}/logs`);
   
         if (!logsResponse.ok) {
           console.error('Failed to fetch logs');

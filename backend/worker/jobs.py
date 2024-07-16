@@ -10,6 +10,7 @@ from jvoy.driver import JvoyDriver
 from jvoy.record import RecordType, ActionRecord, ScreenshotRecord
 
 from lib.sources_db import SourcesDatabase
+from lib.job_runner import JobRunner, Job
 from lib.settings import settings
 
 
@@ -39,11 +40,8 @@ def query(url, supporting_docs, user_task):
     # it to Redis. Then, the markdown is read from Redis and compiled
     # HTML. Instead, we should just pass data and let the UI decide
     # how to render it.
-    job_id = get_current_job().id
-    redis = Redis(
-        host=settings.REDIS_HOST,
-    )
-    logs = f"logs:{job_id}"
+    runner =JobRunner()
+    job_id = JobRunner.get_job().id
 
     def report(record: RecordType):
         match record:
@@ -53,10 +51,10 @@ def query(url, supporting_docs, user_task):
                 message = f'## {title}\n{text}\n\n'
                 message = message.replace('<', '&lt;').replace('>', '&gt;')
                 message += "\n\n"
-                redis.rpush(logs, message)
+                runner.write_message(job_id, message)
             case ScreenshotRecord(data, ext):
                 encoded_image = b64encode(data).decode('utf-8')
-                redis.rpush(logs, f'base64 image: {encoded_image}\n\n')
+                runner.write_message(job_id, f'base64 image: {encoded_image}\n\n')
             # Ignore remaining record types
             case _:
                 pass
