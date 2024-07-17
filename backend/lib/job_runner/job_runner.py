@@ -65,7 +65,8 @@ class JobRunner:
         return session_id
 
 
-    def list_sessions(self) -> list[str]:
+    @property
+    def session_ids(self) -> list[str]:
         """
         List all sessions that currently exists.
             
@@ -83,10 +84,7 @@ class JobRunner:
         job_ids = self.list_jobs(session_id)
         for job_id in job_ids:
             self._redis.delete(f"messages:{job_id}")
-            try:
-                rq_job_lib.Job.fetch(f"{session_id}:{job_id}").delete()
-            except NoSuchJobError:
-                continue
+            self.delete_job(job_id)
         self._redis.delete(f"session:{session_id}")
         self._redis.lrem("session", session_id)
 
@@ -102,10 +100,38 @@ class JobRunner:
             list[str]: List of Job IDs for a given session.
         """
 
-        if session_id not in session_ids:
+        if session_id not in self.session_ids:
             self._redis.rpush("sessions", session_id)
-        job_ids = redis.lrange(f'sessions:{sessions}', 0, -1)
-        return [session_id.decode('utf-8') for session_id in session_ids]
+        job_ids = self._redis.lrange(f'sessions:{session_id}', 0, -1)
+        return [job_id.decode('utf-8') for job_id in job_ids]
+
+
+    def find_session(self, job_id: str) -> str | None:
+        """
+        Searches and returns the session for the given job ID.
+        If the Job does not belong to a session, it is immediately
+        deleted.
+            
+        Args:
+            job_id (str): ID of Job to find session for.
+        
+        Returns:
+            str | None: ID of the session if the job belongs to a session.
+        """
+        # While we are iterating through every session until we find a match.
+        # we're not expecting the amount of sessions or jobs to be very high.
+        # However, we could make this look up faster in exchange for more state
+        # by storing a key `job:{job_id}:session` but this approach is adequate
+        # for now. Storing the session_id as part of the job_id is another
+        # option, but it complicates job retrieval a bit.
+        for session_id in self.session_ids:
+            if job_id in self.list_jobs(session_id):
+                return session_id
+
+        # A job without a session is an error state and should not exist.
+        # TODO: Is this behaviour confusing for the client?
+        self.kill_job(job_id)
+        self.delete_job(job_id)
 
 
     def exec(self, operation: Operation, args: list | dict, session_id: str) -> str:
@@ -121,13 +147,10 @@ class JobRunner:
         Returns:
             str: The newly created job ID
         """
-        if session_id not in self.list_sessions():
+        if session_id not in self.session_ids:
             self._redis.rpush("sessions", session_id)
-        job_id = str(uuid4())
-        self._redis.rpush(f"sessions:{session_id}", job_id)
         queue = Queue(self._queue_name, connection=self._redis, default_timeout=-1)        
         rq_job = queue.enqueue_call(
-            job_id=f"{session_id}:{job_id}",
             func=operation.value,
             retry=Retry(max=3, interval=[10, 30, 60]),
             # Results are deleted when sessions are closed
@@ -137,9 +160,9 @@ class JobRunner:
             # be passed in.
             **{('kwargs' if isinstance(args, dict) else 'args') : args}
         )
-
+        self._redis.rpush(f"sessions:{session_id}", rq_job.id)
         return Job(
-            id = job_id,
+            id = rq_job.id,
             session_id = session_id,
             status = rq_job.get_status(),
             result = rq_job.return_value,
@@ -181,22 +204,17 @@ class JobRunner:
 
 
         if job_id is not None:
-            rq_job = None
-            candidates = [
-                job 
-                for queue in Queue.all(connection=self._redis)
-                for job in queue.jobs 
-            ] 
-            for candidate_rq_job in candidates:
-                if candidate_rq_job.id.split(":")[1] == job_id:
-                    rq_job = candidate_rq_job
-                    break
-            if rq_job is None:
+            try:
+                rq_job = rq_job_lib.Job.fetch(job_id, connection=self._redis)
+            except NoSuchJobError:
                 return
         else:
             rq_job = get_current_job()
-
-        session_id, job_id = rq_job.id.split(":")                        
+            job_id = rq_job.id
+           
+        session_id = self.find_session(job_id)
+        if session_id is None:
+            return
         
         messages = [
             raw_msg.decode('utf-8')            
@@ -216,14 +234,33 @@ class JobRunner:
         )
 
 
-    def kill(self, job_id: str):
+    def kill_job(self, job_id: str):
         """
         Kill job if it exists.
 
         Args:
             job_id (str): ID of job to kill
         """
-        job = rq_job_lib.Job.fetch(job_id, connection=self._redis)
-        job.kill()
+        try:
+            rq_job = rq_job_lib.Job.fetch(job_id, connection=self._redis)
+        except NoSuchJobError:
+            return
+        else:
+            rq_job.kill()
+
+
+    def delete_job(self, job_id: str):
+        """
+        Delete job if it exists.
+
+        Args:
+            job_id (str): ID of job to delete
+        """
+        try:
+            rq_job = rq_job_lib.Job.fetch(job_id, connection=self._redis)
+        except NoSuchJobError:
+            return
+        else:
+            rq_job.delete()
 
 

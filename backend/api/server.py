@@ -118,7 +118,7 @@ def query(payload: QueryArguments, runner: Runner):
     logger.info(f"Queueing query: {payload}")
     job = runner.exec(
         operation=Operation.QUERY,
-        args={ k:v for k,v in asdict(payload) if k != "session_id" },
+        args={ k:v for (k,v) in asdict(payload).items() if k != "session_id" },
         session_id=payload.session_id,
     )
     
@@ -127,7 +127,10 @@ def query(payload: QueryArguments, runner: Runner):
 
 @app.get("/jobs/{job_id}")
 def status(job_id: str, runner: Runner):
-    return runner.get_job(job_id)
+    job = runner.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} does not exist.")
+    return job
 
 
 @app.delete("/jobs/{job_id}")
@@ -139,8 +142,10 @@ def kill_job(job_id: str, runner: Runner):
 # as discussed in `/backend/worker/jobs.py`.
 # TODO(DESIGN): Make this work for any task. Not just 'query'
 @app.get("/jobs/{job_id}/logs", response_model=list[str])
-def get_query_progress(job_id: str):
-    job = get_job(job_id)
+def get_query_progress(job_id: str, runner: Runner):
+    job = runner.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job does not exist.")
     
     logs = [
         log for log in job.messages 
@@ -171,19 +176,20 @@ def get_query_progress(job_id: str):
                 img_hash = hashlib.sha256(img_data).hexdigest()
                 img_path = f'static/images/{job_id}_{img_hash}.png'
 
-                # Check if the hash already exists in Redis
-                # if not redis.sismember(f'img_hashes:{job_id}', img_hash):
-                #     # If the hash doesn't exist, save the image and add the hash to Redis
-                #     img = Image.open(BytesIO(img_data))
+                #Check if the hash already exists in Redis
+                # if not runner._redis.sismember(f'img_hashes:{job_id}', img_hash):
+                if not os.path.exists(img_path):
+                    # If the hash doesn't exist, save the image and add the hash to Redis
+                    img = Image.open(BytesIO(img_data))
 
-                #     # Ensure image directory exists
-                #     if not os.path.exists("static/images"):
-                #         os.makedirs("static/images")
+                    # Ensure image directory exists
+                    if not os.path.exists("static/images"):
+                        os.makedirs("static/images")
 
-                #     img.save(img_path)
+                    img.save(img_path)
 
-                #     # Add the hash to the 'img_hashes' set in Redis
-                #     redis.sadd(f'img_hashes:{job_id}', img_hash)
+                    # Add the hash to the 'img_hashes' set in Redis
+                    # runner._redis.sadd(f'img_hashes:{job_id}', img_hash)
 
                 # even if the image is already saved, we still need to update the log chunk with the image tag
                 chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'

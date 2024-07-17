@@ -41,7 +41,7 @@ def query(url, supporting_docs, user_task):
     # HTML. Instead, we should just pass data and let the UI decide
     # how to render it.
     runner =JobRunner()
-    job_id = JobRunner.get_job().id
+    job_id = runner.get_job().id
 
     def report(record: RecordType):
         match record:
