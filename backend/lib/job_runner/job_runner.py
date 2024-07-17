@@ -110,8 +110,6 @@ class JobRunner:
     def find_session(self, job_id: str) -> str | None:
         """
         Searches and returns the session for the given job ID.
-        If the Job does not belong to a session, it is immediately
-        deleted.
             
         Args:
             job_id (str): ID of Job to find session for.
@@ -128,11 +126,6 @@ class JobRunner:
         for session_id in self.session_ids:
             if job_id in self.list_jobs(session_id):
                 return session_id
-
-        # A job without a session is an error state and should not exist.
-        # TODO: Is this behaviour confusing for the client?
-        self.kill_job(job_id)
-        self.delete_job(job_id)
 
 
     def exec(self, operation: str, args: list | dict, session_id: str) -> str:
@@ -262,6 +255,10 @@ class JobRunner:
         except NoSuchJobError:
             return
         else:
+            for session_id in self.session_ids:
+                if job_id in self.list_jobs(session_id):
+                    self._redis.lrem(f"session:{session_id}", job_id)
+                    break
             rq_job.delete()
 
 
