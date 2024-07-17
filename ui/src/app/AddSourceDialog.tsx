@@ -176,16 +176,20 @@ export default function AddSource({onRegisterDone}) {
   }
 
   function gotoScan() {
-    fetch('http://localhost:8001/api/tasks/scan', {
+    fetch('http://localhost:8001/api/jobs/scan', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify([{
-        uris: [sourceUri],
-        name: makeid(5)
-      }])
+      body: JSON.stringify(
+        { 
+          "targets": [{
+            uris: [sourceUri],
+            name: makeid(5)
+          }]
+        }
+      )
     }).then(response => {
       if (response.ok) {
         return response.json();
