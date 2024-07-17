@@ -126,7 +126,7 @@ class JobRunner:
         job_id = str(uuid4())
         self._redis.rpush(f"sessions:{session_id}", job_id)
         queue = Queue(self._queue_name, connection=self._redis, default_timeout=-1)        
-        queue.enqueue_call(
+        rq_job = queue.enqueue_call(
             job_id=f"{session_id}:{job_id}",
             func=operation.value,
             retry=Retry(max=3, interval=[10, 30, 60]),
@@ -137,14 +137,18 @@ class JobRunner:
             # be passed in.
             **{('kwargs' if isinstance(args, dict) else 'args') : args}
         )
-        job = self.get_job(job_id)
-        # Unfortunately, `enqueue_call` returns before job is actually in queue.
-        # Therefore, we have to poll until it makes it in there.
-        while (job is None):
-            sleep(0.5)
-            job = self.get_job(job_id)
 
-        return job
+        return Job(
+            id = job_id,
+            session_id = session_id,
+            status = rq_job.get_status(),
+            result = rq_job.return_value,
+            error = rq_job.exc_info,
+            messages = [],
+            created_at = rq_job.created_at,
+            enqueued_at = rq_job.enqueued_at,
+            started_at = rq_job.started_at,
+        )
 
     
     def write_message(self, job_id: str, message: str):
