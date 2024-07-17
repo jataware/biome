@@ -1,5 +1,5 @@
 """
-Jobs
+Interface and implementation of Sessions, Jobs, and Job Messages
 """
 from dataclasses import dataclass
 from typing import Any
@@ -35,8 +35,13 @@ class Job:
 
 class JobRunner:
     """
-    Starts long running, asynchronous jobs and handles their output.
-    Jobs can optionally be given a session which is simply a collection.
+    Handles Sessions, Jobs, and their messages.
+
+    - Job: A queued long-running function.
+    - Messages: Possible intermediary results from a job that can be read
+                while the job is still running.
+    - Session: A namespace for jobs. A group of jobs can be retrieved or
+               deleted together provided they are a part or the same session.
     """
 
     def __init__(self):
