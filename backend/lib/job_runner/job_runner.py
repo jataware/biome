@@ -77,7 +77,7 @@ class JobRunner:
         return [session_id.decode('utf-8') for session_id in session_ids]
 
 
-    def delete_session(self):
+    def delete_session(self, session_id: str):
         """
         Delete session and associated jobs. 
         """

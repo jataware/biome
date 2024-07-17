@@ -72,12 +72,26 @@ async def add_source_from_payload(request: Request, db: SourcesDB):
     return {"success": True}
 
 
+##### SESSIONS #####
+
+@app.get("/sessions/{session_id}")
+def get_jobs(session_id: str, runner: Runner):
+    return {
+        "jobs": runner.get_jobs(session_id)
+    }
+
+@app.delete("/sessions/{session_id}")
+def delete_session(session_id: str, runner: Runner):
+    runner.delete_session(session_id)
+    
+
 ##### JOBS #####
 
 @dataclass
 class ScanTarget:
     uris: list[str]
     name: str
+
 
 @dataclass
 class ScanArguments:
@@ -176,10 +190,8 @@ def get_query_progress(job_id: str, runner: Runner):
                 img_hash = hashlib.sha256(img_data).hexdigest()
                 img_path = f'static/images/{job_id}_{img_hash}.png'
 
-                #Check if the hash already exists in Redis
-                # if not runner._redis.sismember(f'img_hashes:{job_id}', img_hash):
+                # If the hash doesn't exist, save the image and add the hash to Redis
                 if not os.path.exists(img_path):
-                    # If the hash doesn't exist, save the image and add the hash to Redis
                     img = Image.open(BytesIO(img_data))
 
                     # Ensure image directory exists
@@ -187,9 +199,6 @@ def get_query_progress(job_id: str, runner: Runner):
                         os.makedirs("static/images")
 
                     img.save(img_path)
-
-                    # Add the hash to the 'img_hashes' set in Redis
-                    # runner._redis.sadd(f'img_hashes:{job_id}', img_hash)
 
                 # even if the image is already saved, we still need to update the log chunk with the image tag
                 chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'
