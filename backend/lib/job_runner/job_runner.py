@@ -32,10 +32,6 @@ class Job:
     enqueued_at: datetime
     started_at: datetime | None
 
-# TODO(DESIGN): Is there a better way to expose this?
-class Operation(Enum):
-    SCAN = "worker.jobs.scan"
-    QUERY = "worker.jobs.query"
 
 class JobRunner:
     """
@@ -134,12 +130,12 @@ class JobRunner:
         self.delete_job(job_id)
 
 
-    def exec(self, operation: Operation, args: list | dict, session_id: str) -> str:
+    def exec(self, operation: str, args: list | dict, session_id: str) -> str:
         """
         Kick off operation by creating a new job within the provided session.
             
         Args:
-            operation (Operation): Function to run as job.
+            operation (str): Path to function to run as job.
             args (list | dict): Arguments to pass to operation. Please look at the available 
                                 args in `workers/jobs.py`.
             session_id (str): Session the created job belongs to.
@@ -151,7 +147,7 @@ class JobRunner:
             self._redis.rpush("sessions", session_id)
         queue = Queue(self._queue_name, connection=self._redis, default_timeout=-1)        
         rq_job = queue.enqueue_call(
-            func=operation.value,
+            func=operation,
             retry=Retry(max=3, interval=[10, 30, 60]),
             # Results are deleted when sessions are closed
             result_ttl=-1,

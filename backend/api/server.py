@@ -17,7 +17,7 @@ import base64
 import hashlib
 from lib.settings import settings
 from lib.sources_db import SourcesDatabase
-from lib.job_runner import JobRunner, Operation
+from lib.job_runner import JobRunner
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +108,7 @@ def scan_uri(payload: ScanArguments, runner: Runner):
     logger.info(f"Queueing scan fn, uris: {payload}")
     sources = [source.uris for source in payload.targets]
     job = runner.exec(
-        operation=Operation.SCAN,
+        operation="worker.jobs.scan",
         args=[sources],
         session_id=payload.session_id,
     )
@@ -131,7 +131,7 @@ class QueryArguments:
 def query(payload: QueryArguments, runner: Runner):
     logger.info(f"Queueing query: {payload}")
     job = runner.exec(
-        operation=Operation.QUERY,
+        operation="worker.jobs.query",
         args={ k:v for (k,v) in asdict(payload).items() if k != "session_id" },
         session_id=payload.session_id,
     )
