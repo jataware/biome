@@ -33,6 +33,15 @@ def scan(sources: list[list[str]]):
 
 
 def query(url, supporting_docs, user_task):
+
+    import time
+    time.sleep(10)
+
+    return {
+        "answer": "The answer to the query is 101.",
+    }
+
+
     # TODO: Remove hack when jvoy is fixed to return answer 
     # JVOY doesn't return the final answer so we have to get it out of the callback
     final_answer = None
