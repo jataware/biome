@@ -1120,8 +1120,8 @@ urlextract = "1.9.0"
 [package.source]
 type = "git"
 url = "git+ssh://git@github.com/jataware/jvoy.git"
-reference = "hot_fix"
-resolved_reference = "ea20e14c6e274370998ebbffd2a506b4c1ec184b"
+reference = "HEAD"
+resolved_reference = "e5bf7cc569672ac2b37eba136aec4f2bcfd437f4"
 
 [[package]]
 name = "kaitaistruct"
@@ -3726,4 +3726,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "59516d820fe73ef99f4bab3b77d92d292450a17c1afd9928e2eeaf108e22f00c"
+content-hash = "295869c633696a23221f1f8411bf4ff354574d03b79376dd61282b89b8a6f18e"
