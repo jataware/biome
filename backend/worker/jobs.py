@@ -75,9 +75,8 @@ def query(url, supporting_docs, user_task):
         supporting_docs=supporting_docs,
         results_dir=Path('/results'),
         timeout=20,
-        # TODO: Uncomment once we depend off of Jvoy master branch
-        # adblock=False,
-        # port=8080, 
+        adblock=False,
+        port=8080, 
         record_callback=report,
     )
     driver.run(user_task)
