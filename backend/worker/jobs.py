@@ -2,6 +2,7 @@ import logging
 import json
 from pathlib import Path
 from base64 import b64encode
+import shutil
 
 from redis import Redis
 from rq import get_current_job
@@ -32,6 +33,10 @@ def scan(sources: list[list[str]]):
 
 
 def query(url, supporting_docs, user_task):
+    # TODO: Remove hack when jvoy is fixed to return answer 
+    # JVOY doesn't return the final answer so we have to get it out of the callback
+    final_answer = None
+
     ##### Callback #####
     # TODO: Log messages to a service that's not Redis and not Markdown
     # This current logic was copy-pasted from jvoy with very little
@@ -46,8 +51,12 @@ def query(url, supporting_docs, user_task):
     def report(record: RecordType):
         match record:
             case ActionRecord(title, text):
-                if "Element Labels" in title:
+                if "Element Labels" in title or "Read Page" in title:
                     return
+                # NOTE: See `final_answer` comments. This case should eventually be removed
+                if "Answer" in title:
+                    nonlocal final_answer
+                    final_answer = text
                 message = f'## {title}\n{text}\n\n'
                 message = message.replace('<', '&lt;').replace('>', '&gt;')
                 message += "\n\n"
@@ -64,15 +73,28 @@ def query(url, supporting_docs, user_task):
     driver = JvoyDriver(
         url=url,
         supporting_docs=supporting_docs,
-        results_dir=Path('/jvoy/results'),
+        results_dir=Path('/results'),
         timeout=20,
-        #adblock=False,
-        #port=8080,
+        adblock=False,
+        port=8080, 
         record_callback=report,
     )
-    answer = driver.run(user_task)
-    report(ActionRecord("Answer", answer))
+    driver.run(user_task)
+
+    # TODO: Remove this hack
+    # We have to make sure not to end the job so that the UI will listen
+    # for the last message. Once UI rendering of queries is over, this 
+    # should no longer be necessary.
     import time
     time.sleep(6)
+
     driver.end()
-    return {}
+
+    for path in driver.download_tracker.get_all_downloads():
+        shutil.move(path, "/results")
+    shutil.rmtree(str(driver.download_tracker.downloads_dir))
+
+    assert final_answer is not None, "Final answer not found"
+    return {
+        "answer": final_answer,
+    }

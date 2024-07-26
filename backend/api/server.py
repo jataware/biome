@@ -77,7 +77,7 @@ async def add_source_from_payload(request: Request, db: SourcesDB):
 @app.get("/sessions/{session_id}")
 def get_jobs(session_id: str, runner: Runner):
     return {
-        "jobs": runner.get_jobs(session_id)
+        "jobs": [runner.get_job(job_id) for job_id in runner.get_jobs(session_id)]
     }
 
 @app.delete("/sessions/{session_id}")
