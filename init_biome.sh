@@ -8,7 +8,7 @@ then
     cp .env.example .env
 else
     echo ".env file already exists"
-
+fi
 
 # Init submodules
 git submodule status | grep '^-' > /dev/null &&  git submodule init && git submodule update --recursive;
