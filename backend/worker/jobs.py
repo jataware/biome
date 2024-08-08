@@ -91,7 +91,8 @@ def query(url, supporting_docs, user_task):
     driver.end()
 
     for path in driver.download_tracker.get_all_downloads():
-        shutil.move(path, "/results")
+        import subprocess
+        subprocess.run(["mv", path, "/results"])
     shutil.rmtree(str(driver.download_tracker.downloads_dir))
 
     assert final_answer is not None, "Final answer not found"
