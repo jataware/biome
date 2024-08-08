@@ -94,17 +94,24 @@ class SourcesDatabase:
         self.es.index(index=PRIMARY_INDEX, body=body)
 
     
-    def search(self, query: str | None = None) -> SearchResult:
+    def search(self, query: str | None = None, raw_query: str | dict | None = None) -> SearchResult:
         """
         Search data sources
 
         Args:
             query (str): The query to search for. If None, will return all data sources.
-        
+            raw_query (str): The raw elasticsearch query inside the `query` block to be performed. Ignored if None.
+
         Returns:
             SearchResult: The search result containing the total number of results and the sources.
         """
-        if query is None:
+        if raw_query is not None:
+            if isinstance(raw_query, str):
+                raw_query = json.loads(raw_query)
+            es_query = {
+                "query": raw_query
+            }
+        elif query is None:
             es_query = {
                 "query": {
                     "match_all": {}
