@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 class BiomeContext(BaseContext):
 
+    SLUG = "biome"
     agent_cls: "BaseAgent" = BiomeAgent
 
     def __init__(self, beaker_kernel: "LLMKernel", config: Dict[str, Any]):

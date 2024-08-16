@@ -20,7 +20,6 @@ services:
       - TOOL_ENABLED_ASK_USER=true
       - TOOL_ENABLED_RUN_CODE=true
     volumes:
-      - ./contexts/biome:/usr/local/share/jupyter/kernels/beaker_kernel/contexts/biome
       - .:/jupyter
     command: ["beaker", "dev", "watch", "--ip", "0.0.0.0"]
     networks:

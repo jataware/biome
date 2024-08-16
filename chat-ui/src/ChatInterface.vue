@@ -99,6 +99,7 @@ import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
 import BeakerLLMQueryCell from 'beaker-vue/src/components/cell/BeakerLLMQueryCell.vue';
 import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
 import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
+import AnalystDataSourceCell from "./AnalystDataSourceCell.vue"
 
 import BeakerFilePane from 'beaker-vue/src/components/dev-interface/BeakerFilePane.vue';
 
@@ -177,6 +178,7 @@ const cellComponentMapping = {
     'markdown': BeakerMarkdownCell,
     'query': BeakerLLMQueryCell,
     'raw': BeakerRawCell,
+    'data_sources': AnalystDataSourceCell,
 }
 
 const isFileMenuOpen = ref();
@@ -224,6 +226,7 @@ const connectionColor = computed(() => {
 });
 
 const iopubMessage = (msg) => {
+    console.log(msg);
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "debug_event") {
@@ -235,6 +238,7 @@ const iopubMessage = (msg) => {
     } else if (msg.header.msg_type === "job_response") {
         beakerSessionRef.value.session.addMarkdownCell(msg.content.response);
     } else if (msg.header.msg_type === "data_sources") {
+        console.log("fired");
         const metadata = {
             "sources": msg.content.sources
         }

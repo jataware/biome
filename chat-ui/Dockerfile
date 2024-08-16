@@ -1,4 +1,8 @@
 from beaker-kernel:latest
 
-COPY ./beaker-biome/dist/beaker_biome-0.0.1-py3-none-any.whl /opt/install
-RUN pip install /opt/install/beaker_biome-0.0.1-py3-none-any.whl
+COPY ./beaker-biome /opt/beaker-biome
+USER root
+RUN chown -R jupyter:users /opt/beaker-biome
+USER jupyter
+RUN cd /opt/beaker-biome && hatch build
+RUN pip install /opt/beaker-biome/dist/beaker_biome*.whl
