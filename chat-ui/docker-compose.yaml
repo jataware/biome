@@ -1,0 +1,39 @@
+---
+# Jupyter LLM docker compose by Matthew Printz
+version: '3'
+
+networks:
+  beaker:
+
+services:
+  jupyter:
+    image: beaker-kernel:latest
+    ports:
+      - "8888:8888"
+    environment:
+      - DEBUG=1
+      - JUPYTER_SERVER=http://jupyter:8888
+      - JUPYTER_TOKEN=89f73481102c46c0bc13b2998f9a4fce
+      - OPENAI_API_KEY
+      - PYTHONPATH=/jupyter
+      - ENABLE_CHECKPOINTS=true
+      - TOOL_ENABLED_ASK_USER=true
+      - TOOL_ENABLED_RUN_CODE=true
+    volumes:
+      - ./contexts/biome:/usr/local/share/jupyter/kernels/beaker_kernel/contexts/biome
+      - .:/jupyter
+    command: ["beaker", "dev", "watch", "--ip", "0.0.0.0"]
+    networks:
+      - beaker
+    #working_dir: "/results"
+  ui:
+    image: node:20
+    user: "node"
+    volumes:
+      - ./:/ui
+    working_dir: "/ui"
+    ports:
+      - "8080:8080"
+    command: "sh -c 'npm run serve'"
+    networks:
+      - beaker

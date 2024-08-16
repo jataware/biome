@@ -1,6 +1,6 @@
 name: biome
 include:
-  - analyst-ui/docker-compose.yaml
+  - chat-ui/docker-compose.yaml
 services:
   biome_api:
     working_dir: /backend
@@ -81,7 +81,7 @@ services:
     # File copying after tasks pass a `download_dir` parameter around and we
     # have to guarantee it matches up.
     - type: bind
-      source: ./analyst-ui/
+      source: ./chat-ui/
       target: /results
     networks:
       - biome
