@@ -7,7 +7,7 @@ networks:
 
 services:
   jupyter:
-    image: beaker-kernel:latest
+    build: .
     ports:
       - "8888:8888"
     environment:
