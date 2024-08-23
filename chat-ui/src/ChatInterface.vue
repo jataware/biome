@@ -29,10 +29,18 @@
                                     showDelay: 300
                                 }"
                                 :label="beakerSessionRef?.activeContext?.slug"
+                                :loading="!(beakerSessionRef?.activeContext?.slug)"
                             >
                                 <i class="pi pi-circle-fill" :style="`font-size: inherit; color: var(--${connectionColor});`" />
                             </Button>
-                            <ResetButton :on-reset-callback="() => setContext({})"/>
+                            <Button
+                                @click="resetNotebook"
+                                v-tooltip.right="{value: 'Reset notebook', showDelay: 300}"
+                                icon="pi pi-refresh"
+                                size="small"
+                                severity="info"
+                                text
+                            />
                             <Button
                                 @click="toggleFileMenu"
                                 v-tooltip.right="{value: 'Show file menu', showDelay: 300}"
@@ -46,31 +54,48 @@
                             </OverlayPanel>
                             <DarkModeButton :toggle-dark-mode="toggleDarkMode"/>
                         </template>
+                        <template #center>
+                            <div class="vertical-toolbar-divider" />
+                        </template>
                         <template #end>
-
+                            <a  
+                                :href="`/${sessionId == 'dev_session' ? '' : '?session=' + sessionId}`" 
+                                v-tooltip.right="{value: 'To Notebook View', showDelay: 300}"
+                            >
+                                <Button
+                                    icon="pi pi-book"
+                                    size="small"
+                                    severity="info"
+                                    text
+                                />
+                            </a>
                         </template>
                     </VerticalToolbar>
                 </header>
-                <main style="display: flex; overflow: auto;">
+                <main style="display: flex; overflow-y: auto; overflow-x: hidden;">
                     <div class="central-panel">
-                        <BeakerNotebook
-                            ref="beakerNotebookRef"
-                            :cell-map="cellComponentMapping"
-                            v-keybindings="notebookKeyBindings"
+                        <ChatPanel
+                            ref="chatPanelRef"
+                            v-autoscroll
                         >
-                            <ChatPanel
-                                ref="chatPanelRef"
-                                :selected-cell="beakerNotebookRef?.selectedCellId"
-                            >
-                                <template #notebook-background>
-                                    <div class="welcome-placeholder">
-                                    </div>
-                                </template>
-                            </ChatPanel>
-                            <AgentQuery
-                                class="agent-query-container"
-                            />
-                        </BeakerNotebook>
+                            <template #help-text>
+                                <p>Hi! I'm your Biome Agent and I can help you do tasks related to medicinal data sources.</p>
+                                <p>Feel free to ask me about searching for data sources, fetching data, and navigating that downloaded data.</p>
+                                <p>
+                                    On top of answering questions, I can actually run code in a python environment, and evaluate the results. 
+                                    This lets me do some pretty awesome things like: 
+                                </p>
+                                <p>"Search for data sources related like proteomics"</p>
+                                <p>Just shoot me a message when you're ready to get started.</p>
+                            </template>
+                            <template #notebook-background>
+                                <div class="welcome-placeholder">
+                                </div>
+                            </template>
+                        </ChatPanel>
+                        <AgentQuery
+                            class="agent-query-container"
+                        />
                     </div>
                     <HelpSidebar></HelpSidebar>
                 </main>
@@ -78,7 +103,7 @@
             <BeakerContextSelection
                 :isOpen="contextSelectionOpen"
                 :contextProcessing="contextProcessing"
-                @context-changed="(contextData) => {beakerSessionRef.setContext(contextData)}"
+                @context-changed="(contextData) => {console.log(contextData);beakerSessionRef.setContext(contextData)}"
                 @close-context-selection="contextSelectionOpen = false"
             />
         </BeakerSession>
@@ -90,7 +115,6 @@
 <script setup lang="ts">
 import AgentQuery from 'beaker-vue/src/components/chat-interface/AgentQuery.vue';
 import ChatPanel from 'beaker-vue/src/components/chat-interface/ChatPanel.vue';
-import ResetButton from 'beaker-vue/src/components/chat-interface/ResetButton.vue';
 import DarkModeButton from 'beaker-vue/src/components/chat-interface/DarkModeButton.vue';
 import HelpSidebar from 'beaker-vue/src/components/chat-interface/HelpSidebar.vue';
 import VerticalToolbar from 'beaker-vue/src/components/chat-interface/VerticalToolbar.vue';
@@ -99,12 +123,8 @@ import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
 import BeakerLLMQueryCell from 'beaker-vue/src/components/cell/BeakerLLMQueryCell.vue';
 import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
 import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
-import AnalystDataSourceCell from "./AnalystDataSourceCell.vue"
 
 import BeakerFilePane from 'beaker-vue/src/components/dev-interface/BeakerFilePane.vue';
-
-import BeakerNotebook from 'beaker-vue/src/components/notebook/BeakerNotebook.vue';
-import { BeakerNotebookComponentType } from 'beaker-vue/src/components/notebook/BeakerNotebook.vue';
 
 import BeakerSession from 'beaker-vue/src/components/session/BeakerSession.vue';
 
@@ -117,12 +137,14 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, defineEmits, computed } from 'vue';
+import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, defineEmits, computed, shallowRef } from 'vue';
 import { DecapodeRenderer, JSONRenderer, LatexRenderer, wrapJupyterRenderer } from 'beaker-vue/src/renderers';
 
-const { theme, toggleDarkMode } = inject('theme');
+import { IBeakerTheme } from 'beaker-vue/src/plugins/theme';
+
+const { theme, toggleDarkMode } = inject<IBeakerTheme>('theme');
 const toast = useToast();
-const chatPanelRef = ref();
+const chatPanelRef = shallowRef();
 const contextSelectionOpen = ref(false);
 const contextProcessing = ref(false);
 import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerContextSelection.vue';
@@ -130,24 +152,29 @@ import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerCont
 
 
 // NOTE: Right now, we don't want the context changing
-const activeContext = ref();
 const beakerNotebookRef = ref();
-const setContext = (contextInfo) => {
-    if (contextInfo?.slug !== 'default') {
-        beakerSessionRef.value.setContext(activeContext);
-    }
+
+const defaultContext = {
+    context: "biome", 
+    language: "python3", 
+    context_info: {}, 
+    debug: false, 
+    verbose: false 
+};
+
+const setDefaultContext = () => {
+    beakerSessionRef.value.setContext(defaultContext);
 }
 
 // TODO -- WARNING: showToast is only defined locally, but provided/used everywhere. Move to session?
 // Let's only use severity=success|warning|danger(=error) for now
-const showToast = ({title, detail, life=3000, severity='success', position='bottom-right'}) => {
+const showToast = ({title, detail, life=3000, severity='success' as any}) => {
     toast.add({
         summary: title,
         detail,
         life,
         // for options, seee https://primevue.org/toast/
         severity,
-        position
     });
 };
 
@@ -167,7 +194,7 @@ const props = defineProps([
 ]);
 
 const renderers = [
-    ...standardRendererFactories.map((factory) => new JupyterMimeRenderer(factory)).map(wrapJupyterRenderer),
+    ...standardRendererFactories.map((factory: any) => new JupyterMimeRenderer(factory)).map(wrapJupyterRenderer),
     JSONRenderer,
     LatexRenderer,
     DecapodeRenderer,
@@ -178,14 +205,21 @@ const cellComponentMapping = {
     'markdown': BeakerMarkdownCell,
     'query': BeakerLLMQueryCell,
     'raw': BeakerRawCell,
-    'data_sources': AnalystDataSourceCell,
 }
+
+provide('cell-component-mapping', cellComponentMapping);
 
 const isFileMenuOpen = ref();
 
 const toggleFileMenu = (event) => {
     isFileMenuOpen.value.toggle(event);
 }
+
+const resetNotebook = async () => {
+    const session = beakerSessionRef.value.session;
+    session.reset();
+    setDefaultContext();
+};
 
 const connectionStatus = ref('connecting');
 const debugLogs = ref<object[]>([]);
@@ -226,7 +260,6 @@ const connectionColor = computed(() => {
 });
 
 const iopubMessage = (msg) => {
-    console.log(msg);
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "debug_event") {
@@ -237,13 +270,6 @@ const iopubMessage = (msg) => {
         });
     } else if (msg.header.msg_type === "job_response") {
         beakerSessionRef.value.session.addMarkdownCell(msg.content.response);
-    } else if (msg.header.msg_type === "data_sources") {
-        console.log("fired");
-        const metadata = {
-            "sources": msg.content.sources
-        }
-        const newCell = beakerSessionRef.value.session.addRawCell("", metadata);
-        newCell.cell_type = "data_sources"
     }
 };
 
@@ -260,6 +286,9 @@ const unhandledMessage = (msg) => {
 }
 
 const statusChanged = (newStatus) => {
+    if (newStatus == 'connected' && beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
+        setDefaultContext();
+    }
     connectionStatus.value = newStatus == 'idle' ? 'connected' : newStatus;
 };
 
@@ -275,11 +304,9 @@ onBeforeMount(() => {
     }
     if (notebookData[sessionId]?.data) {
         nextTick(() => {
-            if (beakerNotebookRef.value?.notebook) {
-                beakerNotebookRef.value?.notebook.loadFromIPynb(notebookData[sessionId].data);
-                nextTick(() => {
-                    beakerNotebookRef.value?.selectCell(notebookData[sessionId].selectedCell);
-                });
+            const notebook = beakerSessionRef?.value?.session?.notebook;
+            if (notebook) {
+                notebook.loadFromIPynb(notebookData[sessionId].data);
             }
         });
     }
@@ -293,60 +320,38 @@ onUnmounted(() => {
     window.removeEventListener("beforeunload", snapshot);
 });
 
-const notebookKeyBindings = {
-    "keydown.enter.ctrl.prevent.capture.in-cell": () => {
-        beakerNotebookRef.value.selectedCell().execute();
-        beakerNotebookRef.value.selectedCell().exit();
-    },
-    "keydown.enter.shift.prevent.capture.in-cell": () => {
-        const targetCell = beakerNotebookRef.value.selectedCell();
-        targetCell.execute();
-        if (!beakerNotebookRef.value.selectNextCell()) {
-            beakerNotebookRef.value.insertCellAfter(
-                targetCell,
-                targetCell.cell.cell_type,
-                true
-            );
+// no state to track selection - find code editor divs and compare to evt
+const executeActiveCell = (editorSourceElement) => {
+    const panel = chatPanelRef?.value;
+    const queryCellComponents = panel?.cellsContainerRef;
+    queryCellComponents.forEach(cell => {
+        const events = cell?.queryEventsRef;
+        if (!events) {
+            return;
         }
-    },
-    "keydown.enter.exact.prevent.in-cell.!in-editor": () => {
-        beakerNotebookRef.value.selectedCell().enter();
-    },
-    "keydown.esc.exact.prevent.in-cell": () => {
-        beakerNotebookRef.value.selectedCell().exit();
-    },
-    "keydown.up.in-cell.!in-editor": () => {
-        beakerNotebookRef.value.selectPrevCell();
-    },
-    "keydown.j.in-cell.!in-editor": () => {
-        beakerNotebookRef.value.selectPrevCell();
-    },
-    "keydown.down.in-cell.!in-editor": () => {
-        beakerNotebookRef.value.selectNextCell();
-    },
-    "keydown.k.in-cell.!in-editor": () => {
-        beakerNotebookRef.value.selectNextCell();
-    },
-    "keydown.a.prevent.in-cell.!in-editor": (evt) => {
-        const notebook = beakerNotebookRef.value;
-        notebook.selectedCell().exit();
-        notebook.insertCellBefore();
-    },
-    "keydown.b.prevent.in-cell.!in-editor": () => {
-        const notebook = beakerNotebookRef.value;
-        notebook.selectedCell().exit();
-        notebook.insertCellAfter();
-    },
-    "keydown.d.selected.!in-editor": () => {
-        console.log("delete");
-        //
-        // TODO implement double press for action
-        // const notebook = beakerNotebookRef.value;
-        // notebook.removeCell();
-    },
+        events.forEach(eventRef => {
+            const codeCellRef = eventRef?.codeCellRef;
+            const codeEditor = codeCellRef?.codeEditorRef;
+            if (!codeEditor) {
+                return;
+            }
+            if (codeEditor.view._root.activeElement == editorSourceElement) {
+                codeCellRef.execute();
+            }
+        });
+    });
 }
 
-const sessionKeybindings = {}
+const sessionKeybindings = {
+    "keydown.enter.ctrl.prevent.capture.in-editor": (evt) => {
+        executeActiveCell(evt.srcElement);
+        // execute
+    },
+    "keydown.enter.shift.prevent.capture.in-editor": (evt) => {
+        // execute
+        executeActiveCell(evt.srcElement);
+    }
+}
 
 const snapshot = () => {
     var notebookData: {[key: string]: any};
@@ -358,10 +363,10 @@ const snapshot = () => {
         notebookData = {};
     }
     // Only save state if there is state to save
-    if (beakerNotebookRef.value?.notebook) {
+    const notebook = beakerSessionRef.value.session?.notebook;
+    if (notebook) {
         notebookData[sessionId] = {
-            data: beakerNotebookRef.value?.notebook.toIPynb(),
-            selectedCell: beakerNotebookRef.value?.selectedCellId,
+            data: notebook.toIPynb(),
         };
         localStorage.setItem("notebookData", JSON.stringify(notebookData));
     }
@@ -473,6 +478,14 @@ div.central-panel, div.beaker-notebook {
 
 button.connection-button {
     border: none;
+}
+
+div.code-cell {
+    margin-bottom: 2rem;
+}
+
+div.code-cell.query-event-code-cell {
+    margin-bottom: 0.25rem;
 }
 
 </style>
