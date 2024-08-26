@@ -86,7 +86,7 @@
                                     On top of answering questions, I can actually run code in a python environment, and evaluate the results. 
                                     This lets me do some pretty awesome things like: 
                                 </p>
-                                <p>"Search for data sources related like proteomics"</p>
+                                <p>"Search for data sources related to proteomics"</p>
                                 <p>Just shoot me a message when you're ready to get started.</p>
                             </template>
                             <template #notebook-background>
@@ -150,6 +150,7 @@ const contextSelectionOpen = ref(false);
 const contextProcessing = ref(false);
 import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerContextSelection.vue';
 import { cell } from 'beaker-vue/dist/components';
+import AnalystDataSourceCell from './AnalystDataSourceCell.vue';
 
 
 
@@ -207,6 +208,7 @@ const cellComponentMapping = {
     'markdown': BeakerMarkdownCell,
     'query': BeakerLLMQueryCell,
     'raw': BeakerRawCell,
+    'data_sources': AnalystDataSourceCell
 }
 
 const isFileMenuOpen = ref();
@@ -270,6 +272,12 @@ const iopubMessage = (msg) => {
         });
     } else if (msg.header.msg_type === "job_response") {
         beakerSessionRef.value.session.addMarkdownCell(msg.content.response);
+    } else if (msg.header.msg_type === "data_sources") {
+        const metadata = {
+            "sources": msg.content.sources
+        }
+        const newCell = beakerSessionRef.value.session.addRawCell("", metadata);
+        newCell.cell_type = "data_sources"
     }
 };
 
