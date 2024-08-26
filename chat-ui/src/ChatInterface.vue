@@ -76,6 +76,7 @@
                     <div class="central-panel">
                         <ChatPanel
                             ref="chatPanelRef"
+                            :cellMap="cellComponentMapping"
                             v-autoscroll
                         >
                             <template #help-text>
@@ -148,6 +149,7 @@ const chatPanelRef = shallowRef();
 const contextSelectionOpen = ref(false);
 const contextProcessing = ref(false);
 import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerContextSelection.vue';
+import { cell } from 'beaker-vue/dist/components';
 
 
 
@@ -206,8 +208,6 @@ const cellComponentMapping = {
     'query': BeakerLLMQueryCell,
     'raw': BeakerRawCell,
 }
-
-provide('cell-component-mapping', cellComponentMapping);
 
 const isFileMenuOpen = ref();
 
@@ -434,6 +434,14 @@ div.cell-container {
     flex-direction: column;
     z-index: 3;
     overflow: auto;
+}
+
+div.llm-prompt-container {
+    margin-right: 0rem;
+}
+
+div.llm-query-cell.beaker-chat-cell {
+    padding: 0rem 0rem 0rem 0rem;
 }
 
 div.llm-prompt-container h2.llm-prompt-text {
