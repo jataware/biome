@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 BIOME_URL = "http://biome_api:8082"
 
 
+
 class BiomeAgent(BaseAgent):
     """
     You are a chat assistant that helps the analyst user with their questions. You are running inside of the Analyst UI which is a chat application
@@ -37,27 +38,47 @@ class BiomeAgent(BaseAgent):
         }
         super().__init__(context, tools, **kwargs)
     
+    def update_job_status(self, job_id, status):
+        self.context.send_response("iopub", 
+                "job_status", {
+                    "job_id": job_id,
+                    "status": status 
+                },
+            )
 
     # TODO: Formatting of these messages should be left to the Analyst-UI in the future. 
     async def poll_query(self, job_id: str, format_result):
         # Poll result
         status = "queued"
         result = None
-        while status == "queued" or status == "started":
+        while status == "queued":
+            response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
+            status = response["status"]
+            sleep(1)
+        
+        self.update_job_status(job_id, status)
+
+        while status == "started":
             response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
             status = response["status"]
             sleep(1)
 
+        self.update_job_status(job_id, status)
+
         # Handle result
         if status != "finished":
+            self.update_job_status(job_id, status)
             self.context.send_response("iopub", 
-                "job_response", {
-                    "response": f"# JOB {job_id} {status} {response} FAILED" 
+                "job_failure", {
+                    "job_id": job_id,
+                    "response": response
                 },
             ) 
+
         result = response["result"] # TODO: Bubble up better cell type
         self.context.send_response("iopub",
             "job_response", {
+                "job_id": job_id,
                 "response": format_result(result),
                 "raw": result
             },
@@ -184,6 +205,13 @@ class BiomeAgent(BaseAgent):
                 f"{result['answer']}\n\n"
                 f"#### ID: {job_id}"
             )
+        self.context.send_response("iopub",
+            "job_create", {
+                "job_id": job_id,
+                "task": task,
+                "url": base_url
+            },
+        )
         asyncio.create_task(self.poll_query(job_id, format_result))
         return job_id
 

@@ -68,6 +68,7 @@
                                     severity="info"
                                     text
                                 />
+
                             </a>
                         </template>
                     </VerticalToolbar>
@@ -98,7 +99,11 @@
                             class="agent-query-container"
                         />
                     </div>
-                    <HelpSidebar></HelpSidebar>
+                    <VerticalToolbar>
+                        <template #start>
+                            <JobTracker :jobs="jobs"/>
+                        </template>
+                    </VerticalToolbar>
                 </main>
             </div>
             <BeakerContextSelection
@@ -114,31 +119,29 @@
 </template>
 
 <script setup lang="ts">
+import { standardRendererFactories } from '@jupyterlab/rendermime';
+import { JupyterMimeRenderer } from 'beaker-kernel';
+
 import AgentQuery from 'beaker-vue/src/components/chat-interface/AgentQuery.vue';
 import ChatPanel from 'beaker-vue/src/components/chat-interface/ChatPanel.vue';
 import DarkModeButton from 'beaker-vue/src/components/chat-interface/DarkModeButton.vue';
-import HelpSidebar from 'beaker-vue/src/components/chat-interface/HelpSidebar.vue';
 import VerticalToolbar from 'beaker-vue/src/components/chat-interface/VerticalToolbar.vue';
-
 import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
 import BeakerLLMQueryCell from 'beaker-vue/src/components/cell/BeakerLLMQueryCell.vue';
 import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
 import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
-
 import BeakerFilePane from 'beaker-vue/src/components/dev-interface/BeakerFilePane.vue';
-
 import BeakerSession from 'beaker-vue/src/components/session/BeakerSession.vue';
 
-import { standardRendererFactories } from '@jupyterlab/rendermime';
-
-import { JupyterMimeRenderer } from 'beaker-kernel';
+import AnalystDataSourceCell from './AnalystDataSourceCell.vue';
+import JobTracker from './JobTracker.vue';
 
 import Button from "primevue/button";
 import OverlayPanel from 'primevue/overlaypanel';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, defineEmits, computed, shallowRef } from 'vue';
+import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, reactive, defineEmits, computed, shallowRef } from 'vue';
 import { DecapodeRenderer, JSONRenderer, LatexRenderer, wrapJupyterRenderer } from 'beaker-vue/src/renderers';
 
 import { IBeakerTheme } from 'beaker-vue/src/plugins/theme';
@@ -150,9 +153,35 @@ const contextSelectionOpen = ref(false);
 const contextProcessing = ref(false);
 import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerContextSelection.vue';
 import { cell } from 'beaker-vue/dist/components';
-import AnalystDataSourceCell from './AnalystDataSourceCell.vue';
 
+import { BiomeJobCollection } from "./BiomeJob"
 
+const jobs: BiomeJobCollection = reactive({
+    "b936477a-55d2-4643-9730-21d200c3b9a2" : {
+        status: 'finished',
+        response: 'String Resopnse',
+        queue_order: 1,
+        url: 'google.com',
+        task: 'find the forecast for the next seven days'
+    },
+    "1cf01215-ca30-4ba9-aa00-a1428e1841bb" : {
+        status: 'finished',
+        response: 'String Resopnse',
+        queue_order: 2,
+        url: 'pdc.cancer.gov',
+        task: 'find data for the case ID: XXXXXX'
+    },
+    "1cf01215-ca30-4ba9-aa00-a1428e1841ba" : {
+        status: 'failed',
+        response: 'String Resopnse',
+        queue_order: 3,
+    },
+    "2cf01215-ca30-4ba9-aa00-a1428e1841ba" : {
+        status: 'started',
+        response: 'String Resopnse',
+        queue_order: 4,
+    }
+});
 
 // NOTE: Right now, we don't want the context changing
 const beakerNotebookRef = ref();
@@ -261,7 +290,30 @@ const connectionColor = computed(() => {
     return statusColors[beakerSessionRef?.value?.status] || "grey-200"
 });
 
+const handleJobMessages = msg => {
+    console.log("iopub", msg);
+    const messageType = msg.header.msg_type;
+    if (messageType === "job_create") {
+        jobs[msg.content.job_id] = {
+            status: 'queued',
+            task: msg.content.task,
+            url: msg.content.url,
+            queue_order: Object.keys(jobs).length + 1
+        }
+    } else if (msg.header.msg_type === "job_status") {
+        jobs[msg.content.job_id].status = msg.content.status;
+    } else if (msg.header.msg_type === "job_failure") {
+        // TODO: ui failure notice notificaion
+        jobs[msg.content.job_id].response = msg.content.response;
+    } else if (msg.header.msg_type === "job_response") {
+        // TODO: good notification
+        jobs[msg.content.job_id].response = msg.content.response;
+        jobs[msg.content.job_id].raw = msg.content.raw;
+    }
+}
+
 const iopubMessage = (msg) => {
+    handleJobMessages(msg);
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "debug_event") {
@@ -270,8 +322,6 @@ const iopubMessage = (msg) => {
             body: msg.content.body,
             timestamp: msg.header.date,
         });
-    } else if (msg.header.msg_type === "job_response") {
-        beakerSessionRef.value.session.addMarkdownCell(msg.content.response);
     } else if (msg.header.msg_type === "data_sources") {
         const metadata = {
             "sources": msg.content.sources
