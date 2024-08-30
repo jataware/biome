@@ -155,33 +155,9 @@ import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerCont
 import { cell } from 'beaker-vue/dist/components';
 
 import { BiomeJobCollection } from "./BiomeJob"
+import AnalystJobNotificationCell from './AnalystJobNotificationCell.vue';
 
-const jobs: BiomeJobCollection = reactive({
-    "b936477a-55d2-4643-9730-21d200c3b9a2" : {
-        status: 'finished',
-        response: 'String Resopnse',
-        queue_order: 1,
-        url: 'google.com',
-        task: 'find the forecast for the next seven days'
-    },
-    "1cf01215-ca30-4ba9-aa00-a1428e1841bb" : {
-        status: 'finished',
-        response: 'String Resopnse',
-        queue_order: 2,
-        url: 'pdc.cancer.gov',
-        task: 'find data for the case ID: XXXXXX'
-    },
-    "1cf01215-ca30-4ba9-aa00-a1428e1841ba" : {
-        status: 'failed',
-        response: 'String Resopnse',
-        queue_order: 3,
-    },
-    "2cf01215-ca30-4ba9-aa00-a1428e1841ba" : {
-        status: 'started',
-        response: 'String Resopnse',
-        queue_order: 4,
-    }
-});
+const jobs: BiomeJobCollection = reactive({});
 
 // NOTE: Right now, we don't want the context changing
 const beakerNotebookRef = ref();
@@ -237,7 +213,8 @@ const cellComponentMapping = {
     'markdown': BeakerMarkdownCell,
     'query': BeakerLLMQueryCell,
     'raw': BeakerRawCell,
-    'data_sources': AnalystDataSourceCell
+    'data_sources': AnalystDataSourceCell,
+    'job_notification': AnalystJobNotificationCell
 }
 
 const isFileMenuOpen = ref();
@@ -291,8 +268,10 @@ const connectionColor = computed(() => {
 });
 
 const handleJobMessages = msg => {
-    console.log("iopub", msg);
     const messageType = msg.header.msg_type;
+    // if (messageType.startsWith('job_')) {
+    //     console.log(messageType, msg);
+    // }
     if (messageType === "job_create") {
         jobs[msg.content.job_id] = {
             status: 'queued',
@@ -300,6 +279,12 @@ const handleJobMessages = msg => {
             url: msg.content.url,
             queue_order: Object.keys(jobs).length + 1
         }
+        const metadata = {
+            job: jobs[msg.content.job_id],
+            type: "creation"
+        }
+        const newCell = beakerSessionRef.value.session.addRawCell("", metadata);
+        newCell.cell_type = "job_notification"
     } else if (msg.header.msg_type === "job_status") {
         jobs[msg.content.job_id].status = msg.content.status;
     } else if (msg.header.msg_type === "job_failure") {
@@ -309,6 +294,14 @@ const handleJobMessages = msg => {
         // TODO: good notification
         jobs[msg.content.job_id].response = msg.content.response;
         jobs[msg.content.job_id].raw = msg.content.raw;
+        const metadata = {
+            job: jobs[msg.content.job_id],
+            type: "response"
+        }
+        const newCell = beakerSessionRef.value.session.addRawCell("", metadata);
+        newCell.cell_type = "job_notification"
+    } else if (msg.header.msg_type === "job_logs") {
+        jobs[msg.content.job_id].logs = msg.content.logs;
     }
 }
 

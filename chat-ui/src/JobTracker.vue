@@ -3,7 +3,7 @@
         <Sidebar v-model:visible="visible" header="Jobs" position="right">
             <Accordion>
                 <AccordionTab 
-                    v-for="job, id in jobs" 
+                    v-for="[id, job] in chronologicalJobs" 
                     :key="id"
                     :pt="{
                         root: {
@@ -29,41 +29,85 @@
                                 :value="job.queue_order" 
                                 class="job-header-badge" 
                                 shape="circle" 
-                                :severity="colorMap[job.status]"
+                                :severity="biomeJobColorMap[job.status]"
                             />
                             <span class="job-uuid">{{ formatJob(job, id) }}</span>
                         </span>
                     </template>
+                    <div class="job-info">
+                        <span class="job-uuid-small">{{ id }}</span>
+                        <span class="job-url" v-if="job?.url">{{ job.url }}</span>
+                        <span class="job-status">Job Status: <b>{{ job.status }}</b></span>
+                        <span class="job-task" v-if="job?.task">{{ job.task }}</span>
+                    </div>
+                    <Accordion v-if="job?.logs">
+                        <AccordionTab 
+                            :pt="{
+                                root: {
+                                    class: [`job-tab`]
+                                },
+                                header: {
+                                    class: [`job-tab-header`]
+                                },
+                                headerAction: {
+                                    class: [`job-tab-headeraction`]
+                                },
+                                content: {
+                                    class: [`job-tab-content`]
+                                },
+                                headerIcon: {
+                                    class: [`job-tab-icon`]
+                                }
+                            }"
+                        >
+                        <template #header> 
+                            Job Details
+                        </template>
+                        <template #default>
+                            <div v-html="job.logs.join('')"></div>
+                        </template>
+                        </AccordionTab>
+                    </Accordion>
                 </AccordionTab>
             </Accordion>
         </Sidebar>
-        <Button icon="pi pi-arrow-left" @click="visible = true" />
+        <Button 
+            @click="visible = true" 
+            rounded
+            outlined
+            :severity="jobsColor"
+            size="small"
+            class="jobs-button"
+        >
+            <span>{{ numJobs }}</span>
+        </Button>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, computed } from 'vue';
 import Sidebar from 'primevue/sidebar';
 import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import { type BiomeJobCollection, type BiomeJobStatus } from "./BiomeJob"
+import { BiomeJob, type BiomeJobCollection, biomeJobColorMap, getJobGroupColor } from "./BiomeJob"
 
 const props = defineProps<{
   jobs: BiomeJobCollection
 }>()
 
-const visible = ref()
+const visible = ref();
 
-const colorMap: {[key in BiomeJobStatus]: string} = {
-    started: 'secondary',
-    cancelled: 'warning',
-    deferred: 'warning',
-    failed: 'danger',
-    finished: 'success',
-    queued: 'info',
-    scheduled: 'info'
+const numJobs = computed(() => Object.keys(props.jobs).length);
+
+const chronologicalJobs = computed((): [string, BiomeJob][] => 
+    Object.entries(props.jobs).sort(([_, {queue_order}]) => queue_order));
+        
+const jobsColor = computed(() => getJobGroupColor(props.jobs))
+
+const addNotification = (job: BiomeJob, duration: number) => {
+    return '';
 }
 
 const formatJob = (job, id) => {
@@ -119,6 +163,43 @@ a.job-tab-headeraction {
     align-items: center;
     flex-direction: row;
     border:none;
+}
+
+button.jobs-button {
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    border: 0.175rem solid;
+    span {
+        font-weight: 900;
+        padding: 0;
+        margin: auto;
+    }
+}
+
+.job-tab-content {
+    padding: 0.5rem 0 1.25rem 1.25rem;
+}
+
+.job-info {
+    display: flex;
+    flex-direction: column;
+    .job-uuid-small {
+        font-size: 0.75rem;
+        font-style: italic;
+        padding-bottom: 0.25rem;
+    }
+    .job-url {
+        font-size: 0.75rem;
+        padding-bottom: 0.5rem;
+    }
+    .job-status {
+        padding-bottom: 0.5rem;
+    }
+    .job-task {
+        padding-bottom: 0.5rem;
+    }
 }
 
 </style>

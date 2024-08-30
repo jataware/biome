@@ -47,7 +47,7 @@ class BiomeAgent(BaseAgent):
             )
 
     # TODO: Formatting of these messages should be left to the Analyst-UI in the future. 
-    async def poll_query(self, job_id: str, format_result):
+    async def poll_query(self, job_id: str):
         # Poll result
         status = "queued"
         result = None
@@ -58,10 +58,18 @@ class BiomeAgent(BaseAgent):
         
         self.update_job_status(job_id, status)
 
+        #asyncio.create_task(self.poll_query_logs(job_id))
         while status == "started":
+            response = requests.get(f"{BIOME_URL}/jobs/{job_id}/logs").json()
+            self.context.send_response("iopub",
+                "job_logs", {
+                    "job_id": job_id,
+                    "logs": response,
+                },
+            )
             response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
             status = response["status"]
-            sleep(1)
+            sleep(5)
 
         self.update_job_status(job_id, status)
 
@@ -79,11 +87,10 @@ class BiomeAgent(BaseAgent):
         self.context.send_response("iopub",
             "job_response", {
                 "job_id": job_id,
-                "response": format_result(result),
+                "response": result['answer'],
                 "raw": result
             },
         ) 
-
 
     @tool(autosummarize=True)
     async def search(self, query: str) -> list[dict[str, Any]]:
@@ -178,7 +185,7 @@ class BiomeAgent(BaseAgent):
 
     # CHOOSING OPTION 1 FOR THE TIME BEING
     @tool()
-    async def query_page(self, task: str, base_url: str) -> str:
+    async def query_page(self, task: str, base_url: str, agent: AgentRef, loop: LoopControllerRef):
         """
         Run an action over a *specific* source in the Biome app and return the results.
         Find the url from a data source by using `search` tool first and
@@ -194,17 +201,9 @@ class BiomeAgent(BaseAgent):
         Args:
             task (str): Task given in natural language to perform over URL.
             base_url (str): URL to run query over.
-        Returns:
-            str: Job ID to poll for the result. 
         """
         response = requests.post( f"{BIOME_URL}/jobs/query", json={"user_task": task, "url": base_url})
         job_id = response.json()["job_id"]
-        def format_result(result):
-            return (
-                "## Query Response\n"
-                f"{result['answer']}\n\n"
-                f"#### ID: {job_id}"
-            )
         self.context.send_response("iopub",
             "job_create", {
                 "job_id": job_id,
@@ -212,9 +211,8 @@ class BiomeAgent(BaseAgent):
                 "url": base_url
             },
         )
-        asyncio.create_task(self.poll_query(job_id, format_result))
-        return job_id
-
+        asyncio.create_task(self.poll_query(job_id))
+        loop.set_state(loop.STOP_SUCCESS)
 
     @tool()
     async def scan(self, base_url: str, agent:AgentRef, loop: LoopControllerRef) -> str:
@@ -231,11 +229,5 @@ class BiomeAgent(BaseAgent):
         """
         response = requests.post( f"{BIOME_URL}/jobs/scan", json={"uris": [base_url]})
         job_id = response.json()["job_id"]
-        def format_result(_result):
-            return (
-                "## Scan Response\n"
-                f"SUCCESS\n\n"
-                f"#### ID: {job_id}"
-            )
-        asyncio.create_task(self.poll_query(job_id, format_result))
+        asyncio.create_task(self.poll_query(job_id))
         return job_id
