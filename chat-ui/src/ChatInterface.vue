@@ -141,7 +141,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, reactive, defineEmits, computed, shallowRef } from 'vue';
+import { defineProps, inject, nextTick, onBeforeMount, onUnmounted, provide, ref, reactive, defineEmits, computed, shallowRef, onMounted } from 'vue';
 import { DecapodeRenderer, JSONRenderer, LatexRenderer, wrapJupyterRenderer } from 'beaker-vue/src/renderers';
 
 import { IBeakerTheme } from 'beaker-vue/src/plugins/theme';
@@ -307,6 +307,12 @@ const handleJobMessages = msg => {
 
 const iopubMessage = (msg) => {
     handleJobMessages(msg);
+    if (msg?.parent_header.msg_type === "context_info_request") {
+        if (beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
+            console.log("setting default");
+            setDefaultContext();
+        }
+    }
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "debug_event") {
@@ -337,9 +343,6 @@ const unhandledMessage = (msg) => {
 }
 
 const statusChanged = (newStatus) => {
-    if (newStatus == 'connected' && beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
-        setDefaultContext();
-    }
     connectionStatus.value = newStatus == 'idle' ? 'connected' : newStatus;
 };
 

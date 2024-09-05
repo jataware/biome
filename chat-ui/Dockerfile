@@ -1,4 +1,12 @@
-from beaker-kernel:latest
+FROM python:3.10
+RUN useradd -m jupyter
+EXPOSE 8888
+
+RUN apt update && apt install -y lsof
+RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel
+
+USER jupyter
+WORKDIR /jupyter
 
 COPY ./beaker-biome /opt/beaker-biome
 USER root

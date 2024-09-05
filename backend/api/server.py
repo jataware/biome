@@ -1,4 +1,4 @@
-from fastapi import FastAPI, exceptions, Request, HTTPException, Depends, status
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 import logging
 from dataclasses import dataclass, asdict
@@ -6,16 +6,12 @@ import os
 import json
 import re
 from typing import Any, Annotated
-from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 from PIL import Image
 from io import BytesIO
 from markdown import markdown
 import base64
 import hashlib
-from lib.settings import settings
 from lib.sources_db import SourcesDatabase
 from lib.job_runner import JobRunner
 
@@ -155,74 +151,27 @@ def kill_job(job_id: str, runner: Runner):
 # We may want to rethink how progress is handled in the future
 # as discussed in `/backend/worker/jobs.py`.
 # TODO(DESIGN): Make this work for any task. Not just 'query'
-@app.get("/jobs/{job_id}/logs", response_model=list[str])
+@app.get("/jobs/{job_id}/logs")
 def get_query_progress(job_id: str, runner: Runner):
     job = runner.get_job(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job does not exist.")
     
-    logs = [
-        log for log in job.messages 
-        if not log.startswith('Element Labels') 
-        and not log.startswith('![log image')
-    ]
+    def replace_images(message):
+        if (message['type'] == 'screenshot'):
+            img_data = base64.b64decode(message['image'])
+            img_hash = hashlib.sha256(img_data).hexdigest()
+            img_path = f'static/images/{job_id}_{img_hash}.png'
+            if not os.path.exists(img_path):
+                img = Image.open(BytesIO(img_data))
+                if not os.path.exists("static/images"):
+                    os.makedirs("static/images")
+                img.save(img_path)
+            return {
+                'type': 'image',
+                'path': img_path
+            }
+        return message
 
-    chunks = []
-    chunk = []
-    for log in logs:
-        if log.startswith('## Observation'):
-            if chunk:
-                chunks.append(chunk)
-            chunk = [log]
-        else:
-            chunk.append(log)
-    if chunk:
-        chunks.append(chunk)
-
-    for chunk in chunks:
-        image_added = False
-        for i, log in enumerate(chunk):
-            if log.startswith('base64 image:') and not image_added:
-                base64_str = log.replace('base64 image: ', '')
-                img_data = base64.b64decode(base64_str)
-
-                # Create a hash of the image data
-                img_hash = hashlib.sha256(img_data).hexdigest()
-                img_path = f'static/images/{job_id}_{img_hash}.png'
-
-                # If the hash doesn't exist, save the image and add the hash to Redis
-                if not os.path.exists(img_path):
-                    img = Image.open(BytesIO(img_data))
-
-                    # Ensure image directory exists
-                    if not os.path.exists("static/images"):
-                        os.makedirs("static/images")
-
-                    img.save(img_path)
-
-                # even if the image is already saved, we still need to update the log chunk with the image tag
-                chunk[i] = f'<a href="/api/{img_path}" target="_blank"><img src="/api/{img_path}"/></a>'
-                image_added = True
-            elif log.startswith('base64 image:'):
-                chunk[i] = '' 
-            else:
-                # this is a regular (text) log entry
-                # Make 'Action:' and 'Thought:' bold, etc
-                log = log.replace('ANSWER;', '<b>ANSWER:</b>')
-                log = log.replace('Action:', '<b>Action:</b>')
-                log = log.replace('Thought:', '<b>Thought:</b>')
-                log = log.replace('State:', '<b>Action:</b>')
-                log = log.replace('Plan:', '<b>Thought:</b>')
-
-                # Find URLs and replace them with <a> tags
-                url_pattern = r'(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)'
-                log = re.sub(url_pattern, r'<a href="\1" target="_blank">\1</a>', log)
-
-                chunk[i] = markdown(log)
-
-    # Convert each chunk to an HTML string
-    chunks = ['\n'.join(chunk) for chunk in chunks]
-
-    return chunks
-
+    return {'history': [replace_images(json.loads(message)) for message in job.messages]}
 

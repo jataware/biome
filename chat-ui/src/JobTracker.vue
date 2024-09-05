@@ -64,7 +64,7 @@
                             Job Details
                         </template>
                         <template #default>
-                            <div v-html="job.logs.join('')"></div>
+                            <div>{{job.logs}}</div>
                         </template>
                         </AccordionTab>
                     </Accordion>
