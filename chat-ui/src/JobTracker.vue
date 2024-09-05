@@ -1,6 +1,6 @@
 <template>
     <div class="card flex justify-content-center">
-        <Sidebar v-model:visible="visible" header="Jobs" position="right">
+        <Sidebar v-model:visible="visible" header="Jobs" position="right" class="jobs-sidebar">
             <Accordion>
                 <AccordionTab 
                     v-for="[id, job] in chronologicalJobs" 
@@ -37,9 +37,11 @@
                     <div class="job-info">
                         <span class="job-uuid-small">{{ id }}</span>
                         <span class="job-url" v-if="job?.url">{{ job.url }}</span>
-                        <span class="job-status">Job Status: <b>{{ job.status }}</b></span>
+                        <span class="job-divider" />
+                        <span class="job-status">Status: <b>{{ job.status }}</b></span>
                         <span class="job-task" v-if="job?.task">{{ job.task }}</span>
                     </div>
+                    <span v-if="job?.logs" class="job-divider" />
                     <Accordion v-if="job?.logs">
                         <AccordionTab 
                             :pt="{
@@ -61,10 +63,10 @@
                             }"
                         >
                         <template #header> 
-                            Job Details
+                            Details
                         </template>
                         <template #default>
-                            <div>{{job.logs}}</div>
+                            <JobTrackerLogs :logs="job.logs" />
                         </template>
                         </AccordionTab>
                     </Accordion>
@@ -92,6 +94,7 @@ import Badge from 'primevue/badge';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import { BiomeJob, type BiomeJobCollection, biomeJobColorMap, getJobGroupColor } from "./BiomeJob"
+import JobTrackerLogs from './JobTrackerLogs.vue';
 
 const props = defineProps<{
   jobs: BiomeJobCollection
@@ -126,6 +129,11 @@ const formatJob = (job, id) => {
 
 div.job-tab {
     margin-bottom: 1rem;
+}
+
+div.jobs-sidebar {
+    width: 48rem;
+    max-width: 80%;
 }
 
 .job-tab-icon {
@@ -186,12 +194,12 @@ button.jobs-button {
     display: flex;
     flex-direction: column;
     .job-uuid-small {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         font-style: italic;
         padding-bottom: 0.25rem;
     }
     .job-url {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         padding-bottom: 0.5rem;
     }
     .job-status {
@@ -200,6 +208,13 @@ button.jobs-button {
     .job-task {
         padding-bottom: 0.5rem;
     }
+}
+
+.job-divider {
+    width: 80%;
+    background-color: var(--surface-200);
+    height: 1px;
+    margin: 0.25rem 0 0.5rem 0;
 }
 
 </style>
