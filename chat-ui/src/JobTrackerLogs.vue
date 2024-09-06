@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-autoscroll>
         <Fieldset 
             v-for="record, index in history" 
             :legend="titleFromRecord(record)" 

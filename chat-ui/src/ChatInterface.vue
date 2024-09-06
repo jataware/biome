@@ -309,7 +309,6 @@ const iopubMessage = (msg) => {
     handleJobMessages(msg);
     if (msg?.parent_header.msg_type === "context_info_request") {
         if (beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
-            console.log("setting default");
             setDefaultContext();
         }
     }
@@ -422,7 +421,20 @@ const snapshot = () => {
         notebookData[sessionId] = {
             data: notebook.toIPynb(),
         };
-        localStorage.setItem("notebookData", JSON.stringify(notebookData));
+        try {
+            localStorage.setItem("notebookData", JSON.stringify(notebookData));
+        }
+        catch (e) {
+            // quota exceeded - evict old sessions
+            notebookData = { [sessionId]: { data: notebook.toIPynb() } }
+            try {
+                localStorage.setItem("notebookData", JSON.stringify(notebookData));
+            }
+            catch (e) {
+                // just this session is >5 MiB 
+                console.warn("notebook too large to save in local storage");
+            }
+        }
     }
 };
 

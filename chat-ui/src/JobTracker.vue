@@ -1,7 +1,7 @@
 <template>
     <div class="card flex justify-content-center">
         <Sidebar v-model:visible="visible" header="Jobs" position="right" class="jobs-sidebar">
-            <Accordion>
+            <Accordion v-autoscroll>
                 <AccordionTab 
                     v-for="[id, job] in chronologicalJobs" 
                     :key="id"
