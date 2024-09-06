@@ -1,4 +1,0 @@
-[submodule "analyst-ui"]
-	path = analyst-ui
-	url = git@github.com:jataware/analyst-ui.git
-	branch = main

@@ -57,13 +57,19 @@ def query(url, supporting_docs, user_task):
                 if "Answer" in title:
                     nonlocal final_answer
                     final_answer = text
-                message = f'## {title}\n{text}\n\n'
-                message = message.replace('<', '&lt;').replace('>', '&gt;')
-                message += "\n\n"
-                runner.write_message(job_id, message)
+                message = {
+                    'type': 'action',
+                    'title': title,
+                    'text': text
+                }
+                runner.write_message(job_id, json.dumps(message))
             case ScreenshotRecord(data, ext):
                 encoded_image = b64encode(data).decode('utf-8')
-                runner.write_message(job_id, f'base64 image: {encoded_image}\n\n')
+                message = {
+                    'type': 'screenshot',
+                    'image': encoded_image
+                }
+                runner.write_message(job_id, json.dumps(message))
             # Ignore remaining record types
             case _:
                 pass
@@ -91,7 +97,12 @@ def query(url, supporting_docs, user_task):
     driver.end()
 
     for path in driver.download_tracker.get_all_downloads():
-        shutil.move(path, "/results")
+        import os
+        import subprocess
+        subprocess.run([
+            "mv", 
+            os.path.join(driver.download_tracker.downloads_dir, path), 
+            "/results"])
     shutil.rmtree(str(driver.download_tracker.downloads_dir))
 
     assert final_answer is not None, "Final answer not found"
