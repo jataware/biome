@@ -133,7 +133,7 @@ export default function Home() {
         <h1 className="text-6xl">DataSource Manager</h1>
       </section>
       <div className={styles.apisLayout}>
-        <aside className={styles.aside}>
+        {/* <aside className={styles.aside}>
           <Categories
             title="Categories"
             options={[
@@ -159,7 +159,7 @@ export default function Home() {
 
           <AccessControlFilters />
 
-        </aside>
+        </aside> */}
         <main className={styles.main}>
             <Sources 
               category={category} 

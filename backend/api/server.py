@@ -45,12 +45,14 @@ app.add_middleware(
 
 # TODO: Enable scrolling
 @app.get("/sources")
-def search_sources(db: SourcesDB, query: str | None = None):
+def search_sources(db: SourcesDB, query: str | None = None, raw_query: str | None = None):
+    if raw_query is not None:
+        logger.info(f"Searching with raw_query: {raw_query}")
     if query is None:
         logger.info("Getting all registered sources")
     else:
         logger.info(f"Searching sources with query: {query}")
-    result = db.search(query)
+    result = db.search(query, raw_query)
     return {
         "total": result.total,
         "sources": result.sources,
