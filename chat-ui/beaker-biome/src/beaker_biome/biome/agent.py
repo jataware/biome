@@ -11,12 +11,68 @@ from typing import Any
 from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
 
+from dataclasses import dataclass
+from typing import Literal
+
 
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
 
+def dynamic_docstring(docstring):
+    def decorator(fn):
+        fn.__doc__ = docstring
+        return fn
+    return decorator
 
+@dataclass
+class GetStudiesInputs:
+    keyword: str
+    projection: Literal['ID', 'SUMMARY', 'DETAILED', 'META']
+    pageSize: int 
+    pageNumber: int 
+    sortBy: Literal[
+        'studyId', 
+        'cancerTypeId', 
+        'name', 
+        'description', 
+        'publicStudy', 
+        'pmid', 
+        'citation', 
+        'groups', 
+        'status', 
+        'importDate'
+    ]
+    direction: Literal['ASC', 'DESC']
+
+@dataclass
+class GetStudiesOutputs:
+    name: str
+    description: str
+    publicSudy: bool
+    pmid: str
+    citation: str
+    groups: str
+    status: int
+    importDate: str
+    allSampleCount: int
+    sequencedSampleCount: int
+    cnaSampleCount: int
+    mrnaRnaSeqSampleCount: int
+    mrnaRnaSeqV2SampleCount: int
+    mrnaMicroarraySampleCount: int
+    miRnaSampleCount: int
+    methylationHm27SampleCount: int
+    rppaSampleCount: int
+    massSpectrometrySampleCount: int
+    completeSampleCount: int
+    readPermission: bool
+    treatmentCount: int
+    structuralVariantCount: int
+    studyId: str
+    cancerTypeId: str
+    cancerType: dict[Literal['name', 'dedicatedColor', 'shortName', 'parent', 'cancerTypeId'], str]
+    referenceGenome: str
 
 class BiomeAgent(BaseAgent):
     """
@@ -231,3 +287,40 @@ class BiomeAgent(BaseAgent):
         job_id = response.json()["job_id"]
         asyncio.create_task(self.poll_query(job_id))
         return job_id
+    
+    @tool()
+    @dynamic_docstring(docstring=f'''
+        This tool retrieves all studies from the cBioPortal API.
+
+        Args:
+            target_var (str): The target variable to save the studies to.
+            request_input (GetStudiesInputs): The parameters for the API call.
+                GetStudiesInputs is in the following structure, surrounded by backticks:
+                    ```
+                    {GetStudiesInputs.__annotations__}
+                    ```
+                Create this object based on what fields should be filled as to the user's request.
+                All fields are optional, so choose only the ones relevant to the user's request.
+    ''')
+    async def get_studies(self, target_var: str, request_input: GetStudiesInputs, agent: AgentRef):
+        code = agent.context.get_code('get_studies', {
+            "target_var": target_var, 
+            'request_input': request_input
+        })
+        self.context.send_response("iopub",
+            "debug_event", {
+                "body": {
+                    "target_var": str(target_var), 
+                    'request_input': str(request_input)
+                }
+            },
+        )
+        _response = await agent.context.evaluate(code)
+        agent.messages = agent.messages[:-1]
+        agent.add_context(f"""
+            I have now just finished saving the API call to a variable {target_var}.
+            The variable {target_var} is of type GetStudiesOutput, the dataclass defined above. 
+            The structure of it is enclosed in backticks:
+            ```{GetStudiesOutputs.__annotations__}```
+            I need to tell the user I have done this and show what studies I found.
+        """)
