@@ -314,7 +314,7 @@ const iopubMessage = (msg) => {
     }
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
-    } else if (msg.header.msg_type === "debug_event") {
+    } else if (msg.header.msg_type === "api_tool_call" || msg.header.msg_type === "api_tool_fail") {
         debugLogs.value.push({
             type: msg.content.event,
             body: msg.content.body,
