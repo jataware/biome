@@ -5,7 +5,7 @@ import requests
 from time import sleep
 import asyncio
 
-from archytas.tool_utils import AgentRef, LoopControllerRef, tool
+from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
 from typing import Any
 
 from beaker_kernel.lib.agent import BaseAgent
@@ -139,7 +139,7 @@ class BiomeAgent(BaseAgent):
 
 
     @tool()
-    async def interact_with_api(self, goal: str, agent: AgentRef):
+    async def interact_with_api(self, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
         This tool provides interaction with external APIs with a second agent.
         You will query external APIs through this tool and have code returned, which will be executed.
@@ -150,6 +150,9 @@ class BiomeAgent(BaseAgent):
 
         Args:
             goal (str): The task given to the second agent
+        Returns:
+            str: A summary of the current step being run, along with the collected stdout, stderr, returned result, display_data items, and any
+                errors that may have occurred.
         """
         self.gemini_info({'goal': goal})
         try:
@@ -175,20 +178,12 @@ class BiomeAgent(BaseAgent):
             return
         self.gemini_info({'response': agent_response})
         try:
-            evaluation = await agent.context.evaluate(agent_response)
+            evaluation = await agent.tools['run_code'](agent_response, agent, loop, react_context)
         except Exception as e:
             self.gemini_error({'error': str(e)})
             agent.add_context(f"The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}.")
             return
-        self.gemini_info({'eval': str(evaluation)})
-        if evaluation.get('result', {}).get('status', None) != 'ok':
-            agent.add_context("The second agent failed to create valid code. Instruct it to rerun.")
-            return
-        agent.add_context("""
-            The code ran successfully. If this completes the user's original task, inform them and stop.
-            If there is still more to do, inform the user and proceed with the next API interaction
-            using the results from what you just ran.
-        """)
+        return evaluation
 
     # def update_job_status(self, job_id, status):
     #     self.context.send_response("iopub", 
