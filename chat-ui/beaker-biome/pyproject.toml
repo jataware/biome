@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
   "beaker-kernel>=1.6.5",
   "requests",
+  "google-generativeai"
 ]
 
 [project.urls]

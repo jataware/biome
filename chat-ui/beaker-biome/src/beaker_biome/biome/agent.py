@@ -11,12 +11,60 @@ from typing import Any
 from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
 
+import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
 
-
+disease_types = """
+- adenomas and adenocarcinomas
+- ductal and lobular neoplasms
+- myeloid leukemias
+- epithelial neoplasms, nos
+- squamous cell neoplasms
+- gliomas
+- lymphoid leukemias
+- cystic, mucinous and serous neoplasms
+- nevi and melanomas
+- neuroepitheliomatous neoplasms
+- acute lymphoblastic leukemia
+- plasma cell tumors
+- complex mixed and stromal neoplasms
+- mature b-cell lymphomas
+- transitional cell papillomas and carcinomas
+- not applicable
+- osseous and chondromatous neoplasms
+- germ cell neoplasms
+- mesothelial neoplasms
+- not reported
+- acinar cell neoplasms
+- paragangliomas and glomus tumors
+- chronic myeloproliferative disorders
+- neoplasms, nos
+- thymic epithelial neoplasms
+- myomatous neoplasms
+- complex epithelial neoplasms
+- soft tissue tumors and sarcomas, nos
+- lipomatous neoplasms
+- meningiomas
+- fibromatous neoplasms
+- specialized gonadal neoplasms
+- unknown
+- miscellaneous tumors
+- adnexal and skin appendage neoplasms
+- basal cell neoplasms
+- mucoepidermoid neoplasms
+- myelodysplastic syndromes
+- nerve sheath tumors
+- leukemias, nos
+- synovial-like neoplasms
+- fibroepithelial neoplasms
+- miscellaneous bone tumors
+- blood vessel tumors
+- mature t- and nk-cell lymphomas
+- _missing
+"""
 
 class BiomeAgent(BaseAgent):
     """
@@ -34,200 +82,304 @@ class BiomeAgent(BaseAgent):
     dataframe.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        libraries = {
-        }
+        import os
+        import pathlib
+        agent_dir = pathlib.Path(__file__).resolve().parent
+        
+        with open(f'{agent_dir}/docs.md', 'r') as f:
+            docs = f.read()
+        self.gemini = {}
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        self.gemini['prompt'] = f"""
+        You are an assistant who will help me query the genomics data commons API.
+        You should write clean python code to solve specific queries I pose. You should 
+        write it as though it will be directly used in a Jupyter notebook. You should not 
+        include backticks or "python" at the top of the code blocks, that is unnecessary.
+        You should not provide explanation unless I ask a follow up question.
+        Assume pandas is installed and is imported with `import pandas as pd`. Also assume `requests`, `json`, 
+        and `os` are imported properly.
+
+        You will be given the entire API documentation, but first I want to give you a list of available 
+        disease types since this is a common search parameter: 
+
+        {disease_types}
+
+        If you are specifying a disease type, it MUST be from this enumerated list.
+
+        Now, I will provide you the extensive API documentation. When you write code against this API
+        you should avail yourself of the appropriate query parameters, your understanding of the response model
+        and be cognizant that not all data is public and thus may require a token, etc. When you are downloading
+        things you should log progress. When you are doing complex things try to break them down and 
+        implement appropriate exception handling. Ok here we go, here are the docs: 
+
+        {docs}       
+        """
+        self.gemini['model'] = genai.GenerativeModel("gemini-1.5-pro")
+        self.gemini['chat'] = self.gemini['model'].start_chat(
+            history=[
+                {"role": "user", "parts": self.gemini['prompt']},
+                {"role": "model", "parts": "Great to meet you. Let me help you query that API!"},
+            ]
+        )
         super().__init__(context, tools, **kwargs)
     
-    def update_job_status(self, job_id, status):
-        self.context.send_response("iopub", 
-                "job_status", {
-                    "job_id": job_id,
-                    "status": status 
-                },
-            )
-
-    # TODO: Formatting of these messages should be left to the Analyst-UI in the future. 
-    async def poll_query(self, job_id: str):
-        # Poll result
-        status = "queued"
-        result = None
-        while status == "queued":
-            response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
-            status = response["status"]
-            sleep(1)
-        
-        self.update_job_status(job_id, status)
-
-        #asyncio.create_task(self.poll_query_logs(job_id))
-        while status == "started":
-            response = requests.get(f"{BIOME_URL}/jobs/{job_id}/logs").json()
-            self.context.send_response("iopub",
-                "job_logs", {
-                    "job_id": job_id,
-                    "logs": response,
-                },
-            )
-            response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
-            status = response["status"]
-            sleep(5)
-
-        self.update_job_status(job_id, status)
-
-        # Handle result
-        if status != "finished":
-            self.update_job_status(job_id, status)
-            self.context.send_response("iopub", 
-                "job_failure", {
-                    "job_id": job_id,
-                    "response": response
-                },
-            ) 
-
-        result = response["result"] # TODO: Bubble up better cell type
+    def gemini_info(self, info: dict):
         self.context.send_response("iopub",
-            "job_response", {
-                "job_id": job_id,
-                "response": result['answer'],
-                "raw": result
+            "gemini_info", {
+                "body": info
+            },
+        ) 
+    
+    def gemini_error(self, error: dict):
+        self.context.send_response("iopub",
+            "gemini_error", {
+                "body": error
             },
         ) 
 
-    @tool(autosummarize=True)
-    async def search(self, query: str) -> list[dict[str, Any]]:
-        """
-        Search for data sources in the Biome app. Results will be matched semantically
-        and string distance. Use this to find a data source. You don't need live
-        web searches. If the user asks about data sources, use this tool.
-
-        Be sure to use the `display_search` tool for the output. Ensure you always use `display_search` after.
-
-        Args:
-            query (str): The query used to find the datasource.
-        Returns:
-            list: A JSON-formatted string containing a list of strings.
-                  The list should contain only the `name` field and no other field
-                  of the data sources found, ordered from most relevant to least relevant.
-                  Ensure that only the name field is present.
-                  An example is provided surrounded in backticks.
-                  ```
-                  ["Proteomics Data Commons", ""Office of Cancer Clinical Proteomics Research", "UniProt"]
-                  ```
-        """
-
-        endpoint = f"{BIOME_URL}/sources"
-        response = requests.get(endpoint, params={"query": query})
-        raw_sources = response.json()['sources']
-        sources = [
-            # Include only necessary fields to ensure LLM context length is not exceeded.
-            {
-                "id": source["id"],
-                "name": source["content"]["Web Page Descriptions"]["name"],
-                "initials": source["content"]["Web Page Descriptions"]["initials"],
-                "purpose": source["content"]["Web Page Descriptions"]["purpose"],
-                "links": source["content"]["Information on Links on Web Page"],
-                "base_url": source.get("base_url", None)
-            } for source in raw_sources
-        ]
-        return sources
-
-    @tool(autosummarize=True)
-    async def display_search(self, results: list[str], agent:AgentRef, loop: LoopControllerRef):
-        """
-        Once search has been performed, this tool will display it to the user.
-        Args:
-            results (list[str]): The query used to find the datasource.
-        """
-        # sometimes it wraps the output
-        if isinstance(results, dict):
-            results = results.get("results", results)
-        endpoint = f"{BIOME_URL}/sources"
-        response = requests.get(endpoint, params={
-            "simple_query_string": {
-                "fields": ["content.Web Page Descriptions.name"],
-                "query": "|".join(results)
-            }
-        })
-        raw_sources = response.json()['sources']
-        sources = [
-            {
-                "id": source["id"],
-                "name": source["content"]["Web Page Descriptions"]["name"],
-                "initials": source["content"]["Web Page Descriptions"]["initials"],
-                "purpose": source["content"]["Web Page Descriptions"]["purpose"],
-                "links": source["content"]["Information on Links on Web Page"],
-                "base_url": source.get("base_url", None),
-                "logo": source.get("logo", None)
-            } for source in raw_sources
-        ]
-        # match sources to ordering from previous llm step by dict to avoid n^2
-
-        sources_map = { source.get("name", ""): source for source in sources }
-        ordered_sources = [sources_map[name] for name in results]
-        self.context.send_response("iopub",
-            "data_sources", {
-                "sources": ordered_sources
-            },
-        )
-        loop.set_state(loop.STOP_SUCCESS)
-
-    # TODO(DESIGN): Deal with long running jobs in tools
-    #
-    # Option 1: We can return the job id and the agent can poll for the result.
-    # This will require a job status tool. Once the status is done, we can either
-    # check the result if it's a query or check the data source if it's a scan.
-    # This feels a bit messy though that the job creation has a similar return
-    # output on queue but getting the result is very different for each job.
-    #
-    # Option 2: We can wait for the job and return it to the agent when it's done
-    #
-    # Option 3: We can maybe leverage new widgets in the Analyst UI??
-    #
-
-    # CHOOSING OPTION 1 FOR THE TIME BEING
-    @tool()
-    async def query_page(self, task: str, base_url: str, agent: AgentRef, loop: LoopControllerRef):
-        """
-        Run an action over a *specific* source in the Biome app and return the results.
-        Find the url from a data source by using `search` tool first and
-        picking the most relevant one.
-
-        This kicks off a long-running job so you'll have to just return the ID to the user
-        instead of the result. 
-
-        This can be used to ask questions about a data source or download some kind
-        of artifact from it. This tool just kicks off a job where an AI crawls the website
-        and performs the task.
-
-        Args:
-            task (str): Task given in natural language to perform over URL.
-            base_url (str): URL to run query over.
-        """
-        response = requests.post( f"{BIOME_URL}/jobs/query", json={"user_task": task, "url": base_url})
-        job_id = response.json()["job_id"]
-        self.context.send_response("iopub",
-            "job_create", {
-                "job_id": job_id,
-                "task": task,
-                "url": base_url
-            },
-        )
-        asyncio.create_task(self.poll_query(job_id))
-        loop.set_state(loop.STOP_SUCCESS)
 
     @tool()
-    async def scan(self, base_url: str, agent:AgentRef, loop: LoopControllerRef) -> str:
+    async def interact_with_api(self, goal: str, agent: AgentRef):
         """
-        Profiles the given web page and adds it to the data sources in the Biome app.
-
-        This kicks off a long-running job so you'll have to just return the ID to the user
-        instead of the result. 
+        This tool provides interaction with external APIs with a second agent.
+        You will query external APIs through this tool and have code returned, which will be executed.
+        Based on what that code returns and the user's goal, continue to interact with the API to get to that goal.
+        
+        If there is an error running the code given back, instruct the second agent 
+        to fix it and run this tool again with a goal of getting that code to successfully run.
 
         Args:
-            base_url (str): The url to scan and add as a data source.
-        Returns:
-            str: Job ID to poll for the result. 
+            goal (str): The task given to the second agent
         """
-        response = requests.post( f"{BIOME_URL}/jobs/scan", json={"uris": [base_url]})
-        job_id = response.json()["job_id"]
-        asyncio.create_task(self.poll_query(job_id))
-        return job_id
+        self.gemini_info({'goal': goal})
+        try:
+            agent_response = self.gemini['chat'].send_message(goal).text
+            prefixes = ['```python', '```']
+            suffixes = ['```', '```\n']
+            for prefix in prefixes:
+                if agent_response.startswith(prefix):
+                    agent_response = agent_response[len(prefix):]
+            for suffix in suffixes:
+                if agent_response.endswith(suffix):
+                    agent_response = agent_response[:-len(suffix)]
+            agent_response = '\n'.join([
+                'import pandas as pd',
+                'import os',
+                'import json',
+                'import requests',
+                agent_response
+            ])
+            
+        except Exception as e:
+            self.gemini_error({'error': str(e)})
+            return
+        self.gemini_info({'response': agent_response})
+        try:
+            evaluation = await agent.context.evaluate(agent_response)
+        except Exception as e:
+            self.gemini_error({'error': str(e)})
+            agent.add_context(f"The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}.")
+            return
+        self.gemini_info({'eval': str(evaluation)})
+        if evaluation.get('result', {}).get('status', None) != 'ok':
+            agent.add_context("The second agent failed to create valid code. Instruct it to rerun.")
+            return
+        agent.add_context("""
+            The code ran successfully. If this completes the user's original task, inform them and stop.
+            If there is still more to do, inform the user and proceed with the next API interaction
+            using the results from what you just ran.
+        """)
+
+    # def update_job_status(self, job_id, status):
+    #     self.context.send_response("iopub", 
+    #             "job_status", {
+    #                 "job_id": job_id,
+    #                 "status": status 
+    #             },
+    #         )
+
+    # # TODO: Formatting of these messages should be left to the Analyst-UI in the future. 
+    # async def poll_query(self, job_id: str):
+    #     # Poll result
+    #     status = "queued"
+    #     result = None
+    #     while status == "queued":
+    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
+    #         status = response["status"]
+    #         sleep(1)
+        
+    #     self.update_job_status(job_id, status)
+
+    #     #asyncio.create_task(self.poll_query_logs(job_id))
+    #     while status == "started":
+    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}/logs").json()
+    #         self.context.send_response("iopub",
+    #             "job_logs", {
+    #                 "job_id": job_id,
+    #                 "logs": response,
+    #             },
+    #         )
+    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
+    #         status = response["status"]
+    #         sleep(5)
+
+    #     self.update_job_status(job_id, status)
+
+    #     # Handle result
+    #     if status != "finished":
+    #         self.update_job_status(job_id, status)
+    #         self.context.send_response("iopub", 
+    #             "job_failure", {
+    #                 "job_id": job_id,
+    #                 "response": response
+    #             },
+    #         ) 
+
+    #     result = response["result"] # TODO: Bubble up better cell type
+    #     self.context.send_response("iopub",
+    #         "job_response", {
+    #             "job_id": job_id,
+    #             "response": result['answer'],
+    #             "raw": result
+    #         },
+    #     ) 
+
+    # @tool(autosummarize=True)
+    # async def search(self, query: str) -> list[dict[str, Any]]:
+    #     """
+    #     Search for data sources in the Biome app. Results will be matched semantically
+    #     and string distance. Use this to find a data source. You don't need live
+    #     web searches. If the user asks about data sources, use this tool.
+
+    #     Be sure to use the `display_search` tool for the output. Ensure you always use `display_search` after.
+
+    #     Args:
+    #         query (str): The query used to find the datasource.
+    #     Returns:
+    #         list: A JSON-formatted string containing a list of strings.
+    #               The list should contain only the `name` field and no other field
+    #               of the data sources found, ordered from most relevant to least relevant.
+    #               Ensure that only the name field is present.
+    #               An example is provided surrounded in backticks.
+    #               ```
+    #               ["Proteomics Data Commons", ""Office of Cancer Clinical Proteomics Research", "UniProt"]
+    #               ```
+    #     """
+
+    #     endpoint = f"{BIOME_URL}/sources"
+    #     response = requests.get(endpoint, params={"query": query})
+    #     raw_sources = response.json()['sources']
+    #     sources = [
+    #         # Include only necessary fields to ensure LLM context length is not exceeded.
+    #         {
+    #             "id": source["id"],
+    #             "name": source["content"]["Web Page Descriptions"]["name"],
+    #             "initials": source["content"]["Web Page Descriptions"]["initials"],
+    #             "purpose": source["content"]["Web Page Descriptions"]["purpose"],
+    #             "links": source["content"]["Information on Links on Web Page"],
+    #             "base_url": source.get("base_url", None)
+    #         } for source in raw_sources
+    #     ]
+    #     return sources
+
+    # @tool(autosummarize=True)
+    # async def display_search(self, results: list[str], agent:AgentRef, loop: LoopControllerRef):
+    #     """
+    #     Once search has been performed, this tool will display it to the user.
+    #     Args:
+    #         results (list[str]): The query used to find the datasource.
+    #     """
+    #     # sometimes it wraps the output
+    #     if isinstance(results, dict):
+    #         results = results.get("results", results)
+    #     endpoint = f"{BIOME_URL}/sources"
+    #     response = requests.get(endpoint, params={
+    #         "simple_query_string": {
+    #             "fields": ["content.Web Page Descriptions.name"],
+    #             "query": "|".join(results)
+    #         }
+    #     })
+    #     raw_sources = response.json()['sources']
+    #     sources = [
+    #         {
+    #             "id": source["id"],
+    #             "name": source["content"]["Web Page Descriptions"]["name"],
+    #             "initials": source["content"]["Web Page Descriptions"]["initials"],
+    #             "purpose": source["content"]["Web Page Descriptions"]["purpose"],
+    #             "links": source["content"]["Information on Links on Web Page"],
+    #             "base_url": source.get("base_url", None),
+    #             "logo": source.get("logo", None)
+    #         } for source in raw_sources
+    #     ]
+    #     # match sources to ordering from previous llm step by dict to avoid n^2
+
+    #     sources_map = { source.get("name", ""): source for source in sources }
+    #     ordered_sources = [sources_map[name] for name in results]
+    #     self.context.send_response("iopub",
+    #         "data_sources", {
+    #             "sources": ordered_sources
+    #         },
+    #     )
+    #     loop.set_state(loop.STOP_SUCCESS)
+
+    # # TODO(DESIGN): Deal with long running jobs in tools
+    # #
+    # # Option 1: We can return the job id and the agent can poll for the result.
+    # # This will require a job status tool. Once the status is done, we can either
+    # # check the result if it's a query or check the data source if it's a scan.
+    # # This feels a bit messy though that the job creation has a similar return
+    # # output on queue but getting the result is very different for each job.
+    # #
+    # # Option 2: We can wait for the job and return it to the agent when it's done
+    # #
+    # # Option 3: We can maybe leverage new widgets in the Analyst UI??
+    # #
+
+    # # CHOOSING OPTION 1 FOR THE TIME BEING
+    # @tool()
+    # async def query_page(self, task: str, base_url: str, agent: AgentRef, loop: LoopControllerRef):
+    #     """
+    #     Run an action over a *specific* source in the Biome app and return the results.
+    #     Find the url from a data source by using `search` tool first and
+    #     picking the most relevant one.
+
+    #     This kicks off a long-running job so you'll have to just return the ID to the user
+    #     instead of the result. 
+
+    #     This can be used to ask questions about a data source or download some kind
+    #     of artifact from it. This tool just kicks off a job where an AI crawls the website
+    #     and performs the task.
+
+    #     Args:
+    #         task (str): Task given in natural language to perform over URL.
+    #         base_url (str): URL to run query over.
+    #     """
+    #     response = requests.post( f"{BIOME_URL}/jobs/query", json={"user_task": task, "url": base_url})
+    #     job_id = response.json()["job_id"]
+    #     self.context.send_response("iopub",
+    #         "job_create", {
+    #             "job_id": job_id,
+    #             "task": task,
+    #             "url": base_url
+    #         },
+    #     )
+    #     asyncio.create_task(self.poll_query(job_id))
+    #     loop.set_state(loop.STOP_SUCCESS)
+
+    # @tool()
+    # async def scan(self, base_url: str, agent:AgentRef, loop: LoopControllerRef) -> str:
+    #     """
+    #     Profiles the given web page and adds it to the data sources in the Biome app.
+
+    #     This kicks off a long-running job so you'll have to just return the ID to the user
+    #     instead of the result. 
+
+    #     Args:
+    #         base_url (str): The url to scan and add as a data source.
+    #     Returns:
+    #         str: Job ID to poll for the result. 
+    #     """
+    #     response = requests.post( f"{BIOME_URL}/jobs/scan", json={"uris": [base_url]})
+    #     job_id = response.json()["job_id"]
+    #     asyncio.create_task(self.poll_query(job_id))
+    #     return job_id
