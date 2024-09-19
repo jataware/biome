@@ -12,6 +12,7 @@ from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
 
 import google.generativeai as genai
+from google.generativeai import caching
 
 logger = logging.getLogger(__name__)
 
@@ -81,16 +82,40 @@ class BiomeAgent(BaseAgent):
     of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
     dataframe.
     """
+    GDC_MODEL_DISPLAY_NAME='GDC_CACHE_API_DOCS'
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         import os
-        import pathlib
-        agent_dir = pathlib.Path(__file__).resolve().parent
+    
+        content = caching.CachedContent.list()
+
+        is_cached = False
+        for cache_object in content: 
+            if cache_object.display_name == self.GDC_MODEL_DISPLAY_NAME:
+                is_cached = True 
+                break
         
+        self.gemini = {}
+
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+        if not is_cached:
+            self.gemini_info({"cache": "Cache was not found."})
+            cache_object = self.build_cache()
+        else:
+            self.gemini_info({"cache": "Cache was found."})
+
+        self.gemini['model'] = genai.GenerativeModel.from_cached_content(cached_content=cache_object)
+        
+        super().__init__(context, tools, **kwargs)
+    
+    def build_cache(self):
+        import pathlib
+        import datetime
+        agent_dir = pathlib.Path(__file__).resolve().parent
         with open(f'{agent_dir}/docs.md', 'r') as f:
             docs = f.read()
-        self.gemini = {}
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.gemini['prompt'] = f"""
+
+        prompt = """
         You are an assistant who will help me query the genomics data commons API.
         You should write clean python code to solve specific queries I pose. You should 
         write it as though it will be directly used in a Jupyter notebook. You should not 
@@ -98,7 +123,9 @@ class BiomeAgent(BaseAgent):
         You should not provide explanation unless I ask a follow up question.
         Assume pandas is installed and is imported with `import pandas as pd`. Also assume `requests`, `json`, 
         and `os` are imported properly.
+        """
 
+        cached_content = f"""
         You will be given the entire API documentation, but first I want to give you a list of available 
         disease types since this is a common search parameter: 
 
@@ -112,17 +139,17 @@ class BiomeAgent(BaseAgent):
         things you should log progress. When you are doing complex things try to break them down and 
         implement appropriate exception handling. Ok here we go, here are the docs: 
 
-        {docs}       
+        {docs}
         """
-        self.gemini['model'] = genai.GenerativeModel("gemini-1.5-pro")
-        self.gemini['chat'] = self.gemini['model'].start_chat(
-            history=[
-                {"role": "user", "parts": self.gemini['prompt']},
-                {"role": "model", "parts": "Great to meet you. Let me help you query that API!"},
-            ]
+        cache = caching.CachedContent.create(
+            model='models/gemini-1.5-flash-001',
+            display_name=self.GDC_MODEL_DISPLAY_NAME,
+            contents=[cached_content],
+            ttl=datetime.timedelta(days=30),
+            system_instruction=prompt
         )
-        super().__init__(context, tools, **kwargs)
-    
+        return cache
+
     def gemini_info(self, info: dict):
         self.context.send_response("iopub",
             "gemini_info", {
@@ -137,6 +164,18 @@ class BiomeAgent(BaseAgent):
             },
         ) 
 
+    @tool() 
+    async def syntax_check(self, code: str) -> str:
+        """
+        This tool checks python code for syntax to fix things that might be wrong without 
+        changing the meaning or operation of the code.
+
+        Args:
+            code (str): Python code with attempted syntax fixes to go back for use in other tools.
+        Returns:
+            str: The python code with syntax fixes.
+        """
+        return code 
 
     @tool()
     async def interact_with_api(self, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
@@ -152,7 +191,9 @@ class BiomeAgent(BaseAgent):
             goal (str): The task given to the second agent
         Returns:
             str: A summary of the current step being run, along with the collected stdout, stderr, returned result, display_data items, and any
-                errors that may have occurred.
+                 errors that may have occurred.
+
+                 If the code fails with a syntax error to be checked
         """
         self.gemini_info({'goal': goal})
         try:
@@ -175,14 +216,16 @@ class BiomeAgent(BaseAgent):
             
         except Exception as e:
             self.gemini_error({'error': str(e)})
-            return
+            return str(e)
         self.gemini_info({'response': agent_response})
         try:
             evaluation = await agent.tools['run_code'](agent_response, agent, loop, react_context)
         except Exception as e:
             self.gemini_error({'error': str(e)})
-            agent.add_context(f"The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}.")
-            return
+            agent.add_context(f"""
+                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
+                """)
+            return agent_response
         return evaluation
 
     # def update_job_status(self, job_id, status):
