@@ -83,31 +83,29 @@ class BiomeAgent(BaseAgent):
     dataframe.
     """
     GDC_MODEL_DISPLAY_NAME='GDC_CACHE_API_DOCS'
+    GDC_MODEL='models/gemini-1.5-flash-001'
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         import os
-    
-        content = caching.CachedContent.list()
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        self.gemini = {}
+        super().__init__(context, tools, **kwargs)
+        self.try_load_cache()
 
+    def try_load_cache(self):
+        content = caching.CachedContent.list()
         is_cached = False
         for cache_object in content: 
             if cache_object.display_name == self.GDC_MODEL_DISPLAY_NAME:
                 is_cached = True 
                 break
-        
-        self.gemini = {}
-
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-
         if not is_cached:
             self.gemini_info({"cache": "Cache was not found."})
             cache_object = self.build_cache()
         else:
             self.gemini_info({"cache": "Cache was found."})
-
         self.gemini['model'] = genai.GenerativeModel.from_cached_content(cached_content=cache_object)
-        
-        super().__init__(context, tools, **kwargs)
-    
+        self.gemini['chat'] = self.gemini['model'].start_chat()
+
     def build_cache(self):
         import pathlib
         import datetime
@@ -142,7 +140,7 @@ class BiomeAgent(BaseAgent):
         {docs}
         """
         cache = caching.CachedContent.create(
-            model='models/gemini-1.5-flash-001',
+            model=self.GDC_MODEL,
             display_name=self.GDC_MODEL_DISPLAY_NAME,
             contents=[cached_content],
             ttl=datetime.timedelta(days=30),
