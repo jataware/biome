@@ -137,6 +137,9 @@ class BiomeAgent(BaseAgent):
         things you should log progress. When you are doing complex things try to break them down and 
         implement appropriate exception handling. Ok here we go, here are the docs: 
 
+        Unless you receive a 403 forbidden, assume the endpoints are unauthenticated.
+        If the user says the API does not require authentication, OMIT code about tokens and token handling and token headers.
+        
         {docs}
         """
         cache = caching.CachedContent.create(
@@ -162,36 +165,22 @@ class BiomeAgent(BaseAgent):
             },
         ) 
 
-    @tool() 
-    async def syntax_check(self, code: str) -> str:
-        """
-        This tool checks python code for syntax to fix things that might be wrong without 
-        changing the meaning or operation of the code.
-
-        Args:
-            code (str): Python code with attempted syntax fixes to go back for use in other tools.
-        Returns:
-            str: The python code with syntax fixes.
-        """
-        return code 
-
     @tool()
     async def interact_with_api(self, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
         This tool provides interaction with external APIs with a second agent.
-        You will query external APIs through this tool and have code returned, which will be executed.
+        You will query external APIs through this tool.
         Based on what that code returns and the user's goal, continue to interact with the API to get to that goal.
-        
-        If there is an error running the code given back, instruct the second agent 
-        to fix it and run this tool again with a goal of getting that code to successfully run.
+
+        The output will either be a summary of the code output or an error. 
+        If it is an error, instruct the second agent to fix the code and retry.
 
         Args:
-            goal (str): The task given to the second agent
+            goal (str): The task given to the second agent. If the user states the API is unauthenticated, relay that information here.
         Returns:
             str: A summary of the current step being run, along with the collected stdout, stderr, returned result, display_data items, and any
-                 errors that may have occurred.
-
-                 If the code fails with a syntax error to be checked
+                 errors that may have occurred, or just an error.
+              
         """
         self.gemini_info({'goal': goal})
         try:
@@ -211,21 +200,51 @@ class BiomeAgent(BaseAgent):
                 'import requests',
                 agent_response
             ])
-            
         except Exception as e:
             self.gemini_error({'error': str(e)})
-            return str(e)
-        self.gemini_info({'response': agent_response})
-        try:
-            evaluation = await agent.tools['run_code'](agent_response, agent, loop, react_context)
-        except Exception as e:
-            self.gemini_error({'error': str(e)})
-            agent.add_context(f"""
-                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
-                """)
-            return agent_response
-        return evaluation
+            return f"The agent failed to produce valid code: {str(e)}"
+        
+        fixed_code = await agent.query(f"""The code you received is will be listed below the line of dashes.
+Please fix the python code for syntax errors and only return the python code with fixed syntax errors.
+Ensure the output has no formatting and return just the code, please.
 
+If the output has formatting like backticks or a language specifier, be sure to remove all formatting
+and return nothing but the code itself with no additional text.
+                                       
+Example:
+    Input:
+        ```python
+        print(a)
+        ```
+    Output:
+        print(a)
+    Input:
+        ```python
+        de f fn_b(b):
+            print(this is an unescaped string)
+        def fn_a(a):
+            print(a)
+        ```
+        This code has been fixed to correctly solve the task.
+    Output:
+        def fn_b(b):
+            print("this is an unescaped string")
+        def fn(a):
+            print(a)
+                    
+----------
+
+{agent_response}
+""")
+        self.gemini_info({'syntax_check_output': fixed_code})
+        try:
+            evaluation = await agent.tools['run_code'](fixed_code, agent, loop, react_context)
+        except Exception as e:
+            self.gemini_error({'error': str(e)})
+            return f"""
+                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
+                """
+        return evaluation
     # def update_job_status(self, job_id, status):
     #     self.context.send_response("iopub", 
     #             "job_status", {
