@@ -305,8 +305,23 @@ const handleJobMessages = msg => {
     }
 }
 
+const handleGeminiMessages = msg => {
+    const expansion = body => {
+        if (typeof body === 'string') {
+            return body;
+        }
+        return Object.entries(body).map(([key, value]) => `${key}: ${value}`).join('\n');
+    }
+    if (msg.header.msg_type === "gemini_info") {
+        beakerSessionRef.value.session.addRawCell(`Gemini INFO: ${expansion(msg.content.body)}`)
+    } else if (msg.header.msg_type === "gemini_error") {
+        beakerSessionRef.value.session.addRawCell(`Gemini ERROR: ${expansion(msg.content.body)}`)
+    }
+}
+
 const iopubMessage = (msg) => {
     handleJobMessages(msg);
+    handleGeminiMessages(msg);
     if (msg?.parent_header.msg_type === "context_info_request") {
         if (beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
             setDefaultContext();
@@ -314,10 +329,6 @@ const iopubMessage = (msg) => {
     }
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
-    } else if (msg.header.msg_type === "gemini_info" || msg.header.msg_type === "gemini_error") {
-        debugLogs.value.push({
-            body: msg.content.body,
-        });
     } else if (msg.header.msg_type === "data_sources") {
         const metadata = {
             "sources": msg.content.sources

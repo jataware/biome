@@ -146,7 +146,7 @@ class BiomeAgent(BaseAgent):
             model=self.GDC_MODEL,
             display_name=self.GDC_MODEL_DISPLAY_NAME,
             contents=[cached_content],
-            ttl=datetime.timedelta(days=30),
+            ttl=datetime.timedelta(minutes=30),
             system_instruction=prompt
         )
         return cache
@@ -236,7 +236,6 @@ Example:
 
 {agent_response}
 """)
-        self.gemini_info({'syntax_check_output': fixed_code})
         try:
             evaluation = await agent.tools['run_code'](fixed_code, agent, loop, react_context)
         except Exception as e:
