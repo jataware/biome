@@ -1,0 +1,95 @@
+apis:
+    # if a field is not specified, the default field will be used.
+    # fields can be referenced by python f-string syntax for interpolation.
+    # be sure to use | for block strings so that new lines are given to the prompt.
+    default:
+        # user-visible name
+        name: "Default API"
+        # should this API be disabled
+        # (the default value for any given user-defined api is to be enabled 
+        #   - here, default is handled specially as if the "api" was disabled.)
+        disabled: false
+        cache: 
+            # key -- no default specified! it is required to be manually filled.
+            model: "models/gemini-1.5-flash-001"
+            ttl: 30 # in minutes
+        # relative to ./docs/
+        docs: "api_docs.md"
+        system_prompt: |
+            You are an assistant who will help me query the {name} API. 
+            You should write clean python code to solve specific queries I pose. 
+            You should write it as though it will be directly used in a Jupyter notebook. 
+            You should not include backticks or 'python' at the top of the code blocks, that is unnecessary. 
+            You should not provide explanation unless I ask a follow up question. 
+            Assume pandas is installed and is imported with `import pandas as pd`. 
+            Also assume `requests`, `json`, and `os` are imported properly.
+        cache_body: |
+            You will be given the entire API documentation. 
+            When you write code against this API, you should avail yourself of the appropriate query parameters, 
+            your understanding of the response model, and be cognizant that not all data is public and thus may require a token, etc.
+            Unless you receive a 403 forbidden, assume the endpoints are unauthenticated.
+            If the user says the API does not require authentication, OMIT code about tokens and token handling and token headers.
+            When you are downloading, communicate via stdout that something has been downloaded.
+            When you are doing complex things try to break them down step by step and implement appropriate exception handling.
+            {additional_cache_body}
+            Here is the documentation.
+            {docs}
+        # inserted after preamble but above full documentation. 
+        # useful for slight changes without fully replacing the text.
+        additional_cache_body: ''
+
+    gdc:
+        name: "Genomics Data Commons"
+        docs: "gdc.md"
+        cache: 
+            key: "api_assistant_gdc"
+        additional_cache_body: |
+            Additionally, here is a list of available disease types since this is a common search parameter:
+                - adenomas and adenocarcinomas
+                - ductal and lobular neoplasms
+                - myeloid leukemias
+                - epithelial neoplasms, nos
+                - squamous cell neoplasms
+                - gliomas
+                - lymphoid leukemias
+                - cystic, mucinous and serous neoplasms
+                - nevi and melanomas
+                - neuroepitheliomatous neoplasms
+                - acute lymphoblastic leukemia
+                - plasma cell tumors
+                - complex mixed and stromal neoplasms
+                - mature b-cell lymphomas
+                - transitional cell papillomas and carcinomas
+                - not applicable
+                - osseous and chondromatous neoplasms
+                - germ cell neoplasms
+                - mesothelial neoplasms
+                - not reported
+                - acinar cell neoplasms
+                - paragangliomas and glomus tumors
+                - chronic myeloproliferative disorders
+                - neoplasms, nos
+                - thymic epithelial neoplasms
+                - myomatous neoplasms
+                - complex epithelial neoplasms
+                - soft tissue tumors and sarcomas, nos
+                - lipomatous neoplasms
+                - meningiomas
+                - fibromatous neoplasms
+                - specialized gonadal neoplasms
+                - unknown
+                - miscellaneous tumors
+                - adnexal and skin appendage neoplasms
+                - basal cell neoplasms
+                - mucoepidermoid neoplasms
+                - myelodysplastic syndromes
+                - nerve sheath tumors
+                - leukemias, nos
+                - synovial-like neoplasms
+                - fibroepithelial neoplasms
+                - miscellaneous bone tumors
+                - blood vessel tumors
+                - mature t- and nk-cell lymphomas
+                - _missing
+
+    

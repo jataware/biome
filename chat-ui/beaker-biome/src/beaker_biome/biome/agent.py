@@ -14,58 +14,12 @@ from beaker_kernel.lib.context import BaseContext
 import google.generativeai as genai
 from google.generativeai import caching
 
+from .cache import APICache
+import pathlib
+
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
-
-disease_types = """
-- adenomas and adenocarcinomas
-- ductal and lobular neoplasms
-- myeloid leukemias
-- epithelial neoplasms, nos
-- squamous cell neoplasms
-- gliomas
-- lymphoid leukemias
-- cystic, mucinous and serous neoplasms
-- nevi and melanomas
-- neuroepitheliomatous neoplasms
-- acute lymphoblastic leukemia
-- plasma cell tumors
-- complex mixed and stromal neoplasms
-- mature b-cell lymphomas
-- transitional cell papillomas and carcinomas
-- not applicable
-- osseous and chondromatous neoplasms
-- germ cell neoplasms
-- mesothelial neoplasms
-- not reported
-- acinar cell neoplasms
-- paragangliomas and glomus tumors
-- chronic myeloproliferative disorders
-- neoplasms, nos
-- thymic epithelial neoplasms
-- myomatous neoplasms
-- complex epithelial neoplasms
-- soft tissue tumors and sarcomas, nos
-- lipomatous neoplasms
-- meningiomas
-- fibromatous neoplasms
-- specialized gonadal neoplasms
-- unknown
-- miscellaneous tumors
-- adnexal and skin appendage neoplasms
-- basal cell neoplasms
-- mucoepidermoid neoplasms
-- myelodysplastic syndromes
-- nerve sheath tumors
-- leukemias, nos
-- synovial-like neoplasms
-- fibroepithelial neoplasms
-- miscellaneous bone tumors
-- blood vessel tumors
-- mature t- and nk-cell lymphomas
-- _missing
-"""
 
 class BiomeAgent(BaseAgent):
     """
@@ -82,74 +36,14 @@ class BiomeAgent(BaseAgent):
     of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
     dataframe.
     """
-    GDC_MODEL_DISPLAY_NAME='GDC_CACHE_API_DOCS'
-    GDC_MODEL='models/gemini-1.5-flash-001'
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         import os
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.gemini = {}
+        root_folder = pathlib.Path(__file__).resolve().parent
+        self.cache = APICache(f'{root_folder}/apis.yaml')
+        self.cache.load_api('gdc')
         super().__init__(context, tools, **kwargs)
-        self.try_load_cache()
-
-    def try_load_cache(self):
-        content = caching.CachedContent.list()
-        is_cached = False
-        for cache_object in content: 
-            if cache_object.display_name == self.GDC_MODEL_DISPLAY_NAME:
-                is_cached = True 
-                break
-        if not is_cached:
-            self.gemini_info({"cache": "Cache was not found."})
-            cache_object = self.build_cache()
-        else:
-            self.gemini_info({"cache": "Cache was found."})
-        self.gemini['model'] = genai.GenerativeModel.from_cached_content(cached_content=cache_object)
-        self.gemini['chat'] = self.gemini['model'].start_chat()
-
-    def build_cache(self):
-        import pathlib
-        import datetime
-        agent_dir = pathlib.Path(__file__).resolve().parent
-        with open(f'{agent_dir}/docs.md', 'r') as f:
-            docs = f.read()
-
-        prompt = """
-        You are an assistant who will help me query the genomics data commons API.
-        You should write clean python code to solve specific queries I pose. You should 
-        write it as though it will be directly used in a Jupyter notebook. You should not 
-        include backticks or "python" at the top of the code blocks, that is unnecessary.
-        You should not provide explanation unless I ask a follow up question.
-        Assume pandas is installed and is imported with `import pandas as pd`. Also assume `requests`, `json`, 
-        and `os` are imported properly.
-        """
-
-        cached_content = f"""
-        You will be given the entire API documentation, but first I want to give you a list of available 
-        disease types since this is a common search parameter: 
-
-        {disease_types}
-
-        If you are specifying a disease type, it MUST be from this enumerated list.
-
-        Now, I will provide you the extensive API documentation. When you write code against this API
-        you should avail yourself of the appropriate query parameters, your understanding of the response model
-        and be cognizant that not all data is public and thus may require a token, etc. When you are downloading
-        things you should log progress. When you are doing complex things try to break them down and 
-        implement appropriate exception handling. Ok here we go, here are the docs: 
-
-        Unless you receive a 403 forbidden, assume the endpoints are unauthenticated.
-        If the user says the API does not require authentication, OMIT code about tokens and token handling and token headers.
-        
-        {docs}
-        """
-        cache = caching.CachedContent.create(
-            model=self.GDC_MODEL,
-            display_name=self.GDC_MODEL_DISPLAY_NAME,
-            contents=[cached_content],
-            ttl=datetime.timedelta(minutes=30),
-            system_instruction=prompt
-        )
-        return cache
+        self.add_context(f"The APIs available to you are: {self.cache.available_apis()}")
 
     def gemini_info(self, info: dict):
         self.context.send_response("iopub",
@@ -166,7 +60,7 @@ class BiomeAgent(BaseAgent):
         ) 
 
     @tool()
-    async def interact_with_api(self, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
         This tool provides interaction with external APIs with a second agent.
         You will query external APIs through this tool.
@@ -175,16 +69,28 @@ class BiomeAgent(BaseAgent):
         The output will either be a summary of the code output or an error. 
         If it is an error, instruct the second agent to fix the code and retry.
 
+        Consult the APIs available to you when specifying which to use.
+
         Args:
+            api (str): The API to query. Must be one of the available APIs.
             goal (str): The task given to the second agent. If the user states the API is unauthenticated, relay that information here.
         Returns:
             str: A summary of the current step being run, along with the collected stdout, stderr, returned result, display_data items, and any
                  errors that may have occurred, or just an error.
               
         """
-        self.gemini_info({'goal': goal})
+        self.gemini_info({'api': api, 'goal': goal})
+
+        if api not in self.cache.loaded_apis():
+            self.gemini_info({'cache': f'api is not loaded: {api}'})
+            if api not in self.cache.available_apis():
+                self.gemini_info({'cache': f'api does not exist: {api}'})
+                return f"The selected API was not in the following list: {self.cache.available_apis()}. Please use one of those."
+            self.gemini_info({'cache': f'loading api: {api}'})
+            self.cache.load_api(api)
+            
         try:
-            agent_response = self.gemini['chat'].send_message(goal).text
+            agent_response = self.cache.chats[api].send_message(goal).text
             prefixes = ['```python', '```']
             suffixes = ['```', '```\n']
             for prefix in prefixes:
