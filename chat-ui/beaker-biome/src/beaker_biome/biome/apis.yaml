@@ -1,3 +1,6 @@
+config:
+    # prepended with the containing folder path - ./ resolves to the current working directory of this file
+    documentation_root: "./api_documentation"
 apis:
     # if a field is not specified, the default field will be used.
     # fields can be referenced by python f-string syntax for interpolation.
@@ -5,6 +8,8 @@ apis:
     default:
         # user-visible name
         name: "Default API"
+        # description provided to the agent
+        description: ''
         # should this API be disabled
         # (the default value for any given user-defined api is to be enabled 
         #   - here, default is handled specially as if the "api" was disabled.)
@@ -13,8 +18,10 @@ apis:
             # key -- no default specified! it is required to be manually filled.
             model: "models/gemini-1.5-flash-001"
             ttl: 30 # in minutes
-        # relative to ./docs/
-        docs: "api_docs.md"
+        # relative to config.documentation_root
+        documentation_file: "api_docs.md"
+        # docs is a special field added at load time, populated with the contents of documentation above.
+        docs: "" 
         system_prompt: |
             You are an assistant who will help me query the {name} API. 
             You should write clean python code to solve specific queries I pose. 
@@ -37,10 +44,16 @@ apis:
         # inserted after preamble but above full documentation. 
         # useful for slight changes without fully replacing the text.
         additional_cache_body: ''
+        # gpt info
 
     gdc:
         name: "Genomics Data Commons"
-        docs: "gdc.md"
+        description: |
+            The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational 
+            platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
+            The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG), 
+            including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
+        documentation_file: "gdc.md"
         cache: 
             key: "api_assistant_gdc"
         additional_cache_body: |

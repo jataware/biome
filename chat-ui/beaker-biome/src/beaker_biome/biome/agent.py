@@ -43,7 +43,7 @@ class BiomeAgent(BaseAgent):
         self.cache = APICache(f'{root_folder}/apis.yaml')
         self.cache.load_api('gdc')
         super().__init__(context, tools, **kwargs)
-        self.add_context(f"The APIs available to you are: {self.cache.available_apis()}")
+        self.add_context(f"The APIs available to you are: \n{self.cache.available_api_context()}")
 
     def gemini_info(self, info: dict):
         self.context.send_response("iopub",

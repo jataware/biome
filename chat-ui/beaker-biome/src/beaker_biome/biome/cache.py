@@ -15,9 +15,13 @@ class APICache:
         self.cache = {}
         self.chats = {}
         self.models = {}
+        self.documentation_path = ""
         with open(api_definition_filepath, 'r') as f:
             try:
-                api_definitions = yaml.safe_load(f)['apis']
+                contents = yaml.safe_load(f)
+                config = contents['config']
+                self.documentation_path = config.get("documentation_root", "./api_documentation")
+                api_definitions = contents['apis']
             except Exception as e:
                 print(f"failed to load API definitions file properly. check filepath and/or format: {str(e)}")
                 return
@@ -41,11 +45,11 @@ class APICache:
             # fill docs body
             try:
                 root_folder = pathlib.Path(__file__).resolve().parent
-                filepath = f'{root_folder}/docs/{self.cache[api_name]["docs"]}'
+                filepath = f'{root_folder}/{self.documentation_path}/{self.cache[api_name]["documentation_file"]}'
                 with open(filepath, 'r') as f:
                     self.cache[api_name]['docs'] = f.read()
             except Exception as e:
-                print(f"failed to open docs for api {api_name}: file path {self.cache[api_name]['docs']}: {str(e)}")
+                print(f"failed to open docs for api {api_name}: file path {self.cache[api_name]['documentation_file']}: {str(e)}")
             
             # formatting interpolations - don't format API docs though.
             self.cache[api_name] = {
@@ -56,10 +60,16 @@ class APICache:
             }
         del self.cache['default']
 
-    def available_apis(self):
-        return self.cache.keys()
+    def available_apis(self) -> dict[str, str]:
+        """Returns a mapping of available APIs to their descriptions and full, human readable names."""
+        return {key: f"{self.cache[key]['name']}: {self.cache[key]['description']}" for key in self.cache.keys()}
+
+    def available_api_context(self) -> str:
+        """Nicer formatting for a system prompt of APIs and their descriptions."""
+        return "\n".join([f'    - {k}: {v}' for k, v in self.available_apis().items()])
 
     def loaded_apis(self):
+        """Returns a list of loaded APIs."""
         return self.chats.keys()
 
     def load_api(self, api_name: str):
