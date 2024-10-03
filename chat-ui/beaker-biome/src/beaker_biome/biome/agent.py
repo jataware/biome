@@ -4,6 +4,7 @@ import re
 import requests
 from time import sleep
 import asyncio
+import os
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
 from typing import Any
@@ -37,12 +38,11 @@ class BiomeAgent(BaseAgent):
     dataframe.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        import os
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         root_folder = pathlib.Path(__file__).resolve().parent
-        self.cache = APICache(f'{root_folder}/apis.yaml')
-        self.cache.load_api('gdc')
+        self.cache = APICache(f'{root_folder}/api_agent.yaml')
         super().__init__(context, tools, **kwargs)
+        sleep(2)
         self.add_context(f"The APIs available to you are: \n{self.cache.available_api_context()}")
 
     def gemini_info(self, info: dict):
@@ -58,6 +58,13 @@ class BiomeAgent(BaseAgent):
                 "body": error
             },
         ) 
+
+    @tool()
+    async def dump_cache(self):
+        """
+        This tool dumps the API cache to the user.
+        """
+        self.gemini_info({'config': str(self.cache.config), 'cache': str(self.cache.cache)})
 
     @tool()
     async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
@@ -109,41 +116,34 @@ class BiomeAgent(BaseAgent):
         except Exception as e:
             self.gemini_error({'error': str(e)})
             return f"The agent failed to produce valid code: {str(e)}"
-        
-        fixed_code = await agent.query(f"""The code you received is will be listed below the line of dashes.
-Please fix the python code for syntax errors and only return the python code with fixed syntax errors.
-Ensure the output has no formatting and return just the code, please.
 
-If the output has formatting like backticks or a language specifier, be sure to remove all formatting
-and return nothing but the code itself with no additional text.
-                                       
-Example:
-    Input:
-        ```python
-        print(a)
-        ```
-    Output:
-        print(a)
-    Input:
-        ```python
-        de f fn_b(b):
-            print(this is an unescaped string)
-        def fn_a(a):
-            print(a)
-        ```
-        This code has been fixed to correctly solve the task.
-    Output:
-        def fn_b(b):
-            print("this is an unescaped string")
-        def fn(a):
-            print(a)
-                    
-----------
+        transformed_code = agent_response
 
-{agent_response}
-""")
+        syntax_check_prompt = self.cache.config.get('syntax_check_prompt','')
+        if syntax_check_prompt != '':
+            transformed_code = await agent.query(syntax_check_prompt.format(code=transformed_code))
+            if transformed_code.strip() != agent_response.strip():
+                self.gemini_info({
+                    "message": "GPT has changed the code output from Gemini in the syntax fix step.", 
+                    "gpt": transformed_code, 
+                    "gemini": agent_response}
+                )
+
+        additional_pass_prompt = self.cache.cache[api].get('gpt_additional_pass', '')
+        if additional_pass_prompt != '':
+            prior_code = transformed_code
+            transformed_code = await agent.query(
+                additional_pass_prompt.format(code=transformed_code)
+                                      .format_map(self.cache.cache[api])
+            )
+            if transformed_code.strip() != prior_code.strip():
+                self.gemini_info({
+                    "message": "GPT has changed the code output from Gemini or the syntax check in the additional pass step.", 
+                    "gpt": transformed_code, 
+                    "prior": prior_code}
+                )
         try:
-            evaluation = await agent.tools['run_code'](fixed_code, agent, loop, react_context)
+            evaluation = await agent.tools['run_code'](transformed_code, agent, loop, react_context)
         except Exception as e:
             self.gemini_error({'error': str(e)})
             return f"""

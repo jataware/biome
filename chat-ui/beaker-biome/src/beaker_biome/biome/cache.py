@@ -11,16 +11,16 @@ class APICache:
     cache: dict
     chats: dict 
     models: dict
+    config: dict
     def __init__(self, api_definition_filepath: str):
         self.cache = {}
         self.chats = {}
         self.models = {}
-        self.documentation_path = ""
+        self.config = {}
         with open(api_definition_filepath, 'r') as f:
             try:
                 contents = yaml.safe_load(f)
-                config = contents['config']
-                self.documentation_path = config.get("documentation_root", "./api_documentation")
+                self.config = contents['config']
                 api_definitions = contents['apis']
             except Exception as e:
                 print(f"failed to load API definitions file properly. check filepath and/or format: {str(e)}")
@@ -45,18 +45,22 @@ class APICache:
             # fill docs body
             try:
                 root_folder = pathlib.Path(__file__).resolve().parent
-                filepath = f'{root_folder}/{self.documentation_path}/{self.cache[api_name]["documentation_file"]}'
+                filepath = '/'.join([
+                    str(root_folder),
+                    self.config["documentation_root"],
+                    self.cache[api_name]["documentation_file"]
+                ])
                 with open(filepath, 'r') as f:
                     self.cache[api_name]['docs'] = f.read()
             except Exception as e:
-                print(f"failed to open docs for api {api_name}: file path {self.cache[api_name]['documentation_file']}: {str(e)}")
+                raise ValueError(f"failed to open docs for api {api_name}: file path {self.cache[api_name]['documentation_file']}: {str(e)}")
             
             # formatting interpolations - don't format API docs though.
             self.cache[api_name] = {
                 k: v.format_map(self.cache[api_name]) 
                     if isinstance(v, str) else v
                 for k, v in self.cache[api_name].items() 
-                    if k != 'docs'
+                    if k not in self.config['deferred_formatting_fields'] 
             }
         del self.cache['default']
 
