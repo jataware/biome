@@ -17,6 +17,7 @@ from google.generativeai import caching
 
 from .cache import APICache
 import pathlib
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +79,8 @@ class BiomeAgent(BaseAgent):
 
         Consult the APIs available to you when specifying which to use.
 
+        Continue to use the `use_api` tool until finished. 
+
         Args:
             api (str): The API to query. Must be one of the available APIs.
             goal (str): The task given to the second agent. If the user states the API is unauthenticated, relay that information here.
@@ -119,15 +122,18 @@ class BiomeAgent(BaseAgent):
 
         transformed_code = agent_response
 
+        def remove_whitespace(code: str) -> str:
+            return re.sub(r'\s+', '', code)
+
         syntax_check_prompt = self.cache.config.get('syntax_check_prompt','')
         if syntax_check_prompt != '':
             transformed_code = await agent.query(syntax_check_prompt.format(code=transformed_code))
-            if transformed_code.strip() != agent_response.strip():
+            if remove_whitespace(transformed_code) != remove_whitespace(agent_response):
                 self.gemini_info({
                     "message": "GPT has changed the code output from Gemini in the syntax fix step.", 
                     "gpt": transformed_code, 
-                    "gemini": agent_response}
-                )
+                    "gemini": agent_response
+                })
 
         additional_pass_prompt = self.cache.cache[api].get('gpt_additional_pass', '')
         if additional_pass_prompt != '':
@@ -136,20 +142,162 @@ class BiomeAgent(BaseAgent):
                 additional_pass_prompt.format(code=transformed_code)
                                       .format_map(self.cache.cache[api])
             )
-            if transformed_code.strip() != prior_code.strip():
+            if remove_whitespace(transformed_code.strip) != remove_whitespace(prior_code.strip()):
                 self.gemini_info({
                     "message": "GPT has changed the code output from Gemini or the syntax check in the additional pass step.", 
                     "gpt": transformed_code, 
-                    "prior": prior_code}
-                )
+                    "prior": prior_code
+                })
         try:
-            evaluation = await agent.tools['run_code'](transformed_code, agent, loop, react_context)
+            self.gemini_info({'tools': str(agent.tools)})
+            evaluation = await self.tools['BiomeAgent.run_code2'](transformed_code, agent, loop, react_context)
         except Exception as e:
             self.gemini_error({'error': str(e)})
             return f"""
                 The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
                 """
+        self.gemini_info({"eval": str(evaluation), "type": str(type(evaluation))})
         return evaluation
+    
+
+    @tool()
+    async def run_code2(self, code: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+        """
+        Executes code in the user's notebook on behalf of the user, but collects the outputs of the run for use by the Agent
+        in the ReAct loop, if needed.
+
+        The code runs in a new codecell and the user can watch the execution and will see all of the normal output in the
+        Jupyter interface.
+
+        This tool can be used to probe the user's environment or collect information to answer questions, or can be used to
+        run code completely on behalf of the user. If a user asks the agent to do something that reasonably should be done
+        via code, you should probably default to using this tool.
+
+        This tool can be run more than once in a react loop. All actions and variables created in earlier uses of the tool
+        in a particular loop should be assumed to exist for future uses of the tool in the same loop.
+
+        Args:
+            code (str): Code to run directly in Jupyter. This should be a string exactly as it would appear in a notebook
+                        codecell. No extra escaping of newlines or similar characters is required.
+        Returns:
+            str: A summary of the run, along with the collected stdout, stderr, returned result, display_data items, and any
+                errors that may have occurred.
+        """
+        def format_execution_context(context) -> str:
+            """
+            Formats the execution context into a format that is easy for the agent to parse and understand.
+            """
+            stdout_list = context.get("stdout_list")
+            stderr_list = context.get("stderr_list")
+            display_data_list = context.get("display_data_list")
+            error = context.get("error")
+            return_value = context.get("return")
+
+            success = context['done'] and not context['error']
+            if context['result']['status'] == 'error':
+                success = False
+                error = context['result']
+                ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                error['traceback'] = ansi_escape.sub('', error['traceback'])
+
+            output = [
+                """Execution report:""",
+                f"""Execution id: {context['id']}""",
+                f"""Successful?: {success}""",
+                f"""Code executed:
+    ```
+    {context['command']}
+    ```\n""",
+            ]
+
+            if error:
+                output.extend([
+                    "The following error was thrown when executing the code",
+                    "  Error:",
+                    f"    {error['ename']} {error['evalue']}",
+                    "  TraceBack:",
+                    "\n".join(error['traceback']),
+                    "",
+                ])
+
+
+            if stdout_list:
+                output.extend([
+                    "The execution produced the following stdout output:",
+                    "\n".join(["```", *stdout_list, "```\n"]),
+                ])
+            if stderr_list:
+                output.extend([
+                    "The execution produced the following stderr output:",
+                    "\n".join(["```", *stderr_list, "```\n"]),
+                ])
+            if display_data_list:
+                output.append(
+                    "The execution produced the following `display_data` objects to display in the notebook:",
+                )
+                for idx, display_data in enumerate(display_data_list):
+                    output.append(
+                        f"display_data item {idx}:"
+                    )
+                    for mimetype, value in display_data.items():
+                        if len(value) > 800:
+                            value = f"{value[:400]} ... truncated ... {value[-400:]}"
+                        output.append(
+                            f"{mimetype}:"
+                        )
+                        output.append(
+                            f"```\n{value}\n```\n"
+                        )
+            if return_value:
+                output.append(
+                    "The execution returned the following:",
+                )
+                if isinstance(return_value, str):
+                    output.extend([
+                        '```', return_value, '```\n'
+                    ])
+            output.append("Execution Report Complete")
+            return "\n".join(output)
+
+        # TODO: In future, this may become a parameter and we allow the agent to decide if code should be automatically run
+        # or just be added.
+        autoexecute = True
+        message = react_context.get("message", None)
+        identities = getattr(message, 'identities', [])
+
+        try:
+            execution_task = None
+            checkpoint_index, execution_task = await agent.context.subkernel.checkpoint_and_execute(
+                code, not autoexecute, parent_header=message.header, identities=identities
+            )
+            execute_request_msg = {
+                name: getattr(execution_task.execute_request_msg, name)
+                for name in execution_task.execute_request_msg.json_field_names
+            }
+            agent.context.send_response(
+                "iopub",
+                "add_child_codecell",
+                {
+                    "action": "code_cell",
+                    "language": agent.context.subkernel.SLUG,
+                    "code": code.strip(),
+                    "autoexecute": autoexecute,
+                    "execute_request_msg": execute_request_msg,
+                    "checkpoint_index": checkpoint_index,
+                },
+                parent_header=message.header,
+                parent_identities=getattr(message, "identities", None),
+            )
+
+            execution_context = await execution_task
+        except Exception as err:
+            logger.error(err, exc_info=err)
+            raise
+
+        self.gemini_info({'ctx': str(execution_context)})
+
+        return format_execution_context(execution_context)
+
     # def update_job_status(self, job_id, status):
     #     self.context.send_response("iopub", 
     #             "job_status", {
