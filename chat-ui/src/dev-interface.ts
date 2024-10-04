@@ -5,8 +5,10 @@ import ToastService from 'primevue/toastservice';
 import FocusTrap from 'primevue/focustrap';
 
 import BeakerThemePlugin from 'beaker-vue/src/plugins/theme';
-import ChatInterface from './ChatInterface.vue';
+
 import { vKeybindings } from 'beaker-vue/src/directives/keybindings';
+
+import DevInterface from 'beaker-vue/src/pages/DevInterface.vue';
 import { vAutoScroll } from 'beaker-vue/src/directives/autoscroll';
 
 import 'primeicons/primeicons.css';
@@ -18,6 +20,8 @@ const baseUrl = PageConfig.getBaseUrl();
 
 (async () => {
 
+  const confUrl = URLExt.join(baseUrl, '/config')
+  const configResponse = await fetch(confUrl);
   let config;
   if (process.env.NODE_ENV === "development") {
     config = {
@@ -33,14 +37,14 @@ const baseUrl = PageConfig.getBaseUrl();
     config = await configResponse.json();
   }
 
-  const app = createApp(ChatInterface, {config});
+  const app = createApp(DevInterface, {config});
 
   app.use(PrimeVue);
   app.use(ToastService);
-  app.use(BeakerThemePlugin as any);
+  app.use(BeakerThemePlugin);
   app.directive('tooltip', Tooltip);
   app.directive('focustrap', FocusTrap);
-  app.directive('keybindings', vKeybindings as any);
+  app.directive('keybindings', vKeybindings);
   app.directive('autoscroll', vAutoScroll);
   app.mount('#app');
 })();
