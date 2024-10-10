@@ -8,7 +8,7 @@ import BeakerThemePlugin from 'beaker-vue/src/plugins/theme';
 
 import { vKeybindings } from 'beaker-vue/src/directives/keybindings';
 
-import DevInterface from 'beaker-vue/src/pages/DevInterface.vue';
+import NotebookInterface from 'beaker-vue/src/pages/NotebookInterface.vue';
 import { vAutoScroll } from 'beaker-vue/src/directives/autoscroll';
 
 import 'primeicons/primeicons.css';
@@ -37,7 +37,7 @@ const baseUrl = PageConfig.getBaseUrl();
     config = await configResponse.json();
   }
 
-  const app = createApp(DevInterface, {config});
+  const app = createApp(NotebookInterface, {config});
 
   app.use(PrimeVue);
   app.use(ToastService);

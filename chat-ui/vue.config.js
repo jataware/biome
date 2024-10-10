@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = defineConfig({
   pages: {
     index: 'src/chat-interface.ts',
-    notebook: 'src/dev-interface.ts'
+    notebook: 'src/notebook-interface.ts'
   },
   assetsDir: "static/",
   transpileDependencies: true,

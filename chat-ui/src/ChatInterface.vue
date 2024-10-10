@@ -127,7 +127,7 @@ import ChatPanel from 'beaker-vue/src/components/chat-interface/ChatPanel.vue';
 import DarkModeButton from 'beaker-vue/src/components/chat-interface/DarkModeButton.vue';
 import VerticalToolbar from 'beaker-vue/src/components/chat-interface/VerticalToolbar.vue';
 import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
-import BeakerLLMQueryCell from 'beaker-vue/src/components/cell/BeakerLLMQueryCell.vue';
+import BeakerQueryCell from 'beaker-vue/src/components/cell/BeakerQueryCell.vue';
 import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
 import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
 import BeakerFilePane from 'beaker-vue/src/components/dev-interface/BeakerFilePane.vue';
@@ -211,7 +211,7 @@ const renderers = [
 const cellComponentMapping = {
     'code': BeakerCodeCell,
     'markdown': BeakerMarkdownCell,
-    'query': BeakerLLMQueryCell,
+    'query': BeakerQueryCell,
     'raw': BeakerRawCell,
     'data_sources': AnalystDataSourceCell,
     'job_notification': AnalystJobNotificationCell
