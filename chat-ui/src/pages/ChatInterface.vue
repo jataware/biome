@@ -59,7 +59,7 @@
                         </template>
                         <template #end>
                             <a  
-                                :href="`/${sessionId == 'dev_session' ? '' : '?session=' + sessionId}`" 
+                                :href="`/notebook${sessionId == 'biome_dev_session' ? '' : '?session=' + sessionId}`" 
                                 v-tooltip.right="{value: 'To Notebook View', showDelay: 300}"
                             >
                                 <Button
@@ -133,8 +133,11 @@ import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
 import BeakerFilePane from 'beaker-vue/src/components/dev-interface/BeakerFilePane.vue';
 import BeakerSession from 'beaker-vue/src/components/session/BeakerSession.vue';
 
-import AnalystDataSourceCell from './AnalystDataSourceCell.vue';
-import JobTracker from './JobTracker.vue';
+import AnalystDataSourceCell from '../components/AnalystDataSourceCell.vue';
+import JobTracker from '../components/JobTracker.vue';
+import { BiomeJobCollection } from "../shared/BiomeJob"
+import AnalystJobNotificationCell from '../components/AnalystJobNotificationCell.vue';
+
 
 import Button from "primevue/button";
 import OverlayPanel from 'primevue/overlaypanel';
@@ -152,10 +155,6 @@ const chatPanelRef = shallowRef();
 const contextSelectionOpen = ref(false);
 const contextProcessing = ref(false);
 import BeakerContextSelection from 'beaker-vue/src/components/session/BeakerContextSelection.vue';
-import { cell } from 'beaker-vue/dist/components';
-
-import { BiomeJobCollection } from "./BiomeJob"
-import AnalystJobNotificationCell from './AnalystJobNotificationCell.vue';
 
 const jobs: BiomeJobCollection = reactive({});
 
@@ -190,7 +189,8 @@ provide('show_toast', showToast);
 
 const urlParams = new URLSearchParams(window.location.search);
 
-const sessionId = urlParams.has("session") ? urlParams.get("session") : "dev_session";
+// parity with whatever is set in notebook interface.
+const sessionId = urlParams.has("session") ? urlParams.get("session") : "biome_dev_session";
 
 const props = defineProps([
     "config",

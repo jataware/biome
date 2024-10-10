@@ -8,7 +8,7 @@ import BeakerThemePlugin from 'beaker-vue/src/plugins/theme';
 
 import { vKeybindings } from 'beaker-vue/src/directives/keybindings';
 
-import NotebookInterface from 'beaker-vue/src/pages/NotebookInterface.vue';
+import NotebookInterface from './NotebookInterface.vue';
 import { vAutoScroll } from 'beaker-vue/src/directives/autoscroll';
 
 import 'primeicons/primeicons.css';

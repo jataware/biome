@@ -93,7 +93,7 @@ import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import { BiomeJob, type BiomeJobCollection, biomeJobColorMap, getJobGroupColor } from "./BiomeJob"
+import { BiomeJob, type BiomeJobCollection, biomeJobColorMap, getJobGroupColor } from "../shared/BiomeJob"
 import JobTrackerLogs from './JobTrackerLogs.vue';
 
 const props = defineProps<{

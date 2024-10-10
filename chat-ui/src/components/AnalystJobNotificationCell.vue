@@ -50,7 +50,7 @@ import { BeakerSessionComponentType } from 'beaker-vue/src/components/session/Be
 import Badge from 'primevue/badge';
 import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
-import { type BiomeJob, biomeJobColorMap } from "./BiomeJob";
+import { type BiomeJob, biomeJobColorMap } from "../shared/BiomeJob";
 
 const props = defineProps([
     "cell",

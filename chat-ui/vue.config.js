@@ -3,8 +3,8 @@ const path = require('path');
 
 module.exports = defineConfig({
   pages: {
-    index: 'src/chat-interface.ts',
-    notebook: 'src/notebook-interface.ts'
+    index: 'src/pages/chat-interface.ts',
+    notebook: 'src/pages/notebook-interface.ts'
   },
   assetsDir: "static/",
   transpileDependencies: true,
