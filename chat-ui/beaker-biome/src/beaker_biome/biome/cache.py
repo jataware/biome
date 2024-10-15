@@ -4,7 +4,7 @@ import google.generativeai as genai
 from google.generativeai import caching
 import pathlib
 import datetime
-
+import json
 # requires gemini API key initialization done beforehand
 
 class APICache:
@@ -32,6 +32,7 @@ class APICache:
             
             # merge w/ overwriting defaults
             self.cache[api_name] = copy.deepcopy(self.cache['default'])
+
             for key, value in definition.items():
                 if isinstance(value, str | int | list | bool):
                     self.cache[api_name][key] = value
@@ -57,11 +58,17 @@ class APICache:
             
             # formatting interpolations - don't format API docs though.
             self.cache[api_name] = {
-                k: v.format_map(self.cache[api_name]) 
-                    if isinstance(v, str) else v
+                k: (v.format_map(self.cache[api_name]) 
+                        if k not in self.config['deferred_formatting_fields'] 
+                        else v)
+                    if isinstance(v, str) 
+                    else v
                 for k, v in self.cache[api_name].items() 
-                    if k not in self.config['deferred_formatting_fields'] 
             }
+            # cache_body should be last.
+            self.cache[api_name]['cache_body'] = self.cache[api_name]['cache_body'].format_map(self.cache[api_name])
+        with open('cachedump.json', 'w') as f:
+            json.dump(self.cache, f)
         del self.cache['default']
 
     def available_apis(self) -> dict[str, str]:

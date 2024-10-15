@@ -43,9 +43,8 @@ class BiomeAgent(BaseAgent):
         root_folder = pathlib.Path(__file__).resolve().parent
         self.cache = APICache(f'{root_folder}/api_agent.yaml')
         super().__init__(context, tools, **kwargs)
-        sleep(2)
         self.add_context(f"The APIs available to you are: \n{self.cache.available_api_context()}")
-
+        sleep(5)
     def gemini_info(self, info: dict):
         self.context.send_response("iopub",
             "gemini_info", {
@@ -123,31 +122,43 @@ class BiomeAgent(BaseAgent):
         transformed_code = agent_response
 
         def remove_whitespace(code: str) -> str:
-            return re.sub(r'\s+', '', code)
+            return re.sub(r'\s+', '', str(code))
 
-        syntax_check_prompt = self.cache.config.get('syntax_check_prompt','')
-        if syntax_check_prompt != '':
-            transformed_code = await agent.query(syntax_check_prompt.format(code=transformed_code))
-            if remove_whitespace(transformed_code) != remove_whitespace(agent_response):
-                self.gemini_info({
-                    "message": "GPT has changed the code output from Gemini in the syntax fix step.", 
-                    "gpt": transformed_code, 
-                    "gemini": agent_response
-                })
+        try:
+            syntax_check_prompt = self.cache.config.get('syntax_check_prompt','')
+            if syntax_check_prompt != '':
+                transformed_code = await agent.query(syntax_check_prompt.format(code=transformed_code))
+                if remove_whitespace(transformed_code) != remove_whitespace(agent_response):
+                    self.gemini_info({
+                        "message": "GPT has changed the code output from Gemini in the syntax fix step.", 
+                        "gpt": transformed_code, 
+                        "gemini": agent_response
+                    })
+        except Exception as e:
+            self.gemini_error({'error': str(e)})
+            return f"""
+                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
+                """
+        try:
+            additional_pass_prompt = self.cache.cache[api].get('gpt_additional_pass', '')
+            if additional_pass_prompt != '':
+                prior_code = transformed_code
+                transformed_code = await agent.query(
+                    additional_pass_prompt.format_map(self.cache.cache[api] | {'code': transformed_code})
+                )
+                if remove_whitespace(transformed_code.strip) != remove_whitespace(prior_code.strip()):
+                    self.gemini_info({
+                        "message": "GPT has changed the code output from Gemini or the syntax check in the additional pass step.", 
+                        "gpt": transformed_code, 
+                        "prior": prior_code
+                    })
+        except Exception as e:
+            self.gemini_error({'error': str(e)})
+            return f"""
+                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
+                """
+        
 
-        additional_pass_prompt = self.cache.cache[api].get('gpt_additional_pass', '')
-        if additional_pass_prompt != '':
-            prior_code = transformed_code
-            transformed_code = await agent.query(
-                additional_pass_prompt.format(code=transformed_code)
-                                      .format_map(self.cache.cache[api])
-            )
-            if remove_whitespace(transformed_code.strip) != remove_whitespace(prior_code.strip()):
-                self.gemini_info({
-                    "message": "GPT has changed the code output from Gemini or the syntax check in the additional pass step.", 
-                    "gpt": transformed_code, 
-                    "prior": prior_code
-                })
         try:
             self.gemini_info({'tools': str(agent.tools)})
             evaluation = await self.tools['BiomeAgent.run_code2'](transformed_code, agent, loop, react_context)
