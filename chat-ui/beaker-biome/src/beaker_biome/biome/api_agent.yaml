@@ -93,10 +93,12 @@ apis:
             including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
         documentation_file: "gdc.md"
         cache: 
-            key: "api_assistant_gdc_faceted2"
+            key: "api_assistant_gdc_faceted"
         # for brevity, we define `disease_types` below and use it to avoid repetition.
         gpt_additional_pass: |
             You will be given python code to query the GDC API. 
+
+            When querying GDC, change the `format` from "TSV" to "JSON"
 
             Ensure filters align to the facets provided.
             A list of filters and their respective choices are as follows, between backticks:
@@ -105,10 +107,11 @@ apis:
             ```
 
             The code is as follows:
-            
+
             {code}
         additional_cache_body: |
             When querying the API, always use the JSON format, not TSV or anything else.
+            Do not use format="TSV".
 
             Ensure filters align to the facets provided.
             A list of filters and their respective choices are as follows, between backticks:
