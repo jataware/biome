@@ -21,7 +21,7 @@ services:
       - TOOL_ENABLED_RUN_CODE=true
     volumes:
       - .:/jupyter
-    command: "sh -c 'pip install -e /jupyter/beaker-biome && beaker dev watch --ip 0.0.0.0 '"
+    command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     networks:
       - beaker
     #working_dir: "/results"
@@ -33,6 +33,6 @@ services:
     working_dir: "/ui"
     ports:
       - "8080:8080"
-    command: "sh -c 'npm run serve'"
+    command: "sh -c 'npm install && npm install beaker*.tgz && npm run serve'"
     networks:
       - beaker

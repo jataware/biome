@@ -19,4 +19,4 @@ RUN pip install /jupyter/beaker_kernel-1.6.8-py3-none-any.whl
 
 # RUN cd /opt/beaker-biome && hatch build
 # RUN pip install /opt/beaker-biome/dist/beaker_biome*.whl
-RUN pip install -e /jupyter/beaker-biome
+RUN pip install /jupyter/beaker-biome

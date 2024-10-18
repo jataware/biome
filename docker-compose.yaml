@@ -2,37 +2,37 @@ name: biome
 include:
   - chat-ui/docker-compose.yaml
 services:
-  biome_api:
-    working_dir: /backend
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile.api
-    depends_on:
-      biome_es:
-        condition: service_healthy
-      biome_redis:
-        condition: service_healthy
-    command: > 
-      bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
-    container_name: biome_api
-    ports:
-    - mode: ingress
-      target: 8082
-      published: "8082"
-      protocol: tcp
-    # restart: always
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-    volumes:
-    - type: bind
-      source: ./backend
-      target: /backend
-    networks:
-      - biome
-      - beaker
+  # biome_api:
+  #   working_dir: /backend
+  #   build:
+  #     context: .
+  #     dockerfile: ./backend/docker/Dockerfile.api
+  #   depends_on:
+  #     biome_es:
+  #       condition: service_healthy
+  #     biome_redis:
+  #       condition: service_healthy
+  #   command: > 
+  #     bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
+  #   container_name: biome_api
+  #   ports:
+  #   - mode: ingress
+  #     target: 8082
+  #     published: "8082"
+  #     protocol: tcp
+  #   # restart: always
+  #   environment:
+  #     - ES_HOST=${ES_HOST}
+  #     - ES_PORT=${ES_PORT}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+  #   volumes:
+  #   - type: bind
+  #     source: ./backend
+  #     target: /backend
+  #   networks:
+  #     - biome
+  #     - beaker
   biome_redis:
     container_name: biome_redis
     # restart: always
@@ -56,38 +56,38 @@ services:
       retries: 50
     # extra_hosts:
     # - host.docker.internal:host-gateway
-  biome_worker:
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-    working_dir: /backend
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile.worker
-    depends_on:
-      biome_redis:
-        condition: service_healthy
-      biome_es:
-        condition: service_healthy
-    container_name: biome_worker
-    # restart: always
-    volumes:
-    - type: bind
-      source: ./backend/
-      target: /backend
-    # This has to match beaker's use of the volume EXACTLY.
-    # File copying after tasks pass a `download_dir` parameter around and we
-    # have to guarantee it matches up.
-    - type: bind
-      source: ./chat-ui/
-      target: /results
-    networks:
-      - biome
-    command: > 
-      bash -c  "poetry install 
-      && poetry run rq worker --with-scheduler -c lib.job_runner.rq_configuration"
+  # biome_worker:
+  #   environment:
+  #     - ES_HOST=${ES_HOST}
+  #     - ES_PORT=${ES_PORT}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+  #   working_dir: /backend
+  #   build:
+  #     context: .
+  #     dockerfile: ./backend/docker/Dockerfile.worker
+  #   depends_on:
+  #     biome_redis:
+  #       condition: service_healthy
+  #     biome_es:
+  #       condition: service_healthy
+  #   container_name: biome_worker
+  #   # restart: always
+  #   volumes:
+  #   - type: bind
+  #     source: ./backend/
+  #     target: /backend
+  #   # This has to match beaker's use of the volume EXACTLY.
+  #   # File copying after tasks pass a `download_dir` parameter around and we
+  #   # have to guarantee it matches up.
+  #   - type: bind
+  #     source: ./chat-ui/
+  #     target: /results
+  #   networks:
+  #     - biome
+  #   command: > 
+  #     bash -c  "poetry install 
+  #     && poetry run rq worker --with-scheduler -c lib.job_runner.rq_configuration"
   biome_router:
     image: caddy
     hostname: biome_router.biome

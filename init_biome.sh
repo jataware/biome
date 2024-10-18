@@ -28,10 +28,5 @@ Host github.com
     IdentityFile /etc/ssh/id_rsa
 " > ./.ssh/ssh_config
 
-# Build Analyst UI
-cd analyst-ui
-make beaker_kernel/server/ui/index.html
-cd ..
-
 # Build docker compose
-docker compose build
+docker compose build --no-cache
