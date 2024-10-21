@@ -33,6 +33,6 @@ services:
     working_dir: "/ui"
     ports:
       - "8080:8080"
-    command: "sh -c 'npm install && npm install beaker*.tgz && npm run serve'"
+    command: "sh -c 'npm run serve'"
     networks:
       - beaker
