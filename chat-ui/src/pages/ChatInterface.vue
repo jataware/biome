@@ -322,11 +322,11 @@ const handleGeminiMessages = msg => {
 const iopubMessage = (msg) => {
     handleJobMessages(msg);
     handleGeminiMessages(msg);
-    if (msg?.parent_header.msg_type === "context_info_request") {
-        if (beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
-            setDefaultContext();
-        }
-    }
+    // if (msg?.parent_header.msg_type === "context_info_request") {
+    //     if (beakerSessionRef?.value?.activeContext?.slug !== 'biome') {
+    //         setDefaultContext();
+    //     }
+    // }
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "data_sources") {

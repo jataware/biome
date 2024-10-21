@@ -15,13 +15,17 @@ from beaker_kernel.lib.context import BaseContext
 import google.generativeai as genai
 from google.generativeai import caching
 
-from .cache import APICache
 import pathlib
 import re
+
+from adhoc_api.tool import AdhocApi
+from .yaml_loader import load, MessageLogger
 
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
+
+
 
 class BiomeAgent(BaseAgent):
     """
@@ -38,141 +42,47 @@ class BiomeAgent(BaseAgent):
     of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
     dataframe.
     """
+
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         root_folder = pathlib.Path(__file__).resolve().parent
-        self.cache = APICache(f'{root_folder}/api_agent.yaml')
+        drafter_config, finalizer_config, specs, = load(f'{root_folder}/api_agent.yaml', 'api_documentation')
         super().__init__(context, tools, **kwargs)
-        self.add_context(f"The APIs available to you are: \n{self.cache.available_api_context()}")
         sleep(5)
-    def gemini_info(self, info: dict):
-        self.context.send_response("iopub",
-            "gemini_info", {
-                "body": info
-            },
-        ) 
-    
-    def gemini_error(self, error: dict):
-        self.context.send_response("iopub",
-            "gemini_error", {
-                "body": error
-            },
-        ) 
-
-    @tool()
-    async def dump_cache(self):
-        """
-        This tool dumps the API cache to the user.
-        """
-        self.gemini_info({'config': str(self.cache.config), 'cache': str(self.cache.cache)})
+        self.logger = MessageLogger(self.context) 
+        self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
+        self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
 
     @tool()
     async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        This tool provides interaction with external APIs with a second agent.
-        You will query external APIs through this tool.
-        Based on what that code returns and the user's goal, continue to interact with the API to get to that goal.
-
-        The output will either be a summary of the code output or an error. 
-        If it is an error, instruct the second agent to fix the code and retry.
-
-        Consult the APIs available to you when specifying which to use.
-
-        Continue to use the `use_api` tool until finished. 
+        Draft python code for an API request given some goal in plain English.
 
         Args:
-            api (str): The API to query. Must be one of the available APIs.
-            goal (str): The task given to the second agent. If the user states the API is unauthenticated, relay that information here.
+            api (str): The name of the API to use
+            goal (str): The task to be performed by the API request (in plain English)
+
         Returns:
-            str: A summary of the current step being run, along with the collected stdout, stderr, returned result, display_data items, and any
-                 errors that may have occurred, or just an error.
-              
+            str: Depending on the user defined configuration will do one of two things.
+                 Either A) return the raw generated code. Or B) Will attempt to run the code and return the result or
+                 any errors that occurred (along with the original code). if an error is returned, you may consider
+                 trying to fix the code yourself rather than reusing the tool.
         """
-        self.gemini_info({'api': api, 'goal': goal})
-
-        if api not in self.cache.loaded_apis():
-            self.gemini_info({'cache': f'api is not loaded: {api}'})
-            if api not in self.cache.available_apis():
-                self.gemini_info({'cache': f'api does not exist: {api}'})
-                return f"The selected API was not in the following list: {self.cache.available_apis()}. Please use one of those."
-            self.gemini_info({'cache': f'loading api: {api}'})
-            self.cache.load_api(api)
+        self.logger.info("using api")
+        try: 
+            code = self.api.use_api(api, goal)
+        except Exception as e:
+            self.logger.error(str(e))
             
+        self.logger.info(f"running code from rc2 {code}")
         try:
-            agent_response = self.cache.chats[api].send_message(goal).text
-            prefixes = ['```python', '```']
-            suffixes = ['```', '```\n']
-            for prefix in prefixes:
-                if agent_response.startswith(prefix):
-                    agent_response = agent_response[len(prefix):]
-            for suffix in suffixes:
-                if agent_response.endswith(suffix):
-                    agent_response = agent_response[:-len(suffix)]
-            agent_response = '\n'.join([
-                'import pandas as pd',
-                'import os',
-                'import json',
-                'import requests',
-                agent_response
-            ])
+            result = await self.run_code(code, agent=agent, react_context=react_context)
         except Exception as e:
-            self.gemini_error({'error': str(e)})
-            return f"The agent failed to produce valid code: {str(e)}"
+            self.logger.error(f"error in using api with wrapped partial: {e}")
+        return result
 
-        transformed_code = agent_response
 
-        def remove_whitespace(code: str) -> str:
-            return re.sub(r'\s+', '', str(code))
-
-        try:
-            syntax_check_prompt = self.cache.config.get('syntax_check_prompt','')
-            if syntax_check_prompt != '':
-                transformed_code = await agent.query(syntax_check_prompt.format(code=transformed_code))
-                if remove_whitespace(transformed_code) != remove_whitespace(agent_response):
-                    self.gemini_info({
-                        "message": "GPT has changed the code output from Gemini in the syntax fix step.", 
-                        "gpt": transformed_code, 
-                        "gemini": agent_response
-                    })
-        except Exception as e:
-            self.gemini_error({'error': str(e)})
-            return f"""
-                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
-                """
-        try:
-            additional_pass_prompt = self.cache.cache[api].get('gpt_additional_pass', '')
-            if additional_pass_prompt != '':
-                prior_code = transformed_code
-                transformed_code = await agent.query(
-                    additional_pass_prompt.format_map(self.cache.cache[api] | {'code': transformed_code})
-                )
-                if remove_whitespace(transformed_code.strip) != remove_whitespace(prior_code.strip()):
-                    self.gemini_info({
-                        "message": "GPT has changed the code output from Gemini or the syntax check in the additional pass step.", 
-                        "gpt": transformed_code, 
-                        "prior": prior_code
-                    })
-        except Exception as e:
-            self.gemini_error({'error': str(e)})
-            return f"""
-                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
-                """
-        
-
-        try:
-            self.gemini_info({'tools': str(agent.tools)})
-            evaluation = await self.tools['BiomeAgent.run_code2'](transformed_code, agent, loop, react_context)
-        except Exception as e:
-            self.gemini_error({'error': str(e)})
-            return f"""
-                The second agent failed to create valid code. Instruct it to rerun. The error was {str(e)}. The code will be provided for fixes or retry.
-                """
-        self.gemini_info({"eval": str(evaluation), "type": str(type(evaluation))})
-        return evaluation
-    
-
-    @tool()
-    async def run_code2(self, code: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
         """
         Executes code in the user's notebook on behalf of the user, but collects the outputs of the run for use by the Agent
         in the ReAct loop, if needed.
@@ -194,6 +104,7 @@ class BiomeAgent(BaseAgent):
             str: A summary of the run, along with the collected stdout, stderr, returned result, display_data items, and any
                 errors that may have occurred.
         """
+        self.logger.info(f"used runcode2: {code}")
         def format_execution_context(context) -> str:
             """
             Formats the execution context into a format that is easy for the agent to parse and understand.
@@ -304,9 +215,6 @@ class BiomeAgent(BaseAgent):
         except Exception as err:
             logger.error(err, exc_info=err)
             raise
-
-        self.gemini_info({'ctx': str(execution_context)})
-
         return format_execution_context(execution_context)
 
     # def update_job_status(self, job_id, status):
