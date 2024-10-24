@@ -12,6 +12,10 @@
             @any-msg="anyMessage"
             @session-status-changed="statusChanged"
             v-keybindings="sessionKeybindings"
+            :context="{
+                slug: 'biome',
+                payload: {}
+            }"
         >
             <div class="beaker-dev-interface">
                 <header style="justify-content: center;">
