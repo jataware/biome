@@ -306,17 +306,18 @@ const handleJobMessages = msg => {
 }
 
 const handleGeminiMessages = msg => {
-    const expansion = body => {
-        if (typeof body === 'string') {
-            return body;
-        }
-        return Object.entries(body).map(([key, value]) => `${key}: ${value}`).join('\n');
-    }
-    if (msg.header.msg_type === "gemini_info") {
-        beakerSessionRef.value.session.addRawCell(`Gemini INFO: ${expansion(msg.content.body)}`)
-    } else if (msg.header.msg_type === "gemini_error") {
-        beakerSessionRef.value.session.addRawCell(`Gemini ERROR: ${expansion(msg.content.body)}`)
-    }
+    return;
+    // const expansion = body => {
+    //     if (typeof body === 'string') {
+    //         return body;
+    //     }
+    //     return Object.entries(body).map(([key, value]) => `${key}: ${value}`).join('\n');
+    // }
+    // if (msg.header.msg_type === "gemini_info") {
+    //     beakerSessionRef.value.session.addRawCell(`Gemini INFO: ${expansion(msg.content.body)}`)
+    // } else if (msg.header.msg_type === "gemini_error") {
+    //     beakerSessionRef.value.session.addRawCell(`Gemini ERROR: ${expansion(msg.content.body)}`)
+    // }
 }
 
 const iopubMessage = (msg) => {
