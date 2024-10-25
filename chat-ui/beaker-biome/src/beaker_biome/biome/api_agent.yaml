@@ -100,6 +100,9 @@ apis:
 
             When querying GDC, change the `format` from "TSV" to "JSON"
 
+            If you download a file by file-id, the output will be TSV.
+            Save the file with the proper extension.
+
             Ensure filters align to the facets provided.
             A list of filters and their respective choices are as follows, between backticks:
             ```
@@ -116,6 +119,9 @@ apis:
             Ensure filters align to the facets provided.
             A list of filters and their respective choices are as follows, between backticks:
             
+            If you download a file by file-id, the output will be TSV.
+            Save the file with the proper extension.
+
             ```
             {facets}
             ```
