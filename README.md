@@ -84,3 +84,8 @@ down and up again to have the changes reflected.
 ### Services 
 
 - Biome UI (8080): Notebook and chat support through Beaker
+
+
+## Funding
+
+The development of Biome is based upon work supported by the Defense Advanced Research Projects Agency (DARPA) under Agreement No. HR00112490514.
