@@ -6,6 +6,16 @@ The goal of Biome is to seamlessly combine the ability to find research data wit
 
 Biome is being developed under ARPA-H's [Biomedical Data Fabric (BDF) Toolbox](https://arpa-h.gov/news-and-events/arpa-h-announces-effort-develop-single-data-system-biomedical-research) program.
 
+- - -
+
+Workflow screen recording (at 2x speed) 
+
+![main-2x](https://github.com/jataware/biome/raw/refs/heads/gemini-cache/assets/main-2x.mp4)
+
+Notebook workflow and editing 
+
+![notebook](https://github.com/jataware/biome/raw/refs/heads/gemini-cache/assets/notebook.mp4)
+
 ## Requirements
 
 - docker-compose
