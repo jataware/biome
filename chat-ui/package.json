@@ -1,6 +1,6 @@
 {
   "name": "biome-chat",
-  "version": "1.6.2",
+  "version": "1.6.8",
   "scripts": {
     "serve": "vue-cli-service serve",
     "start": "npm run serve",
@@ -13,8 +13,8 @@
   "dependencies": {
     "@jupyterlab/coreutils": "^6.0.8",
     "@jupyterlab/rendermime": "^4.0.8",
-    "beaker-kernel": "^1.6.5",
-    "beaker-vue": "^1.6.5",
+    "beaker-kernel": "~1.7.2",
+    "beaker-vue": "~1.7.2",
     "core-js": "^3.8.3",
     "primeicons": "^7.0.0",
     "primevue": "~3.46.0",

@@ -27,6 +27,11 @@ classifiers = [
 dependencies = [
   "beaker-kernel>=1.6.5",
   "requests",
+  "google-generativeai",
+  "PyYAML",
+  "adhoc-api",
+  "seaborn",
+  "biopython"
 ]
 
 [project.urls]
@@ -48,7 +53,7 @@ require-runtime-dependencies = true
 [tool.hatch.envs.default]
 dependencies = [
   "coverage[toml]>=6.5",
-  "pytest",
+  "pytest"
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"

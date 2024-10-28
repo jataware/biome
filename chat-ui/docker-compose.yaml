@@ -21,7 +21,8 @@ services:
       - TOOL_ENABLED_RUN_CODE=true
     volumes:
       - .:/jupyter
-    command: ["beaker", "dev", "watch", "--ip", "0.0.0.0"]
+      - ../.env:/jupyter/.env
+    command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     networks:
       - beaker
     #working_dir: "/results"

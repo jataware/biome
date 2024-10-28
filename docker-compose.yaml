@@ -1,136 +1,136 @@
 name: biome
 include:
   - chat-ui/docker-compose.yaml
-services:
-  biome_api:
-    working_dir: /backend
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile.api
-    depends_on:
-      biome_es:
-        condition: service_healthy
-      biome_redis:
-        condition: service_healthy
-    command: > 
-      bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
-    container_name: biome_api
-    ports:
-    - mode: ingress
-      target: 8082
-      published: "8082"
-      protocol: tcp
-    # restart: always
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-    volumes:
-    - type: bind
-      source: ./backend
-      target: /backend
-    networks:
-      - biome
-      - beaker
-  biome_redis:
-    container_name: biome_redis
-    # restart: always
-    image: redis
-    networks:
-      - biome
-    ports:
-    - mode: ingress
-      target: 6379
-      published: "6380"
-      protocol: tcp
-    expose:
-      - '6379'
-    healthcheck:
-      test:
-      - CMD
-      - redis-cli
-      - ping
-      timeout: 30s
-      interval: 5s
-      retries: 50
+# services:
+  # biome_api:
+  #   working_dir: /backend
+  #   build:
+  #     context: .
+  #     dockerfile: ./backend/docker/Dockerfile.api
+  #   depends_on:
+  #     biome_es:
+  #       condition: service_healthy
+  #     biome_redis:
+  #       condition: service_healthy
+  #   command: > 
+  #     bash -c "poetry run uvicorn api.server:app --host 0.0.0.0 --port 8082 --log-config server_log_config.ini --reload"
+  #   container_name: biome_api
+  #   ports:
+  #   - mode: ingress
+  #     target: 8082
+  #     published: "8082"
+  #     protocol: tcp
+  #   # restart: always
+  #   environment:
+  #     - ES_HOST=${ES_HOST}
+  #     - ES_PORT=${ES_PORT}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+  #   volumes:
+  #   - type: bind
+  #     source: ./backend
+  #     target: /backend
+  #   networks:
+  #     - biome
+  #     - beaker
+  # biome_redis:
+  #   container_name: biome_redis
+  #   # restart: always
+  #   image: redis
+  #   networks:
+  #     - biome
+  #   ports:
+  #   - mode: ingress
+  #     target: 6379
+  #     published: "6380"
+  #     protocol: tcp
+  #   expose:
+  #     - '6379'
+  #   healthcheck:
+  #     test:
+  #     - CMD
+  #     - redis-cli
+  #     - ping
+  #     timeout: 30s
+  #     interval: 5s
+  #     retries: 50
     # extra_hosts:
     # - host.docker.internal:host-gateway
-  biome_worker:
-    environment:
-      - ES_HOST=${ES_HOST}
-      - ES_PORT=${ES_PORT}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
-    working_dir: /backend
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile.worker
-    depends_on:
-      biome_redis:
-        condition: service_healthy
-      biome_es:
-        condition: service_healthy
-    container_name: biome_worker
-    # restart: always
-    volumes:
-    - type: bind
-      source: ./backend/
-      target: /backend
-    # This has to match beaker's use of the volume EXACTLY.
-    # File copying after tasks pass a `download_dir` parameter around and we
-    # have to guarantee it matches up.
-    - type: bind
-      source: ./chat-ui/
-      target: /results
-    networks:
-      - biome
-    command: > 
-      bash -c  "poetry install 
-      && poetry run rq worker --with-scheduler -c lib.job_runner.rq_configuration"
-  biome_router:
-    image: caddy
-    hostname: biome_router.biome
-    networks:
-      - biome
-    container_name: biome_router
-    ports:
-      - 8001:8001
-    configs:
-      - source: biome_router_Caddyfile
-        target: /etc/caddy/Caddyfile
-    logging:
-      driver: json-file
-      options:
-        max-size: 100m
-        max-file: "5"
-  biome_es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: biome_es
-    networks:
-      - biome
-    labels:
-      co.elastic.logs/module: elasticsearch
-    ports:
-      - 9200:9200
-    environment:
-      - http.host=0.0.0.0
-      - transport.host=127.0.0.1
-      - xpack.security.enabled=false
-      - xpack.security.http.ssl.enabled=false
-      - cluster.name=${CLUSTER_NAME}
-    mem_limit: ${ES_MEM_LIMIT}
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    healthcheck:
-      test: curl -s -f http://localhost:9200/_cat/health >/dev/null || exit 1
-      timeout: 3s
-      interval: 5s
-      retries: 20
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+  # biome_worker:
+  #   environment:
+  #     - ES_HOST=${ES_HOST}
+  #     - ES_PORT=${ES_PORT}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+  #   working_dir: /backend
+  #   build:
+  #     context: .
+  #     dockerfile: ./backend/docker/Dockerfile.worker
+  #   depends_on:
+  #     biome_redis:
+  #       condition: service_healthy
+  #     biome_es:
+  #       condition: service_healthy
+  #   container_name: biome_worker
+  #   # restart: always
+  #   volumes:
+  #   - type: bind
+  #     source: ./backend/
+  #     target: /backend
+  #   # This has to match beaker's use of the volume EXACTLY.
+  #   # File copying after tasks pass a `download_dir` parameter around and we
+  #   # have to guarantee it matches up.
+  #   - type: bind
+  #     source: ./chat-ui/
+  #     target: /results
+  #   networks:
+  #     - biome
+  #   command: > 
+  #     bash -c  "poetry install 
+  #     && poetry run rq worker --with-scheduler -c lib.job_runner.rq_configuration"
+  # biome_router:
+  #   image: caddy
+  #   hostname: biome_router.biome
+  #   networks:
+  #     - biome
+  #   container_name: biome_router
+  #   ports:
+  #     - 8001:8001
+  #   configs:
+  #     - source: biome_router_Caddyfile
+  #       target: /etc/caddy/Caddyfile
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: 100m
+  #       max-file: "5"
+  # biome_es:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+  #   container_name: biome_es
+  #   networks:
+  #     - biome
+  #   labels:
+  #     co.elastic.logs/module: elasticsearch
+  #   ports:
+  #     - 9200:9200
+  #   environment:
+  #     - http.host=0.0.0.0
+  #     - transport.host=127.0.0.1
+  #     - xpack.security.enabled=false
+  #     - xpack.security.http.ssl.enabled=false
+  #     - cluster.name=${CLUSTER_NAME}
+  #   mem_limit: ${ES_MEM_LIMIT}
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   healthcheck:
+  #     test: curl -s -f http://localhost:9200/_cat/health >/dev/null || exit 1
+  #     timeout: 3s
+  #     interval: 5s
+  #     retries: 20
+  #   volumes:
+  #     - esdata:/usr/share/elasticsearch/data
 
   # For Prod with https and security, depends on setup
   # es01:
@@ -184,64 +184,64 @@ services:
   #     - certs:/usr/share/elasticsearch/config/certs
   #     - esdata01:/usr/share/elasticsearch/data
 
-  biome_kibana:
-    container_name: biome_kibana
-    depends_on:
-      biome_es:
-        condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    networks:
-      - biome
-    labels:
-      co.elastic.logs/module: kibana
-    volumes:
-      # - certs:/usr/share/kibana/config/certs
-      - kibanadata:/usr/share/kibana/data
-    ports:
-      - ${KIBANA_PORT}:5601
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://biome_es.biome:9200
-      # - ELASTICSEARCH_USERNAME=kibana_system
-      # - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-      # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-      # - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      # - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - xpack.security.enabled=false
-      - xpack.security.http.ssl.enabled=false
-    mem_limit: ${KB_MEM_LIMIT}
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
-        ]
-      interval: 10s
-      timeout: 10s
-      retries: 120
-  biome_ui:
-    image: node:20
-    container_name: biome_ui
-    networks:
-      - biome
-    volumes:
-      - ./ui:/ui
-    working_dir: "/ui"
-    ports:
-      - "3000:3000"
-    command: ["npm", "run", "dev"]
-  biome_rq_dashboard:
-    container_name: biome_rq_dashboard
-    build:
-      context: ./dev/dockerfiles/rq-dashboard
-    ports:
-      - '9181:9181'
-    networks:
-      - biome
-    environment:
-      RQ_DASHBOARD_REDIS_URL: redis://biome_redis.biome:6379
-    command: ["bash", "-c", "rq-dashboard"]
+  # biome_kibana:
+  #   container_name: biome_kibana
+  #   depends_on:
+  #     biome_es:
+  #       condition: service_healthy
+  #   image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+  #   networks:
+  #     - biome
+  #   labels:
+  #     co.elastic.logs/module: kibana
+  #   volumes:
+  #     # - certs:/usr/share/kibana/config/certs
+  #     - kibanadata:/usr/share/kibana/data
+  #   ports:
+  #     - ${KIBANA_PORT}:5601
+  #   environment:
+  #     - SERVERNAME=kibana
+  #     - ELASTICSEARCH_HOSTS=http://biome_es.biome:9200
+  #     # - ELASTICSEARCH_USERNAME=kibana_system
+  #     # - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+  #     # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+  #     # - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+  #     # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+  #     # - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+  #     - xpack.security.enabled=false
+  #     - xpack.security.http.ssl.enabled=false
+  #   mem_limit: ${KB_MEM_LIMIT}
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+  #       ]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 120
+  # biome_ui:
+  #   image: node:20
+  #   container_name: biome_ui
+  #   networks:
+  #     - biome
+  #   volumes:
+  #     - ./ui:/ui
+  #   working_dir: "/ui"
+  #   ports:
+  #     - "3000:3000"
+  #   command: ["npm", "run", "dev"]
+  # biome_rq_dashboard:
+  #   container_name: biome_rq_dashboard
+  #   build:
+  #     context: ./dev/dockerfiles/rq-dashboard
+  #   ports:
+  #     - '9181:9181'
+  #   networks:
+  #     - biome
+  #   environment:
+  #     RQ_DASHBOARD_REDIS_URL: redis://biome_redis.biome:6379
+  #   command: ["bash", "-c", "rq-dashboard"]
 
   # beaker:
   #   build:
@@ -274,20 +274,20 @@ services:
 
 
 
-configs:
-  biome_router_Caddyfile:
-    file: Caddyfile
-networks:
-  biome:
-    name: biome
-    driver: bridge
-volumes:
-  # For setting up es in prod
-  # certs:
-  #   driver: local
-  # esdata01:
-  #   driver: local
-  kibanadata:
-    driver: local
-  esdata:
-    driver: local
+# configs:
+#   biome_router_Caddyfile:
+#     file: Caddyfile
+# networks:
+#   biome:
+#     name: biome
+#     driver: bridge
+# volumes:
+#   # For setting up es in prod
+#   # certs:
+#   #   driver: local
+#   # esdata01:
+#   #   driver: local
+#   kibanadata:
+#     driver: local
+#   esdata:
+#     driver: local

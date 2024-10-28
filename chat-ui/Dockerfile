@@ -8,9 +8,11 @@ RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel
 USER jupyter
 WORKDIR /jupyter
 
-COPY ./beaker-biome /opt/beaker-biome
+COPY ./beaker-biome /jupyter/beaker-biome
 USER root
-RUN chown -R jupyter:users /opt/beaker-biome
+RUN chown -R jupyter:users /jupyter/beaker-biome
+
 USER jupyter
-RUN cd /opt/beaker-biome && hatch build
-RUN pip install /opt/beaker-biome/dist/beaker_biome*.whl
+# RUN cd /opt/beaker-biome && hatch build
+# RUN pip install /opt/beaker-biome/dist/beaker_biome*.whl
+RUN pip install -e /jupyter/beaker-biome
