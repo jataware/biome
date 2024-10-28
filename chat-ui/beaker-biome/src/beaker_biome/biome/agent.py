@@ -44,13 +44,16 @@ class BiomeAgent(BaseAgent):
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
         root_folder = pathlib.Path(__file__).resolve().parent
         drafter_config, finalizer_config, specs, = load(f'{root_folder}/api_agent.yaml', 'api_documentation')
         super().__init__(context, tools, **kwargs)
         sleep(5)
         self.logger = MessageLogger(self.context) 
-        self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
+        try:
+            self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
+        except ValueError as e:
+            self.api = None
         self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
 
     @tool()
@@ -72,6 +75,8 @@ class BiomeAgent(BaseAgent):
         try: 
             code = self.api.use_api(api, goal)
         except Exception as e:
+            if self.api is None:
+                return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             self.logger.error(str(e))
             
         self.logger.info(f"running code from rc2 {code}")
