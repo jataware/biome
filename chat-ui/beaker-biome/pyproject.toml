@@ -30,7 +30,8 @@ dependencies = [
   "google-generativeai",
   "PyYAML",
   "adhoc-api",
-  "seaborn"
+  "seaborn",
+  "biopython"
 ]
 
 [project.urls]
