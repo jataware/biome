@@ -10,11 +10,13 @@ Biome is being developed under ARPA-H's [Biomedical Data Fabric (BDF) Toolbox](h
 
 Workflow screen recording (at 2x speed) 
 
-![main-2x](https://github.com/jataware/biome/raw/refs/heads/gemini-cache/assets/main-2x.mp4)
+https://github.com/user-attachments/assets/4f08307b-dc60-4d90-a52e-6f6962dde76e
+
 
 Notebook workflow and editing 
 
-![notebook](https://github.com/jataware/biome/raw/refs/heads/gemini-cache/assets/notebook.mp4)
+https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
+
 
 ## Requirements
 
