@@ -15,6 +15,10 @@
         @any-msg="anyMessage"
         @session-status-changed="statusChanged"
         @open-file="loadNotebook"
+        :context="{
+            slug: 'biome',
+            payload: {}
+        }"
     >
         <div class="notebook-container">
             <BeakerNotebook
