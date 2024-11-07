@@ -1911,3 +1911,24 @@ apis:
             This API is through GraphQL. You will be provided the schema. 
             All requests go to the following URL: https://pdc.cancer.gov/graphql
             Make all GraphQL requests to that URL. 
+    cbioportal:
+        name: "cBioPortal for Cancer Genomics"
+        description: |
+            The cBioPortal for Cancer Genomics was originally developed at 
+            Memorial Sloan Kettering Cancer Center (MSK). The public cBioPortal 
+            site is hosted by the Center for Molecular Oncology at MSK. The 
+            cBioPortal software is now available under an open source license 
+            via GitHub. The software is now developed and maintained by a 
+            multi-institutional team, consisting of MSK, the Dana Farber Cancer 
+            Institute, Princess Margaret Cancer Centre in Toronto, Children's 
+            Hospital of Philadelphia, Caris Life Sciences, The Hyve and SE4BIO 
+            in the Netherlands, and Bilkent University in Ankara, Turkey.
+        documentation_file: "cbioportal.json"
+        cache: 
+            key: "api_assistant_cbioportal_json"
+        additional_cache_body: |
+            This API is through Open API Spec (Swagger). You will be provided the schema. 
+            All requests go to the following URL: https://www.cbioportal.org/api
+            That is the base URL for all requests. There are not very many studies (less than 1000) 
+            so if the user is searching for a specific study, you can just fetch all studies
+            and then filter the list yourself since cbioportals filters are tricky.
