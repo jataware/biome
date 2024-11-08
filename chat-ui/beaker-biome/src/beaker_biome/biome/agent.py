@@ -16,7 +16,6 @@ import google.generativeai as genai
 from google.generativeai import caching
 
 import pathlib
-import re
 
 from adhoc_api.tool import AdhocApi
 from .yaml_loader import load, MessageLogger
@@ -24,8 +23,6 @@ from .yaml_loader import load, MessageLogger
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
-
-
 
 class BiomeAgent(BaseAgent):
     """
@@ -49,7 +46,7 @@ class BiomeAgent(BaseAgent):
         drafter_config, finalizer_config, specs, = load(f'{root_folder}/api_agent.yaml', 'api_documentation')
         super().__init__(context, tools, **kwargs)
         sleep(5)
-        self.logger = MessageLogger(self.context) 
+        self.logger = MessageLogger(self.context)
         try:
             self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
         except ValueError as e:
@@ -82,9 +79,10 @@ class BiomeAgent(BaseAgent):
         self.logger.info(f"running code from rc2 {code}")
         try:
             result = await self.run_code(code, agent=agent, react_context=react_context)
+            return result
         except Exception as e:
             self.logger.error(f"error in using api with wrapped partial: {e}")
-        return result
+            raise e
 
 
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
@@ -191,7 +189,6 @@ class BiomeAgent(BaseAgent):
         autoexecute = True
         message = react_context.get("message", None)
         identities = getattr(message, 'identities', [])
-
         try:
             execution_task = None
             checkpoint_index, execution_task = await agent.context.subkernel.checkpoint_and_execute(
