@@ -1,0 +1,52 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Beaker Notebook (Local)",
+            "type": "python",
+            "request": "launch",
+            "module": "beaker_kernel.server.dev",
+            "cwd": "${workspaceFolder}/chat-ui/beaker-biome",
+            "subProcess": true,
+            "justMyCode": false,
+            "autoReload": {
+                "enable": true,
+                "include": [
+                    "**/*.py",
+                    "**/*.pyw"
+                ]
+            },
+            "python": "/Users/brandonrose/miniforge3/envs/biome/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/beaker-biome/src",
+                "LOGLEVEL": "DEBUG",
+                "PYTHONUNBUFFERED": "1",
+                "PYTHONDEVMODE": "1",
+                "OPENAI_API_KEY": "KEY GOES HERE",
+                "GEMINI_API_KEY": "KEY GOES HERE",
+                "JUPYTER_SERVER": "http://localhost:8888",
+                "JUPYTER_TOKEN": "89f73481102c46c0bc13b2998f9a4fce",
+                "ENABLE_CHECKPOINTS": "true",
+                "TOOL_ENABLED_ASK_USER": "true",
+                "TOOL_ENABLED_RUN_CODE": "true"
+            },
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Beaker Notebook (Docker)",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/chat-ui",
+                    "remoteRoot": "/jupyter"
+                }
+            ],
+            "justMyCode": false
+        }
+    ]
+}

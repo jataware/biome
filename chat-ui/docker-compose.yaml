@@ -1,5 +1,3 @@
----
-# Jupyter LLM docker compose by Matthew Printz
 version: '3'
 
 networks:
@@ -10,6 +8,7 @@ services:
     build: .
     ports:
       - "8888:8888"
+      - "5678:5678"
     environment:
       - DEBUG=1
       - JUPYTER_SERVER=http://jupyter:8888
@@ -19,13 +18,14 @@ services:
       - ENABLE_CHECKPOINTS=true
       - TOOL_ENABLED_ASK_USER=true
       - TOOL_ENABLED_RUN_CODE=true
+      - PYTHONBREAKPOINT=debugpy.breakpoint
     volumes:
       - .:/jupyter
       - ../.env:/jupyter/.env
     command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
+    # command: "sh -c 'python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m beaker_kernel.server.dev --ip 0.0.0.0'"
     networks:
       - beaker
-    #working_dir: "/results"
   ui:
     image: node:20
     user: "node"

@@ -1,0 +1,2728 @@
+query FilteredFilesData(
+      $program_name_filter: String!
+      $project_name_filter: String!
+      $study_name_filter: String!
+      $disease_filter: String!
+      $filterValue: String!
+      $analytical_frac_filter: String!
+      $exp_type_filter: String!
+    ) {
+      uiFile(
+        program_name: $program_name_filter
+        project_name: $project_name_filter
+        study_name: $study_name_filter
+        disease_type: $disease_filter
+        primary_site: $filterValue
+        analytical_fraction: $analytical_frac_filter
+        experiment_type: $exp_type_filter
+      ) {
+        submitter_id_name
+        file_name
+        study_run_metadata_submitter_id
+        project_name
+        file_type
+        file_size
+      }
+    }
+  
+query FilteredFilesDataPaginated(
+	  $study_version_value: String!
+      $offset_value: Int
+      $limit_value: Int
+      $sort_value: String
+      $program_name_filter: String!
+      $project_name_filter: String!
+      $study_name_filter: String!
+      $disease_filter: String!
+      $filterValue: String!
+      $analytical_frac_filter: String!
+      $exp_type_filter: String!
+      $ethnicity_filter: String!
+      $race_filter: String!
+      $gender_filter: String!
+      $tumor_grade_filter: String!
+      $sample_type_filter: String!
+      $acquisition_type_filter: String!
+      $data_category_filter: String!
+      $file_type_filter: String!
+      $access_filter: String!
+      $downloadable_filter: String!,
+      $biospecimen_status_filter: String!,
+      $case_status_filter: String!
+    ) {
+      getPaginatedUIFile(
+	    study_version: $study_version_value
+        offset: $offset_value
+        limit: $limit_value
+        sort: $sort_value
+        program_name: $program_name_filter
+        project_name: $project_name_filter
+        study_name: $study_name_filter
+        disease_type: $disease_filter
+        primary_site: $filterValue
+        analytical_fraction: $analytical_frac_filter
+        experiment_type: $exp_type_filter
+        ethnicity: $ethnicity_filter
+        race: $race_filter
+        gender: $gender_filter
+        tumor_grade: $tumor_grade_filter
+        sample_type: $sample_type_filter
+        acquisition_type: $acquisition_type_filter
+        data_category: $data_category_filter
+        file_type: $file_type_filter
+        access: $access_filter
+        downloadable: $downloadable_filter,
+        biospecimen_status: $biospecimen_status_filter,
+        case_status: $case_status_filter
+      ) {
+        total
+        uiFiles {
+          submitter_id_name
+          study_id
+          pdc_study_id
+		      embargo_date
+          file_name
+          study_run_metadata_submitter_id
+          project_name
+          data_category
+          file_type
+          access
+          file_size
+          file_id
+          md5sum
+          downloadable
+        }
+        pagination {
+          count
+          sort
+          from
+          page
+          total
+          pages
+          size
+        }
+      }
+    }
+  
+query FilteredFilesLegacyDataPaginated(
+	  $offset_value: Int
+	  $limit_value: Int
+	  $sort_value: String!
+	  $study_id_filter: String!
+	  $data_source_filter: String!
+	  $data_category_filter: String!
+	  $file_type_filter: String!) {
+		  getPaginatedUILegacyFile(
+			study_id: $study_id_filter
+			data_source: $data_source_filter
+			offset: $offset_value
+			limit:  $limit_value
+			sort: $sort_value
+			data_category:$data_category_filter
+			file_type:$file_type_filter
+		  ) {
+			total
+			uiLegacyFiles {
+			  file_id
+			  pdc_study_id
+			  submitter_id_name
+			  embargo_date
+			  file_name
+			  study_run_metadata_submitter_id
+			  project_name
+			  data_category
+			  file_type
+			  file_size
+			  md5sum
+			  downloadable
+			  access
+			  study_id
+			}
+			pagination {
+			  count
+			  sort
+			  from
+			  page
+			  total
+			  pages
+			  size
+			}
+		  }
+	  }
+query FilesDataQuery(
+      $file_name: String!
+	  $study_id: String!
+    ) {
+      uiFilesPerStudy (file_name: $file_name, study_id: $study_id) {
+          file_id
+          file_name
+          signedUrl {
+            url
+          }
+      }
+    }
+  
+query LegacyFilesDataQuery(
+      $file_name: String!
+    ) {
+        uiLegacyFilesPerStudy (file_name: $file_name) {
+          file_id
+          file_name
+          signedUrl {
+            url
+          }
+      }
+    }
+  
+query PaginatedFilesForPublication(
+    $offset_value: Int
+    $limit_value: Int
+    $publication_id: String!
+  ) {
+    getPaginatedUIPancancerFiles(
+      offset: $offset_value
+      limit: $limit_value
+      publication_id: $publication_id
+    ) {
+      total
+      uiPancancerFiles {
+        file_id
+        file_name
+        description
+        characterization
+        cohorts
+        related_publications
+        related_studies
+        downloadable
+      }
+      pagination {
+        count
+        sort
+        from
+        page
+        total
+        pages
+        size
+      }
+    }
+  }
+
+query FilesData {
+            uiFile {
+              submitter_id_name
+              file_name
+              study_run_metadata_submitter_id
+              project_name
+              file_type
+              file_size
+            }
+          }
+        
+query CasePerFile($file_id: String!) {
+            uiCasePerFile(file_id: $file_id) {
+              file_id
+              case_id
+              case_submitter_id
+            }
+          }
+        
+query StudiesVersions{
+            getPaginatedUIStudy(offset: 0, limit: 1000){
+				uiStudies {
+					study_id
+					submitter_id_name
+					pdc_study_id
+					versions {
+						number
+					}
+				}
+			}
+          }
+        
+query CaseSummaryDataQuery($case_id: String!, $case_submitter_id: String!, $source: String!){
+			uiCase (case_id: $case_id, case_submitter_id: $case_submitter_id, source: $source) {
+				aliquot_id
+				sample_id
+				case_id
+				project_name
+				program_name
+				sample_type
+				disease_type
+				primary_site
+			}
+		}
+query FilteredStudiesData($case_id: String!, $source: String!){
+					  uiCaseSummary(case_id: $case_id, source: $source) {
+						  case_id
+						  case_submitter_id
+						  project_submitter_id
+						  disease_type
+						  tissue_source_site_code
+						  days_to_lost_to_followup
+						  index_date
+						  lost_to_followup
+						  primary_site
+							demographics {
+								ethnicity
+								gender
+								demographic_submitter_id
+								race
+								cause_of_death
+								days_to_birth
+								days_to_death
+								vital_status
+								year_of_birth
+								year_of_death
+								age_at_index
+								premature_at_birth
+								weeks_gestation_at_birth
+								age_is_obfuscated
+								cause_of_death_source
+								occupation_duration_years
+								country_of_residence_at_enrollment
+							}
+							samples{
+								sample_id
+								gdc_sample_id
+								gdc_project_id
+								sample_submitter_id
+								sample_type
+								status
+								pool
+								sample_is_ref
+								biospecimen_anatomic_site
+								biospecimen_laterality
+								composition
+								current_weight
+								days_to_collection
+								days_to_sample_procurement
+								diagnosis_pathologically_confirmed
+								freezing_method
+								initial_weight
+								intermediate_dimension
+								longest_dimension
+								method_of_sample_procurement
+								pathology_report_uuid
+								preservation_method
+								sample_type_id
+								shortest_dimension
+								time_between_clamping_and_freezing
+								time_between_excision_and_freezing
+								tissue_type
+								tumor_code
+								tumor_code_id
+								tumor_descriptor
+								annotation
+								aliquots{
+									aliquot_id
+									aliquot_submitter_id
+									aliquot_quantity
+									aliquot_volume
+									status
+									pool
+									aliquot_is_ref
+									amount
+									analyte_type
+									concentration
+								}
+
+							}
+						}
+					}
+query FilteredStudiesData($case_id: String!, $source: String!){
+		  uiCaseSummary(case_id: $case_id, source: $source) {
+			  case_id
+			  case_submitter_id
+			  project_submitter_id
+			  disease_type
+			  tissue_source_site_code
+			  days_to_lost_to_followup
+			  index_date
+			  lost_to_followup
+			  primary_site
+			  exposures {
+				age_at_onset
+				alcohol_days_per_week
+				alcohol_drinks_per_day
+				alcohol_history
+				alcohol_intensity
+				alcohol_type
+				asbestos_exposure
+				cigarettes_per_day
+				coal_dust_exposure
+				environmental_tobacco_smoke_exposure
+				exposure_id
+				exposure_submitter_id
+				exposure_duration
+				exposure_duration_years
+				exposure_type
+				marijuana_use_per_week
+				pack_years_smoked
+				parent_with_radiation_exposure
+				radon_exposure
+				respirable_crystalline_silica_exposure
+				secondhand_smoke_as_child
+				smokeless_tobacco_quit_age
+				smoking_frequency
+				time_between_waking_and_first_smoke
+				tobacco_smoking_onset_year
+				tobacco_smoking_quit_year
+				tobacco_smoking_status
+				tobacco_use_per_day
+				type_of_smoke_exposure
+				type_of_tobacco_used
+				years_smoked
+			  }
+			  follow_ups {
+				adverse_event
+				adverse_event_grade
+				aids_risk_factors
+				barretts_esophagus_goblet_cells_present
+				bmi
+				body_surface_area
+				cause_of_response
+				cd4_count
+				cdc_hiv_risk_factors
+				comorbidity
+				comorbidity_method_of_diagnosis
+				days_to_adverse_event
+				days_to_comorbidity
+				days_to_follow_up
+				days_to_imaging
+				days_to_progression
+				days_to_progression_free
+				days_to_recurrence
+				diabetes_treatment_type
+				disease_response
+				dlco_ref_predictive_percent
+				ecog_performance_status
+				evidence_of_recurrence_type
+				eye_color
+				fev1_ref_post_bronch_percent
+				fev1_ref_pre_bronch_percent
+				fev1_fvc_pre_bronch_percent
+				fev1_fvc_post_bronch_percent
+				follow_up_id
+				follow_up_submitter_id
+				haart_treatment_indicator
+				height
+				hepatitis_sustained_virological_response
+				history_of_tumor
+				history_of_tumor_type
+				hiv_viral_load
+				hormonal_contraceptive_type
+				hormonal_contraceptive_use
+				hormone_replacement_therapy_type
+				hpv_positive_type
+				hysterectomy_margins_involved
+				hysterectomy_type
+				imaging_result
+				imaging_type
+				immunosuppressive_treatment_type
+				karnofsky_performance_status
+				menopause_status
+				nadir_cd4_count
+				pancreatitis_onset_year
+				pregnancy_outcome
+				procedures_performed
+				progression_or_recurrence
+				progression_or_recurrence_anatomic_site
+				progression_or_recurrence_type
+				recist_targeted_regions_number
+				recist_targeted_regions_sum
+				reflux_treatment_type
+				risk_factor
+				risk_factor_treatment
+				scan_tracer_used
+				undescended_testis_corrected
+				undescended_testis_corrected_age
+				undescended_testis_corrected_laterality
+				undescended_testis_corrected_method
+				undescended_testis_history
+				undescended_testis_history_laterality
+				viral_hepatitis_serologies
+				weight
+			  }
+			}
+		}
+query FilteredStudiesData($case_id: String!, $source: String!){
+		  uiCaseSummary(case_id: $case_id, source: $source) {
+			  case_id
+			  case_submitter_id
+			  project_submitter_id
+			  disease_type
+			  tissue_source_site_code
+			  days_to_lost_to_followup
+			  index_date
+			  lost_to_followup
+			  primary_site
+			  diagnoses{
+					age_at_diagnosis
+					morphology
+					primary_diagnosis
+					tumor_grade
+					tumor_stage
+					tissue_or_organ_of_origin
+					diagnosis_submitter_id
+					classification_of_tumor
+					days_to_last_follow_up
+					days_to_last_known_disease_status
+					days_to_recurrence
+					last_known_disease_status
+					progression_or_recurrence
+					site_of_resection_or_biopsy
+					prior_malignancy
+					ajcc_clinical_m
+					ajcc_clinical_n
+					ajcc_clinical_stage
+					ajcc_clinical_t
+					ajcc_pathologic_m
+					ajcc_pathologic_n
+					ajcc_pathologic_stage
+					ajcc_pathologic_t
+					ajcc_staging_system_edition
+					ann_arbor_b_symptoms
+					ann_arbor_clinical_stage
+					ann_arbor_extranodal_involvement
+					ann_arbor_pathologic_stage
+					best_overall_response
+					burkitt_lymphoma_clinical_variant
+					circumferential_resection_margin
+					colon_polyps_history
+					days_to_best_overall_response
+					days_to_diagnosis
+					days_to_hiv_diagnosis
+					days_to_new_event
+					figo_stage
+					hiv_positive
+					hpv_positive_type
+					hpv_status
+					iss_stage
+					laterality
+					ldh_level_at_diagnosis
+					ldh_normal_range_upper
+					lymph_nodes_positive
+					lymphatic_invasion_present
+					method_of_diagnosis
+					new_event_anatomic_site
+					new_event_type
+					overall_survival
+					perineural_invasion_present
+					prior_treatment
+					progression_free_survival
+					progression_free_survival_event
+					residual_disease
+					vascular_invasion_present
+					year_of_diagnosis
+					icd_10_code
+					synchronous_malignancy
+					anaplasia_present
+					anaplasia_present_type
+					child_pugh_classification
+					cog_liver_stage
+					cog_neuroblastoma_risk_group
+					cog_renal_stage
+					cog_rhabdomyosarcoma_risk_group
+					enneking_msts_grade
+					enneking_msts_metastasis
+					enneking_msts_stage
+					enneking_msts_tumor_site
+					esophageal_columnar_dysplasia_degree
+					esophageal_columnar_metaplasia_present
+					first_symptom_prior_to_diagnosis
+					gastric_esophageal_junction_involvement
+					goblet_cells_columnar_mucosa_present
+					gross_tumor_weight
+					inpc_grade
+					inpc_histologic_group
+					inrg_stage
+					inss_stage
+					irs_group
+					irs_stage
+					ishak_fibrosis_score
+					lymph_nodes_tested
+					medulloblastoma_molecular_classification
+					metastasis_at_diagnosis
+					metastasis_at_diagnosis_site
+					mitosis_karyorrhexis_index
+					peripancreatic_lymph_nodes_positive
+					peripancreatic_lymph_nodes_tested
+					supratentorial_localization
+					tumor_confined_to_organ_of_origin
+					tumor_focality
+					tumor_regression_grade
+					vascular_invasion_type
+					wilms_tumor_histologic_subtype
+					breslow_thickness
+					gleason_grade_group
+					igcccg_stage
+					international_prognostic_index
+					largest_extrapelvic_peritoneal_focus
+					masaoka_stage
+					non_nodal_regional_disease
+					non_nodal_tumor_deposits
+					ovarian_specimen_status
+					ovarian_surface_involvement
+					percent_tumor_invasion
+					peritoneal_fluid_cytological_status
+					primary_gleason_grade
+					secondary_gleason_grade
+					weiss_assessment_score
+					adrenal_hormone
+					ann_arbor_b_symptoms_described
+					diagnosis_is_primary_disease
+					eln_risk_classification
+					figo_staging_edition_year
+					gleason_grade_tertiary
+					gleason_patterns_percent
+					margin_distance
+					margins_involved_site
+					pregnant_at_diagnosis
+					satellite_nodule_present
+					sites_of_involvement
+					tumor_depth
+					who_cns_grade
+					who_nte_grade
+					diagnosis_uuid
+				}
+			}
+		}
+query ExperimentFileByCaseCountQuery($case_id_filter: String, $source: String!){
+				  uiExperimentFileCount(case_id: $case_id_filter, source: $source) {
+					acquisition_type
+					submitter_id_name
+					experiment_type
+					files_count
+				}
+			}
+query DataCategoryFileByCaseCountQuery($case_id_filter: String, $source: String!){
+				  uiDataCategoryFileCount (case_id: $case_id_filter, source: $source) {
+					file_type
+					submitter_id_name
+					data_category
+					files_count
+				}
+			}
+query FilteredStudiesDataPaginated($study_name_filter: String!, $source: String!){
+			getPaginatedUIStudy(study_name: $study_name_filter, source: $source) {
+			total
+			uiStudies {
+				study_id
+				pdc_study_id
+				submitter_id_name
+				study_description
+				study_submitter_id
+				program_name
+				project_name
+				disease_type
+				primary_site
+				analytical_fraction
+				experiment_type
+				embargo_date
+				cases_count
+				aliquots_count
+				filesCount {
+					file_type
+					data_category
+					files_count
+				}
+				supplementaryFilesCount {
+					data_category
+					file_type
+					files_count
+				}
+				nonSupplementaryFilesCount {
+					data_category
+					file_type
+					files_count
+				}
+				contacts {
+					name
+					institution
+					email
+					url
+				}
+				versions {
+							number
+				}
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+				pages
+				size
+			}
+		}
+	}
+query FilteredStudiesData($case_id: String!, $source: String!){
+		  uiCaseSummary(case_id: $case_id, source: $source) {
+			  case_id
+			  case_submitter_id
+			  project_submitter_id
+			  disease_type
+			  tissue_source_site_code
+			  days_to_lost_to_followup
+			  index_date
+			  lost_to_followup
+			  primary_site
+				externalReferences {
+					reference_resource_shortname
+					reference_entity_location
+					reference_resource_name
+					external_reference_id
+				}
+				demographics {
+					ethnicity
+					gender
+					demographic_submitter_id
+					race
+					cause_of_death
+					days_to_birth
+					days_to_death
+					vital_status
+					year_of_birth
+					year_of_death
+					age_at_index
+					premature_at_birth
+					weeks_gestation_at_birth
+					age_is_obfuscated
+					cause_of_death_source
+					occupation_duration_years
+					country_of_residence_at_enrollment
+				}
+				diagnoses{
+					samples {
+						sample_id
+						 sample_submitter_id
+						 annotation
+					}
+					age_at_diagnosis
+					morphology
+					primary_diagnosis
+					tumor_grade
+					tumor_stage
+					tissue_or_organ_of_origin
+					diagnosis_submitter_id
+					classification_of_tumor
+					days_to_last_follow_up
+					days_to_last_known_disease_status
+					days_to_recurrence
+					last_known_disease_status
+					progression_or_recurrence
+					site_of_resection_or_biopsy
+					prior_malignancy
+					ajcc_clinical_m
+					ajcc_clinical_n
+					ajcc_clinical_stage
+					ajcc_clinical_t
+					ajcc_pathologic_m
+					ajcc_pathologic_n
+					ajcc_pathologic_stage
+					ajcc_pathologic_t
+					ajcc_staging_system_edition
+					ann_arbor_b_symptoms
+					ann_arbor_clinical_stage
+					ann_arbor_extranodal_involvement
+					ann_arbor_pathologic_stage
+					best_overall_response
+					burkitt_lymphoma_clinical_variant
+					circumferential_resection_margin
+					colon_polyps_history
+					days_to_best_overall_response
+					days_to_diagnosis
+					days_to_hiv_diagnosis
+					days_to_new_event
+					figo_stage
+					hiv_positive
+					hpv_positive_type
+					hpv_status
+					iss_stage
+					laterality
+					ldh_level_at_diagnosis
+					ldh_normal_range_upper
+					lymph_nodes_positive
+					lymphatic_invasion_present
+					method_of_diagnosis
+					new_event_anatomic_site
+					new_event_type
+					overall_survival
+					perineural_invasion_present
+					prior_treatment
+					progression_free_survival
+					progression_free_survival_event
+					residual_disease
+					vascular_invasion_present
+					year_of_diagnosis
+					icd_10_code
+					synchronous_malignancy
+					anaplasia_present
+					anaplasia_present_type
+					child_pugh_classification
+					cog_liver_stage
+					cog_neuroblastoma_risk_group
+					cog_renal_stage
+					cog_rhabdomyosarcoma_risk_group
+					enneking_msts_grade
+					enneking_msts_metastasis
+					enneking_msts_stage
+					enneking_msts_tumor_site
+					esophageal_columnar_dysplasia_degree
+					esophageal_columnar_metaplasia_present
+					first_symptom_prior_to_diagnosis
+					gastric_esophageal_junction_involvement
+					goblet_cells_columnar_mucosa_present
+					gross_tumor_weight
+					inpc_grade
+					inpc_histologic_group
+					inrg_stage
+					inss_stage
+					irs_group
+					irs_stage
+					ishak_fibrosis_score
+					lymph_nodes_tested
+					medulloblastoma_molecular_classification
+					metastasis_at_diagnosis
+					metastasis_at_diagnosis_site
+					mitosis_karyorrhexis_index
+					peripancreatic_lymph_nodes_positive
+					peripancreatic_lymph_nodes_tested
+					supratentorial_localization
+					tumor_confined_to_organ_of_origin
+					tumor_focality
+					tumor_regression_grade
+					vascular_invasion_type
+					wilms_tumor_histologic_subtype
+					breslow_thickness
+					gleason_grade_group
+					igcccg_stage
+					international_prognostic_index
+					largest_extrapelvic_peritoneal_focus
+					masaoka_stage
+					non_nodal_regional_disease
+					non_nodal_tumor_deposits
+					ovarian_specimen_status
+					ovarian_surface_involvement
+					percent_tumor_invasion
+					peritoneal_fluid_cytological_status
+					primary_gleason_grade
+					secondary_gleason_grade
+					weiss_assessment_score
+					adrenal_hormone
+					ann_arbor_b_symptoms_described
+					diagnosis_is_primary_disease
+					eln_risk_classification
+					figo_staging_edition_year
+					gleason_grade_tertiary
+					gleason_patterns_percent
+					margin_distance
+					margins_involved_site
+					pregnant_at_diagnosis
+					satellite_nodule_present
+					sites_of_involvement
+					tumor_depth
+					who_cns_grade
+					who_nte_grade
+					diagnosis_uuid
+				}
+				samples{
+					sample_id
+					gdc_sample_id
+					gdc_project_id
+					sample_submitter_id
+					sample_type
+					status
+					pool
+					sample_is_ref
+					biospecimen_anatomic_site
+					biospecimen_laterality
+					composition
+					current_weight
+					days_to_collection
+					days_to_sample_procurement
+					diagnosis_pathologically_confirmed
+					freezing_method
+					initial_weight
+					intermediate_dimension
+					longest_dimension
+					method_of_sample_procurement
+					pathology_report_uuid
+					preservation_method
+					sample_type_id
+					shortest_dimension
+					time_between_clamping_and_freezing
+					time_between_excision_and_freezing
+					tissue_type
+					tumor_code
+					tumor_code_id
+					tumor_descriptor
+					annotation
+					aliquots{
+						aliquot_id
+						aliquot_submitter_id
+						aliquot_quantity
+						aliquot_volume
+						status
+						pool
+						aliquot_is_ref
+						amount
+						analyte_type
+						concentration
+					}
+					diagnoses {
+						diagnosis_id
+						diagnosis_submitter_id
+					}
+				}
+				exposures {
+					age_at_onset
+					alcohol_days_per_week
+					alcohol_drinks_per_day
+					alcohol_history
+					alcohol_intensity
+					alcohol_type
+					asbestos_exposure
+					cigarettes_per_day
+					coal_dust_exposure
+					environmental_tobacco_smoke_exposure
+					exposure_id
+					exposure_submitter_id
+					exposure_duration
+					exposure_duration_years
+					exposure_type
+					marijuana_use_per_week
+					pack_years_smoked
+					parent_with_radiation_exposure
+					radon_exposure
+					respirable_crystalline_silica_exposure
+					secondhand_smoke_as_child
+					smokeless_tobacco_quit_age
+					smoking_frequency
+					time_between_waking_and_first_smoke
+					tobacco_smoking_onset_year
+					tobacco_smoking_quit_year
+					tobacco_smoking_status
+					tobacco_use_per_day
+					type_of_smoke_exposure
+					type_of_tobacco_used
+					years_smoked
+				  }
+				  follow_ups {
+					adverse_event
+					adverse_event_grade
+					aids_risk_factors
+					barretts_esophagus_goblet_cells_present
+					bmi
+					body_surface_area
+					cause_of_response
+					cd4_count
+					cdc_hiv_risk_factors
+					comorbidity
+					comorbidity_method_of_diagnosis
+					days_to_adverse_event
+					days_to_comorbidity
+					days_to_follow_up
+					days_to_imaging
+					days_to_progression
+					days_to_progression_free
+					days_to_recurrence
+					diabetes_treatment_type
+					disease_response
+					dlco_ref_predictive_percent
+					ecog_performance_status
+					evidence_of_recurrence_type
+					eye_color
+					fev1_ref_post_bronch_percent
+					fev1_ref_pre_bronch_percent
+					fev1_fvc_pre_bronch_percent
+					fev1_fvc_post_bronch_percent
+					follow_up_id
+					follow_up_submitter_id
+					haart_treatment_indicator
+					height
+					hepatitis_sustained_virological_response
+					history_of_tumor
+					history_of_tumor_type
+					hiv_viral_load
+					hormonal_contraceptive_type
+					hormonal_contraceptive_use
+					hormone_replacement_therapy_type
+					hpv_positive_type
+					hysterectomy_margins_involved
+					hysterectomy_type
+					imaging_result
+					imaging_type
+					immunosuppressive_treatment_type
+					karnofsky_performance_status
+					menopause_status
+					nadir_cd4_count
+					pancreatitis_onset_year
+					pregnancy_outcome
+					procedures_performed
+					progression_or_recurrence
+					progression_or_recurrence_anatomic_site
+					progression_or_recurrence_type
+					recist_targeted_regions_number
+					recist_targeted_regions_sum
+					reflux_treatment_type
+					risk_factor
+					risk_factor_treatment
+					scan_tracer_used
+					undescended_testis_corrected
+					undescended_testis_corrected_age
+					undescended_testis_corrected_laterality
+					undescended_testis_corrected_method
+					undescended_testis_history
+					undescended_testis_history_laterality
+					viral_hepatitis_serologies
+					weight
+				  }
+				 treatments {
+					days_to_treatment_end
+					days_to_treatment_start
+					initial_disease_status
+					regimen_or_line_of_therapy
+					therapeutic_agents
+					treatment_anatomic_site
+					treatment_effect
+					treatment_intent_type
+					treatment_or_therapy
+					treatment_outcome
+					treatment_type			
+					chemo_concurrent_to_radiation
+					number_of_cycles
+					reason_treatment_ended
+					route_of_administration
+					treatment_arm
+					treatment_dose
+					treatment_dose_units
+					treatment_effect_indicator
+					treatment_frequency
+				}
+
+			}
+		}
+query FilteredStudiesData($program_name_filter: String!, $project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!, $analytical_frac_filter: String!, $exp_type_filter: String!){
+					uiStudy(program_name: $program_name_filter , project_name: $project_name_filter, study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, analytical_fraction: $analytical_frac_filter, experiment_type: $exp_type_filter) {
+					submitter_id_name
+					program_name
+					project_name
+					disease_type
+					primary_site
+					analytical_fraction
+					experiment_type
+					num_raw
+					num_mzml
+					num_prot
+					num_prot_assem
+					num_psm
+				}
+			}
+query paginatedUIStudyQuery($study_name: String!, $pdc_study_id: String!, $study_version: String!, $source: String!){
+			getPaginatedUIStudy(study_name: $study_name, pdc_study_id: $pdc_study_id, study_version: $study_version, source: $source) {
+				total
+				uiStudies {
+					study_id
+					pdc_study_id
+					submitter_id_name
+					study_description
+					program_name
+					project_name
+					disease_type
+					primary_site
+					analytical_fraction
+					experiment_type
+					embargo_date
+					aliquots_count
+					cases_count
+					filesCount {
+						file_type
+						data_category
+						files_count
+					}
+					supplementaryFilesCount {
+						data_category
+						file_type
+						files_count
+					}
+					nonSupplementaryFilesCount {
+						data_category
+						file_type
+						files_count
+					}
+					contacts {
+						name
+						institution
+						email
+						url
+					}
+					versions {
+							number
+					}
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+	}
+query WorkflowMetadataQery($study_id: String!, $source: String!){
+						uiWorkflowMetadata(study_id: $study_id, source: $source) {
+						  workflow_metadata_submitter_id
+						  study_submitter_id
+						  protocol_submitter_id
+						  cptac_study_id
+						  submitter_id_name
+						  study_submitter_name
+						  analytical_fraction
+						  experiment_type
+						  instrument
+						  refseq_database_version
+						  uniport_database_version
+						  hgnc_version
+						  raw_data_processing
+						  raw_data_conversion
+						  sequence_database_search
+						  search_database_parameters
+						  phosphosite_localization
+						  ms1_data_analysis
+						  psm_report_generation
+						  cptac_dcc_mzidentml
+						  mzidentml_refseq
+						  mzidentml_uniprot
+						  gene_to_prot
+						  cptac_galaxy_workflows
+						  cptac_galaxy_tools
+						  cdap_reports
+						  cptac_dcc_tools
+						}
+				}
+query ProtocolQuery($study_id: String!, $source: String!){
+		  uiProtocol (study_id: $study_id, source: $source ){
+			protocol_id
+			protocol_submitter_id
+			program_id
+			program_submitter_id
+			protocol_name
+			protocol_date
+			document_name
+			quantitation_strategy
+			experiment_type
+			label_free_quantitation
+			labeled_quantitation
+			isobaric_labeling_reagent
+			reporter_ion_ms_level
+			starting_amount
+			starting_amount_uom
+			digestion_reagent
+			alkylation_reagent
+			enrichment_strategy
+			enrichment
+			chromatography_dimensions_count
+			one_d_chromatography_type
+			two_d_chromatography_type
+			fractions_analyzed_count
+			column_type
+			amount_on_column
+			amount_on_column_uom
+			column_length
+			column_length_uom
+			column_inner_diameter
+			column_inner_diameter_uom
+			particle_size
+			particle_size_uom
+			particle_type
+			gradient_length
+			gradient_length_uom
+			instrument_make
+			instrument_model
+			dissociation_type
+			ms1_resolution
+			ms2_resolution
+			dda_topn
+			normalized_collision_energy
+			acquistion_type
+			dia_multiplexing
+			dia_ims
+			auxiliary_data
+			cud_label
+			analytical_technique
+			chromatography_instrument_make
+			chromatography_instrument_model
+			polarity
+			reconstitution_solvent
+			reconstitution_volume
+			reconstitution_volume_uom
+			internal_standards
+			extraction_method
+			ionization_mode
+		}
+	}
+query PublicationsQuery($study_id: String!, $source: String!){
+							uiPublication (study_id: $study_id, source: $source){
+								publication_id
+								pubmed_id
+								title
+							}
+						}
+query FilesCountsQuery($study_id: String!, $source: String!){
+							uiFilesCountPerStudy (study_id: $study_id, source: $source ){
+								study_submitter_id
+								file_type
+								files_count
+								data_category
+							}
+						}
+query FilteredClinicalDataPaginated($offset_value: Int, $limit_value: Int, $sort_value: String, $program_name_filter: String!, $project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!, $analytical_frac_filter: String!, $exp_type_filter: String!, $ethnicity_filter: String!, $race_filter: String!, $gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!, $data_category_filter: String!, $file_type_filter: String!, $access_filter: String!, $downloadable_filter: String!, $case_status_filter: String!, $biospecimen_status_filter: String!, $source: String!){
+		getPaginatedUIClinical(offset: $offset_value, limit: $limit_value, sort: $sort_value, program_name: $program_name_filter , project_name: $project_name_filter,
+								study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, analytical_fraction: $analytical_frac_filter,
+								experiment_type: $exp_type_filter, ethnicity: $ethnicity_filter, race: $race_filter, gender: $gender_filter,
+								tumor_grade: $tumor_grade_filter, sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter, data_category: $data_category_filter, file_type: $file_type_filter, access: $access_filter, downloadable: $downloadable_filter, case_status: $case_status_filter, biospecimen_status: $biospecimen_status_filter, source: $source) {
+			total
+			uiClinical{
+				case_submitter_id
+				external_case_id
+				ethnicity
+				gender
+				race
+				morphology
+				primary_diagnosis
+				site_of_resection_or_biopsy
+				tissue_or_organ_of_origin
+				tumor_grade
+				tumor_stage
+				age_at_diagnosis
+				classification_of_tumor
+				days_to_recurrence
+				case_id
+				disease_type
+				primary_site
+				program_name
+				project_name
+				status
+				externalReferences {
+					reference_resource_shortname
+					reference_entity_location
+				}
+				samples {
+					sample_id
+					sample_submitter_id
+				}
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+				pages
+				size
+			}
+		}
+	}
+query FilteredCasesDataPaginated($offset_value: Int, $limit_value: Int, $sort_value: String, $program_name_filter: String!, $project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!, $analytical_frac_filter: String!, $exp_type_filter: String!,  $ethnicity_filter: String!, $race_filter: String!, $gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!, $data_category_filter: String!, $file_type_filter: String!, $access_filter: String!, $downloadable_filter: String!, $biospecimen_status_filter: String!, $case_status_filter: String!, $source: String!){
+		getPaginatedUICase(offset: $offset_value, limit: $limit_value, sort: $sort_value, program_name: $program_name_filter ,
+							project_name: $project_name_filter, study_name: $study_name_filter, disease_type: $disease_filter,
+							primary_site: $filterValue, analytical_fraction: $analytical_frac_filter, experiment_type: $exp_type_filter,
+							ethnicity: $ethnicity_filter, race: $race_filter, gender: $gender_filter, tumor_grade: $tumor_grade_filter,
+							sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter, data_category: $data_category_filter, file_type: $file_type_filter, access: $access_filter, downloadable: $downloadable_filter, biospecimen_status: $biospecimen_status_filter, case_status: $case_status_filter, source: $source) {
+			total
+			uiCases{
+				aliquot_id
+				sample_id
+				case_id
+				aliquot_submitter_id
+				aliquot_is_ref
+				aliquot_status
+				aliquot_quantity
+				aliquot_volume
+				amount
+				analyte_type
+				concentration
+				case_status
+				sample_status
+				sample_submitter_id
+				sample_is_ref
+				biospecimen_anatomic_site
+				biospecimen_laterality
+				composition
+				current_weight
+				days_to_collection
+				days_to_sample_procurement
+				diagnosis_pathologically_confirmed
+				freezing_method
+				initial_weight
+				intermediate_dimension
+				longest_dimension
+				method_of_sample_procurement
+				pathology_report_uuid
+				preservation_method
+				sample_type_id
+				shortest_dimension
+				time_between_clamping_and_freezing
+				time_between_excision_and_freezing
+				tissue_type
+				tumor_code
+				tumor_code_id
+				tumor_descriptor
+				case_submitter_id
+				program_name
+				project_name
+				sample_type
+				disease_type
+				primary_site
+				tissue_collection_type
+				sample_ordinal
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+					pages
+					size
+				}
+			}
+		}
+query StudyExperimentalDesign($study_id_value: String, $source: String!) {
+		uiStudyExperimentalDesign(study_id: $study_id_value, source: $source) {
+			study_id
+			study_submitter_id
+			study_run_metadata_id
+			study_run_metadata_submitter_id
+			experiment_number
+			experiment_type
+			plex_dataset_name
+			acquisition_type
+			number_of_fractions
+			analyte
+			polarity
+			label_free {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_113 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_114 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_115 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_116 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_117 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_118 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_119 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			itraq_121 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_126{
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_127n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_127c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_128n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_128c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_129n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_129c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_130c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_130n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_131 {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_131c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_132n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_132c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_133n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_133c {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			},
+			tmt_134n {
+				aliquot_id,
+				aliquot_run_metadata_id,
+				aliquot_submitter_id
+			}
+		}
+	}
+query BiospecimenPerStudy($study_id_value: String, $source: String!) {
+		uiBiospecimenPerStudy(study_id: $study_id_value, source: $source) {
+			aliquot_id
+			sample_id
+			case_id
+			aliquot_submitter_id
+			sample_submitter_id
+			case_submitter_id
+			aliquot_is_ref
+			aliquot_status
+			case_status
+			sample_status
+			project_name
+			sample_type
+			disease_type
+			primary_site
+			pool
+			taxon
+		}
+	}
+query EntityReferenceQueryData($entity_type_filter: String!, $entity_id_filter: String!, $reference_type_filter: String!, $source: String!){
+		uiPdcEntityReference(entity_type: $entity_type_filter , entity_id: $entity_id_filter, reference_type: $reference_type_filter, source: $source) {
+			reference_id
+			entity_type
+			entity_id
+			reference_type
+			reference_entity_type
+			reference_entity_alias
+			reference_resource_name
+			reference_resource_shortname
+			reference_entity_location
+			submitter_id_name
+		}
+	}
+query FilteredClinicalDataPaginated($offset_value: Int, $limit_value: Int, $sort_value: String, $program_name_filter: String!, $project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!, $analytical_frac_filter: String!, $exp_type_filter: String!, $ethnicity_filter: String!, $race_filter: String!, $gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!, $data_category_filter: String!, $file_type_filter: String!, $access_filter: String!, $downloadable_filter: String!, $case_status_filter: String!, $biospecimen_status_filter: String!, $source: String!){
+		getPaginatedUIClinical(offset: $offset_value, limit: $limit_value, sort: $sort_value, program_name: $program_name_filter , project_name: $project_name_filter,
+								study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, analytical_fraction: $analytical_frac_filter,
+								experiment_type: $exp_type_filter, ethnicity: $ethnicity_filter, race: $race_filter, gender: $gender_filter,
+								tumor_grade: $tumor_grade_filter, sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter, data_category: $data_category_filter, file_type: $file_type_filter, access: $access_filter, downloadable: $downloadable_filter, case_status: $case_status_filter, biospecimen_status: $biospecimen_status_filter, source: $source) {
+			total
+			uiClinical{
+				case_submitter_id
+				external_case_id
+				ethnicity
+				gender
+				race
+				morphology
+				primary_diagnosis
+				site_of_resection_or_biopsy
+				tissue_or_organ_of_origin
+				tumor_grade
+				tumor_stage
+				age_at_diagnosis
+				classification_of_tumor
+				days_to_recurrence
+				case_id
+				disease_type
+				primary_site
+				program_name
+				project_name
+				status
+				cause_of_death
+				days_to_birth
+				days_to_death
+				vital_status
+				year_of_birth
+				year_of_death
+				age_at_index
+				premature_at_birth
+				weeks_gestation_at_birth
+				age_is_obfuscated
+				cause_of_death_source
+				occupation_duration_years
+				country_of_residence_at_enrollment
+				days_to_last_follow_up
+				days_to_last_known_disease_status
+				last_known_disease_status
+				progression_or_recurrence
+				prior_malignancy
+				ajcc_clinical_m
+				ajcc_clinical_n
+				ajcc_clinical_stage
+				ajcc_clinical_t
+				ajcc_pathologic_m
+				ajcc_pathologic_n
+				ajcc_pathologic_stage
+				ajcc_pathologic_t
+				ajcc_staging_system_edition
+				ann_arbor_b_symptoms
+				ann_arbor_clinical_stage
+				ann_arbor_extranodal_involvement
+				ann_arbor_pathologic_stage
+				best_overall_response
+				burkitt_lymphoma_clinical_variant
+				circumferential_resection_margin
+				colon_polyps_history
+				days_to_best_overall_response
+				days_to_diagnosis
+				days_to_hiv_diagnosis
+				days_to_new_event
+				figo_stage
+				hiv_positive
+				hpv_positive_type
+				hpv_status
+				iss_stage
+				laterality
+				ldh_level_at_diagnosis
+				ldh_normal_range_upper
+				lymph_nodes_positive
+				lymphatic_invasion_present
+				method_of_diagnosis
+				peripancreatic_lymph_nodes_positive
+				peripancreatic_lymph_nodes_tested
+				supratentorial_localization
+				tumor_confined_to_organ_of_origin
+				tumor_focality
+				tumor_regression_grade
+				vascular_invasion_type
+				wilms_tumor_histologic_subtype
+				breslow_thickness
+				gleason_grade_group
+				igcccg_stage
+				international_prognostic_index
+				largest_extrapelvic_peritoneal_focus
+				masaoka_stage
+				new_event_anatomic_site
+				new_event_type
+				overall_survival
+				perineural_invasion_present
+				prior_treatment
+				progression_free_survival
+				progression_free_survival_event
+				residual_disease
+				vascular_invasion_present
+				year_of_diagnosis
+				icd_10_code
+				synchronous_malignancy
+				metastasis_at_diagnosis
+				metastasis_at_diagnosis_site
+				mitosis_karyorrhexis_index
+				non_nodal_regional_disease
+				non_nodal_tumor_deposits
+				ovarian_specimen_status
+				ovarian_surface_involvement
+				percent_tumor_invasion
+				peritoneal_fluid_cytological_status
+				primary_gleason_grade
+				secondary_gleason_grade
+				weiss_assessment_score
+				adrenal_hormone
+				ann_arbor_b_symptoms_described
+				diagnosis_is_primary_disease
+				eln_risk_classification
+				figo_staging_edition_year
+				gleason_grade_tertiary
+				gleason_patterns_percent
+				margin_distance
+				margins_involved_site
+				pregnant_at_diagnosis
+				satellite_nodule_present
+				sites_of_involvement
+				tumor_depth
+				who_cns_grade
+				who_nte_grade
+				diagnosis_uuid
+				anaplasia_present
+				anaplasia_present_type
+				child_pugh_classification
+				cog_liver_stage
+				cog_neuroblastoma_risk_group
+				cog_renal_stage
+				cog_rhabdomyosarcoma_risk_group
+				enneking_msts_grade
+				enneking_msts_metastasis
+				enneking_msts_stage
+				enneking_msts_tumor_site
+				esophageal_columnar_dysplasia_degree
+				esophageal_columnar_metaplasia_present
+				first_symptom_prior_to_diagnosis
+				gastric_esophageal_junction_involvement
+				goblet_cells_columnar_mucosa_present
+				gross_tumor_weight
+				inpc_grade
+				inpc_histologic_group
+				inrg_stage
+				inss_stage
+				irs_group
+				irs_stage
+				ishak_fibrosis_score
+				lymph_nodes_tested
+				medulloblastoma_molecular_classification
+				externalReferences {
+					reference_resource_shortname
+					reference_entity_location
+				}
+				exposures {
+					exposure_id
+					exposure_submitter_id
+					alcohol_days_per_week
+					alcohol_drinks_per_day
+					alcohol_history
+					alcohol_intensity
+					asbestos_exposure
+					cigarettes_per_day
+					coal_dust_exposure
+					environmental_tobacco_smoke_exposure
+					pack_years_smoked
+					radon_exposure
+					respirable_crystalline_silica_exposure
+					smoking_frequency
+					time_between_waking_and_first_smoke
+					tobacco_smoking_onset_year
+					tobacco_smoking_quit_year
+					tobacco_smoking_status
+					type_of_smoke_exposure
+					type_of_tobacco_used
+					years_smoked
+					age_at_onset
+					alcohol_type
+					exposure_duration
+					exposure_duration_years
+					exposure_type
+					marijuana_use_per_week
+					parent_with_radiation_exposure
+					secondhand_smoke_as_child
+					smokeless_tobacco_quit_age
+					tobacco_use_per_day
+				}
+				follow_ups {
+					follow_up_id
+					follow_up_submitter_id
+					adverse_event
+					adverse_event_grade
+					aids_risk_factors
+					barretts_esophagus_goblet_cells_present
+					bmi
+					body_surface_area
+					cause_of_response
+					cd4_count
+					cdc_hiv_risk_factors
+					comorbidity
+					comorbidity_method_of_diagnosis
+					days_to_adverse_event
+					days_to_comorbidity
+					days_to_follow_up
+					days_to_imaging
+					days_to_progression
+					days_to_progression_free
+					days_to_recurrence
+					diabetes_treatment_type
+					disease_response
+					dlco_ref_predictive_percent
+					ecog_performance_status
+					evidence_of_recurrence_type
+					eye_color
+					fev1_ref_post_bronch_percent
+					fev1_ref_pre_bronch_percent
+					fev1_fvc_pre_bronch_percent
+					fev1_fvc_post_bronch_percent
+					haart_treatment_indicator
+					height
+					hepatitis_sustained_virological_response
+					history_of_tumor
+					history_of_tumor_type
+					hiv_viral_load
+					hormonal_contraceptive_type
+					hormonal_contraceptive_use
+					hormone_replacement_therapy_type
+					hpv_positive_type
+					hysterectomy_margins_involved
+					hysterectomy_type
+					imaging_result
+					imaging_type
+					immunosuppressive_treatment_type
+					karnofsky_performance_status
+					menopause_status
+					nadir_cd4_count
+					pancreatitis_onset_year
+					pregnancy_outcome
+					procedures_performed
+					progression_or_recurrence
+					progression_or_recurrence_anatomic_site
+					progression_or_recurrence_type
+					recist_targeted_regions_number
+					recist_targeted_regions_sum
+					reflux_treatment_type
+					risk_factor
+					risk_factor_treatment
+					scan_tracer_used
+					undescended_testis_corrected
+					undescended_testis_corrected_age
+					undescended_testis_corrected_laterality
+					undescended_testis_corrected_method
+					undescended_testis_history
+					undescended_testis_history_laterality
+					viral_hepatitis_serologies
+					weight
+				}
+				treatments {
+					treatment_id
+					treatment_submitter_id
+					days_to_treatment_end
+					days_to_treatment_start
+					initial_disease_status
+					regimen_or_line_of_therapy
+					therapeutic_agents
+					treatment_anatomic_site
+					treatment_effect
+					treatment_intent_type
+					treatment_or_therapy
+					treatment_outcome
+					treatment_type			
+					chemo_concurrent_to_radiation
+					number_of_cycles
+					reason_treatment_ended
+					route_of_administration
+					treatment_arm
+					treatment_dose
+					treatment_dose_units
+					treatment_effect_indicator
+					treatment_frequency
+				}
+				samples {
+					sample_id
+					sample_submitter_id
+					annotation
+				}
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+				pages
+				size
+			}
+		}
+	}
+query CasesData{
+					uiStudy {
+					submitter_id_name
+					program_name
+					project_name
+					disease_type
+					primary_site
+					analytical_fraction
+					experiment_type
+					num_raw
+					num_mzml
+					num_prot
+					num_prot_assem
+					num_psm
+					}
+				}
+query ProteinQuery($protein_name: String!){
+					uiProtein(protein: $protein_name){
+					  gene_name
+					  NCBI_gene_id
+					  alias
+					  authority
+					  description
+					  organism
+					  chromosome
+					  locus
+					  proteins
+					  assays
+					  spectral_counts {
+						  project_submitter_id
+						  plex
+						  spectral_count
+						  distinct_peptide
+						  unshared_peptide
+					  }
+					}
+				}
+query ProteinQuery($gene_name: String!, $source: String!){
+					uiGeneSpectralCount(gene_name: $gene_name, source: $source){
+					  gene_id	
+					  gene_name
+					  ncbi_gene_id
+					  alias
+					  authority
+					  description
+					  organism
+					  chromosome
+					  locus
+					  proteins
+					  assays
+					  spectral_counts {
+						  project_submitter_id
+								  study_submitter_id
+						  plex
+						  spectral_count
+						  distinct_peptide
+						  unshared_peptide
+					  }
+					}
+				}
+query ProteinQuery($gene_name: String, $gene_id: String $source: String!){
+					uiGeneSpectralCount(gene_name: $gene_name, gene_id: $gene_id, source: $source){
+					  gene_id	
+					  gene_name
+					  ncbi_gene_id
+					  alias
+					  authority
+					  description
+					  organism
+					  chromosome
+					  locus
+					  proteins
+					  assays
+					  spectral_counts {
+						  project_submitter_id
+						  study_submitter_id
+						  plex
+						  spectral_count
+						  distinct_peptide
+						  unshared_peptide
+					  }
+					}
+				}
+query aliquotSpectralCountQuery($gene_name:String!, $offset_param: Int, $limit_param: Int, $source: String!){
+					getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: $offset_param, limit: $limit_param, source: $source){
+						total
+						uiGeneAliquotSpectralCounts {
+							aliquot_id 
+							plex
+							label
+							submitter_id_name 
+							experiment_type
+							spectral_count
+							distinct_peptide
+							unshared_peptide
+							precursor_area
+							log2_ratio
+							unshared_precursor_area
+							unshared_log2_ratio
+						}
+						pagination {
+							count
+							sort
+							from
+							page
+							total
+							pages
+							size
+						}
+					}
+				}
+query studySpectralCountQuery($gene_name:String!, $offset_param: Int, $limit_param: Int, $source: String!){
+			getPaginatedUIGeneStudySpectralCount(gene_name: $gene_name, offset: $offset_param, limit: $limit_param, source: $source){
+				total
+				uiGeneStudySpectralCounts {
+					submitter_id_name 
+					experiment_type
+					spectral_count
+					distinct_peptide
+					unshared_peptide
+					aliquots_count
+					plexes_count	
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+		}
+query PTMDataByGeneQuery($gene_name:String!, $offset_param: Int, $limit_param: Int, $source: String!){
+			getPaginatedUIPtm(gene_name: $gene_name offset: $offset_param limit: $limit_param, source: $source){
+				total
+				uiPtm {
+					ptm_type 
+					site
+					peptide
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+		}
+query PTMDataByGeneQuery($gene_name: String, $gene_id:String, $offset_param: Int, $limit_param: Int, $source: String!){
+			getPaginatedUIPtm(gene_name: $gene_name gene_id: $gene_id offset: $offset_param limit: $limit_param, source: $source){
+				total
+				uiPtm {
+					ptm_type 
+					site
+					peptide
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+		}
+query GeneStudyCountQuery($gene_id: String!){
+		geneStudyCount(gene_id: $gene_id)
+	}
+query allTissueSites{
+				uiTissueSiteCaseCount {
+					tissue_or_organ_of_origin
+					cases_count
+				}
+			}
+query allStats{
+		uiPdcDataStats{
+    program,
+    study,
+    spectra,
+    data_label,
+    protein,
+    project,
+    peptide,
+    data_size,
+    data_label,
+    data_file
+  	}
+	 }
+query allDiseases{
+			  uiDiseasesAvailable {
+			  disease_type
+			  tissue_or_organ_of_origin
+			  project_submitter_id
+			  cases_count
+			}
+		   } 
+query Programs{
+					 uiAllPrograms {
+						program_submitter_id
+						name
+						sponsor
+						start_date
+						end_date
+						program_manager
+						projects {
+						  project_submitter_id
+						}
+					  }
+				}
+query sunburstChartData{
+			    uiSunburstChart {
+					project_submitter_id
+					tissue_or_organ_of_origin
+					disease_type
+					sample_type
+					cases_count
+			    }
+			}
+query HumanBodyPrimarySiteData {
+					uiPrimarySiteCaseCount{
+					major_primary_site
+					cases_count
+					primarySites
+				}
+			} 
+query CaseSearchQuery($case_name: String!){
+					caseSearch(name: $case_name){
+						searchCases {
+							record_type
+							name
+							case_id
+						}
+					}
+			}
+query GeneSearchQuery($gene_name: String!){
+					geneSearch(name: $gene_name){
+						genes {
+							record_type
+							name
+							description
+							gene_id
+							ncbi_gene_id
+							alias
+						}
+					}
+			}
+query ProteinSearchQuery($protein_name: String!){
+					proteinSearch(name: $protein_name){
+						genesWithProtein  {
+							record_type
+							name
+							description
+							gene_id
+							ncbi_gene_id
+							proteins
+						}
+					}
+			}
+query StudySearchQuery($study_name: String!){
+					studySearch(name: $study_name){
+						studies{
+							record_type
+							name
+							submitter_id_name
+							study_id
+							study_submitter_id
+							pdc_study_id
+						}
+					}
+			}
+query StudySearchByPDCStudyIdQuery($pdc_study_id: String!){
+		studySearchByPDCStudyId(pdc_study_id: $pdc_study_id){
+			studies {
+				record_type
+				name
+				submitter_id_name
+				study_id
+				study_submitter_id
+				pdc_study_id
+			}
+		}
+	}
+query StudySearchByExternalRefQuery($reference_entity_alias: String!){
+		studySearchByExternalId(reference_entity_alias: $reference_entity_alias){
+			studies {
+				record_type
+				name
+				submitter_id_name
+				study_id
+				study_submitter_id
+				pdc_study_id
+			}
+		}
+	}
+query AliquotSearchQuery($aliquot_submitter_id: String!){
+		aliquotSearch(name: $aliquot_submitter_id){
+			searchAliquots{
+				aliquot_id
+				aliquot_submitter_id
+			}
+		}
+	}
+query studyByUUIDQuery($study_id: String!, $study_submitter_id: String!, $source: String!){
+		uiStudySummary(study_id: $study_id, study_submitter_id: $study_submitter_id, source: $source){
+			study_submitter_id
+			study_shortname
+		}
+	}
+query studyByUUIDQuery($study_id: String!, $pdc_study_id: String!, $source: String!){
+		uiStudySummary(study_id: $study_id, pdc_study_id: $pdc_study_id, source: $source){
+			study_submitter_id
+			study_name
+			pdc_study_id
+			study_id
+		}
+	}
+query caseByUUIDQuery($case_id: String!, $source: String!){
+		uiCaseSummary(case_id: $case_id, source: $source){
+			case_submitter_id
+			case_id
+		}
+	}
+query CaseSummaryDataQuery($case_id: String!, $case_submitter_id: String!, $source: String!){
+		uiCase (case_id: $case_id, case_submitter_id: $case_submitter_id, source: $source) {
+			case_id
+			case_submitter_id
+			aliquot_id 	
+			sample_id
+			project_name
+			program_name
+			sample_type
+			disease_type
+			primary_site
+			aliquot_submitter_id
+			sample_submitter_id
+		}
+	}
+query SampleDataQuery($sample_id: String!, $source: String!){
+		uiSampleSummary (sample_id: $sample_id, source: $source) {
+			case_submitter_id
+			sample_submitter_id
+			sample_id
+		}
+	}
+query SampleDataQuery($sample_submitter_id: String!, $source: String!){
+		uiSampleSummary (sample_submitter_id: $sample_submitter_id, source: $source) {
+			case_submitter_id
+			sample_submitter_id
+			sample_id
+		}
+	}
+query AliquotDataQuery($aliquot_id: String!, $source: String!){
+		uiAliquotSummary (aliquot_id: $aliquot_id, source: $source) {
+			case_submitter_id
+			aliquot_submitter_id
+			aliquot_id
+		}
+	}
+query AliquotDataQuery($aliquot_submitter_id: String!, $source: String!){
+		uiAliquotSummary (aliquot_submitter_id: $aliquot_submitter_id, source: $source) {
+			case_submitter_id
+			aliquot_submitter_id
+			aliquot_id
+		}
+	}
+query ObjectSearchedQuery($type: String!, $parameterType: String!, $parameterValue: String!){
+		objectSearched (type: $type, parameterType: $parameterType, parameterValue: $parameterValue)
+	}
+query uiDataVersionSoftwareVersion {
+            uiDataVersionSoftwareVersion {
+                data_release
+                build_tag
+            }
+        } 
+query ProteinQuery($protein_name: String!){
+					uiProtein(protein: $protein_name){
+					  gene_name
+					  NCBI_gene_id
+					  authority
+					  description
+					  organism
+					  chromosome
+					  locus
+					  proteins
+					  assays
+					  spectral_counts {
+						  project_submitter_id
+						  plex
+						  spectral_count
+						  distinct_peptide
+						  unshared_peptide
+					  }
+					}
+				}
+query ProteinQuery($gene_name: String, $gene_id: String){
+					uiGeneSpectralCount(gene_name: $gene_name, gene_id: $gene_id){
+					  gene_id	
+					  gene_name
+					  ncbi_gene_id
+					  alias
+					  authority
+					  description
+					  organism
+					  chromosome
+					  locus
+					  proteins
+					  assays
+					  spectral_counts {
+						  project_submitter_id
+						  study_submitter_id
+						  plex
+						  spectral_count
+						  distinct_peptide
+						  unshared_peptide
+					  }
+					}
+				}
+query aliquotSpectralCountQuery($gene_name:String, $gene_id:String, $offset_param: Int, $limit_param: Int, $program_name_filter: String!, 
+											$project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!,
+											$analytical_frac_filter: String!, $exp_type_filter: String!, $ethnicity_filter: String!, $race_filter: String!,
+											$gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!){
+					getPaginatedUIGeneAliquotSpectralCountFiltered(gene_name: $gene_name, gene_id:  $gene_id, offset: $offset_param, limit: $limit_param, program_name: $program_name_filter , 
+										project_name: $project_name_filter, study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, 
+										analytical_fraction: $analytical_frac_filter, experiment_type: $exp_type_filter, ethnicity: $ethnicity_filter, race: $race_filter, 
+										gender: $gender_filter, tumor_grade: $tumor_grade_filter, sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter){
+						total
+						uiGeneAliquotSpectralCounts {
+							aliquot_id 
+							plex
+							label
+							submitter_id_name 
+							pdc_study_id
+							experiment_type
+							spectral_count
+							distinct_peptide
+							unshared_peptide
+							precursor_area
+							log2_ratio
+							unshared_precursor_area
+							unshared_log2_ratio
+						}
+						pagination {
+							count
+							sort
+							from
+							page
+							total
+							pages
+							size
+						}
+					}
+				}
+query studySpectralCountQuery($gene_name:String, $gene_id:String, $offset_param: Int, $limit_param: Int, $program_name_filter: String!, 
+											$project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!,
+											$analytical_frac_filter: String!, $exp_type_filter: String!, $ethnicity_filter: String!, $race_filter: String!,
+											$gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!){
+			getPaginatedUIGeneStudySpectralCountFiltered(gene_name: $gene_name, gene_id: $gene_id, offset: $offset_param, limit: $limit_param, program_name: $program_name_filter , 
+										project_name: $project_name_filter, study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, 
+										analytical_fraction: $analytical_frac_filter, experiment_type: $exp_type_filter, ethnicity: $ethnicity_filter, race: $race_filter, 
+										gender: $gender_filter, tumor_grade: $tumor_grade_filter, sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter){
+				total
+				uiGeneStudySpectralCounts {
+					pdc_study_id
+					submitter_id_name 
+					experiment_type
+					spectral_count
+					distinct_peptide
+					unshared_peptide
+					aliquots_count
+					plexes_count	
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+		}
+query PTMDataByGeneQuery($gene_name:String!, $gene_id:String, $offset_param: Int, $limit_param: Int){
+			getPaginatedUIPtm(gene_name: $gene_name gene_id: $gene_id offset: $offset_param limit: $limit_param){
+				total
+				uiPtm {
+					ptm_type 
+					site
+					peptide
+				}
+				pagination {
+					count
+					sort
+					from
+					page
+					total
+					pages
+					size
+				}
+			}
+		}
+query GeneStudyData($gene_name: String!){
+		uiGeneStudySpectralCount(gene_name: $gene_name) {
+			study_submitter_id
+			submitter_id_name
+		}
+	}
+	
+query GeneSearchQuery($gene_name: String!){
+					geneSearch(name: $gene_name){
+						genes {
+							record_type
+							name
+							description
+							alias
+						}
+					}
+			}
+query FiltersData($program_name_filter: String!, $project_name_filter: String!, $study_name_filter: String!, $disease_filter: String!, $filterValue: String!, $analytical_frac_filter: String!, $exp_type_filter: String!, $ethnicity_filter: String!, $race_filter: String!, $gender_filter: String!, $tumor_grade_filter: String!, $sample_type_filter: String!, $acquisition_type_filter: String!, $data_category_filter: String!, $file_type_filter: String!, $access_filter: String!, $downloadable_filter: String!, $biospecimen_status_filter: String!, $case_status_filter: String!){
+			uiFilters(program_name: $program_name_filter , project_name: $project_name_filter, 
+									study_name: $study_name_filter, disease_type: $disease_filter, primary_site: $filterValue, analytical_fraction: $analytical_frac_filter, 
+									experiment_type: $exp_type_filter, ethnicity: $ethnicity_filter, race: $race_filter, gender: $gender_filter, tumor_grade: $tumor_grade_filter,
+									sample_type: $sample_type_filter, acquisition_type: $acquisition_type_filter, data_category: $data_category_filter, file_type: $file_type_filter, access: $access_filter, downloadable: $downloadable_filter, biospecimen_status: $biospecimen_status_filter, case_status: $case_status_filter) {			
+				project_name {
+					filterName
+					filterValue
+				}
+				primary_site {
+					filterName
+					filterValue
+				}
+				program_name {
+					filterName
+					filterValue
+				}
+				disease_type {
+					filterName
+					filterValue
+				}
+				analytical_fraction {
+					filterName
+					filterValue
+				}
+				experiment_type {
+					filterName
+					filterValue
+				}
+				acquisition_type {
+					filterName
+					filterValue
+				}
+				submitter_id_name {
+					filterName
+					filterValue
+				}
+				sample_type {
+					filterName
+					filterValue
+				}
+				ethnicity {
+					filterName
+					filterValue
+				}
+				race {
+					filterName
+					filterValue
+				}
+				gender {
+					filterName
+					filterValue
+				}
+				tumor_grade {
+					filterName
+					filterValue
+				}
+				data_category {
+					filterName
+					filterValue
+				}
+				file_type {
+					filterName
+					filterValue
+				}
+				access {
+					filterName
+					filterValue
+				}
+				downloadable { 
+					filterName 
+					filterValue 
+				}
+				biospecimen_status { 
+					filterName 
+					filterValue 
+				} 
+				case_status { 
+					filterName 
+					filterValue 
+				} 
+			}
+		}
+	
+query CasesData{
+					uiStudy {
+					submitter_id_name
+					program_name
+					project_name
+					disease_type
+					primary_site
+					analytical_fraction
+					experiment_type
+					num_raw
+					num_mzml
+					num_prot
+					num_prot_assem
+					num_psm
+					}
+				}
+query FiltersData {
+					uiFilters{
+						project_name {
+							filterName
+							filterValue
+						}
+						primary_site {
+							filterName
+							filterValue
+						}
+						program_name {
+							filterName
+							filterValue
+						}
+						disease_type {
+							filterName
+							filterValue
+						}
+						analytical_fraction {
+							filterName
+							filterValue
+						}
+						experiment_type {
+							filterName
+							filterValue
+						}
+						acquisition_type {
+							filterName
+							filterValue
+						}
+						submitter_id_name {
+							filterName
+							filterValue
+						}
+						sample_type {
+							filterName
+							filterValue
+						}
+						ethnicity {
+							filterName
+							filterValue
+						}
+						race {
+							filterName
+							filterValue
+						}
+						gender {
+							filterName
+							filterValue
+						}
+						tumor_grade {
+							filterName
+							filterValue
+						}
+						data_category {
+							filterName
+							filterValue
+						}
+						file_type {
+							filterName
+							filterValue
+						}
+						access {
+							filterName
+							filterValue
+						}
+					}
+				}
+query FilterdPaginatedPublicationsQuery ($offset_value: Int, $limit_value: Int, $year_filter: String!, $disease_type_filter: String!, $program_filter: String!, $pubmedid_filter: String!) {
+		getPaginatedUIPublication(offset: $offset_value, limit: $limit_value, year: $year_filter, disease_type: $disease_type_filter, program: $program_filter, pubmed_id: $pubmedid_filter) {
+			total
+			uiPublication {
+				publication_id
+				program_name
+				pubmed_id
+				doi
+				author
+				title
+				journal
+				journal_url
+				year
+				abstract
+				citation
+				studies {
+					study_id
+					pdc_study_id
+					submitter_id_name
+				}
+				disease_types
+				supplementary_data
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+				pages
+				size
+			}
+		}
+	}
+query PubmedIDSearchQuery($search_term: String!){
+		  getPaginatedUIPublication(pubmed_id: $search_term) {
+			uiPublication {
+			  pubmed_id
+			  title
+			}
+		  }
+		}
+query allPublicationsFilters{
+				getUIPublicationFilters {
+					disease_types
+					years
+					programs
+				 }
+		   } 
+query UILegacyStudyQuery($study_name: String!){
+			uiLegacyStudies(pdc_study_id: $study_name) {
+				study_id
+				submitter_id_name
+				study_submitter_id
+				pdc_study_id
+				study_description
+				project_submitter_id
+				analytical_fraction
+				experiment_type
+				embargo_date
+				sort_order
+				supplementaryFilesCount {
+				  data_category
+				  file_type
+				  files_count
+				}
+				nonSupplementaryFilesCount {
+				  data_category
+				  file_type
+				  files_count
+				}
+				publications {
+				  publication_id
+				  pubmed_id
+				  doi
+				  author
+				  title
+				  journal
+				  journal_url
+				  year
+				  abstract
+				  citation
+				}
+			  }
+	}
+query PublicationsQuery($study_id: String!){
+							uiPublication (study_id: $study_id ){
+								publication_id
+								pubmed_id
+								title
+							}
+						}
+query FilesCountsQuery($study_id: String!){
+							uiFilesCountPerStudy (study_id: $study_id ){
+								study_submitter_id
+								file_type
+								files_count
+								data_category 
+							}
+						}
+query LegacyDataEntityReferenceQueryData($entity_id_filter: String!, $reference_type_filter: String!){
+		uiLegacyStudyReference(entity_id: $entity_id_filter, reference_type: $reference_type_filter) {
+			reference_id
+			entity_type
+			entity_id
+			reference_type
+			reference_entity_type
+			reference_entity_alias
+			reference_resource_name
+			reference_resource_shortname
+			reference_entity_location
+			submitter_id_name
+		}
+	}
+query FilterdPaginatedPublicationsQuery ($offset_value: Int, $limit_value: Int, $year_filter: String!, $disease_type_filter: String!, $program_filter: String!) {
+		getPaginatedUIPublication(offset: $offset_value, limit: $limit_value, year: $year_filter, disease_type: $disease_type_filter, program: $program_filter) {
+			total
+			uiPublication {
+				publication_id
+				pubmed_id
+				doi
+				author
+				title
+				journal
+				journal_url
+				year
+				abstract
+				citation
+				studies {
+					pdc_study_id
+					submitter_id_name
+				}
+				disease_types
+						supplementary_data
+			}
+			pagination {
+				count
+				sort
+				from
+				page
+				total
+				pages
+				size
+			}
+		}
+	}
+query allLegacyStudies{
+				uiLegacyStudies {
+					study_id
+					submitter_id_name
+					study_submitter_id
+					pdc_study_id
+					study_description
+					project_submitter_id
+					analytical_fraction
+					experiment_type
+					sort_order
+					embargo_date
+					supplementaryFilesCount {
+						data_category
+						file_type
+						files_count
+					}
+					nonSupplementaryFilesCount{
+						data_category
+						file_type
+						files_count
+					}
+					publications {
+						publication_id
+						pubmed_id
+						doi
+						author
+						title
+						journal
+						journal_url
+						year
+						abstract
+						citation
+					}
+				} 
+		   } 
+query FilterdHeatmapsQuery ($sort_value: String!, $primary_sites_filter: String!, $disease_type_filter: String!, $analytical_fractions_filter: String!) {
+		uiHeatmapStudies ( sort: $sort_value, primary_site: $primary_sites_filter, disease_type: $disease_type_filter, analytical_fraction: $analytical_fractions_filter) {
+			study_id
+			study_submitter_id
+			submitter_id_name
+			pdc_study_id
+			study_description
+			program_name
+			project_name
+			analytical_fraction
+			primary_site
+			disease_type
+			experiment_type
+			embargo_date
+			heatmapFiles
+		} 
+	}
+query allHeatmapsFilters{
+				getUIHeatmapFilters {
+				filterCount
+				disease_types
+				primary_sites
+				analytical_fractions
+			  } 
+		   } 
+query StudySearchByExternalRefQuery($reference_entity_alias: String!){
+		studySearchByExternalId(reference_entity_alias: $reference_entity_alias){
+			studies {
+				record_type
+				name
+				submitter_id_name
+				study_id
+				study_submitter_id
+				pdc_study_id
+			}
+		}
+	}
+query PubmedIDSearchQuery {
+			getUIPancancerPublications {
+				publication_id
+				pubmed_id
+				doi
+				author
+				title
+				journal
+				journal_url
+				year
+				abstract
+				citation
+				files {
+					file_id
+					file_name
+					data_category
+					description
+					downloadable
+					characterization
+					cohorts
+					related_publications
+					related_studies
+				}
+				studies {
+					study_id
+					submitter_id_name
+					pdc_study_id
+				}
+		}
+	}
+query PancancerFilesQuery {
+		getAllUIPancancerFiles {
+			file_id
+			file_name
+			data_category
+			description
+			downloadable
+			characterization
+			cohorts
+			related_publications
+			related_studies
+		}
+	}

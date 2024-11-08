@@ -5,6 +5,9 @@ EXPOSE 8888
 RUN apt update && apt install -y lsof
 RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel
 
+# Install debugpy for remote debugging
+RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel debugpy
+
 USER jupyter
 WORKDIR /jupyter
 
