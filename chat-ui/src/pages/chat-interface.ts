@@ -16,6 +16,31 @@ import { PageConfig, URLExt } from '@jupyterlab/coreutils';
 
 const baseUrl = PageConfig.getBaseUrl();
 
+// Add new directive to auto-collapse code cells
+const vAutoCollapse = {
+  mounted: (el) => {
+    // Use MutationObserver to watch for dynamically added accordions
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(() => {
+        // Find all code cell accordions that are open
+        const openCodeCells = el.querySelectorAll('.p-accordion-tab[data-p-active="true"] .query-tab-code_cell');
+        openCodeCells.forEach(cell => {
+          // Find and click the header link to collapse
+          const headerLink = cell.querySelector('.p-accordion-header-link');
+          if (headerLink) {
+            (headerLink as HTMLElement).click();
+          }
+        });
+      });
+    });
+
+    observer.observe(el, {
+      childList: true,
+      subtree: true
+    });
+  }
+};
+
 (async () => {
 
   let config;
@@ -42,5 +67,6 @@ const baseUrl = PageConfig.getBaseUrl();
   app.directive('focustrap', FocusTrap);
   app.directive('keybindings', vKeybindings as any);
   app.directive('autoscroll', vAutoScroll);
+  app.directive('auto-collapse', vAutoCollapse);
   app.mount('#app');
 })();
