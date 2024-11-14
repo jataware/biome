@@ -83,6 +83,7 @@
                             ref="chatPanelRef"
                             :cellMap="cellComponentMapping"
                             v-autoscroll
+                            v-auto-collapse
                         >
                             <template #help-text>
                                 <p>Hi! I'm your Biome Agent and I can help you do tasks related to medicinal data sources.</p>
@@ -452,6 +453,40 @@ const snapshot = () => {
     }
 };
 
+onMounted(() => {
+  const removeAgentOutputSpans = () => {
+    const spans = document.querySelectorAll('span');
+    spans.forEach(span => {
+      const h4 = span.querySelector('h4.agent-outputs');
+      if (h4 && span.contains(h4)) {
+        // Check if span contains any img tags
+        const hasImages = span.querySelector('img');
+        if (!hasImages) {
+          span.remove();
+        }
+      }
+    });
+  };
+
+  // Initial removal
+  removeAgentOutputSpans();
+
+  // Set up a MutationObserver to handle dynamically added content
+  const observer = new MutationObserver((mutations) => {
+    removeAgentOutputSpans();
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  // Cleanup observer on component unmount
+  onUnmounted(() => {
+    observer.disconnect();
+  });
+});
+
 </script>
 
 <style lang="scss">
@@ -575,5 +610,7 @@ div.code-cell {
 div.code-cell.query-event-code-cell {
     margin-bottom: 0.25rem;
 }
+
+
 
 </style>
