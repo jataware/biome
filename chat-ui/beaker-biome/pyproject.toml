@@ -29,7 +29,7 @@ dependencies = [
   "requests",
   "google-generativeai",
   "PyYAML",
-  "adhoc-api",
+  "adhoc-api~=0.2.8",
   "seaborn",
   "biopython"
 ]
