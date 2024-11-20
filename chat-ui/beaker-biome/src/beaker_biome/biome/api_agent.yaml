@@ -1994,4 +1994,24 @@ apis:
             key: "api_assistant_cda_json"
         additional_cache_body: |
             You should make use of the python requests library to interact with the API.
-            Note that the endpoint to access the API is 'https://cda.datacommons.cancer.gov/'
+            Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
+    indra_cogex:
+        name: "INDRA Context Graph Extension (CoGEx)"
+        description: >
+            INDRA CoGEx (Context Graph Extension) is an automatically assembled biomedical knowledge graph which integrates causal mechanisms from INDRA 
+            with non-causal contextual relations including properties, ontology, and data. 
+            
+            The INDRA CoGEx Query API is a RESTful service designed to streamline complex queries within the biomedical domain, 
+            powered by the Contextual Graph Explorer (CoGEx) framework. It provides an interface to retrieve detailed insights 
+            by integrating and analyzing data from diverse biomedical sources. Users can execute queries to uncover relationships 
+            such as diseases associated with specific clinical trials, drugs linked to particular side effects, or other intricate 
+            connections in biomedical knowledge. By leveraging its contextual graph-based approach, the API enables researchers, 
+            data scientists, and healthcare professionals to explore and analyze rich biomedical data efficiently, supporting 
+            advancements in drug discovery, clinical decision-making, and research. With its robust architecture, the INDRA CoGEx 
+            Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
+        documentation_file: "indra.json"
+        cache: 
+            key: "api_assistant_indra_json"
+        additional_cache_body: |
+            You should make use of the python requests library to interact with the API.
+            Note that the base URL of the API is 'https://discovery.indra.bio/api/'
