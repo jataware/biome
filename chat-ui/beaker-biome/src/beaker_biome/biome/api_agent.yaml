@@ -1989,9 +1989,9 @@ apis:
 
             ## Data Standards Services (DSS)
             The DSS provides us with harmonized values mapped to the data sources above. In our current release, DSS has provided values for: ethnicity, file_format, morphology, primary_diagnosis, race, species, therapeutic_agent, source_material_type (cancer/normal), treatment_type, and vital_status.
-        documentation_file: "cda.json"
+        documentation_file: "cda.yaml"
         cache: 
-            key: "api_assistant_cda_json"
+            key: "api_assistant_cda_yaml"
         additional_cache_body: |
             You should make use of the python requests library to interact with the API.
             Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
@@ -2000,7 +2000,7 @@ apis:
         description: >
             INDRA CoGEx (Context Graph Extension) is an automatically assembled biomedical knowledge graph which integrates causal mechanisms from INDRA 
             with non-causal contextual relations including properties, ontology, and data. 
-            
+
             The INDRA CoGEx Query API is a RESTful service designed to streamline complex queries within the biomedical domain, 
             powered by the Contextual Graph Explorer (CoGEx) framework. It provides an interface to retrieve detailed insights 
             by integrating and analyzing data from diverse biomedical sources. Users can execute queries to uncover relationships 
