@@ -1,0 +1,2652 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+      "/api/continuous_analysis": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/continuous_analysis_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Perform continuous gene set analysis on gene expression data",
+          "description": "Parameters\n----------\ngene_names : List[str]\n    Name of the column containing gene names.\n\nlog_fold_change : List[str]\n    Name of the column containing log fold change values.\n\nspecies : \u003Cclass 'str'\u003E\n    Species of the gene expression data. Should be one of 'rat', 'mouse', or 'human'.\n\npermutations : \u003Cclass 'int'\u003E\n    Number of permutations for statistical analysis.\n\nsource : \u003Cclass 'str'\u003E\n    The type of analysis to perform. Should be one of 'go', 'reactome',\n'wikipathways', 'phenotype', 'indra-upstream', or 'indra-downstream'.\n\nalpha : \u003Cclass 'float'\u003E\n    The significance level. Defaults to 0.05.\n\nkeep_insignificant : \u003Cclass 'bool'\u003E\n    Whether to keep statistically insignificant results. Defaults to False.\n\nminimum_evidence_count : \u003Cclass 'int'\u003E\n    Minimum number of evidence required for INDRA analysis. Defaults to 1.\n\nminimum_belief : \u003Cclass 'float'\u003E\n    Minimum belief score for INDRA analysis. Defaults to 0.\n\nReturns\n-------\n\u003Cclass 'pandas.core.frame.DataFrame'\u003E\n    A DataFrame containing the results of the specified analysis.",
+          "operationId": "post_query_resource_/api/continuous_analysis",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/discrete_analysis": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/discrete_analysis_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Perform discrete analysis on the provided genes",
+          "description": "Parameters\n----------\ngene_list : List[str]\n    A list of gene identifiers. Can be HGNC symbols or identifiers.\n\nmethod : \u003Cclass 'str'\u003E\n    Statistical method to apply, by default 'fdr_bh'.\n\nalpha : \u003Cclass 'float'\u003E\n    Significance level, by default 0.05.\n\nkeep_insignificant : \u003Cclass 'bool'\u003E\n    Whether to retain insignificant results, by default False.\n\nminimum_evidence_count : \u003Cclass 'int'\u003E\n    Minimum number of evidence for inclusion, by default 1.\n\nminimum_belief : \u003Cclass 'float'\u003E\n    Minimum belief score for filtering, by default 0.\n\nindra_path_analysis : \u003Cclass 'bool'\u003E\n    Whether to perform INDRA pathway analysis, by default False.\n\nReturns\n-------\nDict[str, Union[pandas.core.frame.DataFrame, NoneType]]\n    A dict with results per analysis type in the form of a DataFrame or None\nif an error occurs or no results are found.",
+          "operationId": "post_query_resource_/api/discrete_analysis",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_diseases_for_trial": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_diseases_for_trial_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the diseases for the given trial",
+          "description": "Parameters\n----------\ntrial : Tuple[str, str]\n    The trial to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The diseases for the given trial.",
+          "operationId": "post_query_resource_/api/get_diseases_for_trial",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_drugs_for_side_effect": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_drugs_for_side_effect_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the drugs for the given side effect",
+          "description": "Parameters\n----------\nside_effect : Tuple[str, str]\n    The side effect to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The drugs for the given side effect.",
+          "operationId": "post_query_resource_/api/get_drugs_for_side_effect",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_drugs_for_target": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_drugs_for_target_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the drugs targeting the given protein",
+          "description": "Parameters\n----------\ntarget : Tuple[str, str]\n    The target to query.\n\nReturns\n-------\nIterable[indra.statements.agent.Agent]\n    The drugs targeting the given protein.",
+          "operationId": "post_query_resource_/api/get_drugs_for_target",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_drugs_for_targets": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_drugs_for_targets_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the drugs targeting each of the given targets",
+          "description": "Parameters\n----------\ntargets : Iterable[Tuple[str, str]]\n    The targets to query.\n\nReturns\n-------\nMapping[str, Iterable[indra.statements.agent.Agent]]\n    A mapping of targets to the drugs targeting each of the given targets.",
+          "operationId": "post_query_resource_/api/get_drugs_for_targets",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_drugs_for_trial": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_drugs_for_trial_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the drugs for the given trial",
+          "description": "Parameters\n----------\ntrial : Tuple[str, str]\n    The trial to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The drugs for the given trial.",
+          "operationId": "post_query_resource_/api/get_drugs_for_trial",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_evidences_for_mesh": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_evidences_for_mesh_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the evidence objects for the given MESH term",
+          "description": "Parameters\n----------\nmesh_term : Tuple[str, str]\n    The MESH ID to query.\n\ninclude_child_terms : \u003Cclass 'bool'\u003E\n    If True, also match against the child MESH terms of the given MESH ID\n\nReturns\n-------\nDict[int, List[indra.statements.evidence.Evidence]]\n    The evidence objects for the given MESH ID grouped into a dict\nby statement hash.",
+          "operationId": "post_query_resource_/api/get_evidences_for_mesh",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_evidences_for_stmt_hash": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_evidences_for_stmt_hash_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the matching evidence objects for the given statement hash",
+          "description": "Parameters\n----------\nstmt_hash : \u003Cclass 'str'\u003E\n    The statement hash to query, accepts both string and integer.\n\nlimit : Union[int, NoneType]\n    The maximum number of results to return.\n\noffset : \u003Cclass 'int'\u003E\n    The number of results to skip before returning the first result.\n\nReturns\n-------\nIterable[indra.statements.evidence.Evidence]\n    The evidence objects for the given statement hash.",
+          "operationId": "post_query_resource_/api/get_evidences_for_stmt_hash",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_evidences_for_stmt_hashes": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_evidences_for_stmt_hashes_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the matching evidence objects for the given statement hashes",
+          "description": "Parameters\n----------\nstmt_hashes : List[str]\n    The statement hashes to query, accepts integers and strings.\n\nlimit : Union[str, NoneType]\n    The optional maximum number of evidences returned for each statement hash\n\nReturns\n-------\nDict[int, List[indra.statements.evidence.Evidence]]\n    A mapping of stmt hash to a list of evidence objects for the given\nstatement hashes.",
+          "operationId": "post_query_resource_/api/get_evidences_for_stmt_hashes",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_genes_for_go_term": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_genes_for_go_term_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the genes associated with the given GO term",
+          "description": "Parameters\n----------\ngo_term : Tuple[str, str]\n    The GO term to query. Example: ``(\"GO\", \"GO:0006915\")``\n\ninclude_indirect : \u003Cclass 'bool'\u003E\n    Should ontological children of the given GO term\nbe queried as well? Defaults to False.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The genes associated with the given GO term.",
+          "operationId": "post_query_resource_/api/get_genes_for_go_term",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_genes_for_pathway": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_genes_for_pathway_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the genes for the given pathway",
+          "description": "Parameters\n----------\npathway : Tuple[str, str]\n    The pathway to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The genes for the given pathway.",
+          "operationId": "post_query_resource_/api/get_genes_for_pathway",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_genes_in_tissue": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_genes_in_tissue_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the genes in the given tissue",
+          "description": "Parameters\n----------\ntissue : Tuple[str, str]\n    The tissue to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The genes expressed in the given tissue.",
+          "operationId": "post_query_resource_/api/get_genes_in_tissue",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_go_terms_for_gene": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_go_terms_for_gene_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the GO terms for the given gene",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\ninclude_indirect : \u003Cclass 'bool'\u003E\n    If True, also return indirect GO terms.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The GO terms for the given gene.",
+          "operationId": "post_query_resource_/api/get_go_terms_for_gene",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_hgnc_ids_from_uniprot_ids": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_hgnc_ids_from_uniprot_ids_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Maps UniProt IDs to HGNC IDs",
+          "description": "This method expects a JSON payload with a list of UniProt IDs under the key\n\"uniprot_ids\". It returns a dictionary mapping each UniProt ID to its\ncorresponding HGNC ID, if available.\n\nReturns\n-------\n:\n    A dictionary where keys are UniProt IDs and values are HGNC IDs.",
+          "operationId": "post_hgnc_ids_from_uniprot_ids",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/get_hgnc_names_from_hgnc_ids": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_hgnc_names_from_hgnc_ids_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Maps HGNC IDs to their corresponding names",
+          "description": "This method expects a JSON payload with a list of HGNC IDs under the key\n\"hgnc_ids\". It retrieves the corresponding HGNC names using the `hgnc_client`\nand returns a dictionary mapping each HGNC ID to its name.\n\nReturns\n-------\n:\n    A dictionary where keys are HGNC IDs and values are HGNC names.",
+          "operationId": "post_hgnc_names_from_hgnc_ids",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/get_mesh_ids_for_pmid": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_mesh_ids_for_pmid_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the MESH terms for the given PubMed ID",
+          "description": "Parameters\n----------\npmid_term : Tuple[str, str]\n    The PubMed ID to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The MESH terms for the given PubMed ID.",
+          "operationId": "post_query_resource_/api/get_mesh_ids_for_pmid",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_mesh_ids_for_pmids": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_mesh_ids_for_pmids_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the MESH terms for the given PubMed ID",
+          "description": "Parameters\n----------\npmids : List[str]\n    The PubMed IDs to query.\n\nReturns\n-------\nMapping[str, List[str]]\n    A dictionary from PubMed ID to MeSH IDs",
+          "operationId": "post_query_resource_/api/get_mesh_ids_for_pmids",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_mutated_genes": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_mutated_genes_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the list of genes that are mutated in a given cell line",
+          "description": "Parameters\n----------\ncell_line : Tuple[str, str]\n    The cell line to query.\n\nReturns\n-------\nList[indra_cogex.representation.Node]\n    The list of genes that are mutated in the given cell line.",
+          "operationId": "post_query_resource_/api/get_mutated_genes",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_ontology_child_terms": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_ontology_child_terms_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the child terms of the given term",
+          "description": "Parameters\n----------\nterm : Tuple[str, str]\n    The term to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The child terms of the given term.",
+          "operationId": "post_query_resource_/api/get_ontology_child_terms",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_ontology_parent_terms": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_ontology_parent_terms_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the parent terms of the given term",
+          "description": "Parameters\n----------\nterm : Tuple[str, str]\n    The term to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The parent terms of the given term.",
+          "operationId": "post_query_resource_/api/get_ontology_parent_terms",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_pathways_for_gene": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_pathways_for_gene_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the pathways for the given gene",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The pathways for the given gene.",
+          "operationId": "post_query_resource_/api/get_pathways_for_gene",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_pmids_for_mesh": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_pmids_for_mesh_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the PubMed IDs for the given MESH term",
+          "description": "Parameters\n----------\nmesh_term : Tuple[str, str]\n    The MESH term to query.\n\ninclude_child_terms : \u003Cclass 'bool'\u003E\n    If True, also match against the child MESH terms of the given MESH\nterm.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The PubMed IDs for the given MESH term and, optionally, its child terms.",
+          "operationId": "post_query_resource_/api/get_pmids_for_mesh",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_shared_pathways_for_genes": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_shared_pathways_for_genes_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the shared pathways for the given list of genes",
+          "description": "Parameters\n----------\ngenes : Iterable[Tuple[str, str]]\n    The list of genes to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The pathways for the given gene.",
+          "operationId": "post_query_resource_/api/get_shared_pathways_for_genes",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_side_effects_for_drug": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_side_effects_for_drug_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the side effects for the given drug",
+          "description": "Parameters\n----------\ndrug : Tuple[str, str]\n    The drug to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The side effects for the given drug.",
+          "operationId": "post_query_resource_/api/get_side_effects_for_drug",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_stmts_for_mesh": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_stmts_for_mesh_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the statements with evidence for the given MESH ID",
+          "description": "Parameters\n----------\nmesh_term : Tuple[str, str]\n    The MESH ID to query.\n\ninclude_child_terms : \u003Cclass 'bool'\u003E\n    If True, also match against the children of the given MESH ID.\n\nReturns\n-------\nList[Dict[str, Any]]\n    The statements for the given MESH ID.",
+          "operationId": "post_query_resource_/api/get_stmts_for_mesh",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_stmts_for_paper": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_stmts_for_paper_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the statements with evidence from the given PubMed ID",
+          "description": "Parameters\n----------\npaper_term : Tuple[str, str]\n    The term to query. Can be a PubMed ID, PMC id, TRID, or DOI\n\nReturns\n-------\nList[indra.statements.statements.Statement]\n    The statements for the given PubMed ID.",
+          "operationId": "post_query_resource_/api/get_stmts_for_paper",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_stmts_for_pmids": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_stmts_for_pmids_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the statements with evidence from the given PubMed IDs",
+          "description": "Parameters\n----------\npmids : List[Union[str, int]]\n    The PMIDs to query\n\nReturns\n-------\nList[indra.statements.statements.Statement]\n    The statements for the given PubMed identifiers.",
+          "operationId": "post_query_resource_/api/get_stmts_for_pmids",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_stmts_for_stmt_hashes": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_stmts_for_stmt_hashes_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the statements for the given statement hashes",
+          "description": "Parameters\n----------\nstmt_hashes : List[str]\n    The statement hashes to query.\n\nevidence_limit : Union[int, NoneType]\n    An optional maximum number of evidences to return\n\nReturns\n-------\nUnion[List[indra.statements.statements.Statement], Tuple[List[indra.statements.statements.Statement], Mapping[int, int]]]\n    The statements for the given statement hashes.",
+          "operationId": "post_query_resource_/api/get_stmts_for_stmt_hashes",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_stmts_meta_for_stmt_hashes": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_stmts_meta_for_stmt_hashes_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the metadata and statements for a given list of hashes",
+          "description": "Parameters\n----------\nstmt_hashes : List[str]\n    The list of statement hashes to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Relation]\n    A dict of statements with their metadata",
+          "operationId": "post_query_resource_/api/get_stmts_meta_for_stmt_hashes",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_targets_for_drug": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_targets_for_drug_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the proteins targeted by the given drug",
+          "description": "Parameters\n----------\ndrug : Tuple[str, str]\n    The drug to query.\n\nReturns\n-------\nIterable[indra.statements.agent.Agent]\n    The proteins targeted by the given drug.",
+          "operationId": "post_query_resource_/api/get_targets_for_drug",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_targets_for_drugs": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_targets_for_drugs_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the proteins targeted by each of the given drugs",
+          "description": "Parameters\n----------\ndrugs : Iterable[Tuple[str, str]]\n    A list of drugs to get the targets for.\n\nReturns\n-------\nMapping[str, Iterable[indra.statements.agent.Agent]]\n    A mapping from each drug to the proteins targeted by that drug.",
+          "operationId": "post_query_resource_/api/get_targets_for_drugs",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_tissues_for_gene": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_tissues_for_gene_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the tissues the gene is expressed in",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The tissues the gene is expressed in.",
+          "operationId": "post_query_resource_/api/get_tissues_for_gene",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_trials_for_disease": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_trials_for_disease_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the trials for the given disease",
+          "description": "Parameters\n----------\ndisease : Tuple[str, str]\n    The disease to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The trials for the given disease.",
+          "operationId": "post_query_resource_/api/get_trials_for_disease",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_trials_for_drug": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_trials_for_drug_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the trials for the given drug",
+          "description": "Parameters\n----------\ndrug : Tuple[str, str]\n    The drug to query.\n\nReturns\n-------\nIterable[indra_cogex.representation.Node]\n    The trials for the given drug.",
+          "operationId": "post_query_resource_/api/get_trials_for_drug",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/get_uniprot_ids_from_uniprot_mnemonic_ids": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_uniprot_ids_from_uniprot_mnemonic_ids_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Maps UniProt mnemonic IDs to UniProt IDs",
+          "description": "This method expects a JSON payload with a key \"uniprot_mnemonic_ids\"\ncontaining a list of UniProt mnemonic IDs. It uses the UniProt client to\nconvert each mnemonic ID to a UniProt ID. Then, it adds the mapping from the\nmnemonic ID to the UniProt ID to the result.\n\nReturns\n-------\n:\n    A dictionary mapping UniProt mnemonic IDs to UniProt IDs.",
+          "operationId": "post_uniprot_ids_from_uniprot_mnemonic_ids",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/indra_subnetwork_meta": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/indra_subnetwork_meta_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the subnetwork induced by the given nodes as a list of metadata",
+          "description": "Parameters\n----------\nnodes : Iterable[Tuple[str, str]]\n    The nodes to query.\n\nReturns\n-------\nList[List[Any]]\n    The subnetwork induced by the given nodes represented as a list of\nmetadata on relations. The elements of each list are:\nCURIE of source node, CURIE of target node, statement type,\nstatement hash, source counts.",
+          "operationId": "post_query_resource_/api/indra_subnetwork_meta",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/indra_subnetwork_relations": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/indra_subnetwork_relations_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return the subnetwork induced by the given nodes as a set of Relations",
+          "description": "Parameters\n----------\nnodes : Iterable[Tuple[str, str]]\n    The nodes to query.\n\nReturns\n-------\nList[indra_cogex.representation.Relation]\n    The subnetwork induced by the given nodes represented as Relation\nobjects.",
+          "operationId": "post_query_resource_/api/indra_subnetwork_relations",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_drug_target": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_drug_target_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the drug targets the given protein",
+          "description": "Parameters\n----------\ndrug : Tuple[str, str]\n    The drug to query.\n\ntarget : Tuple[str, str]\n    The target to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the drug targets the given protein.",
+          "operationId": "post_query_resource_/api/is_drug_target",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_gene_in_pathway": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_gene_in_pathway_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the gene is in the given pathway",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\npathway : Tuple[str, str]\n    The pathway to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the gene is in the given pathway.",
+          "operationId": "post_query_resource_/api/is_gene_in_pathway",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_gene_in_tissue": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_gene_in_tissue_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the gene is expressed in the given tissue",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\ntissue : Tuple[str, str]\n    The tissue to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the gene is expressed in the given tissue.",
+          "operationId": "post_query_resource_/api/is_gene_in_tissue",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_gene_mutated": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_gene_mutated_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the gene is mutated in the given cell line",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\ncell_line : Tuple[str, str]\n    The cell line to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the gene is mutated in the given cell line.",
+          "operationId": "post_query_resource_/api/is_gene_mutated",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_go_term_for_gene": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_go_term_for_gene_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the given GO term is associated with the given gene",
+          "description": "Parameters\n----------\ngene : Tuple[str, str]\n    The gene to query.\n\ngo_term : Tuple[str, str]\n    The GO term to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the given GO term is associated with the given gene.",
+          "operationId": "post_query_resource_/api/is_go_term_for_gene",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_kinase": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_is_kinase_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Determines if the given genes are kinases",
+          "description": "This method expects a JSON payload with a list of genes under the key \"genes\".\nIt checks each gene to determine if it is a kinase using the\n`hgnc_client.is_kinase` method and returns a mapping of each gene to a boolean\nindicating whether it is a kinase.\n\nReturns\n-------\n:\n    A dictionary where the keys are gene names and the values are booleans\n    indicating whether each gene is a kinase.",
+          "operationId": "post_check_if_kinase",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/is_phosphatase": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_is_phosphatase_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Determines if the given genes are phosphatases",
+          "description": "This method expects a JSON payload with a list of gene identifiers under the\nkey \"genes\". It checks each gene to determine if it is a phosphatase using the\n`hgnc_client.is_phosphatase` method. The result is a dictionary mapping each\ngene to a boolean indicating whether it is a phosphatase.\n\nReturns\n-------\n:\n    A dictionary where keys are gene identifiers and values are booleans\n    indicating if the gene is a phosphatase.",
+          "operationId": "post_check_if_phosphatase",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/is_side_effect_for_drug": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/is_side_effect_for_drug_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the given side effect is associated with the given drug",
+          "description": "Parameters\n----------\ndrug : Tuple[str, str]\n    The drug to query.\n\nside_effect : Tuple[str, str]\n    The side effect to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the given side effect is associated with the given drug.",
+          "operationId": "post_query_resource_/api/is_side_effect_for_drug",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/is_transcription_factor": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/get_is_transcription_factor_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Determines if the given genes are transcription factors",
+          "description": "This method expects a JSON payload with a list of genes under the key \"genes\".\nIt checks each gene to determine if it is a transcription factor using the\n`hgnc_client.is_transcription_factor` method and returns a mapping of genes\nto their transcription factor status.\n\nReturns\n-------\n:\n    A dictionary where keys are gene names and values are booleans indicating\n    whether the gene is a transcription factor.",
+          "operationId": "post_check_if_transcription_factor",
+          "tags": [
+            "BioEntity"
+          ]
+        }
+      },
+      "/api/isa_or_partof": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/isa_or_partof_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Return True if the given term is a child of the given parent",
+          "description": "Parameters\n----------\nterm : Tuple[str, str]\n    The term to query.\n\nparent : Tuple[str, str]\n    The parent to query.\n\nReturns\n-------\nDict[str, bool]\n    True if the given term is a child term of the given parent.",
+          "operationId": "post_query_resource_/api/isa_or_partof",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/metabolite_discrete_analysis": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/metabolite_discrete_analysis_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Perform discrete metabolite analysis and return results as a DataFrame",
+          "description": "Parameters\n----------\nmetabolites : List[str]\n    List of metabolite identifiers (CHEBI IDs or CHEBI names).\n\nmethod : \u003Cclass 'str'\u003E\n    Method to adjust p-values, default is family-wise correction with\nBenjamini/Hochberg.\n\nalpha : \u003Cclass 'float'\u003E\n    Significance level, default is 0.05.\n\nkeep_insignificant : \u003Cclass 'bool'\u003E\n    Whether to retain insignificant results, default is False.\n\nminimum_evidence_count : \u003Cclass 'int'\u003E\n    Minimum evidence count threshold, default is 1.\n\nminimum_belief : \u003Cclass 'float'\u003E\n    Minimum belief threshold for filtering results, default is 0.\n\nReturns\n-------\n\u003Cclass 'pandas.core.frame.DataFrame'\u003E\n    A DataFrame containing the analysis results.",
+          "operationId": "post_query_resource_/api/metabolite_discrete_analysis",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      },
+      "/api/signed_analysis": {
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/signed_analysis_model"
+            }
+          }
+        ],
+        "post": {
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          },
+          "summary": "Perform signed analysis using reverse causal reasoning",
+          "description": "Parameters\n----------\npositive_genes : List[str]\n    List of positive gene identifiers.\n\nnegative_genes : List[str]\n    List of negative gene identifiers.\n\nalpha : \u003Cclass 'float'\u003E\n    Significance level, by default 0.05.\n\nkeep_insignificant : \u003Cclass 'bool'\u003E\n    Whether to retain insignificant results, by default False.\n\nminimum_evidence_count : \u003Cclass 'int'\u003E\n    Minimum number of evidence for inclusion, by default 1.\n\nminimum_belief : \u003Cclass 'float'\u003E\n    Minimum belief score for filtering, by default 0.\n\nReturns\n-------\nUnion[pandas.core.frame.DataFrame, NoneType]\n    A DataFrame containing analysis results, or None if an error occurs.",
+          "operationId": "post_query_resource_/api/signed_analysis",
+          "tags": [
+            "CoGEx Queries"
+          ]
+        }
+      }
+    },
+    "info": {
+      "title": "INDRA CoGEx Query API",
+      "version": "1.0",
+      "description": "REST API for INDRA CoGEx queries"
+    },
+    "produces": [
+      "application/json"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "tags": [
+      {
+        "name": "CoGEx Queries",
+        "description": "Queries for INDRA CoGEx"
+      },
+      {
+        "name": "BioEntity",
+        "description": "Queries for BioEntity"
+      }
+    ],
+    "definitions": {
+      "get_genes_in_tissue_model": {
+        "properties": {
+          "tissue": {
+            "type": "array",
+            "example": [
+              "UBERON",
+              "UBERON:0001162"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_tissues_for_gene_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "is_gene_in_tissue_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "tissue": {
+            "type": "array",
+            "example": [
+              "UBERON",
+              "UBERON:0001162"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_go_terms_for_gene_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_indirect": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "type": "object"
+      },
+      "get_genes_for_go_term_model": {
+        "properties": {
+          "go_term": {
+            "type": "array",
+            "example": [
+              "GO",
+              "GO:0000978"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_indirect": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "type": "object"
+      },
+      "is_go_term_for_gene_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "go_term": {
+            "type": "array",
+            "example": [
+              "GO",
+              "GO:0000978"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_trials_for_drug_model": {
+        "properties": {
+          "drug": {
+            "type": "array",
+            "example": [
+              "CHEBI",
+              "CHEBI:27690"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_trials_for_disease_model": {
+        "properties": {
+          "disease": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D007855"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_drugs_for_trial_model": {
+        "properties": {
+          "trial": {
+            "type": "array",
+            "example": [
+              "CLINICALTRIALS",
+              "NCT00000114"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_diseases_for_trial_model": {
+        "properties": {
+          "trial": {
+            "type": "array",
+            "example": [
+              "CLINICALTRIALS",
+              "NCT00000114"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_pathways_for_gene_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_shared_pathways_for_genes_model": {
+        "properties": {
+          "genes": {
+            "type": "array",
+            "example": [
+              [
+                "HGNC",
+                "1097"
+              ],
+              [
+                "HGNC",
+                "6407"
+              ]
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_genes_for_pathway_model": {
+        "properties": {
+          "pathway": {
+            "type": "array",
+            "example": [
+              "WIKIPATHWAYS",
+              "WP5037"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "is_gene_in_pathway_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "pathway": {
+            "type": "array",
+            "example": [
+              "WIKIPATHWAYS",
+              "WP5037"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_side_effects_for_drug_model": {
+        "properties": {
+          "drug": {
+            "type": "array",
+            "example": [
+              "CHEBI",
+              "CHEBI:27690"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_drugs_for_side_effect_model": {
+        "properties": {
+          "side_effect": {
+            "type": "array",
+            "example": [
+              "UMLS",
+              "C3267206"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "is_side_effect_for_drug_model": {
+        "properties": {
+          "drug": {
+            "type": "array",
+            "example": [
+              "CHEBI",
+              "CHEBI:27690"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "side_effect": {
+            "type": "array",
+            "example": [
+              "UMLS",
+              "C3267206"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_ontology_child_terms_model": {
+        "properties": {
+          "term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D007855"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_ontology_parent_terms_model": {
+        "properties": {
+          "term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D007855"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "isa_or_partof_model": {
+        "properties": {
+          "term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D007855"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "parent": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D007855"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_pmids_for_mesh_model": {
+        "properties": {
+          "mesh_term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D015002"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_child_terms": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "type": "object"
+      },
+      "get_mesh_ids_for_pmid_model": {
+        "properties": {
+          "pmid_term": {
+            "type": "array",
+            "example": [
+              "PUBMED",
+              "34634383"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_mesh_ids_for_pmids_model": {
+        "properties": {
+          "pmids": {
+            "type": "array",
+            "example": [
+              "20861832",
+              "19503834"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_evidences_for_mesh_model": {
+        "properties": {
+          "mesh_term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D015002"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_child_terms": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "type": "object"
+      },
+      "get_evidences_for_stmt_hash_model": {
+        "properties": {
+          "stmt_hash": {
+            "type": "string",
+            "example": "12198579805553967"
+          },
+          "limit": {
+            "type": "integer",
+            "example": 30
+          },
+          "offset": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "type": "object"
+      },
+      "get_evidences_for_stmt_hashes_model": {
+        "properties": {
+          "stmt_hashes": {
+            "type": "array",
+            "example": [
+              "12198579805553967",
+              "30651649296901235"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "example": 30
+          }
+        },
+        "type": "object"
+      },
+      "get_stmts_for_paper_model": {
+        "properties": {
+          "paper_term": {
+            "type": "array",
+            "example": [
+              "PUBMED",
+              "34634383"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_stmts_for_pmids_model": {
+        "properties": {
+          "pmids": {
+            "type": "array",
+            "example": [
+              "20861832",
+              "19503834"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_stmts_for_mesh_model": {
+        "properties": {
+          "mesh_term": {
+            "type": "array",
+            "example": [
+              "MESH",
+              "D015002"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_child_terms": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "type": "object"
+      },
+      "get_stmts_meta_for_stmt_hashes_model": {
+        "properties": {
+          "stmt_hashes": {
+            "type": "array",
+            "example": [
+              "12198579805553967",
+              "30651649296901235"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_stmts_for_stmt_hashes_model": {
+        "properties": {
+          "stmt_hashes": {
+            "type": "array",
+            "example": [
+              "12198579805553967",
+              "30651649296901235"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_limit": {
+            "type": "integer",
+            "example": 30
+          }
+        },
+        "type": "object"
+      },
+      "is_gene_mutated_model": {
+        "properties": {
+          "gene": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "9896"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "cell_line": {
+            "type": "array",
+            "example": [
+              "CCLE",
+              "BT20_BREAST"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_mutated_genes_model": {
+        "properties": {
+          "cell_line": {
+            "type": "array",
+            "example": [
+              "CCLE",
+              "BT20_BREAST"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_drugs_for_target_model": {
+        "properties": {
+          "target": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "6840"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_drugs_for_targets_model": {
+        "properties": {
+          "targets": {
+            "type": "array",
+            "example": [
+              [
+                "HGNC",
+                "6840"
+              ],
+              [
+                "HGNC",
+                "1097"
+              ]
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_targets_for_drug_model": {
+        "properties": {
+          "drug": {
+            "type": "array",
+            "example": [
+              "CHEBI",
+              "CHEBI:27690"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_targets_for_drugs_model": {
+        "properties": {
+          "drugs": {
+            "type": "array",
+            "example": [
+              [
+                "CHEBI",
+                "CHEBI:27690"
+              ],
+              [
+                "CHEBI",
+                "CHEBI:114785"
+              ]
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      },
+      "is_drug_target_model": {
+        "properties": {
+          "drug": {
+            "type": "array",
+            "example": [
+              "CHEBI",
+              "CHEBI:27690"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "target": {
+            "type": "array",
+            "example": [
+              "HGNC",
+              "6840"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "indra_subnetwork_relations_model": {
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "example": [
+              [
+                "FPLX",
+                "MEK"
+              ],
+              [
+                "FPLX",
+                "ERK"
+              ]
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      },
+      "indra_subnetwork_meta_model": {
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "example": [
+              [
+                "FPLX",
+                "MEK"
+              ],
+              [
+                "FPLX",
+                "ERK"
+              ]
+            ],
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      },
+      "metabolite_discrete_analysis_model": {
+        "properties": {
+          "metabolites": {
+            "type": "array",
+            "example": [
+              "CHEBI:15366",
+              "CHEBI:15343",
+              "CHEBI:16995",
+              "CHEBI:16842"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "method": {
+            "type": "string",
+            "example": "fdr_bh"
+          },
+          "alpha": {
+            "type": "number",
+            "example": 0.05,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "keep_insignificant": {
+            "type": "boolean",
+            "example": false
+          },
+          "minimum_evidence_count": {
+            "type": "integer",
+            "example": 2
+          },
+          "minimum_belief": {
+            "type": "number",
+            "example": 0.7,
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "type": "object"
+      },
+      "discrete_analysis_model": {
+        "properties": {
+          "gene_list": {
+            "type": "array",
+            "example": [
+              "613",
+              "1116",
+              "1119",
+              "1697",
+              "7067",
+              "2537",
+              "2734",
+              "29517",
+              "8568",
+              "4910",
+              "4931",
+              "4932",
+              "4962",
+              "4983",
+              "18873",
+              "5432",
+              "5433",
+              "5981",
+              "16404",
+              "5985",
+              "18358",
+              "6018",
+              "6019",
+              "6021",
+              "6118",
+              "6120",
+              "6122",
+              "6148",
+              "6374",
+              "6378",
+              "6395",
+              "6727",
+              "14374",
+              "8004",
+              "18669",
+              "8912",
+              "30306",
+              "23785",
+              "9253",
+              "9788",
+              "10498",
+              "10819",
+              "6769",
+              "11120",
+              "11133",
+              "11432",
+              "11584",
+              "18348",
+              "11849",
+              "28948",
+              "11876",
+              "11878",
+              "11985",
+              "20820",
+              "12647",
+              "20593",
+              "12713"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "method": {
+            "type": "string",
+            "example": "fdr_bh"
+          },
+          "alpha": {
+            "type": "number",
+            "example": 0.05,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "keep_insignificant": {
+            "type": "boolean",
+            "example": false
+          },
+          "minimum_evidence_count": {
+            "type": "integer",
+            "example": 2
+          },
+          "minimum_belief": {
+            "type": "number",
+            "example": 0.7,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "indra_path_analysis": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "type": "object"
+      },
+      "signed_analysis_model": {
+        "properties": {
+          "positive_genes": {
+            "type": "array",
+            "example": [
+              "10354",
+              "4141",
+              "1692",
+              "11771",
+              "4932",
+              "12692",
+              "6561",
+              "3999",
+              "20768",
+              "10317",
+              "5472",
+              "10372",
+              "12468",
+              "132",
+              "11253",
+              "2198",
+              "10304",
+              "10383",
+              "7406",
+              "10401",
+              "10388",
+              "10386",
+              "7028",
+              "10410",
+              "4933",
+              "10333",
+              "13312",
+              "2705",
+              "10336",
+              "10610",
+              "3189",
+              "402",
+              "11879",
+              "8831",
+              "10371",
+              "2528",
+              "17194",
+              "12458",
+              "11553",
+              "11820"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "negative_genes": {
+            "type": "array",
+            "example": [
+              "5471",
+              "11763",
+              "2192",
+              "2001",
+              "17389",
+              "3972",
+              "10312",
+              "8556",
+              "10404",
+              "7035",
+              "7166",
+              "13429",
+              "29213",
+              "6564",
+              "6502",
+              "15476",
+              "13347",
+              "20766",
+              "3214",
+              "13388",
+              "3996",
+              "7541",
+              "10417",
+              "4910",
+              "2527",
+              "667",
+              "10327",
+              "1546",
+              "6492",
+              "7",
+              "163",
+              "3284",
+              "3774",
+              "12437",
+              "8547",
+              "6908",
+              "3218",
+              "10424",
+              "10496",
+              "1595"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "alpha": {
+            "type": "number",
+            "example": 0.05,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "keep_insignificant": {
+            "type": "boolean",
+            "example": false
+          },
+          "minimum_evidence_count": {
+            "type": "integer",
+            "example": 2
+          },
+          "minimum_belief": {
+            "type": "number",
+            "example": 0.7,
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "type": "object"
+      },
+      "continuous_analysis_model": {
+        "properties": {
+          "gene_names": {
+            "type": "array",
+            "example": [
+              "YWHAB",
+              "YWHAE",
+              "YWHAH",
+              "YWHAG",
+              "SFN",
+              "YWHAQ",
+              "YWHAZ",
+              "PPP2R5A",
+              "PPP2R5D",
+              "PPP2R5E",
+              "PPP2R5C",
+              "PPP2R1A",
+              "PPP2R1B",
+              "PPP2R2A",
+              "SH3BP1",
+              "MPG",
+              "EIF4ENIF1",
+              "SLC3A2",
+              "BZW2",
+              "BZW1",
+              "NT5C3A",
+              "PGD",
+              "PGLS",
+              "A1CF",
+              "APP",
+              "AAAS",
+              "SLC1A5",
+              "AAGAB",
+              "AAK1",
+              "PRKAA1",
+              "AAR2",
+              "AATF",
+              "APOBEC3A",
+              "APOBEC3B",
+              "APOBEC3C",
+              "APOBEC3F",
+              "APOBEC3G",
+              "ABCA3",
+              "ABCB10",
+              "ABCD1",
+              "ABCD2",
+              "ABCD3",
+              "ABCE1",
+              "ABCF1",
+              "ABCF2",
+              "ABCF3",
+              "ABHD12",
+              "ABHD14B",
+              "ABI1",
+              "ABI2",
+              "ABL1",
+              "ABL2",
+              "ABR",
+              "ABRAXAS1",
+              "ABRAXAS2",
+              "ABT1",
+              "ACACA",
+              "ACACB",
+              "ACAD9",
+              "ACADVL",
+              "ACAP2",
+              "ACBD5",
+              "ACBD6",
+              "DBI",
+              "ACAD10",
+              "ACIN1",
+              "ACTL6A",
+              "ACLY",
+              "ACOT13",
+              "ACO1",
+              "ACOT8",
+              "ACOT9",
+              "ACSL3",
+              "ACSL4",
+              "ACTB",
+              "ACTBL2",
+              "POTEKP",
+              "ACTN1",
+              "ACTN2",
+              "ACTN3",
+              "ACTN4",
+              "ACTA1",
+              "ACTR1B",
+              "ACTR1A",
+              "ADAM10",
+              "ADA2",
+              "ADAP1",
+              "AGPS",
+              "ADD1",
+              "ADD2",
+              "ADD3",
+              "ADNP",
+              "ADPGK",
+              "AASDHPPT",
+              "ADRM1",
+              "SLC25A4",
+              "SLC25A5",
+              "SLC25A6",
+              "SLC25A31",
+              "AEBP2",
+              "AFAP1",
+              "AFF1",
+              "AFF4",
+              "AFG3L2",
+              "AFTPH",
+              "ALG10B",
+              "AGAP2",
+              "AGAP3",
+              "AGFG1",
+              "AGGF1",
+              "AGK",
+              "PGM3",
+              "AGO1",
+              "AGO2",
+              "AGO3",
+              "AGO4",
+              "ADGRF1",
+              "AGRN",
+              "ADGRL2",
+              "ADGRL3",
+              "AHNAK",
+              "AHNAK2",
+              "AIFM1",
+              "AIMP1",
+              "AIMP2",
+              "AIP",
+              "AKAP17A",
+              "AKAP1",
+              "AKAP8",
+              "AKR1E2",
+              "AKAP13",
+              "AKAP8L",
+              "AKT1S1",
+              "ARL14EP",
+              "ALDH1A1",
+              "ALDH1L2",
+              "ALDH3A1",
+              "ALDH3A2",
+              "ALDH3B1",
+              "ALOX5AP",
+              "ALB",
+              "ALDH2",
+              "ALDOA",
+              "ALG12",
+              "ALG2",
+              "ALG3",
+              "ALG6",
+              "ALG8",
+              "ALKBH2",
+              "ALKBH5",
+              "ALS2",
+              "ALX1",
+              "AMOTL1",
+              "AMPH",
+              "LAP3",
+              "ANPEP",
+              "LRPAP1",
+              "ANP32A",
+              "ANP32B",
+              "ANP32E",
+              "ANAPC2",
+              "ANK2",
+              "ANKHD1",
+              "ANKLE2",
+              "ANKZF1",
+              "ANLN",
+              "PRMT1",
+              "PRMT3",
+              "PRMT5",
+              "ANO2",
+              "ANKRD11",
+              "ANKRD17",
+              "ANKRD24",
+              "ANKRD27",
+              "ANKRD28",
+              "ANKRD44",
+              "ANKRD50",
+              "ANKS1A",
+              "ANXA11",
+              "ANXA1",
+              "ANXA2",
+              "ANXA4",
+              "ANXA5",
+              "ANXA6",
+              "SNAP91",
+              "AP1B1",
+              "AP1G1",
+              "AP1M1",
+              "AP1S1",
+              "AP1S2",
+              "AP2A1",
+              "AP2A2",
+              "AP2B1",
+              "AP2M1",
+              "AP2S1",
+              "AP3B1",
+              "AP3B2",
+              "AP3D1",
+              "AP3M1",
+              "AP3M2"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "log_fold_change": {
+            "type": "array",
+            "example": [-0.007834918, -0.015973798, 0.06525256, 0.044404462, -0.02976365, 0.027458748, -0.004621383, 0.172823826, 0.023434448, -0.216846213, -0.36182941, -0.076917203, 0.104152273, 0.031030455, 0.042832082, -0.051368183, -0.113104564, 0.213079298, 0.066744158, 0.100280513, 0.011070345, 0.004263778, -0.098158149, 0.105347041, -0.174194188, -0.03014477, -0.027154538, 0.090027177, -0.082737155, 0.140364596, -0.0125346, -0.016067206, 0.1357998, -0.037393152, -0.002644567, 0.013894275, -0.086607048, -0.014380271, 0.003477282, -0.100460811, 0.10783447, -0.060373037, -0.04365049, -0.036172563, -0.021618789, -0.12688348, 0.002547447, 0.026315795, 0.02447343, 0.070248284, 0.183487775, 0.241480286, -0.116763081, 0.001991917, 0.320259547, -0.044982617, -0.038471683, -0.100024725, -0.037848093, 0.00558187, 0.135190119, -0.085880794, 0.166240241, 1.442972627, 0.070417774, 0.00742579, -0.063511887, -0.065682931, -0.133994534, 0.065871895, -0.025752905, -0.015982487, -0.140558871, -0.064293962, -0.084677564, 0.080023292, -0.013939517, -0.110658673, -0.012408017, -0.054429647, 0.00539965, -0.319373889, 0.37213006, -0.069172151, -0.03588429, -0.059794758, 0.07604121, -0.007960316, 0.062595835, -0.055540585, 0.208582702, -0.077781022, 0.131806442, 0.011900425, 0.041529672, -0.153934351, -0.032218808, 0.037894924, -0.238749677, 0.032025799, 0.203362454, -0.036545192, -0.231393839, -0.032413874, -0.287103952, 0.147116305, -0.045127754, -0.071432392, -0.009055862, -0.040537547, 0.275372803, 0.004758125, 0.024745067, 0.021592856, 0.025918375, -0.06253178, -0.121486812, 0.396592437, -0.234385362, -0.024146725, 0.025674463, -0.089995924, 0.114048943, 0.027067928, 0.037915793, 0.099089107, -0.012553814, -0.084242638, -0.012928769, -0.118821286, -0.103937162, -0.090616788, 0.05396134, 0.051670537, -0.349704002, -0.050594502, -0.114951935, -0.144257648, -0.055511291, 0.006343954, 0.139695178, -0.160142862, 0.01128666, 0.083480407, 0.679985121, -0.177158303, -0.031067381, -0.058193464, 0.059667416, 0.082637821, -0.039450835, -0.239469009, -0.051765201, 0.044654061, 0.337433365, -0.011590467, -0.00286531, 0.001475451, -0.074659255, -0.089343646, -0.043485259, -0.023399971, -0.008324687, -0.063650571, -0.038645576, 0.031970411, 0.080859473, -0.360830799, -0.01841515, -0.039607757, -0.211484382, -0.025024948, -0.454340643, -0.215153685, 0.183323872, 0.074745409, 0.028595357, -0.06003762, -0.183730502, 0.046383985, 0.035745291, -0.021593695, 0.087132071, -0.061374351, -0.0599222, 0.038324903, -0.002652249, -0.10669982, -0.164372562, -0.104389145, 0.048914821, -0.035667563, -0.005440283, -0.041691207, -0.011319567, -0.023396396, -0.003882796, -0.000783146, -0.061487117, 0.037356862],
+            "items": {
+              "type": "number"
+            }
+          },
+          "species": {
+            "type": "string",
+            "example": "human"
+          },
+          "permutations": {
+            "type": "integer",
+            "example": 100
+          },
+          "source": {
+            "type": "string",
+            "example": "go"
+          },
+          "alpha": {
+            "type": "number",
+            "example": 0.05,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "keep_insignificant": {
+            "type": "boolean",
+            "example": false
+          },
+          "minimum_evidence_count": {
+            "type": "integer",
+            "example": 2
+          },
+          "minimum_belief": {
+            "type": "number",
+            "example": 0.7,
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "type": "object"
+      },
+      "get_uniprot_ids_from_uniprot_mnemonic_ids_model": {
+        "required": [
+          "uniprot_mnemonic_ids"
+        ],
+        "properties": {
+          "uniprot_mnemonic_ids": {
+            "type": "array",
+            "description": "List of UniProt mnemonic IDs",
+            "example": [
+              "CLH1_HUMAN"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_hgnc_ids_from_uniprot_ids_model": {
+        "required": [
+          "uniprot_ids"
+        ],
+        "properties": {
+          "uniprot_ids": {
+            "type": "array",
+            "description": "List of UniProt IDs",
+            "example": [
+              "Q00610"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_hgnc_names_from_hgnc_ids_model": {
+        "required": [
+          "hgnc_ids"
+        ],
+        "properties": {
+          "hgnc_ids": {
+            "type": "array",
+            "description": "List of HGNC IDs",
+            "example": [
+              "2092"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_is_kinase_model": {
+        "required": [
+          "genes"
+        ],
+        "properties": {
+          "genes": {
+            "type": "array",
+            "description": "List of gene names",
+            "example": [
+              "CHEK1"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_is_phosphatase_model": {
+        "required": [
+          "genes"
+        ],
+        "properties": {
+          "genes": {
+            "type": "array",
+            "description": "List of gene names",
+            "example": [
+              "MTM1"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "get_is_transcription_factor_model": {
+        "required": [
+          "genes"
+        ],
+        "properties": {
+          "genes": {
+            "type": "array",
+            "description": "List of gene names",
+            "example": [
+              "STAT1"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    "responses": {
+      "ParseError": {
+        "description": "When a mask can't be parsed"
+      },
+      "MaskError": {
+        "description": "When any error occurs on mask"
+      }
+    }
+  }
