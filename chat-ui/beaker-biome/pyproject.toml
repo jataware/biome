@@ -25,13 +25,17 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
+  "archytas~=1.2.3",
   "beaker-kernel>=1.6.5",
   "requests",
   "google-generativeai",
   "PyYAML",
   "adhoc-api~=0.2.8",
+  "idc-index",
   "seaborn",
-  "biopython"
+  "biopython",
+  "boto3",
+  "google-cloud-storage",
 ]
 
 [project.urls]

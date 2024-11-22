@@ -219,6 +219,41 @@ class BiomeAgent(BaseAgent):
             raise
         return format_execution_context(execution_context)
 
+
+    @tool
+    async def drs_uri_info(self, uris: list[str]) -> str:
+        """
+        Get information about a DRS URI.
+        Data Repository Service (DRS) URIs are used to provide a standard way to locate and access data objects in a cloud environment.
+        In the context of the Cancer Data Aggregator (CDA) API, DRS URIs are used to specify how to access data.
+
+        Args:
+            uris (list[str]): A list of DRS URIs to get information about. URIs should be of the form 'drs://<hostname>:<id_number>'.
+            
+        Returns:
+            list[str]: The information from looking up each DRS URI.
+        """
+        responses = []
+        for uri in uris:
+
+            # Split the DRS URI by ':' and take the last part as the object ID
+            if not uri.startswith("drs://"):
+                raise ValueError("Invalid DRS URI: Must start with 'drs://'")
+            try:
+                object_id = uri.split(":")[-1]
+            except IndexError:
+                raise ValueError("Invalid DRS URI: Missing object ID")
+    
+            # Get information about the object from the DRS server
+            url = f"https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/{object_id}"
+            response = requests.get(url)
+            response.raise_for_status()
+
+            # Append the response to the list of responses
+            responses.append(response.json())
+
+        return responses
+
     # def update_job_status(self, job_id, status):
     #     self.context.send_response("iopub", 
     #             "job_status", {
