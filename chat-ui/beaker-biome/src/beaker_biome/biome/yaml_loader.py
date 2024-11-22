@@ -81,7 +81,6 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
             'name',
             'cache_key',
             'description',
-            'documentation',
             'instructions'
         ]
         missing_key = None
