@@ -52,7 +52,7 @@ apis:
         disabled: false
         cache: 
             # key -- no default specified! it is required to be manually filled.
-            model: "models/gemini-1.5-flash-001"
+            model: "models/gemini-1.5-pro-001"
             ttl: 30 # in minutes
         # relative to config.documentation_root
         documentation_file: "api_docs.md"
@@ -1993,6 +1993,13 @@ apis:
         cache: 
             key: "api_assistant_cda_yaml"
         additional_cache_body: |
+            Typically metadata retrieved from CDA will locate the raw data files via Data Repository Service (DRS) URIs.
+            DRS URIs are not to the data itself, but will return metadata about the location of the data.
+            The location metadata (which should include the actual data download URL) can be retrieved by using the drs_uri_info tool if it is available,
+            or by querying "https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/<object_id>" directly.
+
+            All data in CDA should be publicly accessible without any special permissions or credentials.
+
             You should make use of the python requests library to interact with the API.
             Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
     indra_cogex:
@@ -2015,3 +2022,22 @@ apis:
         additional_cache_body: |
             You should make use of the python requests library to interact with the API.
             Note that the base URL of the API is 'https://discovery.indra.bio/api/'
+    idc:
+        name: "Imaging Data Commons"
+        description: |
+            NCI Imaging Data Commons (IDC) is a cloud-based environment containing publicly available cancer imaging data co-located with the analysis and exploration tools and resources.
+
+            Features:
+            - >65 TB: IDC contains radiology, brightfield (H&E) and fluorescence slide microscopy images, along with image-derived data (annotations, segmentations, quantitative measurements) and accompanying clinical data
+            - Free: All of the data in IDC is publicly available: no registration, no access requests
+            - Commercial-friendly: >95% of the data in IDC is covered by the permissive CC-BY license, which allows commercial reuse (small subset of data is covered by the CC-NC license); each file in IDC is tagged with the license to make it easier for you to understand and follow the rules
+            - Cloud-based: All of the data in IDC is available from both Google and AWS public buckets: fast and free to download, no out-of-cloud egress fees
+            - Harmonized: All of the images and image-derived data in IDC is harmonized into standard DICOM representation
+        documentation_file: "idc.md"
+        cache: 
+            key: "api_assistant_idc_yaml"
+        additional_cache_body: |
+            Be sure to import and instantiate the client for the Imaging Data Commons API:
+            ```python
+            from idc_index import index
+            client = index.IDCClient()

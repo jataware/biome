@@ -83,7 +83,7 @@ def load(api_definition_filepath: str, documentation_root: str):
 
     # todo - api contracts with adhoc 
 
-    drafter_config = {'model': "models/gemini-1.5-flash-001", 'ttl_seconds': 1800}
+    drafter_config = {'model': "models/gemini-1.5-pro-001", 'ttl_seconds': 1800}
     finalizer_config = {'model': 'gpt-4o'}
     specs = [
         {
