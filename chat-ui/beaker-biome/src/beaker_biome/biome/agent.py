@@ -43,14 +43,22 @@ class BiomeAgent(BaseAgent):
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
         root_folder = pathlib.Path(__file__).resolve().parent
-        drafter_config, finalizer_config, specs, = load(f'{root_folder}/api_agent.yaml', 'api_documentation')
+
+        api_config = load(f'{root_folder}/api_agent.yaml')
+        drafter_config = api_config["drafter_config"]
+        finalizer_config = api_config["finalizer_config"]
+        specs = api_config["api_specs"]
+
         super().__init__(context, tools, **kwargs)
         sleep(5)
         self.logger = MessageLogger(self.context)
+
         try:
             self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
         except ValueError as e:
+            self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
+
         self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
 
     @tool()
