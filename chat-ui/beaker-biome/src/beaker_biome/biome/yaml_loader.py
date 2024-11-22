@@ -135,15 +135,6 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
         for api in api_definitions
     ]
 
-    lr = {
-        'api_specs': api_specs,
-        'finalizer_config': finalizer_config,
-        'drafter_config': drafter_config
-    }
-
-    with open('dump', 'w') as f:
-        f.write(json.dumps(lr))
-
     return {
         'api_specs': api_specs,
         'finalizer_config': finalizer_config,
