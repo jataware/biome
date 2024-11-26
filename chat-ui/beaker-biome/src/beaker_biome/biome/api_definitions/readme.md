@@ -138,7 +138,7 @@ documentation: |
 
 Arbitrary new keys can be defined.
 
-**They are not interpolated.**
+> New keys are not themselves interpolated, but can be used for interpolation as in the example below (for either `instructions` or `description`).
 
 ```yaml
 facets:
