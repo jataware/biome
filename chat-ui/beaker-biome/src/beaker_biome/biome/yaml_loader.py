@@ -134,7 +134,7 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
         }
         for api in api_definitions
     ]
-
+    
     return {
         'api_specs': api_specs,
         'finalizer_config': finalizer_config,

@@ -51,7 +51,14 @@ class BiomeAgent(BaseAgent):
 
         super().__init__(context, tools, **kwargs)
         sleep(5)
+        
+        # Configure root logger
+        logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
+        
         self.logger = MessageLogger(self.context)
+
+        # Add a direct console log to debug
+        logger.info(f"drafter config (root logger): {drafter_config}")
 
         try:
             self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
@@ -64,7 +71,9 @@ class BiomeAgent(BaseAgent):
     @tool()
     async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        Draft python code for an API request given some goal in plain English.
+        Drafts python code for an API request given some goal in plain English. You MUST use this tool to 
+        interact with the APIs that are available to you. When the user asks you to use an API, you MUST
+        be sure to use this tool. Do not attempt to interact with an API manually.
 
         Args:
             api (str): The name of the API to use
@@ -77,6 +86,7 @@ class BiomeAgent(BaseAgent):
                  trying to fix the code yourself rather than reusing the tool.
         """
         self.logger.info("using api")
+        logger.info(f"using api: {api}")
         try: 
             code = self.api.use_api(api, goal)
         except Exception as e:
