@@ -1,6 +1,6 @@
 <template>
     <BaseInterface
-        title="Biome Notebook"
+        title="Biome"
         :title-extra="saveAsFilename"
         :header-nav="headerNav"
         ref="beakerInterfaceRef"
@@ -15,10 +15,6 @@
         @any-msg="anyMessage"
         @session-status-changed="statusChanged"
         @open-file="loadNotebook"
-        :context="{
-            slug: 'biome',
-            payload: {}
-        }"
     >
         <div class="notebook-container">
             <BeakerNotebook
@@ -74,51 +70,71 @@
                 <SideMenuPanel label="Info" icon="pi pi-home">
                     <InfoPanel/>
                 </SideMenuPanel>
-                <SideMenuPanel id="files" label="Files" icon="pi pi-file-export" no-overflow>
+                <SideMenuPanel id="files" label="Files" icon="pi pi-file-export" no-overflow :lazy="true">
                     <FilePanel
                         ref="filePanelRef"
                         @open-file="loadNotebook"
+                        @preview-file="(file, mimetype) => {
+                            previewedFile = {url: file, mimetype: mimetype};
+                            previewVisible = true;
+                        }"
+                    />
+                </SideMenuPanel>
+                <SideMenuPanel v-if="props.config.config_type !== 'server'" id="config" label="Config" icon="pi pi-cog" :lazy="true">
+                    <ConfigPanel
+                        ref="configPanelRef"
+                        @restart-session="restartSession"
                     />
                 </SideMenuPanel>
             </SideMenu>
         </template>
+        <template #right-panel>
+        </template>
+        <PreviewPanel
+            :url="previewedFile?.url"
+            :mimetype="previewedFile?.mimetype"
+            v-model="previewVisible"
+        />
     </BaseInterface>
 </template>
 
 <script setup lang="ts">
-import { standardRendererFactories } from '@jupyterlab/rendermime';
-import { JupyterMimeRenderer, IBeakerCell, IMimeRenderer, BeakerSession } from 'beaker-kernel';
-
+import { defineProps, ref, onBeforeMount, watch, provide, computed, nextTick, onUnmounted, inject, toRaw } from 'vue';
+import { JupyterMimeRenderer, IBeakerCell, IMimeRenderer, BeakerSession } from 'beaker-kernel/src';
 import BeakerNotebook from 'beaker-vue/src/components/notebook/BeakerNotebook.vue';
 import BeakerNotebookToolbar from 'beaker-vue/src/components/notebook/BeakerNotebookToolbar.vue';
 import BeakerNotebookPanel from 'beaker-vue/src/components/notebook/BeakerNotebookPanel.vue';
-import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
-import BeakerQueryCell from 'beaker-vue/src/components/cell/BeakerQueryCell.vue';
-import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
-import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
+import { DecapodeRenderer, JSONRenderer, LatexRenderer, wrapJupyterRenderer, BeakerRenderOutput, TableRenderer } from 'beaker-vue/src/renderers';
+import { standardRendererFactories } from '@jupyterlab/rendermime';
+
 import Button from "primevue/button";
-
-import { defineProps, inject, nextTick, ref, computed, toRaw, watch } from 'vue';
-import { DecapodeRenderer, JSONRenderer, LatexRenderer, wrapJupyterRenderer, BeakerRenderOutput  } from 'beaker-vue/src/renderers';
-
+import Sidebar from 'primevue/sidebar';
 import BaseInterface from 'beaker-vue/src/pages/BaseInterface.vue';
 import BeakerAgentQuery from 'beaker-vue/src/components/agent/BeakerAgentQuery.vue';
 import InfoPanel from 'beaker-vue/src/components/panels/InfoPanel.vue';
 import FilePanel from 'beaker-vue/src/components/panels/FilePanel.vue';
+import ConfigPanel from 'beaker-vue/src/components/panels/ConfigPanel.vue';
 import SvgPlaceholder from 'beaker-vue/src/components/misc/SvgPlaceholder.vue';
 import SideMenu from "beaker-vue/src/components/sidemenu/SideMenu.vue";
 import SideMenuPanel from "beaker-vue/src/components/sidemenu/SideMenuPanel.vue";
+import PreviewPanel from 'beaker-vue/src/components/panels/PreviewPanel.vue';
 
+import BeakerCodeCell from 'beaker-vue/src/components/cell/BeakerCodeCell.vue';
+import BeakerMarkdownCell from 'beaker-vue/src/components/cell/BeakerMarkdownCell.vue';
+import BeakerQueryCell from 'beaker-vue/src/components/cell/BeakerQueryCell.vue';
+import BeakerRawCell from 'beaker-vue/src/components/cell/BeakerRawCell.vue';
 import { IBeakerTheme } from 'beaker-vue/src/plugins/theme';
 
 
 const beakerNotebookRef = ref();
 const beakerInterfaceRef = ref();
 const filePanelRef = ref();
+const configPanelRef = ref();
 const sideMenuRef = ref();
+const previewVisible = ref<boolean>(false);
 
 const urlParams = new URLSearchParams(window.location.search);
-const sessionId = urlParams.has("session") ? urlParams.get("session") : "biome_dev_session";
+const sessionId = urlParams.has("session") ? urlParams.get("session") : "notebook_dev_session";
 
 const props = defineProps([
     "config",
@@ -134,6 +150,7 @@ const renderers: IMimeRenderer<BeakerRenderOutput>[] = [
     JSONRenderer,
     LatexRenderer,
     DecapodeRenderer,
+    TableRenderer
 ];
 
 const cellComponentMapping = {
@@ -158,12 +175,18 @@ const isMaximized = ref(false);
 const rightMenu = ref<typeof SideMenuPanel>();
 const { theme, toggleDarkMode } = inject<IBeakerTheme>('theme');
 
+type FilePreview = {
+    url: string,
+    mimetype?: string
+}
+const previewedFile = ref<FilePreview>();
+
 const notebookTitle = computed(() => {
     if (saveAsFilename.value) {
-        return `Biome Notebook`;
+        return `Beaker Notebook`;
     }
     else {
-        return 'Biome Notebook';
+        return 'Beaker Notebook';
     }
 });
 
@@ -204,7 +227,7 @@ const beakerSession = computed(() => {
 
 // Ensure we always have at least one cell
 watch(
-    () => beakerNotebookRef?.value?.notebook?.cells,
+    () => beakerNotebookRef?.value?.notebook.cells,
     (cells) => {
         if (cells?.length === 0) {
             beakerNotebookRef.value.insertCellBefore();
@@ -214,6 +237,7 @@ watch(
 )
 
 const iopubMessage = (msg) => {
+    // console.log(msg);
     if (msg.header.msg_type === "preview") {
         previewData.value = msg.content;
     } else if (msg.header.msg_type === "debug_event") {
@@ -242,13 +266,19 @@ const statusChanged = (newStatus) => {
 };
 
 
+const restartSession = async () => {
+    console.log(beakerSession.value);
+    const resetFuture = beakerSession.value.session.sendBeakerMessage(
+        "reset_request",
+        {}
+    )
+    await resetFuture;
+}
+
 const loadNotebook = (notebookJSON: any, filename: string) => {
     const notebook = beakerNotebookRef.value;
     beakerSession.value?.session.loadNotebook(notebookJSON);
     saveAsFilename.value = filename;
-    if (notebook?.notebook === undefined) {
-        return
-    }
     const cellIds = notebook.notebook.cells.map((cell) => cell.id);
     if (!cellIds.includes(notebook.selectedCellId)) {
         nextTick(() => {
