@@ -1,0 +1,24 @@
+name: Genomics Data Commons
+description: |
+    The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational 
+    platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
+    The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG), 
+    including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
+documentation:
+    file: gdc.md
+cache_key: api_assistant_gdc_faceted
+instructions: |
+    You will be given python code to query the GDC API. 
+
+    When querying GDC, change the `format` from "TSV" to "JSON"
+
+    If you download a file by file-id, the output will be TSV.
+    Save the file with the proper extension.
+
+    Ensure filters align to the facets provided.
+    A list of filters and their respective choices are as follows, between backticks:
+    ```
+    {facets}
+    ```
+facets: 
+    file: facets.txt

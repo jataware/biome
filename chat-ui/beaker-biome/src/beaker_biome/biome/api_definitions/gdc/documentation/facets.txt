@@ -1,0 +1,1764 @@
+demographic ethnicity:
+    - not reported
+    - not hispanic or latino
+    - hispanic or latino
+    - unknown
+demographic gender:
+    - female
+    - male
+    - not reported
+    - unknown
+    - unspecified
+demographic race:
+    - not reported
+    - white
+    - black or african american
+    - asian
+    - unknown
+    - other
+    - american indian or alaska native
+    - native hawaiian or other pacific islander
+    - not allowed to collect
+demographic vital_status:
+    - not reported
+    - alive
+    - dead
+    - unknown
+diagnoses ajcc_clinical_stage:
+    - stage iva
+    - stage i
+    - stage iii
+    - stage ii
+    - stage iv
+    - stage ia
+    - stage iia
+    - stage iib
+    - stage iiia
+    - stage is
+    - stage iiib
+    - stage ib
+    - stage iiic
+    - stage ivb
+    - stage ivc
+    - not reported
+    - stage iic
+    - stage 0
+    - stage ia2
+diagnoses ajcc_pathologic_stage:
+    - stage i
+    - stage iia
+    - stage iii
+    - stage iib
+    - stage ii
+    - stage iv
+    - stage iiia
+    - stage ib
+    - stage ia
+    - stage iva
+    - not reported
+    - stage iiib
+    - stage iiic
+    - stage iic
+    - stage is
+    - stage ivb
+    - stage x
+    - stage 0
+    - stage ia3
+    - stage ivc
+    - stage iiic1
+    - unknown
+    - stage ia2
+    - stage ia1
+    - stage iiia2
+    - stage iiic2
+    - stage tis
+diagnoses ann_arbor_clinical_stage:
+    - stage iv
+    - stage ii
+    - stage iii
+    - stage i
+    - not reported
+    - unknown
+diagnoses ann_arbor_pathologic_stage:
+    - stage iv
+    - stage iii
+    - stage i
+    - stage ii
+    - not reported
+diagnoses best_overall_response:
+    - cr-complete response
+    - pr-partial response
+    - nr-no response
+    - cru-complete response unconfirmed
+diagnoses cog_neuroblastoma_risk_group:
+    - high risk
+    - low risk
+    - intermediate risk
+diagnoses cog_renal_stage:
+    - stage iv
+diagnoses cog_rhabdomyosarcoma_risk_group:
+    - high risk
+diagnoses eln_risk_classification:
+    - adverse
+    - intermediate
+    - favorable
+    - unknown
+    - not reported
+diagnoses enneking_msts_stage:
+    - 
+diagnoses figo_stage:
+    - stage iiic
+    - not reported
+    - stage ib
+    - stage ia
+    - stage i
+    - stage iiib
+    - stage iib
+    - stage iv
+    - stage ib1
+    - stage iiia
+    - stage ib2
+    - stage ii
+    - stage ivb
+    - stage ic
+    - stage iii
+    - stage iiic1
+    - stage iiic2
+    - stage iia
+    - stage iic
+    - stage iva
+    - stage iia2
+    - stage iia1
+    - stage ia2
+    - stage ia1
+diagnoses igcccg_stage:
+    - good prognosis
+    - intermediate prognosis
+    - poor prognosis
+diagnoses inpc_grade:
+    - undifferentiated or poorly differentiated
+    - unknown
+    - differentiating
+diagnoses inss_stage:
+    - stage 4
+    - stage 3
+    - stage 1
+    - stage 4s
+    - stage 2b
+    - stage 2a
+    - unknown
+diagnoses international_prognostic_index:
+    - low risk
+    - low-intermediate risk
+    - high-intermediate risk
+    - high risk
+diagnoses iss_stage:
+    - ii
+    - i
+    - iii
+    - unknown
+diagnoses laterality:
+    - right
+    - left
+    - unknown
+    - bilateral
+diagnoses masaoka_stage:
+    - stage iia
+    - stage i
+    - stage iib
+    - stage iii
+    - stage ivb
+    - stage iva
+diagnoses morphology:
+    - 8140/3
+    - 8500/3
+    - 9861/3
+    - 8070/3
+    - 8010/3
+    - 9836/3
+    - not reported
+    - 8441/3
+    - 9440/3
+    - 8260/3
+    - 9835/3
+    - 8720/3
+    - 9732/3
+    - 9500/3
+    - 8380/3
+    - 8120/3
+    - 8960/3
+    - 8310/3
+    - 8046/3
+    - 8170/3
+    - 8246/3
+    - 8312/3
+    - 8520/3
+    - 8160/3
+    - unknown
+    - 9180/3
+    - 9687/3
+    - 8550/3
+    - 9400/3
+    - 8041/34
+    - 8072/3
+    - 9050/3
+    - 9450/3
+    - 8480/3
+    - 9895/3
+    - 9680/3
+    - 8200/3
+    - 8071/3
+    - 9061/3
+    - 8370/3
+    - 8145/3
+    - 8255/3
+    - 9382/3
+    - 9401/3
+    - 9490/3
+    - 8140/6
+    - 8700/0
+    - 8317/3
+    - 8144/3
+    - 8340/3
+    - 8890/3
+    - 8980/3
+    - 8050/3
+    - 8013/3
+    - 8211/3
+    - 8460/3
+    - 9451/3
+    - 8936/1
+    - 8963/3
+    - 8575/3
+    - 8130/3
+    - 9380/3
+    - 8858/3
+    - 9052/3
+    - 9800/3
+    - 9085/3
+    - 9920/3
+    - 9530/0
+    - 8033/3
+    - 8247/3
+    - 8020/3
+    - 8950/3
+    - 9871/3
+    - 8230/3
+    - 8700/3
+    - 8770/3
+    - 9963/3
+    - 8560/3
+    - 9064/3
+    - 8344/3
+    - 8805/3
+    - 8041/3
+    - 9945/3
+    - 8580/1
+    - 8550/1
+    - 8620/1
+    - 8582/3
+    - 9876/3
+    - 8021/3
+    - 8522/3
+    - 8083/3
+    - 8249/3
+    - 9070/3
+    - 9975/3
+    - 8584/3
+    - 8330/3
+    - 8510/3
+    - 8720/6
+    - 8811/3
+    - 9370/3
+    - 9867/3
+    - 8772/3
+    - 9053/3
+    - 9866/3
+    - 8090/3
+    - 8384/3
+    - 8390/3
+    - 8721/3
+    - 8252/3
+    - 8430/3
+    - 8523/3
+    - 8771/3
+    - 8982/3
+    - 8693/1
+    - 8482/3
+    - 9391/3
+    - 8490/3
+    - 9896/3
+    - 8290/0
+    - 8581/3
+    - 9869/3
+    - 9891/3
+    - 8680/1
+    - 8012/3
+    - 8500/2
+    - 8583/3
+    - 8585/3
+    - 8964/3
+    - 9801/3
+    - 8830/3
+    - 9872/3
+    - 9897/3
+    - 8240/3
+    - 8530/3
+    - 8586/3
+    - 9470/3
+    - 9728/3
+    - 8253/3
+    - 8774/3
+    - 9540/3
+    - 9874/3
+    - 8263/3
+    - 8319/3
+    - 8582/1
+    - 9522/3
+    - 9873/3
+    - 8180/3
+    - 8250/3
+    - 8503/3
+    - 8524/3
+    - 8590/1
+    - 8730/3
+    - 9930/3
+    - 9989/3
+    - 8032/3
+    - 8052/3
+    - 8272/0
+    - 8693/3
+    - 9041/3
+    - 8123/3
+    - 8370/1
+    - 8452/1
+    - 8584/1
+    - 8743/3
+    - 9080/0
+    - 9809/3
+    - 9840/3
+    - 8022/3
+    - 8174/3
+    - 8263/0
+    - 8350/3
+    - 8461/3
+    - 8507/3
+    - 9071/3
+    - 9865/3
+    - 9983/3
+    - 8171/3
+    - 8265/3
+    - 8500/6
+    - 8541/3
+    - 8802/3
+    - 8896/3
+    - 9080/3
+    - 9442/3
+    - 8082/3
+    - 8213/0
+    - 8382/3
+    - 8581/1
+    - 8680/3
+    - 8742/3
+    - 8744/3
+    - 8801/3
+    - 8804/6
+    - 8822/1
+    - 8854/3
+    - 8860/0
+    - 8920/6
+    - 8936/3
+    - 9020/3
+    - 9040/3
+diagnoses primary_diagnosis:
+    - adenocarcinoma, nos
+    - squamous cell carcinoma, nos
+    - acute myeloid leukemia, nos
+    - infiltrating duct carcinoma, nos
+    - carcinoma, nos
+    - glioblastoma
+    - common precursor b all
+    - acute lymphocytic leukemia
+    - papillary adenocarcinoma, nos
+    - multiple myeloma
+    - neuroblastoma, nos
+    - endometrioid adenocarcinoma, nos
+    - serous cystadenocarcinoma, nos
+    - wilms tumor
+    - serous carcinoma, nos
+    - non-small cell carcinoma
+    - diffuse large b-cell lymphoma, nos
+    - melanoma, nos
+    - precursor b-cell lymphoblastic leukemia
+    - clear cell adenocarcinoma, nos
+    - hepatocellular carcinoma, nos
+    - malignant melanoma, nos
+    - duct adenocarcinoma, nos
+    - neuroendocrine carcinoma, nos
+    - urothelial carcinoma, nos
+    - renal cell carcinoma, nos
+    - not reported
+    - cholangiocarcinoma
+    - transitional cell carcinoma
+    - lobular carcinoma, nos
+    - osteosarcoma, nos
+    - burkitt lymphoma, nos (includes all variants)
+    - astrocytoma, nos
+    - small cell carcinoma, nos
+    - oligodendroglioma, nos
+    - mesothelioma, nos
+    - acute myeloid leukemia with mutated npm1
+    - acinar adenocarcinoma
+    - acute myeloid leukemia with myelodysplasia-related changes
+    - adenoid cystic carcinoma
+    - squamous cell carcinoma, keratinizing, nos
+    - clear cell carcinoma
+    - seminoma, nos
+    - adrenal cortical carcinoma
+    - mucinous adenocarcinoma
+    - acute lymphoblastic leukemia, nos
+    - adenocarcinoma with mixed subtypes
+    - squamous cell carcinoma, nonkeratinizing, nos
+    - astrocytoma, anaplastic
+    - mixed glioma
+    - ganglioneuroblastoma
+    - adenocarcinoma, metastatic, nos
+    - pheochromocytoma, nos
+    - renal cell carcinoma, chromophobe type
+    - unknown
+    - serous adenocarcinoma, nos
+    - leiomyosarcoma, nos
+    - adenocarcinoma, intestinal type
+    - papillary carcinoma, follicular variant
+    - carcinosarcoma, nos
+    - tumor, nos
+    - papillary carcinoma, nos
+    - large cell neuroendocrine carcinoma
+    - tubular adenocarcinoma
+    - oligodendroglioma, anaplastic
+    - gastrointestinal stromal tumor, nos
+    - papillary serous adenocarcinoma
+    - acinar cell carcinoma
+    - adenocarcinoma, diffuse type
+    - carcinoma, diffuse type
+    - malignant rhabdoid tumor
+    - metaplastic carcinoma, nos
+    - papillary transitional cell carcinoma
+    - squamous cell carcinoma, large cell, nonkeratinizing, nos
+    - invasive mammary carcinoma
+    - glioma, malignant
+    - dedifferentiated liposarcoma
+    - epithelioid mesothelioma, malignant
+    - leukemia, nos
+    - mixed germ cell tumor
+    - nephroblastoma, nos
+    - therapy related myeloid neoplasm
+    - meningioma, nos
+    - malignant lymphoma, large b-cell, diffuse, nos
+    - merkel cell carcinoma
+    - sarcomatoid carcinoma
+    - carcinoma, undifferentiated, nos
+    - papillary renal cell carcinoma
+    - mullerian mixed tumor
+    - acute myeloid leukemia, cbf-beta/myh11
+    - acute myeloid leukemia with mutated cebpa
+    - infiltrating duct and lobular carcinoma
+    - chronic neutrophilic leukemia
+    - mixed epithelioid and spindle cell melanoma
+    - pheochromocytoma, malignant
+    - solid carcinoma, nos
+    - adenosquamous carcinoma
+    - germ cell tumor, nos
+    - papillary carcinoma, columnar cell
+    - angiosarcoma
+    - undifferentiated sarcoma
+    - chronic myelomonocytic leukemia, nos
+    - thymoma, nos
+    - acinar cell tumor
+    - granulosa cell tumor, nos
+    - thymoma, type ab, malignant
+    - atypical chronic myeloid leukemia, bcr/abl negative
+    - carcinoma, anaplastic, nos
+    - atypical carcinoid tumor
+    - epithelial tumor, malignant
+    - infiltrating lobular carcinoma, nos
+    - basaloid squamous cell carcinoma
+    - embryonal carcinoma, nos
+    - fibromyxosarcoma
+    - mucinous carcinoma
+    - thymoma, type b2, malignant
+    - acute myelomonocytic leukemia
+    - chordoma, nos
+    - medullary carcinoma, nos
+    - follicular carcinoma, nos
+    - burkitt-like lymphoma
+    - acute promyelocytic leukaemia, pml-rar-alpha
+    - mesothelioma, biphasic, malignant
+    - spindle cell melanoma, nos
+    - adenocarcinoma, endocervical type
+    - adnexal carcinoma
+    - basal cell carcinoma, nos
+    - nodular melanoma
+    - bronchiolo-alveolar carcinoma, non-mucinous
+    - epithelioid cell melanoma
+    - mucoepidermoid carcinoma
+    - infiltrating duct mixed with other types of carcinoma
+    - myoepithelial carcinoma
+    - extra-adrenal paraganglioma, nos
+    - glioblastoma multiforme
+    - ependymoma, nos
+    - mucinous adenocarcinoma, endocervical type
+    - acute myeloid leukemia with t(8;21)(q22;q22); runx1-runx1t1
+    - acute monoblastic and monocytic leukemia
+    - acute myeloid leukemia with inv(3)(q21q26.2) or t(3;3)(q21;q26.2); rpn1-evi1
+    - oncocytoma
+    - signet ring cell carcinoma
+    - thymoma, type a, malignant
+    - myelodysplastic/myeloproliferative neoplasm, unclassifiable
+    - paraganglioma, nos
+    - clear cell sarcoma of kidney
+    - ductal carcinoma in situ, nos
+    - inflammatory carcinoma
+    - large cell carcinoma, nos
+    - myloproliferative neoplasm, unclassifiable
+    - thymoma, type b1, malignant
+    - thymoma, type b3, malignant
+    - acute myeloid leukemia with t(9;11)(p22;q23); mllt3-mll
+    - acute myeloid leukemia, minimal differentiation
+    - duct carcinoma, nos
+    - malignant fibrous histiocytoma
+    - acute leukemia, nos
+    - carcinoid tumor, nos
+    - malignant peripheral nerve sheath tumor
+    - medulloblastoma, nos
+    - thymic carcinoma, nos
+    - neoplasm, malignant
+    - neoplasm, nos
+    - acute myeloid leukemia with maturation
+    - spindle cell melanoma, type b
+    - acute myeloid leukemia without maturation
+    - adenocarcinoma in tubolovillous adenoma
+    - collecting duct carcinoma
+    - esthesioneuroblastoma
+    - papillary serous cystadenocarcinoma
+    - amelanotic melanoma
+    - combined hepatocellular carcinoma and cholangiocarcinoma
+    - infiltrating lobular mixed with other types of carcinoma
+    - myelodysplastic syndrome, unclassifiable
+    - myeloid sarcoma
+    - precursor cell lymphoblastic leukemia, nos
+    - precursor cell lymphoblastic leukemia, not phenotyped
+    - sex cord tumor, nos
+    - spindle cell carcinoma, nos
+    - thymoma, type ab, nos
+    - bronchio-alveolar carcinoma, mucinous
+    - extra-adrenal paraganglioma, malignant
+    - intraductal papillary adenocarcinoma with invasion
+    - mesothelioma, malignant
+    - papillary squamous cell carcinoma
+    - pituitary adenoma, nos
+    - synovial sarcoma, spindle cell
+    - acute erythroid leukaemia
+    - basaloid carcinoma
+    - mixed phenotype acute leukemia, t/myeloid, nos
+    - solid pseudopapillary tumor
+    - superficial spreading melanoma
+    - teratoma, benign
+    - thymoma, type b2, nos
+    - acute myeloid leukemia with t(6;9)(p23;q34); dek-nup214
+    - hepatocellular carcinoma, clear cell type
+    - intraductal micropapillary carcinoma
+    - invasive mucinous adenocarcinoma
+    - lepidic adenocarcinoma
+    - nonencapsulated sclerosing carcinoma
+diagnoses prior_malignancy:
+    - no
+    - not reported
+    - yes
+    - unknown
+diagnoses prior_treatment:
+    - no
+    - yes
+    - not reported
+    - unknown
+diagnoses progression_or_recurrence:
+    - not reported
+    - no
+    - unknown
+    - yes
+diagnoses residual_disease:
+    - r0
+    - rx
+    - r1
+    - r2
+    - not reported
+diagnoses site_of_resection_or_biopsy:
+    - not reported
+    - bone marrow
+    - lung, nos
+    - liver
+    - breast, nos
+    - lymph node, nos
+    - brain, nos
+    - kidney, nos
+    - colon, nos
+    - thyroid gland
+    - ovary
+    - connective, subcutaneous and other soft tissues, nos
+    - upper lobe, lung
+    - prostate gland
+    - endometrium
+    - pleura, nos
+    - cervix uteri
+    - bladder, nos
+    - lower lobe, lung
+    - skin, nos
+    - cerebrum
+    - pancreas, nos
+    - specified parts of peritoneum
+    - bone, nos
+    - blood
+    - rectum, nos
+    - stomach, nos
+    - adrenal gland, nos
+    - head of pancreas
+    - head, face or neck, nos
+    - esophagus, nos
+    - uterus, nos
+    - peritoneum, nos
+    - testis, nos
+    - tongue, nos
+    - abdomen, nos
+    - cardia, nos
+    - small intestine, nos
+    - thorax, nos
+    - larynx, nos
+    - corpus uteri
+    - gastric antrum
+    - pelvis, nos
+    - other ill-defined sites
+    - sigmoid colon
+    - lower third of esophagus
+    - mediastinum, nos
+    - retroperitoneum
+    - cecum
+    - thymus
+    - body of stomach
+    - lymph nodes of axilla or arm
+    - parotid gland
+    - ascending colon
+    - cortex of adrenal gland
+    - gallbladder
+    - vertebral column
+    - unknown
+    - rectosigmoid junction
+    - temporal lobe
+    - vagina, nos
+    - floor of mouth, nos
+    - connective, subcutaneous and other soft tissues of lower limb and hip
+    - overlapping lesion of lip, oral cavity and pharynx
+    - choroid
+    - tonsil, nos
+    - frontal lobe
+    - lateral wall of bladder
+    - middle lobe, lung
+    - nasal cavity
+    - fallopian tube
+    - lymph nodes of inguinal region or leg
+    - connective, subcutaneous and other soft tissues of thorax
+    - fundus of stomach
+    - skin of trunk
+    - bones of skull and face and associated joints
+    - mouth, nos
+    - posterior wall of bladder
+    - lymph nodes of head, face and neck
+    - duodenum
+    - middle third of esophagus
+    - major salivary gland, nos
+    - intrahepatic bile duct
+    - body of pancreas
+    - heart
+    - anal canal
+    - appendix
+    - parietal lobe
+    - extrahepatic bile duct
+    - tail of pancreas
+    - trachea
+    - fundus uteri
+    - transverse colon
+    - anterior mediastinum
+    - spleen
+    - base of tongue, nos
+    - cheek mucosa
+    - connective, subcutaneous and other soft tissues of trunk, nos
+    - eye, nos
+    - skin of upper limb and shoulder
+    - trigone of bladder
+    - ureter
+    - skin of lower limb and hip
+    - anterior wall of bladder
+    - mandible
+    - connective, subcutaneous and other soft tissues of upper limb and shoulder
+    - descending colon
+    - connective, subcutaneous and other soft tissues of pelvis
+    - urethra
+    - occipital lobe
+    - vulva, nos
+    - hepatic flexure of colon
+    - oropharynx, nos
+    - dome of bladder
+    - overlapping lesion of lung
+    - pelvic bones, sacrum, coccyx and associated joints
+    - connective, subcutaneous and other soft tissues of head, face, and neck
+    - gum, nos
+    - intra-abdominal lymph nodes
+    - main bronchus
+    - skin of scalp and neck
+    - penis, nos
+    - hypopharynx, nos
+    - long bones of lower limb and associated joints
+    - ampulla of vater
+    - connective, subcutaneous and other soft tissues of abdomen
+    - lip, nos
+    - overlapping lesion of eye and adnexa
+    - pelvic lymph nodes
+    - splenic flexure of colon
+    - ciliary body
+    - isthmus uteri
+    - upper third of esophagus
+    - endocervix
+    - external ear
+    - hard palate
+    - lower gum
+    - nervous system, nos
+    - unknown primary site
+    - lower-inner quadrant of breast
+    - myometrium
+    - anterior floor of mouth
+    - border of tongue
+    - jejunum
+    - overlapping lesion of breast
+    - overlapping lesion of pancreas
+    - pituitary gland
+    - thoracic esophagus
+    - upper-inner quadrant of breast
+    - upper-outer quadrant of breast
+    - anus, nos
+    - aortic body and other paraganglia
+    - axillary tail of breast
+    - bladder neck
+    - brain stem
+    - cerebellum, nos
+    - exocervix
+    - gastrointestinal tract, nos
+    - ileum
+    - intrathoracic lymph nodes
+    - lesser curvature of stomach, nos
+    - long bones of upper limb, scapula and associated joints
+    - lower-outer quadrant of breast
+    - orbit, nos
+    - overlapping lesion of brain
+    - overlapping lesion of colon
+    - overlapping lesion of connective, subcutaneous and other soft tissues
+    - overlapping lesion of digestive system
+    - overlapping lesion of female genital organs
+    - overlapping lesion of ill-defined sites
+    - overlapping lesion of rectum, anus and anal canal
+    - palate, nos
+    - pancreatic duct
+    - pancreatic neck
+    - peripheral nerves and autonomic nervous system of upper limb and shoulder
+    - pharynx, nos
+    - posterior wall of oropharynx
+    - pylorus
+    - retromolar area
+    - short bones of lower limb and associated joints
+    - skin of other and unspecified parts of face
+    - spermatic cord
+    - spinal cord
+    - spinal meninges
+    - submandibular gland
+    - supraglottis
+    - upper gum
+    - ureteric orifice
+    - ventral surface of tongue, nos
+    - vestibule of mouth
+diagnoses sites_of_involvement:
+    - central nervous system
+    - lung, nos
+    - liver
+    - maxilla
+    - bone, nos
+    - small intestine
+    - bone marrow
+    - kidney, nos
+    - mandible
+    - soft tissue
+    - peritoneum, nos
+    - colon, nos
+    - abdomen
+    - lymph node, nos
+    - eye
+    - ovary, nos
+    - brain, nos
+    - pleura
+    - stomach
+    - pancreas, nos
+    - spleen
+    - adrenal gland, nos
+    - omentum
+    - testes
+    - cerebrospinal fluid
+    - thyroid
+    - uterus
+    - breast, nos
+    - neck
+    - parotid gland
+    - peripheral nervous system
+    - mediastinal soft tissue
+    - pelvis
+    - mouth
+    - pericardium
+    - unknown
+    - mesentery
+    - nasopharynx
+    - oropharynx
+    - tonsil
+    - chest wall
+    - gallbladder
+    - lymph node, regional
+    - ocular orbits
+    - sinus
+    - skin
+    - abdominal peritoneum
+    - appendix
+    - ascites
+    - esophagus, nos
+    - heart
+    - pelvic lymph node(s)
+    - peri-orbital soft tissue
+    - peripheral blood
+    - retroperitoneum
+    - tongue
+    - vagina
+    - anus, nos
+    - bronchus
+    - diaphragm
+    - distant nodes
+    - ear
+    - fallopian tube, left
+    - gastrointestinal tract
+    - lymph node, axillary
+    - ovary, left
+    - peri-aortic lymph node(s)
+    - perineum
+    - prostate
+    - transplanted kidney
+    - vertebrae
+diagnoses synchronous_malignancy:
+    - no
+    - not reported
+    - yes
+    - unknown
+diagnoses tissue_or_organ_of_origin:
+    - bone marrow
+    - lung, nos
+    - breast, nos
+    - kidney, nos
+    - colon, nos
+    - unknown
+    - ovary
+    - thyroid gland
+    - pancreas, nos
+    - nervous system, nos
+    - brain, nos
+    - prostate gland
+    - not reported
+    - skin, nos
+    - liver
+    - uterus, nos
+    - cervix uteri
+    - head, face or neck, nos
+    - upper lobe, lung
+    - bladder, nos
+    - adrenal gland, nos
+    - endometrium
+    - esophagus, nos
+    - lymph node, nos
+    - cerebrum
+    - stomach, nos
+    - rectum, nos
+    - lower lobe, lung
+    - hematopoietic system, nos
+    - pleura, nos
+    - testis, nos
+    - retroperitoneum
+    - long bones of lower limb and associated joints
+    - major salivary gland, nos
+    - thymus
+    - abdomen, nos
+    - gastric antrum
+    - gastrointestinal tract, nos
+    - gallbladder
+    - head of pancreas
+    - tongue, nos
+    - lower third of esophagus
+    - appendix
+    - sigmoid colon
+    - larynx, nos
+    - cardia, nos
+    - body of stomach
+    - cortex of adrenal gland
+    - ascending colon
+    - cecum
+    - blood
+    - peritoneum, nos
+    - rectosigmoid junction
+    - biliary tract, nos
+    - anus, nos
+    - overlapping lesion of lip, oral cavity and pharynx
+    - fallopian tube
+    - small intestine, nos
+    - choroid
+    - lateral wall of bladder
+    - connective, subcutaneous and other soft tissues of lower limb and hip
+    - medulla of adrenal gland
+    - floor of mouth, nos
+    - overlapping lesion of nasopharynx
+    - duodenum
+    - fundus of stomach
+    - posterior wall of bladder
+    - tonsil, nos
+    - middle third of esophagus
+    - middle lobe, lung
+    - posterior mediastinum
+    - corpus uteri
+    - intrahepatic bile duct
+    - mediastinum, nos
+    - eye, nos
+    - thorax, nos
+    - bone, nos
+    - anterior mediastinum
+    - long bones of upper limb, scapula and associated joints
+    - base of tongue, nos
+    - mouth, nos
+    - trigone of bladder
+    - lymph nodes of head, face and neck
+    - transverse colon
+    - anterior wall of bladder
+    - connective, subcutaneous and other soft tissues of thorax
+    - temporal lobe
+    - cheek mucosa
+    - autonomic nervous system, nos
+    - descending colon
+    - connective, subcutaneous and other soft tissues of pelvis
+    - connective, subcutaneous and other soft tissues, nos
+    - body of pancreas
+    - female genital tract, nos
+    - ureter
+    - dome of bladder
+    - tail of pancreas
+    - connective, subcutaneous and other soft tissues of trunk, nos
+    - frontal lobe
+    - hepatic flexure of colon
+    - overlapping lesion of lung
+    - penis, nos
+    - connective, subcutaneous and other soft tissues of abdomen
+    - extrahepatic bile duct
+    - pelvic bones, sacrum, coccyx and associated joints
+    - pelvis, nos
+    - unknown primary site
+    - main bronchus
+    - vagina, nos
+    - vulva, nos
+    - hypopharynx, nos
+    - oropharynx, nos
+    - urethra
+    - bones of skull and face and associated joints
+    - gum, nos
+    - overlapping lesion of eye and adnexa
+    - overlapping lesion of retroperitoneum and peritoneum
+    - ampulla of vater
+    - connective, subcutaneous and other soft tissues of head, face, and neck
+    - connective, subcutaneous and other soft tissues of upper limb and shoulder
+    - parietal lobe
+    - trachea
+    - external upper lip
+    - fundus uteri
+    - peripheral nerves and autonomic nervous system of trunk, nos
+    - pituitary gland
+    - urinary system, nos
+    - aortic body and other paraganglia
+    - ciliary body
+    - intra-abdominal lymph nodes
+    - lymph nodes of axilla or arm
+    - occipital lobe
+    - other ill-defined sites
+    - peripheral nerves and autonomic nervous system of abdomen
+    - peripheral nerves and autonomic nervous system of thorax
+    - skin of scalp and neck
+    - splenic flexure of colon
+    - upper third of esophagus
+    - hard palate
+    - isthmus uteri
+    - lymph nodes of inguinal region or leg
+    - skin of lower limb and hip
+    - intestinal tract, nos
+    - lip, nos
+    - lower-inner quadrant of breast
+    - peripheral nerves and autonomic nervous system of head, face, and neck
+    - spinal cord
+    - spinal meninges
+    - anterior floor of mouth
+    - heart
+    - lower gum
+    - myometrium
+    - overlapping lesion of breast
+    - overlapping lesion of pancreas
+    - rib, sternum, clavicle and associated joints
+    - short bones of lower limb and associated joints
+    - specified parts of peritoneum
+    - thoracic esophagus
+    - upper-inner quadrant of breast
+    - upper-outer quadrant of breast
+    - vertebral column
+    - anal canal
+    - bladder neck
+    - border of tongue
+    - brain stem
+    - cerebellum, nos
+    - intrathoracic lymph nodes
+    - jejunum
+    - lesser curvature of stomach, nos
+    - lower-outer quadrant of breast
+    - mandible
+    - nasal cavity
+    - orbit, nos
+    - overlapping lesion of brain
+    - overlapping lesion of colon
+    - overlapping lesion of connective, subcutaneous and other soft tissues
+    - overlapping lesion of ill-defined sites
+    - palate, nos
+    - pelvic lymph nodes
+    - peripheral nerves and autonomic nervous system of pelvis
+    - peripheral nerves and autonomic nervous system of upper limb and shoulder
+    - pharynx, nos
+    - posterior wall of oropharynx
+    - pylorus
+    - renal pelvis
+    - retromolar area
+    - skin of trunk
+    - skin of upper limb and shoulder
+    - spermatic cord
+    - spleen
+    - submandibular gland
+    - supraglottis
+    - upper gum
+    - ureteric orifice
+    - ventral surface of tongue, nos
+diagnoses treatments therapeutic_agents:
+    - dexamethasone
+    - lenalidomide
+    - bortezomib
+    - cyclophosphamide
+    - gemtuzumab ozogamicin
+    - carfilzomib
+    - melphalan
+    - other
+    - vincristine
+    - doxorubicin
+    - prednisone
+    - cisplatin
+    - methotrexate
+    - pomalidomide
+    - fluorouracil
+    - etoposide
+    - oxaliplatin
+    - rituximab
+    - cytarabine
+    - leucovorin calcium
+    - ifosfamide
+    - paclitaxel
+    - temozolomide
+    - daratumumab
+    - bevacizumab
+    - gemcitabine
+    - capecitabine
+    - ixazomib
+    - thalidomide
+    - carboplatin
+    - irinotecan
+    - elotuzumab
+    - platinum
+    - nab-paclitaxel
+    - pembrolizumab
+    - nivolumab
+    - unknown
+    - docetaxel
+    - leucovorin
+    - trastuzumab
+    - irinotecan hydrochloride
+    - not reported
+    - bendamustine
+    - epirubicin
+    - ipilimumab
+    - dactinomycin
+    - doxorubicin hydrochloride
+    - gemcitabine hydrochloride
+    - panobinostat
+    - not otherwise specified
+    - pemetrexed
+    - ramucirumab
+    - cetuximab
+    - erlotinib
+    - trametinib
+    - dabrafenib
+    - daunorubicin
+    - epirubicin hydrochloride
+    - everolimus
+    - lomustine
+    - mesna
+    - pegfilgrastim
+    - sunitinib malate
+    - vinorelbine tartrate
+    - zoledronic acid
+    - asparaginase
+    - carmustine
+    - panitumumab
+    - regorafenib
+    - temsirolimus
+    - vinblastine
+    - afatinib
+    - anastrozole
+    - andecaliximab
+    - bavituximab
+    - binimetinib
+    - bleomycin
+    - cabozantinib
+    - chemotherapy
+    - encorafenib
+    - exemestane
+    - imatinib
+    - lanreotide acetate
+    - letrozole
+    - liposomal irinotecan
+    - mercaptopurine
+    - monalizumab
+    - pertuzumab
+    - sorafenib
+    - streptozocin
+    - therapeutic hydrocortisone
+    - topotecan
+    - vemurafenib
+    - vinblastine sulfate
+diagnoses treatments treatment_intent_type:
+    - adjuvant
+    - neoadjuvant
+    - maintenance therapy
+    - palliative
+    - unknown
+    - cure
+    - prevention
+diagnoses treatments treatment_outcome:
+    - complete response
+    - unknown
+    - progressive disease
+    - persistent disease
+    - partial response
+    - stable disease
+    - treatment ongoing
+    - not reported
+    - no response
+diagnoses treatments treatment_type:
+    - pharmaceutical therapy, nos
+    - radiation therapy, nos
+    - chemotherapy
+    - stem cell transplantation, nos
+    - stem cell transplantation, autologous
+    - surgery, nos
+    - immunotherapy (including vaccines)
+    - targeted molecular therapy
+    - radiation, external beam
+    - brachytherapy, low dose
+    - hormone therapy
+    - brachytherapy, high dose
+    - stem cell transplantation, allogeneic
+    - radiation, 2d conventional
+    - radiation, intensity-modulated radiotherapy
+    - radiation, 3d conformal
+    - radiation, stereotactic/gamma knife/srs
+    - stereotactic radiosurgery
+    - ablation, radiofrequency
+    - external beam radiation
+    - peptide receptor radionuclide therapy (prrt)
+    - radiation, proton beam
+diagnoses tumor_grade:
+    - not reported
+    - unknown
+    - g2
+    - g3
+    - g1
+    - gx
+    - g4
+    - gb
+    - high grade
+diagnoses who_cns_grade:
+    - grade iv
+diagnoses wilms_tumor_histologic_subtype:
+    - favorable
+    - unfavorable
+disease_type:
+    - adenomas and adenocarcinomas
+    - ductal and lobular neoplasms
+    - myeloid leukemias
+    - epithelial neoplasms, nos
+    - squamous cell neoplasms
+    - gliomas
+    - lymphoid leukemias
+    - cystic, mucinous and serous neoplasms
+    - nevi and melanomas
+    - neuroepitheliomatous neoplasms
+    - acute lymphoblastic leukemia
+    - plasma cell tumors
+    - complex mixed and stromal neoplasms
+    - mature b-cell lymphomas
+    - transitional cell papillomas and carcinomas
+    - not applicable
+    - osseous and chondromatous neoplasms
+    - germ cell neoplasms
+    - mesothelial neoplasms
+    - not reported
+    - acinar cell neoplasms
+    - paragangliomas and glomus tumors
+    - chronic myeloproliferative disorders
+    - neoplasms, nos
+    - thymic epithelial neoplasms
+    - myomatous neoplasms
+    - complex epithelial neoplasms
+    - soft tissue tumors and sarcomas, nos
+    - lipomatous neoplasms
+    - meningiomas
+    - fibromatous neoplasms
+    - specialized gonadal neoplasms
+    - unknown
+    - miscellaneous tumors
+    - adnexal and skin appendage neoplasms
+    - basal cell neoplasms
+    - mucoepidermoid neoplasms
+    - myelodysplastic syndromes
+    - nerve sheath tumors
+    - leukemias, nos
+    - synovial-like neoplasms
+    - fibroepithelial neoplasms
+    - miscellaneous bone tumors
+    - blood vessel tumors
+    - mature t- and nk-cell lymphomas
+exposures alcohol_history:
+    - not reported
+    - yes
+    - no
+    - unknown
+exposures alcohol_intensity:
+    - lifelong non-drinker
+    - occasional drinker
+    - unknown
+    - non-drinker
+    - drinker
+    - heavy drinker
+exposures tobacco_smoking_status:
+    - lifelong non-smoker
+    - current smoker
+    - current reformed smoker for > 15 yrs
+    - current reformed smoker for < or = 15 yrs
+    - smoking history not documented
+    - current reformed smoker, duration not specified
+    - 1
+    - 5
+    - unknown
+primary_site:
+    - hematopoietic and reticuloendothelial systems
+    - bronchus and lung
+    - breast
+    - colon
+    - kidney
+    - unknown
+    - ovary
+    - brain
+    - pancreas
+    - thyroid gland
+    - spinal cord, cranial nerves, and other parts of central nervous system
+    - prostate gland
+    - stomach
+    - liver and intrahepatic bile ducts
+    - other and ill-defined sites
+    - skin
+    - bladder
+    - adrenal gland
+    - uterus, nos
+    - esophagus
+    - cervix uteri
+    - corpus uteri
+    - lymph nodes
+    - rectum
+    - heart, mediastinum, and pleura
+    - retroperitoneum and peritoneum
+    - not reported
+    - testis
+    - bones, joints and articular cartilage of limbs
+    - other and unspecified major salivary glands
+    - thymus
+    - connective, subcutaneous and other soft tissues
+    - other and ill-defined digestive organs
+    - gallbladder
+    - peripheral nerves and autonomic nervous system
+    - other and unspecified parts of tongue
+    - larynx
+    - eye and adnexa
+    - other and unspecified female genital organs
+    - other and unspecified parts of biliary tract
+    - rectosigmoid junction
+    - anus and anal canal
+    - other and ill-defined sites in lip, oral cavity and pharynx
+    - small intestine
+    - bones, joints and articular cartilage of other and unspecified sites
+    - floor of mouth
+    - nasopharynx
+    - tonsil
+    - other and unspecified parts of mouth
+    - base of tongue
+    - other and unspecified urinary organs
+    - ureter
+    - oropharynx
+    - other endocrine glands and related structures
+    - penis
+    - vulva
+    - gum
+    - vagina
+    - parotid gland
+    - hypopharynx
+    - lip
+    - trachea
+    - meninges
+    - renal pelvis
+    - palate
+    - other and ill-defined sites within respiratory system and intrathoracic organs
+    - other and unspecified male genital organs
+    - accessory sinuses
+    - nasal cavity and middle ear
+project program name:
+    - FM
+    - TCGA
+    - TARGET
+    - CPTAC
+    - MP2PRT
+    - MMRF
+    - BEATAML1.0
+    - CGCI
+    - MATCH
+    - NCICCR
+    - REBC
+    - TRIO
+    - CMI
+    - HCMI
+    - OHSU
+    - WCDT
+    - APOLLO
+    - EXCEPTIONAL_RESPONDERS
+    - ORGANOID
+    - CDDP_EAGLE
+    - CTSP
+    - VAREPOP
+project project_id:
+    - FM-AD
+    - TARGET-AML
+    - TARGET-ALL-P2
+    - MP2PRT-ALL
+    - CPTAC-3
+    - TARGET-NBL
+    - TCGA-BRCA
+    - MMRF-COMMPASS
+    - BEATAML1.0-COHORT
+    - TARGET-WT
+    - TCGA-GBM
+    - TCGA-OV
+    - TCGA-LUAD
+    - TCGA-UCEC
+    - TCGA-KIRC
+    - TCGA-HNSC
+    - TCGA-LGG
+    - TCGA-THCA
+    - TCGA-LUSC
+    - TCGA-PRAD
+    - NCICCR-DLBCL
+    - TCGA-SKCM
+    - TCGA-COAD
+    - REBC-THYR
+    - TCGA-STAD
+    - TCGA-BLCA
+    - TARGET-OS
+    - TCGA-LIHC
+    - CPTAC-2
+    - TRIO-CRU
+    - CGCI-BLGSP
+    - TCGA-CESC
+    - TCGA-KIRP
+    - HCMI-CMDC
+    - TCGA-TGCT
+    - TCGA-SARC
+    - CGCI-HTMCP-CC
+    - CMI-MBC
+    - TCGA-LAML
+    - TARGET-ALL-P3
+    - TCGA-ESCA
+    - TCGA-PAAD
+    - TCGA-PCPG
+    - OHSU-CNL
+    - TCGA-READ
+    - TCGA-THYM
+    - TCGA-KICH
+    - WCDT-MCRPC
+    - TCGA-ACC
+    - APOLLO-LUAD
+    - TCGA-MESO
+    - EXCEPTIONAL_RESPONDERS-ER
+    - TCGA-UVM
+    - CGCI-HTMCP-DLBCL
+    - ORGANOID-PANCREATIC
+    - TARGET-RT
+    - CMI-MPC
+    - MATCH-I
+    - TCGA-DLBC
+    - TCGA-UCS
+    - BEATAML1.0-CRENOLANIB
+    - MP2PRT-WT
+    - TCGA-CHOL
+    - CDDP_EAGLE-1
+    - CTSP-DLBCL1
+    - MATCH-W
+    - MATCH-Z1A
+    - MATCH-S1
+    - CGCI-HTMCP-LC
+    - CMI-ASC
+    - MATCH-Z1D
+    - MATCH-Q
+    - MATCH-B
+    - MATCH-Y
+    - MATCH-Z1B
+    - MATCH-P
+    - MATCH-R
+    - MATCH-Z1I
+    - TARGET-ALL-P1
+    - MATCH-U
+    - MATCH-H
+    - MATCH-N
+    - TARGET-CCSK
+    - MATCH-C1
+    - VAREPOP-APOLLO
+    - MATCH-S2
+samples biospecimen_anatomic_site:
+    - blood
+    - bone marrow
+    - lung
+    - kidney
+    - uterus
+    - breast
+    - liver
+    - pancreas
+    - thyroid
+    - other
+    - brain
+    - prostate
+    - lymph node
+    - bone
+    - frontal lobe
+    - soft tissue
+    - tongue
+    - cerebrum
+    - maxilla
+    - abdomen
+    - chest wall
+    - lymph node(s) axilla
+    - abdominal wall
+    - pelvis
+    - mandible
+    - omentum
+    - peritoneum
+    - lymph node(s) cervical
+    - neck
+    - occipital cortex
+    - pleura
+    - retroperitoneum
+    - vagina
+    - adrenal
+    - temporal cortex
+    - unknown
+    - peritoneal cavity
+    - skin
+    - head & neck
+    - ovary
+    - thorax
+    - lymph node(s) supraclavicular
+    - axilla
+    - ilium
+    - lymph node(s) inguinal
+    - lymph node(s) retroperitoneal
+    - scalp
+    - small bowel
+    - cerebral cortex
+    - spleen
+    - stomach
+    - head, face or neck, nos
+    - lymph nodes(s) mediastinal
+    - colon
+    - groin
+    - mesentery
+    - bladder
+    - bronchus
+    - chest
+    - gastrointestinal tract
+    - lymph node(s) paraaortic
+    - mediastinal soft tissue
+    - vulva
+    - frontal cortex
+    - muscle
+    - sinus
+    - anus
+    - back
+    - brow
+    - buccal mucosa
+    - cervical spine
+    - cervix
+    - esophagus
+    - fallopian tube
+    - forearm
+    - forehead
+    - gallbladder
+    - hepatic flexure
+    - leg
+    - leptomeninges
+    - lymph node(s) hilar
+    - lymph node(s) iliac-common
+    - lymph node(s) mammary
+    - lymph node(s) mesenteric
+    - lymph node(s) pelvic
+    - lymph node(s) regional
+    - lymph node(s) submandibular
+    - mediastinum
+    - not reported
+    - rib
+    - shoulder
+    - sigmoid colon
+    - skeletal muscle
+    - skull
+    - appendix
+    - chin
+    - gum
+    - heart
+    - large bowel
+    - lymph node(s) splenic
+    - oral cavity
+    - parotid gland
+    - spinal column
+    - testis
+    - vein
+samples composition:
+    - not reported
+    - solid tissue
+    - peripheral blood components nos
+    - peripheral whole blood
+    - whole bone marrow
+    - 3d organoid
+    - saliva
+    - buffy coat
+    - adherent cell line
+    - granulocytes
+    - cell
+    - 3d neurosphere
+    - buccal cells
+    - sorted cells
+    - 2d modified conditionally reprogrammed cells
+    - lymphocytes
+    - bone marrow components nos
+    - mixed adherent suspension
+    - pleural effusion
+    - bone marrow components
+    - human original cells
+    - mononuclear cells from bone marrow normal
+samples portions analytes aliquots analyte_type:
+    - dna
+    - rna
+    - ffpe dna
+    - ffpe rna
+    - nuclei rna
+    - total rna
+    - cfdna
+samples preservation_method:
+    - unknown
+    - ffpe
+    - snap frozen
+    - frozen
+    - oct
+    - cryopreserved
+    - fresh
+    - edta
+samples tissue_type:
+    - tumor
+    - normal
+    - peritumoral
+samples tumor_code:
+    - acute lymphoblastic leukemia (all)
+    - acute myeloid leukemia (aml)
+    - neuroblastoma (nbl)
+    - lung cancer (all types)
+    - wilms tumor (wt)
+    - osteosarcoma (os)
+    - nhl, burkitt lymphoma (bl)
+    - cervical cancer (all types)
+    - cns, glioblastoma (gbm)
+    - acute leukemia of ambiguous lineage (alal)
+    - rhabdoid tumor (kidney) (rt)
+    - diffuse large b-cell lymphoma (dlbcl)
+    - induction failure aml (aml-if)
+    - clear cell sarcoma of the kidney (ccsk)
+samples tumor_descriptor:
+    - primary
+    - not applicable
+    - metastatic
+    - unknown
+    - recurrence
+    - xenograft
+    - premalignant
+    - new primary
+    - not reported
+access:
+    - controlled
+    - open
+analysis workflow_type:
+    - BWA with Mark Duplicates and BQSR
+    - STAR - Counts
+    - SeSAMe Methylation Beta Estimation
+    - STAR-Fusion
+    - Arriba
+    - DNAcopy
+    - MuTect2 Annotation
+    - MuSE Annotation
+    - VarScan2 Annotation
+    - Pindel Annotation
+    - Aliquot Ensemble Somatic Variant Merging and Masking
+    - BCGSC miRNA Profiling
+    - Pindel
+    - STAR 2-Pass Genome
+    - STAR 2-Pass Chimeric
+    - STAR 2-Pass Transcriptome
+    - ASCAT2
+    - Birdseed
+    - ASCAT3
+    - MuSE
+    - MuTect2
+    - VarScan2
+    - FM Simple Somatic Mutation
+    - FoundationOne Annotation
+    - FoundationOne Variant Aggregation and Masking
+    - AscatNGS
+    - BRASS
+    - BWA-aln
+    - ABSOLUTE LiftOver
+    - BWA
+    - CaVEMan
+    - GATK4 MuTect2 Tumor-Only Annotation
+    - Tumor-Only Somatic Variant Merging and Masking
+    - GATK4 MuTect2 Tumor-Only
+    - BWA with BQSR
+    - VCF LiftOver
+    - Seurat - 10x Chromium
+    - CellRanger - 10x Chromium
+    - CellRanger - 10x Raw Counts
+    - CellRanger - 10x Filtered Counts
+data_category:
+    - simple nucleotide variation
+    - biospecimen
+    - sequencing reads
+    - clinical
+    - copy number variation
+    - structural variation
+    - transcriptome profiling
+    - dna methylation
+    - somatic structural variation
+    - proteome profiling
+    - combined nucleotide variation
+data_format:
+    - tsv
+    - vcf
+    - bcr biotab
+    - bam
+    - maf
+    - txt
+    - bedpe
+    - svs
+    - idat
+    - cel
+    - bcr xml
+    - xlsx
+    - pdf
+    - bcr ssf xml
+    - bcr auxiliary xml
+    - cdc json
+    - bcr omf xml
+    - bcr pps xml
+    - jpeg 2000
+    - mex
+    - hdf5
+data_type:
+    - Annotated Somatic Mutation
+    - Biospecimen Supplement
+    - Aligned Reads
+    - Clinical Supplement
+    - Raw Simple Somatic Mutation
+    - Transcript Fusion
+    - Aggregated Somatic Mutation
+    - Gene Level Copy Number
+    - Slide Image
+    - Masked Intensities
+    - Copy Number Segment
+    - Raw Intensities
+    - Gene Expression Quantification
+    - Splice Junction Quantification
+    - Simple Germline Variation
+    - Masked Copy Number Segment
+    - Allele-specific Copy Number Segment
+    - Masked Somatic Mutation
+    - Isoform Expression Quantification
+    - miRNA Expression Quantification
+    - Methylation Beta Value
+    - Structural Rearrangement
+    - Pathology Report
+    - Protein Expression Quantification
+    - Tissue Microarray Image
+    - Raw CGI Variant
+    - Single Cell Analysis
+    - Differential Gene Expression
+experimental_strategy:
+    - WXS
+    - RNA-Seq
+    - Genotyping Array
+    - Targeted Sequencing
+    - WGS
+    - miRNA-Seq
+    - Methylation Array
+    - Tissue Slide
+    - Diagnostic Slide
+    - Reverse Phase Protein Array
+    - Expression Array
+    - ATAC-Seq
+    - scRNA-Seq
+platform:
+    - illumina
+    - affymetrix snp 6.0
+    - illumina human methylation 450
+    - illumina human methylation 27
+    - illumina methylation epic
+    - rppa
+    - genechip u133a
+    - complete genomics
+    - illumina methylation epic v2
+    - genechip u133 plus 2.0

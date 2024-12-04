@@ -1,0 +1,19 @@
+name: "Imaging Data Commons"
+description: |
+    NCI Imaging Data Commons (IDC) is a cloud-based environment containing publicly available cancer imaging data co-located with the analysis and exploration tools and resources.
+
+    Features:
+    - >65 TB: IDC contains radiology, brightfield (H&E) and fluorescence slide microscopy images, along with image-derived data (annotations, segmentations, quantitative measurements) and accompanying clinical data
+    - Free: All of the data in IDC is publicly available: no registration, no access requests
+    - Commercial-friendly: >95% of the data in IDC is covered by the permissive CC-BY license, which allows commercial reuse (small subset of data is covered by the CC-NC license); each file in IDC is tagged with the license to make it easier for you to understand and follow the rules
+    - Cloud-based: All of the data in IDC is available from both Google and AWS public buckets: fast and free to download, no out-of-cloud egress fees
+    - Harmonized: All of the images and image-derived data in IDC is harmonized into standard DICOM representation
+documentation:
+    file: "idc.md"
+cache_key: "api_assistant_idc_yaml"
+instructions: |
+    Be sure to import and instantiate the client for the Imaging Data Commons API:
+    ```python
+    from idc_index import index
+    client = index.IDCClient()
+    ```
