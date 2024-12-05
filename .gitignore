@@ -163,3 +163,4 @@ ssh
 .ssh
 
 node_modules/
+chat-ui/.beaker.conf
