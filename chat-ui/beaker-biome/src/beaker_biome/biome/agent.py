@@ -46,8 +46,15 @@ class BiomeAgent(BaseAgent):
     for later use, etc.
 
     When you use a tool you must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+    You do not need to include the class name, just the method. For example you should not indicate `BiomeAgent.draft_api_code` but rather just `draft_api_code`.
 
-    You must NEVER use the `fail_task` tool. If code is erroring out you MUST try to debug it. If it persists you can notify ask the user to help.
+    A very common workflow is to use the `draft_api_code` tool or the `consult_api_docs` tool to get code to interact with an API. 
+    Once you have the code, you can use the `run_code` tool to execute the code.
+
+    You will often be asked to integrate information from multiple sources to answer a question. For example, you may be asked to find a dataset
+    from one API and integrate it with information from another API. In this case, you should be explicit about the steps needed to accomplish the task
+    and where the information from each API is used. When you summarize your findings or results you should be clear about which information
+    came from which API.
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
@@ -100,20 +107,23 @@ class BiomeAgent(BaseAgent):
 
         Make sure you understand all the steps needed to complete the task. Try to run all of the steps at once.
 
-        If the results of a API search yields no results, you should use the `ask_api` tool to check that you are querying the API correctly.
+        If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
         """        
 
     @tool()
-    async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        Drafts python code for an API request given a specified goal, such as a query for a specific study. You MUST use this tool to 
-        interact with the APIs that are available to you. When the user asks you to use an API, you MUST
-        be sure to use this tool. Do not attempt to interact with an API manually. The way this tool functions is that it will
-        provide the goal to an external agent, which we refer to as the "drafter". The drafter has access to the API documentation for the API in question.
-        The drafter will then generate the code to perform the desired operation. However, the drafter requires a very specific goal in order to do their job 
-        and does not have the ability to guess or infer. Therefore, you must provide a very specific goal. It also does not have awareness of 
-        information outside of what you provide in the goal. Therefore, if you have run code previously that returned information such as names of studies,
-        `ids` of datasets, etc, you must provide that information in the goal if it is needed to perform the desired operation.
+        Drafts python code for an API request given a specified goal, such as a query for a specific study. You can use this tool to 
+        get code to interact with the APIs that are available to you. When the user asks you to use an API and you are unsure how to do so, you should
+        be sure to use this tool. Once you've learned how to do common tasks with an API you may not need this tool, but for accomplishing
+        new tasks, you should use this tool. 
+        
+        The way this tool functions is that it will provide the goal to an external agent, which we refer to as the "drafter". 
+        The drafter has access to the API documentation for the API in question. The drafter will then generate the code to perform the desired operation. 
+        However, the drafter requires a very specific goal in order to do their job and does not have the ability to guess or infer. 
+        Therefore, you must provide a very specific goal. It also does not have awareness of information outside of what you provide in the goal. 
+        Therefore, if you have run code previously that returned information such as names of studies, `ids` of datasets, etc, you must provide that 
+        information in the goal if it is needed to perform the desired operation.
 
         If you are asked to query for something specific, e.g. a study, you MUST provide the relevant `id` as part of the goal if you have access to it.
         Most APIs allow you to easily query by `id` so this is often possible to utilize.
@@ -121,7 +131,11 @@ class BiomeAgent(BaseAgent):
         Be as SPECIFIC as possible as this will help you get a more accurate and timely result. Do not be vague, provide
         VERBOSE goals so that the drafter of the code has all the information needed to do their job.
 
-        You may want to use the ask_api tool to ask questions of the API before running this tool to help refine your goal!
+        The code that is drafted will generally be a complete, small program including relevant imports and other boilerplate code. Much of this 
+        may already be implemented in the code you have run previously; if that is the case you should not repeat it. Feel free to streamline the code
+        generated by removing any unnecessary steps before sending it to the `run_code` tool.
+
+        You may want to use the consult_api_docs tool to ask questions of the API before running this tool to help refine your goal!
 
         If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks. 
         
@@ -141,27 +155,23 @@ class BiomeAgent(BaseAgent):
         logger.info(f"using api: {api}")
         try: 
             code = self.api.use_api(api, goal)
+            return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             self.logger.error(str(e))
-            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
-            
-        self.logger.info(f"running code from rc2 {code}")
-        try:
-            result = await self.run_code(code, agent=agent, react_context=react_context)
-            return result
-        except Exception as e:
-            self.logger.error(f"error in using api with wrapped partial: {e}")
-            raise e
+            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
 
 
     @tool()
-    async def ask_api(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        This tool is used to ask a question of an API. It allows you to ask a question of an API and get a result. 
+        This tool is used to ask a question of an API. It allows you to ask a question of an API's documentation and get results in
+        natural language, which may include code snippets or other information that you can then use to write code to interact with the API 
+        (e.g. using the `run_code` tool). You can also use this information to refine your goal when using the `draft_api_code` tool.
+
         You can ask questions related to endpoints, payloads, etc. For example, you can ask "What are the endpoints for this API?"
-        or "What payload do I need to send to this API?"
+        or "What payload do I need to send to this API?" or "How do I query for datasets by keyword?" etc, etc.
 
         If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks.
 
@@ -170,17 +180,18 @@ class BiomeAgent(BaseAgent):
             query (str): The question you want to ask about the API.
 
         Returns:
-            str: returns the information requested from the API.
+            str: returns instructions on how to utilize the API based on the question asked.
         """
         self.logger.info("asking api")
         logger.info(f"asking api: {api}")
         try:
             results = self.api.ask_api(api, query)
+            return f"Here is the information I found about how to use the API: \n{results}"
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             self.logger.error(str(e))
-        return results
+            return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
     
 
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
