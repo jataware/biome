@@ -23,6 +23,7 @@ services:
     volumes:
       - .:/jupyter
       - ../.env:/jupyter/.env
+      - ./.beaker.conf:/jupyter/.beaker.conf
     command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     # command: "sh -c 'python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m beaker_kernel.server.dev --ip 0.0.0.0'"
     networks:

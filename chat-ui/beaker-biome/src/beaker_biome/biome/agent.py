@@ -40,6 +40,14 @@ class BiomeAgent(BaseAgent):
     at cancer research. The user can add new data sources or may ask you to browser the data sources and return relevant datasets or other info. An example
     of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
     dataframe.
+
+    You must be extremely careful about what you print to stdout when running code--be cognizant of the size and make sure you don't print out huge things!
+    Never, ever just print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+    for later use, etc.
+
+    When you use a tool you must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+
+    You must NEVER use the `fail_task` tool. If code is erroring out you MUST try to debug it. If it persists you can notify ask the user to help.
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
@@ -75,6 +83,13 @@ class BiomeAgent(BaseAgent):
         return """You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
         help them choose which APIs to use or to help them query them. 
 
+        You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+        for later use, etc. Be extremely CAREFUL about this.
+
+        If you need to print something, be extremely CAREFUL--don't print the whole thing!
+
+        You must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+
         Users may ask you to load and munge data and many other tasks.
         Try to identify all of the steps needed, and all of the tools. Assume the user wants to do all of the steps at once.
         
@@ -84,18 +99,37 @@ class BiomeAgent(BaseAgent):
         register datasets, setting the input source, filtering datasets, convert datasets, generating schemas, and executing workloads.
 
         Make sure you understand all the steps needed to complete the task. Try to run all of the steps at once.
+
+        If the results of a API search yields no results, you should use the `ask_api` tool to check that you are querying the API correctly.
         """        
 
     @tool()
     async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        Drafts python code for an API request given some goal in plain English. You MUST use this tool to 
+        Drafts python code for an API request given a specified goal, such as a query for a specific study. You MUST use this tool to 
         interact with the APIs that are available to you. When the user asks you to use an API, you MUST
-        be sure to use this tool. Do not attempt to interact with an API manually.
+        be sure to use this tool. Do not attempt to interact with an API manually. The way this tool functions is that it will
+        provide the goal to an external agent, which we refer to as the "drafter". The drafter has access to the API documentation for the API in question.
+        The drafter will then generate the code to perform the desired operation. However, the drafter requires a very specific goal in order to do their job 
+        and does not have the ability to guess or infer. Therefore, you must provide a very specific goal. It also does not have awareness of 
+        information outside of what you provide in the goal. Therefore, if you have run code previously that returned information such as names of studies,
+        `ids` of datasets, etc, you must provide that information in the goal if it is needed to perform the desired operation.
+
+        If you are asked to query for something specific, e.g. a study, you MUST provide the relevant `id` as part of the goal if you have access to it.
+        Most APIs allow you to easily query by `id` so this is often possible to utilize.
+        For example, if you are asked to find a dataset and you have the `id` of the dataset, you should provide that in the goal.
+        Be as SPECIFIC as possible as this will help you get a more accurate and timely result. Do not be vague, provide
+        VERBOSE goals so that the drafter of the code has all the information needed to do their job.
+
+        You may want to use the ask_api tool to ask questions of the API before running this tool to help refine your goal!
+
+        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks. 
+        
+        You MUST also be explicit about the goal in your thinking.
 
         Args:
             api (str): The name of the API to use
-            goal (str): The task to be performed by the API request (in plain English)
+            goal (str): The task to be performed by the API request. This should be as specific as possible and include any relevant details such as the `ids` or other parameters that should be used to get the desired result.
 
         Returns:
             str: Depending on the user defined configuration will do one of two things.
@@ -111,6 +145,7 @@ class BiomeAgent(BaseAgent):
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             self.logger.error(str(e))
+            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
             
         self.logger.info(f"running code from rc2 {code}")
         try:
@@ -120,6 +155,33 @@ class BiomeAgent(BaseAgent):
             self.logger.error(f"error in using api with wrapped partial: {e}")
             raise e
 
+
+    @tool()
+    async def ask_api(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+        """
+        This tool is used to ask a question of an API. It allows you to ask a question of an API and get a result. 
+        You can ask questions related to endpoints, payloads, etc. For example, you can ask "What are the endpoints for this API?"
+        or "What payload do I need to send to this API?"
+
+        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks.
+
+        Args:
+            api (str): The name of the API to use
+            query (str): The question you want to ask about the API.
+
+        Returns:
+            str: returns the information requested from the API.
+        """
+        self.logger.info("asking api")
+        logger.info(f"asking api: {api}")
+        try:
+            results = self.api.ask_api(api, query)
+        except Exception as e:
+            if self.api is None:
+                return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
+            self.logger.error(str(e))
+        return results
+    
 
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
         """
@@ -135,6 +197,12 @@ class BiomeAgent(BaseAgent):
 
         This tool can be run more than once in a react loop. All actions and variables created in earlier uses of the tool
         in a particular loop should be assumed to exist for future uses of the tool in the same loop.
+
+        You must be extremely careful about what you print to stdout when running code--be cognizant of the size and make sure you don't print out huge things!
+        You should NEVER print out the entire results of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+        for later use, etc.
+
+        If you need to print something, be extremely CAREFUL--don't print the whole thing!
 
         Args:
             code (str): Code to run directly in Jupyter. This should be a string exactly as it would appear in a notebook
@@ -159,6 +227,14 @@ class BiomeAgent(BaseAgent):
                 success = False
                 error = context['result']
                 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                
+                # Ensure traceback is a string before applying regex
+                if isinstance(error['traceback'], list):
+                    error['traceback'] = "\n".join(error['traceback'])
+                elif not isinstance(error['traceback'], str):
+                    # Convert other types to string
+                    error['traceback'] = str(error['traceback'])
+                
                 error['traceback'] = ansi_escape.sub('', error['traceback'])
 
             output = [

@@ -19,4 +19,5 @@ instructions: |
     All requests go to the following URL: https://www.cbioportal.org/api
     That is the base URL for all requests. There are not very many studies (less than 1000) 
     so if the user is searching for a specific study, you can just fetch all studies
-    and then filter the list yourself since cbioportals filters are tricky.
+    and then filter the list yourself since cbioportals filters are tricky. It is often most
+    productive to simply filter based on the study name. 

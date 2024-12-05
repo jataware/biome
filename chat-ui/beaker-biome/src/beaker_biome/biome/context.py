@@ -24,9 +24,10 @@ class BiomeContext(BaseContext):
         This runs on setup and invokes the `procedures/python3/setup.py` script to 
         configure the environment appropriately.
         """
-        command = "\n".join(
-            [
-            self.get_code("setup"),
-            ]
-        )
-        await self.execute(command)
+        # command = "\n".join(
+        #     [
+        #     self.get_code("setup"),
+        #     ]
+        # )
+        # await self.execute(command)
+        pass
