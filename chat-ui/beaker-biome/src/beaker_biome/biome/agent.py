@@ -49,7 +49,9 @@ class BiomeAgent(BaseAgent):
     You do not need to include the class name, just the method. For example you should not indicate `BiomeAgent.draft_api_code` but rather just `draft_api_code`.
 
     A very common workflow is to use the `draft_api_code` tool or the `consult_api_docs` tool to get code to interact with an API. 
-    Once you have the code, you can use the `BiomeAgent__run_code` tool to execute the code.
+    Once you have the code, you can use the `BiomeAgent__run_code` tool to execute the code. If you work out something tricky
+    on behalf of the user, let's capture your success: you should ask the user if they would like to use the `add_example` 
+    tool to add the code as an example to the API's documentation.
 
     You will often be asked to integrate information from multiple sources to answer a question. For example, you may be asked to find a dataset
     from one API and integrate it with information from another API. In this case, you should be explicit about the steps needed to accomplish the task
