@@ -193,7 +193,7 @@ class BiomeAgent(BaseAgent):
             self.logger.error(str(e))
             return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
     
-
+    @tool(autosummarize=True)
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
         """
         Executes code in the user's notebook on behalf of the user, but collects the outputs of the run for use by the Agent
