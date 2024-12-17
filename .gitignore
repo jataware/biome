@@ -163,3 +163,5 @@ ssh
 .ssh
 
 node_modules/
+
+.config

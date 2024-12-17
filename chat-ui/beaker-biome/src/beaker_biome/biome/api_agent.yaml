@@ -1,9 +1,7 @@
 definitions_root: ./api_definitions
 drafter:
-    model: models/gemini-1.5-pro-001
-    ttl_seconds: 1800
-finalizer:
-    model: gpt-4o
+    provider: anthropic 
+    model: claude-3-5-sonnet-20241022
 default_cache_body: | 
     You will be given the entire API documentation. 
     When you write code against this API, you should avail yourself of the appropriate query parameters, 

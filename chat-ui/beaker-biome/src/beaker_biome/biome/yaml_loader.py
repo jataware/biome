@@ -6,27 +6,26 @@ import datetime
 import json
 import os
 
-from adhoc_api.tool import DrafterConfig, FinalizerConfig, APISpec
+from adhoc_api.tool import APISpec
 
 class MessageLogger():
     def __init__(self, context):
         self.context = context 
     def info(self, message):
         self.context.send_response("iopub",
-            "gemini_info", {
+            "adhoc_info", {
                 "body": message
             },
         ) 
     def error(self, message):
         self.context.send_response("iopub",
-            "gemini_error", {
+            "adhoc_error", {
                 "body": message
             },
         ) 
 
 class APILoaderOutput(TypedDict):
     drafter_config: dict
-    finalizer_config: dict 
     api_specs: list 
 
 def load(agent_config_filepath: str) -> APILoaderOutput:    
@@ -113,15 +112,11 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
         definition['instructions'] = definition['instructions'].format_map(definition)
         definition['cache_body'] = definition['cache_body'].format_map(definition)
 
-    drafter_config = {'model': "models/gemini-1.5-flash-001", 'ttl_seconds': 1800}
+    # default to claude
+    drafter_config = {'provider': 'anthropic', 'model': "claude-3-5-sonnet-20241022"}
     if 'drafter' in config:
         for key, value in config['drafter'].items():
             drafter_config[key] = value
-
-    finalizer_config = {'model': 'gpt-4o'}
-    if 'finalizer' in config:
-        for key, value in config['finalizer'].items():
-            finalizer_config[key] = value
 
     api_specs = [
         {
@@ -129,14 +124,11 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
             'cache_key': api['definition']['cache_key'],
             'description': api['definition']['description'],
             'documentation': api['definition']['cache_body'],
-            'proofread_instructions': api['definition']['instructions']
-
         }
         for api in api_definitions
     ]
-    
+
     return {
         'api_specs': api_specs,
-        'finalizer_config': finalizer_config,
         'drafter_config': drafter_config
     }

@@ -13,8 +13,8 @@
   "dependencies": {
     "@jupyterlab/coreutils": "^6.0.8",
     "@jupyterlab/rendermime": "^4.0.8",
-    "beaker-kernel": "~1.7.4",
-    "beaker-vue": "~1.7.4",
+    "beaker-kernel": "~1.8.5",
+    "beaker-vue": "~1.8.5",
     "core-js": "^3.8.3",
     "primeicons": "^7.0.0",
     "primevue": "~3.46.0",
