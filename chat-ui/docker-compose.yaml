@@ -18,7 +18,7 @@ services:
       - PYTHONPATH=/jupyter
       - ENABLE_CHECKPOINTS=true
       - TOOL_ENABLED_ASK_USER=true
-      - TOOL_ENABLED_RUN_CODE=true
+      - TOOL_ENABLED_RUN_CODE=false
       - PYTHONBREAKPOINT=debugpy.breakpoint
     volumes:
       - .:/jupyter

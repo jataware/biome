@@ -69,9 +69,9 @@ if response.status_code == 200:
         print(f"    Case ID: {mutation['occurrence'][0]['case'].get('submitter_id', 'Not available')}")
 else:
     print(f"Error: {response.status_code} - {response.text}")
-```# Examples
+```
 
-## Example 1: search based on disease type and gene mutation
+## Example 2: search based on disease type and gene mutation
 
 ```
 import requests
@@ -138,6 +138,83 @@ if response.status_code == 200:
         print(f"    Consequence Type: {mutation['consequence'][0]['transcript'].get('consequence_type', 'Not available')}")
         print(f"    Project ID: {mutation['occurrence'][0]['case']['project']['project_id']}")
         print(f"    Case ID: {mutation['occurrence'][0]['case'].get('submitter_id', 'Not available')}")
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+## Example 3: Get total count of specific mutations for a specific disease type in GDC
+
+```
+import requests
+import json
+from collections import Counter
+
+# Define the endpoint and filters
+endpoint = "https://api.gdc.cancer.gov/ssms"
+filters = {
+    "op": "and",
+    "content": [
+        {
+            "op": "regexp",
+            "content": {
+                "field": "cases.diagnoses.primary_diagnosis",
+                "value": ".*acute myeloid leukemia.*"
+            }
+        },
+        {
+            "op": "in",
+            "content": {
+                "field": "consequence.transcript.gene.symbol",
+                "value": ["JAK2"]
+            }
+        }
+    ]
+}
+
+# Define the fields to be returned
+fields = [
+    "ssm_id",
+    "consequence.transcript.gene.symbol",
+    "mutation_type",
+    "consequence.transcript.aa_change",
+    "consequence.transcript.consequence_type"
+]
+
+# First, get the total count
+params = {
+    "filters": json.dumps(filters),
+    "fields": ",".join(fields),
+    "format": "JSON",
+    "size": "0"  # Set size to 0 to just get the total
+}
+
+response = requests.get(endpoint, params=params)
+
+if response.status_code == 200:
+    total_mutations = response.json()["data"]["pagination"]["total"]
+    print(f"\nTotal number of JAK2 mutations in AML cases: {total_mutations}")
+    
+    # Now get all mutations to analyze types
+    params["size"] = str(total_mutations)  # Get all mutations
+    response = requests.get(endpoint, params=params)
+    data = response.json()
+    mutations = data["data"]["hits"]
+    
+    # Analyze mutation types
+    consequence_types = []
+    for mutation in mutations:
+        if mutation.get('consequence'):
+            cons_type = mutation['consequence'][0]['transcript'].get('consequence_type', 'Unknown')
+            consequence_types.append(cons_type)
+    
+    # Count frequency of each type
+    type_counts = Counter(consequence_types)
+    
+    print("\nBreakdown of mutation types:")
+    for mut_type, count in type_counts.most_common():
+        percentage = (count / len(consequence_types)) * 100
+        print(f"    {mut_type}: {count} mutations ({percentage:.1f}%)")
+        
 else:
     print(f"Error: {response.status_code} - {response.text}")
 ```
