@@ -394,7 +394,7 @@ class BiomeAgent(BaseAgent):
         """
         try:
             # Construct path to examples.md file
-            examples_path = os.path.join(self.root_folder, api, "api_definitions", "documentation", "examples.md")
+            examples_path = os.path.join(self.root_folder, "api_definitions", api, "documentation", "examples.md")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
 
             # Create or append to examples.md
