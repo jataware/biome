@@ -1,7 +1,7 @@
 definitions_root: ./api_definitions
 drafter:
-    provider: anthropic 
-    model: claude-3-5-sonnet-20241022
+    provider: google 
+    model: gemini-1.5-pro-002
 default_cache_body: | 
     You will be given the entire API documentation. 
     When you write code against this API, you should avail yourself of the appropriate query parameters, 
