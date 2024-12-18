@@ -361,7 +361,7 @@ except Exception as e:
     print(f"An error occurred: {str(e)}")
 ```
 
-## Example 9: Download bone marrow biopsy images from the 'cmb_aml' collection using IDC's public S3 bucket.
+## Example 9: Download bone marrow biopsy images from the 'cmb_aml' collection for a specific study using IDC's public S3 bucket.
 
 ```
 import pandas as pd
@@ -403,4 +403,42 @@ plt.imshow(ds.pixel_array, cmap=plt.cm.gray)
 plt.title('Bone Marrow Biopsy Image')
 plt.axis('off')
 plt.show()
+```
+
+## Example 11: List all studies for a given collection
+
+```
+# Query to list all studies in the 'cmb_aml' collection
+query_all_studies = """
+SELECT DISTINCT StudyDescription
+FROM 
+    index
+WHERE 
+    collection_id = 'cmb_aml'
+"""
+
+try:
+    df_all_studies = client.sql_query(query_all_studies)
+    print("All studies in the 'cmb_aml' collection:")
+    print(df_all_studies)
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+```
+
+## Example 12: Retrieve imagery URLs for the 'XR_Biopsy_BoneMarrow' study in the 'cmb_aml' collection from IDC.
+
+```
+import pandas as pd
+from idc_index import index
+
+client = index.IDCClient()
+
+query = """
+SELECT series_aws_url
+FROM index
+WHERE collection_id = 'cmb_aml'
+AND StudyDescription = 'XR_Biopsy_BoneMarrow'
+"""
+df = client.sql_query(query)
+print(df.head())
 ```
