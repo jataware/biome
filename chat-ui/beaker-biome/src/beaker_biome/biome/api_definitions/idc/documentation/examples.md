@@ -335,80 +335,72 @@ finally:
     os.rmdir(temp_dir)
 ```
 
-## Example 8: Download and visualize a slide microscopy image with pydicom and matplotlib
+
+## Example 8: Find collections in the Imaging Data Commons with 'aml' in their name, likely related to Acute Myeloid Leukemia.
 
 ```
-import sys
-import boto3
-from botocore import UNSIGNED
-from botocore.config import Config
-import os
-import tempfile
-import pydicom
-from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
+from idc_index import index
+import pandas as pd
 
-# Create S3 client
-s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+client = index.IDCClient()
 
-# Create temporary directory
-temp_dir = tempfile.mkdtemp()
-
-# Let's try one of the larger image tiles
-file_key = "d53e7fc3-8ef9-4de5-8059-47b21a67eb4f/6f8f2731-cf43-4ae0-a328-186101d6fcd8.dcm"
-local_file = os.path.join(temp_dir, "slide_tile.dcm")
+# Query to find collection names containing 'aml'
+query = """
+SELECT DISTINCT collection_id
+FROM 
+    index
+WHERE 
+    LOWER(collection_id) LIKE '%aml%'
+"""
 
 try:
-    print(f"Downloading file: {file_key}")
-    print("(This might take a while as it's a large file...)")
-    s3.download_file('idc-open-data', file_key, local_file)
-    print("Download successful!")
-    
-    # Try to read the DICOM file
-    print("\nReading DICOM file...")
-    ds = pydicom.dcmread(local_file)
-    
-    print("\nDICOM metadata:")
-    print(f"Patient ID: {ds.PatientID}")
-    print(f"Modality: {ds.Modality}")
-    print(f"Image Type: {ds.ImageType}")
-    print(f"Rows x Columns: {ds.Rows} x {ds.Columns}")
-    if hasattr(ds, 'PhotometricInterpretation'):
-        print(f"Photometric Interpretation: {ds.PhotometricInterpretation}")
-    if hasattr(ds, 'SamplesPerPixel'):
-        print(f"Samples Per Pixel: {ds.SamplesPerPixel}")
-    
-    # Convert to image and display
-    if hasattr(ds, 'pixel_array'):
-        print("\nConverting to image...")
-        pixel_array = ds.pixel_array
-        
-        print(f"Pixel array shape: {pixel_array.shape}")
-        print(f"Pixel array dtype: {pixel_array.dtype}")
-        
-        # Normalize the pixel values
-        if pixel_array.dtype != np.uint8:
-            pixel_array = ((pixel_array - pixel_array.min()) * 255.0 / 
-                         (pixel_array.max() - pixel_array.min())).astype(np.uint8)
-        
-        # Create image
-        img = Image.fromarray(pixel_array)
-        
-        # Display
-        plt.figure(figsize=(15, 10))
-        plt.imshow(img, cmap='gray')
-        plt.axis('off')
-        plt.title(f"DICOM Image Tile - Patient: {ds.PatientID}")
-        plt.show()
-    else:
-        print("No pixel data found in the DICOM file")
-    
+    df_collections = client.sql_query(query)
+    print("Collections with 'aml' in their name:")
+    print(df_collections)
 except Exception as e:
     print(f"An error occurred: {str(e)}")
-finally:
-    # Clean up
-    if os.path.exists(local_file):
-        os.remove(local_file)
-    os.rmdir(temp_dir)
+```
+
+## Example 9: Download bone marrow biopsy images from the 'cmb_aml' collection using IDC's public S3 bucket.
+
+```
+import pandas as pd
+from idc_index import index
+
+client = index.IDCClient()
+
+# Query for the desired images
+query = """
+SELECT series_aws_url
+FROM index
+WHERE collection_id = 'cmb_aml'
+AND StudyDescription = 'XR_Biopsy_BoneMarrow'
+"""
+df = client.sql_query(query)
+
+# Create a download manifest using the current directory
+with open('download_manifest.txt', 'w') as f:
+    for url in df['series_aws_url']:
+        f.write(f'cp {url} ./\n')
+
+# Execute the download
+s5cmd_binary = client.s5cmdPath
+!{s5cmd_binary} --no-sign-request --endpoint-url https://s3.amazonaws.com run download_manifest.txt
+```
+
+## Example 10: Basic plot of dicom image from file
+
+```
+import pydicom
+import matplotlib.pyplot as plt
+
+# Load the DICOM file
+filename = '73f18e49-8699-4c1f-90ad-5db94b6b5602.dcm'
+ds = pydicom.dcmread(filename)
+
+# Display the image
+plt.imshow(ds.pixel_array, cmap=plt.cm.gray)
+plt.title('Bone Marrow Biopsy Image')
+plt.axis('off')
+plt.show()
 ```

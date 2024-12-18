@@ -19,7 +19,9 @@ RUN chown -R jupyter:users /jupyter/beaker-biome
 
 USER jupyter
 
-# TODO: remove this once we have a release
-RUN pip install git+https://github.com/jataware/archytas.git@3619d3d99be001fbfaefa173389ee720e57070ce --force-reinstall --upgrade
-
 RUN pip install -e /jupyter/beaker-biome
+
+RUN pip uninstall -y archytas
+
+# TODO: remove this once we have a release
+RUN pip install git+https://github.com/jataware/archytas.git@581a02fb5f7909ea4f763605a497ea9898b23bdf --force-reinstall --upgrade

@@ -86,7 +86,11 @@ class BiomeAgent(BaseAgent):
             self.api = None
 
         self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
+        self.api_list = [spec['name'] for spec in specs]
 
+        # Get the directories of the APIs
+        # the directories are found inside the api_definitions folder we need to have a dictionary that maps the API name to the directory
+        self.api_directories = {spec['name']: spec['directory'] for spec in specs}
 
     async def auto_context(self):
         return """You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
@@ -198,9 +202,10 @@ class BiomeAgent(BaseAgent):
     @tool(autosummarize=True)
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
         """
-        For the Biome agent, you should use this tool to execute code in the user's notebook on behalf of the user, 
-        but collects the outputs of the run for use by the Agent in the ReAct loop, if needed. Don't use the base `run_code` tool, 
-        use this one instead.
+        You should use this tool to execute code in the user's notebook on behalf of the user. 
+        This tool runs the code, then collects the outputs of the run for your use in the ReAct loop, if needed. 
+
+        You MUST provide `code` to be run every time you use this tool.
 
         The code runs in a new codecell and the user can watch the execution and will see all of the normal output in the
         Jupyter interface.
@@ -346,7 +351,7 @@ class BiomeAgent(BaseAgent):
         return format_execution_context(execution_context)
 
 
-    @tool
+    @tool(autosummarize=True)
     async def drs_uri_info(self, uris: list) -> list:
         """
         Get information about a DRS URI.
@@ -380,11 +385,13 @@ class BiomeAgent(BaseAgent):
 
         return responses
     
-    @tool()
+    @tool(autosummarize=True)
     async def add_example(self, api: str, code: str, description: str) -> str:
         """
         Add a successful code example to the API's examples.md documentation file.
         This tool should be used after successfully completing a task with an API to capture the working code for future reference.
+
+        The API names must match one of the names in the the agent's API list.
 
         Args:
             api (str): The name of the API the example is for
@@ -394,9 +401,13 @@ class BiomeAgent(BaseAgent):
         Returns:
             str: Message indicating success or failure of adding the example
         """
+        if api not in self.api_list:
+            raise ValueError(f"Error: the API name must match one of the names in the {self.api_list}. The API name provided was {api}.")
+        
         try:
+            api_folder = self.api_directories[api]
             # Construct path to examples.md file
-            examples_path = os.path.join(self.root_folder, "api_definitions", api, "documentation", "examples.md")
+            examples_path = os.path.join(self.root_folder, "api_definitions", api_folder, "documentation", "examples.md")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
 
             # Create or append to examples.md
@@ -423,4 +434,15 @@ class BiomeAgent(BaseAgent):
 
         except Exception as e:
             self.logger.error(str(e))
-            return f"Failed to add example: {str(e)}"
+            raise ValueError(f"Failed to add example: {str(e)}")
+
+
+    @tool(autosummarize=True)
+    async def get_available_apis(self) -> list:
+        """
+        Get list of APIs that the agent is designed to interact with.
+
+        Returns:
+            list: The list of available APIs.
+        """
+        return self.api_list
