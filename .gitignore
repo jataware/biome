@@ -164,4 +164,9 @@ ssh
 
 node_modules/
 
+# beaker
 .config
+beaker.conf 
+.beaker.conf
+# Keep .beaker.conf out of version control since it contains sensitive tokens
+chat-ui/.beaker.conf

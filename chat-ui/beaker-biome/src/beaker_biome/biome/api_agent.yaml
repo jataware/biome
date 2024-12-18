@@ -10,6 +10,8 @@ default_cache_body: |
     If the user says the API does not require authentication, OMIT code about tokens and token handling and token headers.
     When you are downloading, communicate via stdout that something has been downloaded.
     When you are doing complex things try to break them down step by step and implement appropriate exception handling.
+    You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+    for later use, etc.
     
     {instructions}
     

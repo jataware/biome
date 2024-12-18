@@ -18,12 +18,12 @@ services:
       - PYTHONPATH=/jupyter
       - ENABLE_CHECKPOINTS=true
       - TOOL_ENABLED_ASK_USER=true
-      - TOOL_ENABLED_RUN_CODE=true
+      - TOOL_ENABLED_RUN_CODE=false
       - PYTHONBREAKPOINT=debugpy.breakpoint
     volumes:
       - .:/jupyter
       - ../.env:/jupyter/.env
-      - ./.config:/home/jupyter/.config
+      - ./.beaker.conf:/jupyter/.beaker.conf
     command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     # command: "sh -c 'python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m beaker_kernel.server.dev --ip 0.0.0.0'"
     networks:

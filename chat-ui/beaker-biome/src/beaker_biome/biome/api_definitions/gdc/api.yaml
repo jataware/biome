@@ -20,5 +20,10 @@ instructions: |
     ```
     {facets}
     ```
+
+    Here are some examples of how to use the API:
+    {examples}
 facets: 
     file: facets.txt
+examples: 
+    file: examples.md

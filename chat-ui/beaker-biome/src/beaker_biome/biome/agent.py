@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
 
+JSON_OUTPUT = False
+
 class BiomeAgent(BaseAgent):
     """
     You are a chat assistant that helps the analyst user with their questions. You are running inside of the Analyst UI which is a chat application
@@ -38,13 +40,30 @@ class BiomeAgent(BaseAgent):
     at cancer research. The user can add new data sources or may ask you to browser the data sources and return relevant datasets or other info. An example
     of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
     dataframe.
+
+    You must be extremely careful about what you print to stdout when running code--be cognizant of the size and make sure you don't print out huge things!
+    Never, ever just print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+    for later use, etc.
+
+    When you use a tool you must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+    You do not need to include the class name, just the method. For example you should not indicate `BiomeAgent.draft_api_code` but rather just `draft_api_code`.
+
+    A very common workflow is to use the `draft_api_code` tool or the `consult_api_docs` tool to get code to interact with an API. 
+    Once you have the code, you can use the `BiomeAgent__run_code` tool to execute the code. If you work out something tricky
+    on behalf of the user, let's capture your success: you should ask the user if they would like to use the `add_example` 
+    tool to add the code as an example to the API's documentation.
+
+    You will often be asked to integrate information from multiple sources to answer a question. For example, you may be asked to find a dataset
+    from one API and integrate it with information from another API. In this case, you should be explicit about the steps needed to accomplish the task
+    and where the information from each API is used. When you summarize your findings or results you should be clear about which information
+    came from which API.
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
-        root_folder = pathlib.Path(__file__).resolve().parent
+        self.root_folder = pathlib.Path(__file__).resolve().parent
 
-        api_config = load(f'{root_folder}/api_agent.yaml')
+        api_config = load(f'{self.root_folder}/api_agent.yaml')
         drafter_config = api_config["drafter_config"]
         specs = api_config["api_specs"]
 
@@ -67,16 +86,65 @@ class BiomeAgent(BaseAgent):
 
         self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
 
+
+    async def auto_context(self):
+        return """You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
+        help them choose which APIs to use or to help them query them. 
+
+        You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+        for later use, etc. Be extremely CAREFUL about this.
+
+        If you need to print something, be extremely CAREFUL--don't print the whole thing!
+
+        You must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+
+        Users may ask you to load and munge data and many other tasks.
+        Try to identify all of the steps needed, and all of the tools. Assume the user wants to do all of the steps at once.
+        
+        If the user asks to extract something from a set of documents, you can use the Palimpzest family of tools to do this. First, generate a schema for the extraction. 
+        Then, if necessary filter the data to only include the relevant documents. Next, convert the dataset to the schema that was generated. 
+        Finally, execute the workload to extract the information from the dataset. You may need to use multiple tools to accomplish this, including the ability to 
+        register datasets, setting the input source, filtering datasets, convert datasets, generating schemas, and executing workloads.
+
+        Make sure you understand all the steps needed to complete the task. Try to run all of the steps at once.
+
+        If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
+        """        
+
     @tool()
-    async def use_api(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         """
-        Drafts python code for an API request given some goal in plain English. You MUST use this tool to 
-        interact with the APIs that are available to you. When the user asks you to use an API, you MUST
-        be sure to use this tool. Do not attempt to interact with an API manually.
+        Drafts python code for an API request given a specified goal, such as a query for a specific study. You can use this tool to 
+        get code to interact with the APIs that are available to you. When the user asks you to use an API and you are unsure how to do so, you should
+        be sure to use this tool. Once you've learned how to do common tasks with an API you may not need this tool, but for accomplishing
+        new tasks, you should use this tool. 
+        
+        The way this tool functions is that it will provide the goal to an external agent, which we refer to as the "drafter". 
+        The drafter has access to the API documentation for the API in question. The drafter will then generate the code to perform the desired operation. 
+        However, the drafter requires a very specific goal in order to do their job and does not have the ability to guess or infer. 
+        Therefore, you must provide a very specific goal. It also does not have awareness of information outside of what you provide in the goal. 
+        Therefore, if you have run code previously that returned information such as names of studies, `ids` of datasets, etc, you must provide that 
+        information in the goal if it is needed to perform the desired operation.
+
+        If you are asked to query for something specific, e.g. a study, you MUST provide the relevant `id` as part of the goal if you have access to it.
+        Most APIs allow you to easily query by `id` so this is often possible to utilize.
+        For example, if you are asked to find a dataset and you have the `id` of the dataset, you should provide that in the goal.
+        Be as SPECIFIC as possible as this will help you get a more accurate and timely result. Do not be vague, provide
+        VERBOSE goals so that the drafter of the code has all the information needed to do their job.
+
+        The code that is drafted will generally be a complete, small program including relevant imports and other boilerplate code. Much of this 
+        may already be implemented in the code you have run previously; if that is the case you should not repeat it. Feel free to streamline the code
+        generated by removing any unnecessary steps before sending it to the `BiomeAgent__run_code` tool.
+
+        You may want to use the consult_api_docs tool to ask questions of the API before running this tool to help refine your goal!
+
+        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks. 
+        
+        You MUST also be explicit about the goal in your thinking.
 
         Args:
             api (str): The name of the API to use
-            goal (str): The task to be performed by the API request (in plain English)
+            goal (str): The task to be performed by the API request. This should be as specific as possible and include any relevant details such as the `ids` or other parameters that should be used to get the desired result.
 
         Returns:
             str: Depending on the user defined configuration will do one of two things.
@@ -87,24 +155,50 @@ class BiomeAgent(BaseAgent):
         logger.info(f"using api: {api}")
         try: 
             code = self.api.use_api(api, goal)
+            return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             logger.error(str(e))
-            
-        self.logger.info(f"running code from rc2 {code}")
+            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
+
+
+    @tool()
+    async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+        """
+        This tool is used to ask a question of an API. It allows you to ask a question of an API's documentation and get results in
+        natural language, which may include code snippets or other information that you can then use to write code to interact with the API 
+        (e.g. using the `BiomeAgent__run_code` tool). You can also use this information to refine your goal when using the `draft_api_code` tool.
+
+        You can ask questions related to endpoints, payloads, etc. For example, you can ask "What are the endpoints for this API?"
+        or "What payload do I need to send to this API?" or "How do I query for datasets by keyword?" etc, etc.
+
+        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks.
+
+        Args:
+            api (str): The name of the API to use
+            query (str): The question you want to ask about the API.
+
+        Returns:
+            str: returns instructions on how to utilize the API based on the question asked.
+        """
+        self.logger.info("asking api")
+        logger.info(f"asking api: {api}")
         try:
-            result = await self.run_code(code, agent=agent, react_context=react_context)
-            return result
+            results = self.api.ask_api(api, query)
+            return f"Here is the information I found about how to use the API: \n{results}"
         except Exception as e:
-            logger.error(f"error in using api with wrapped partial: {e}")
-            raise e
-
-
+            if self.api is None:
+                return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
+            logger.error(str(e))
+            return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
+    
+    @tool(autosummarize=True)
     async def run_code(self, code: str, agent: AgentRef, react_context: ReactContextRef) -> str:
         """
-        Executes code in the user's notebook on behalf of the user, but collects the outputs of the run for use by the Agent
-        in the ReAct loop, if needed.
+        For the Biome agent, you should use this tool to execute code in the user's notebook on behalf of the user, 
+        but collects the outputs of the run for use by the Agent in the ReAct loop, if needed. Don't use the base `run_code` tool, 
+        use this one instead.
 
         The code runs in a new codecell and the user can watch the execution and will see all of the normal output in the
         Jupyter interface.
@@ -115,6 +209,12 @@ class BiomeAgent(BaseAgent):
 
         This tool can be run more than once in a react loop. All actions and variables created in earlier uses of the tool
         in a particular loop should be assumed to exist for future uses of the tool in the same loop.
+
+        You must be extremely careful about what you print to stdout when running code--be cognizant of the size and make sure you don't print out huge things!
+        You should NEVER print out the entire results of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+        for later use, etc.
+
+        If you need to print something, be extremely CAREFUL--don't print the whole thing!
 
         Args:
             code (str): Code to run directly in Jupyter. This should be a string exactly as it would appear in a notebook
@@ -139,6 +239,14 @@ class BiomeAgent(BaseAgent):
                 success = False
                 error = context['result']
                 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                
+                # Ensure traceback is a string before applying regex
+                if isinstance(error['traceback'], list):
+                    error['traceback'] = "\n".join(error['traceback'])
+                elif not isinstance(error['traceback'], str):
+                    # Convert other types to string
+                    error['traceback'] = str(error['traceback'])
+                
                 error['traceback'] = ansi_escape.sub('', error['traceback'])
 
             output = [
@@ -237,17 +345,17 @@ class BiomeAgent(BaseAgent):
 
 
     @tool
-    async def drs_uri_info(self, uris: list[str]) -> str:
+    async def drs_uri_info(self, uris: list) -> list:
         """
         Get information about a DRS URI.
         Data Repository Service (DRS) URIs are used to provide a standard way to locate and access data objects in a cloud environment.
         In the context of the Cancer Data Aggregator (CDA) API, DRS URIs are used to specify how to access data.
 
         Args:
-            uris (list[str]): A list of DRS URIs to get information about. URIs should be of the form 'drs://<hostname>:<id_number>'.
+            uris (list): A list of DRS URIs to get information about. URIs should be of the form 'drs://<hostname>:<id_number>'.
             
         Returns:
-            list[str]: The information from looking up each DRS URI.
+            list: The information from looking up each DRS URI.
         """
         responses = []
         for uri in uris:
@@ -269,197 +377,48 @@ class BiomeAgent(BaseAgent):
             responses.append(response.json())
 
         return responses
+    
+    @tool()
+    async def add_example(self, api: str, code: str, description: str) -> str:
+        """
+        Add a successful code example to the API's examples.md documentation file.
+        This tool should be used after successfully completing a task with an API to capture the working code for future reference.
 
-    # def update_job_status(self, job_id, status):
-    #     self.context.send_response("iopub", 
-    #             "job_status", {
-    #                 "job_id": job_id,
-    #                 "status": status 
-    #             },
-    #         )
+        Args:
+            api (str): The name of the API the example is for
+            code (str): The working, successful code to add as an example
+            description (str): A brief description of what the example demonstrates
 
-    # # TODO: Formatting of these messages should be left to the Analyst-UI in the future. 
-    # async def poll_query(self, job_id: str):
-    #     # Poll result
-    #     status = "queued"
-    #     result = None
-    #     while status == "queued":
-    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
-    #         status = response["status"]
-    #         sleep(1)
-        
-    #     self.update_job_status(job_id, status)
+        Returns:
+            str: Message indicating success or failure of adding the example
+        """
+        try:
+            # Construct path to examples.md file
+            examples_path = os.path.join(self.root_folder, "api_definitions", api, "documentation", "examples.md")
+            os.makedirs(os.path.dirname(examples_path), exist_ok=True)
 
-    #     #asyncio.create_task(self.poll_query_logs(job_id))
-    #     while status == "started":
-    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}/logs").json()
-    #         self.context.send_response("iopub",
-    #             "job_logs", {
-    #                 "job_id": job_id,
-    #                 "logs": response,
-    #             },
-    #         )
-    #         response = requests.get(f"{BIOME_URL}/jobs/{job_id}").json()
-    #         status = response["status"]
-    #         sleep(5)
+            # Create or append to examples.md
+            mode = 'a' if os.path.exists(examples_path) else 'w'
+            with open(examples_path, mode) as f:
+                if mode == 'w':
+                    f.write("# Examples\n\n")
+                
+                # Get next example number
+                example_num = 1
+                if mode == 'a':
+                    with open(examples_path, 'r') as read_f:
+                        for line in read_f:
+                            if line.startswith('## Example'):
+                                example_num += 1
 
-    #     self.update_job_status(job_id, status)
+                # Add the new example
+                f.write(f"\n## Example {example_num}: {description}\n\n")
+                f.write("```\n")
+                f.write(code)
+                f.write("\n```\n")
 
-    #     # Handle result
-    #     if status != "finished":
-    #         self.update_job_status(job_id, status)
-    #         self.context.send_response("iopub", 
-    #             "job_failure", {
-    #                 "job_id": job_id,
-    #                 "response": response
-    #             },
-    #         ) 
+            return f"Successfully added example {example_num} to {examples_path}"
 
-    #     result = response["result"] # TODO: Bubble up better cell type
-    #     self.context.send_response("iopub",
-    #         "job_response", {
-    #             "job_id": job_id,
-    #             "response": result['answer'],
-    #             "raw": result
-    #         },
-    #     ) 
-
-    # @tool(autosummarize=True)
-    # async def search(self, query: str) -> list[dict[str, Any]]:
-    #     """
-    #     Search for data sources in the Biome app. Results will be matched semantically
-    #     and string distance. Use this to find a data source. You don't need live
-    #     web searches. If the user asks about data sources, use this tool.
-
-    #     Be sure to use the `display_search` tool for the output. Ensure you always use `display_search` after.
-
-    #     Args:
-    #         query (str): The query used to find the datasource.
-    #     Returns:
-    #         list: A JSON-formatted string containing a list of strings.
-    #               The list should contain only the `name` field and no other field
-    #               of the data sources found, ordered from most relevant to least relevant.
-    #               Ensure that only the name field is present.
-    #               An example is provided surrounded in backticks.
-    #               ```
-    #               ["Proteomics Data Commons", ""Office of Cancer Clinical Proteomics Research", "UniProt"]
-    #               ```
-    #     """
-
-    #     endpoint = f"{BIOME_URL}/sources"
-    #     response = requests.get(endpoint, params={"query": query})
-    #     raw_sources = response.json()['sources']
-    #     sources = [
-    #         # Include only necessary fields to ensure LLM context length is not exceeded.
-    #         {
-    #             "id": source["id"],
-    #             "name": source["content"]["Web Page Descriptions"]["name"],
-    #             "initials": source["content"]["Web Page Descriptions"]["initials"],
-    #             "purpose": source["content"]["Web Page Descriptions"]["purpose"],
-    #             "links": source["content"]["Information on Links on Web Page"],
-    #             "base_url": source.get("base_url", None)
-    #         } for source in raw_sources
-    #     ]
-    #     return sources
-
-    # @tool(autosummarize=True)
-    # async def display_search(self, results: list[str], agent:AgentRef, loop: LoopControllerRef):
-    #     """
-    #     Once search has been performed, this tool will display it to the user.
-    #     Args:
-    #         results (list[str]): The query used to find the datasource.
-    #     """
-    #     # sometimes it wraps the output
-    #     if isinstance(results, dict):
-    #         results = results.get("results", results)
-    #     endpoint = f"{BIOME_URL}/sources"
-    #     response = requests.get(endpoint, params={
-    #         "simple_query_string": {
-    #             "fields": ["content.Web Page Descriptions.name"],
-    #             "query": "|".join(results)
-    #         }
-    #     })
-    #     raw_sources = response.json()['sources']
-    #     sources = [
-    #         {
-    #             "id": source["id"],
-    #             "name": source["content"]["Web Page Descriptions"]["name"],
-    #             "initials": source["content"]["Web Page Descriptions"]["initials"],
-    #             "purpose": source["content"]["Web Page Descriptions"]["purpose"],
-    #             "links": source["content"]["Information on Links on Web Page"],
-    #             "base_url": source.get("base_url", None),
-    #             "logo": source.get("logo", None)
-    #         } for source in raw_sources
-    #     ]
-    #     # match sources to ordering from previous llm step by dict to avoid n^2
-
-    #     sources_map = { source.get("name", ""): source for source in sources }
-    #     ordered_sources = [sources_map[name] for name in results]
-    #     self.context.send_response("iopub",
-    #         "data_sources", {
-    #             "sources": ordered_sources
-    #         },
-    #     )
-    #     loop.set_state(loop.STOP_SUCCESS)
-
-    # # TODO(DESIGN): Deal with long running jobs in tools
-    # #
-    # # Option 1: We can return the job id and the agent can poll for the result.
-    # # This will require a job status tool. Once the status is done, we can either
-    # # check the result if it's a query or check the data source if it's a scan.
-    # # This feels a bit messy though that the job creation has a similar return
-    # # output on queue but getting the result is very different for each job.
-    # #
-    # # Option 2: We can wait for the job and return it to the agent when it's done
-    # #
-    # # Option 3: We can maybe leverage new widgets in the Analyst UI??
-    # #
-
-    # # CHOOSING OPTION 1 FOR THE TIME BEING
-    # @tool()
-    # async def query_page(self, task: str, base_url: str, agent: AgentRef, loop: LoopControllerRef):
-    #     """
-    #     Run an action over a *specific* source in the Biome app and return the results.
-    #     Find the url from a data source by using `search` tool first and
-    #     picking the most relevant one.
-
-    #     This kicks off a long-running job so you'll have to just return the ID to the user
-    #     instead of the result. 
-
-    #     This can be used to ask questions about a data source or download some kind
-    #     of artifact from it. This tool just kicks off a job where an AI crawls the website
-    #     and performs the task.
-
-    #     Args:
-    #         task (str): Task given in natural language to perform over URL.
-    #         base_url (str): URL to run query over.
-    #     """
-    #     response = requests.post( f"{BIOME_URL}/jobs/query", json={"user_task": task, "url": base_url})
-    #     job_id = response.json()["job_id"]
-    #     self.context.send_response("iopub",
-    #         "job_create", {
-    #             "job_id": job_id,
-    #             "task": task,
-    #             "url": base_url
-    #         },
-    #     )
-    #     asyncio.create_task(self.poll_query(job_id))
-    #     loop.set_state(loop.STOP_SUCCESS)
-
-    # @tool()
-    # async def scan(self, base_url: str, agent:AgentRef, loop: LoopControllerRef) -> str:
-    #     """
-    #     Profiles the given web page and adds it to the data sources in the Biome app.
-
-    #     This kicks off a long-running job so you'll have to just return the ID to the user
-    #     instead of the result. 
-
-    #     Args:
-    #         base_url (str): The url to scan and add as a data source.
-    #     Returns:
-    #         str: Job ID to poll for the result. 
-    #     """
-    #     response = requests.post( f"{BIOME_URL}/jobs/scan", json={"uris": [base_url]})
-    #     job_id = response.json()["job_id"]
-    #     asyncio.create_task(self.poll_query(job_id))
-    #     return job_id
+        except Exception as e:
+            self.logger.error(str(e))
+            return f"Failed to add example: {str(e)}"
