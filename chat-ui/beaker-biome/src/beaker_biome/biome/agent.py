@@ -425,7 +425,7 @@ class BiomeAgent(BaseAgent):
                                 example_num += 1
 
                 # Add the new example
-                f.write(f"\n## Example {example_num}: {description}\n\n")
+                f.write(f"\n\n## Example {example_num}: {description}\n\n")
                 f.write("```\n")
                 f.write(code)
                 f.write("\n```\n")

@@ -442,3 +442,31 @@ AND StudyDescription = 'XR_Biopsy_BoneMarrow'
 df = client.sql_query(query)
 print(df.head())
 ```
+
+
+## Example 12: Fetch studies for a given collection in the Imaging Data Commons (IDC), specifically for the 'cptac_aml' collection.
+
+```
+from idc_index import index
+import pandas as pd
+
+# Initialize the IDC client
+client = index.IDCClient()
+
+# Query to find studies within the 'cptac_aml' collection
+query = """
+SELECT DISTINCT StudyDescription
+FROM 
+    index
+WHERE 
+    collection_id = 'cptac_aml'
+"""
+
+try:
+    # Execute the query
+    df_studies = client.sql_query(query)
+    print("Studies in 'cptac_aml':")
+    print(df_studies)
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+```
