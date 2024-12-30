@@ -47962,5 +47962,3 @@ The table below describes the columns in a protected MAF and their definitions. 
 * Mutation data is only available for TCGA projects
 * The number of cases displayed/visible on the portal is less than what is in the downloadable MAF files <!--SV-624-->
 * Cancer Distribution Plot displays incorrect static title <!--SV-614-->
-
-

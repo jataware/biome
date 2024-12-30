@@ -17,3 +17,9 @@ instructions: |
     from idc_index import index
     client = index.IDCClient()
     ```
+
+    Here are some examples of how to use the API:
+    {examples}
+
+examples: 
+    file: examples.md

@@ -129,12 +129,12 @@ def load(agent_config_filepath: str) -> APILoaderOutput:
             'cache_key': api['definition']['cache_key'],
             'description': api['definition']['description'],
             'documentation': api['definition']['cache_body'],
-            'proofread_instructions': api['definition']['instructions']
-
+            'proofread_instructions': api['definition']['instructions'],
+            'directory': api['folder']
         }
         for api in api_definitions
     ]
-    
+
     return {
         'api_specs': api_specs,
         'finalizer_config': finalizer_config,

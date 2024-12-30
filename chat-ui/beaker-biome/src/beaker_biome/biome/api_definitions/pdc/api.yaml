@@ -19,3 +19,9 @@ instructions: |
     This API is through GraphQL. You will be provided the schema. 
     All requests go to the following URL: https://pdc.cancer.gov/graphql
     Make all GraphQL requests to that URL. 
+
+    Here are some examples of how to use the API:
+    {examples}
+
+examples: 
+    file: examples.md
