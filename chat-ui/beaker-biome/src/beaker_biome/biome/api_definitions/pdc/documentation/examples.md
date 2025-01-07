@@ -705,3 +705,65 @@ except json.JSONDecodeError as e:
   print(f"Error decoding JSON response: {e}")
   print("Response content:", response.text)
 ```
+
+
+## Example 14: Retrieve quantitative mass spectrometry data for STAT5A and STAT5B proteins using the getPaginatedUIGeneAliquotSpectralCount query.
+
+```
+import requests
+import json
+
+url = 'https://pdc.cancer.gov/graphql'
+
+query = """
+query ($gene_name: String!, $offset: Int, $limit: Int) {
+  getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: $offset, limit: $limit) {
+    total
+    uiGeneAliquotSpectralCounts {
+      aliquot_id
+      plex
+      experiment_type
+      spectral_count
+      distinct_peptide
+      unshared_peptide
+      precursor_area
+      log2_ratio
+    }
+  }
+}
+"""
+
+variables_stat5a = {
+    "gene_name": "STAT5A",
+    "offset": 0,
+    "limit": 10  # Retrieve the first 10 results
+}
+
+variables_stat5b = {
+    "gene_name": "STAT5B",
+    "offset": 0,
+    "limit": 10  # Retrieve the first 10 results
+}
+
+try:
+    response_stat5a = requests.post(url, json={'query': query, 'variables': variables_stat5a})
+    response_stat5a.raise_for_status()
+    data_stat5a = response_stat5a.json()
+
+    response_stat5b = requests.post(url, json={'query': query, 'variables': variables_stat5b})
+    response_stat5b.raise_for_status()
+    data_stat5b = response_stat5b.json()
+
+    print("STAT5A Protein Expression Data (First 10 Results):")
+    print(json.dumps(data_stat5a['data']['getPaginatedUIGeneAliquotSpectralCount']['uiGeneAliquotSpectralCounts'], indent=2))
+
+    print("\nSTAT5B Protein Expression Data (First 10 Results):")
+    print(json.dumps(data_stat5b['data']['getPaginatedUIGeneAliquotSpectralCount']['uiGeneAliquotSpectralCounts'], indent=2))
+
+except requests.exceptions.RequestException as e:
+    print(f"An error occurred: {e}")
+except json.JSONDecodeError as e:
+    print(f"Error decoding JSON response: {e}")
+    print("Response content:", response_stat5a.text)
+    print("Response content:", response_stat5b.text)
+```
