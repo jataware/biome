@@ -91,7 +91,10 @@ class BiomeAgent(BaseAgent):
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
 
-        drafter_config={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': 1800}
+        # Note: not all providers support ttl_seconds
+        ttl_seconds = 1800
+        drafter_config_gemini={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
         specs = self.api_specs
 
         super().__init__(context, tools, **kwargs)
@@ -102,13 +105,8 @@ class BiomeAgent(BaseAgent):
         
         self.logger = MessageLogger(self.context)
 
-        # Add a direct console log to debug
-        logger.info(f"drafter config (root logger): {drafter_config}")
-        for spec in self.api_specs:
-            logger.info(f"spec name {spec['name']}: {spec['documentation'][-100:]}")
-
         try:
-            self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, apis=specs)
+            self.api = AdhocApi(logger=logger, drafter_config=[drafter_config_anthropic, drafter_config_gemini], apis=specs)
         except ValueError as e:
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
