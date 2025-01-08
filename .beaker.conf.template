@@ -1,0 +1,36 @@
+jupyter_server = "http://jupyter:8888"
+jupyter_token = "89f73481102c46c0bc13b2998f9a4fce"
+provider = "openai"
+enable_checkpoints = true
+model_provider_import_path = ""
+model_name = ""
+llm_service_token = ""
+
+[tools_enabled]
+ask_user = true
+run_code = false
+
+[providers.openai]
+import_path = "archytas.models.openai.OpenAIModel"
+default_model_name = "gpt-4o"
+api_key = ""
+
+[providers.anthropic]
+import_path = "archytas.models.anthropic.AnthropicModel"
+default_model_name = "claude-3-5-sonnet-20241022"
+api_key = ""
+
+[providers.gemini]
+import_path = "archytas.models.gemini.GeminiModel"
+default_model_name = "gemini-1.5-pro"
+api_key = ""
+
+[providers.groq]
+import_path = "archytas.models.groq.GroqModel"
+default_model_name = "llama3-8b-8192"
+api_key = ""
+
+[providers.ollama]
+import_path = "archytas.models.ollama.OllamaModel"
+default_model_name = "mistral-nemo"
+api_key = ""
