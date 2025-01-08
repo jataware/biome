@@ -91,7 +91,7 @@ class BiomeAgent(BaseAgent):
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
 
-        drafter_config={'provider': 'google', 'model': 'gemini-1.5-pro-001'}
+        drafter_config={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': 1800}
         specs = self.api_specs
 
         super().__init__(context, tools, **kwargs)
