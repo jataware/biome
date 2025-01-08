@@ -13,7 +13,7 @@ RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel debugpy
 USER jupyter
 WORKDIR /jupyter
 
-COPY ./beaker-biome /jupyter/beaker-biome
+COPY ./src/beaker-biome /jupyter/beaker-biome
 USER root
 RUN chown -R jupyter:users /jupyter/beaker-biome
 
