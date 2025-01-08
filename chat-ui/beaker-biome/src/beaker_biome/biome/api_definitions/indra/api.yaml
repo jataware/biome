@@ -13,7 +13,7 @@ description: >
     Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
 documentation: !load documentation/indra.json
 cache_key: "api_assistant_indra_json"
-instructions: |
+proofread_instructions: |
     You should make use of the python requests library to interact with the API.
     Note that the base URL of the API is 'https://discovery.indra.bio/api/'
     

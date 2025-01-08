@@ -79,7 +79,6 @@ class BiomeAgent(BaseAgent):
         self.root_folder = Path(__file__).resolve().parent
         
         api_def_dir = os.path.join(self.root_folder, 'api_definitions')
-        logging.info(f"api def dir: {api_def_dir}")
 
         # Get API specs and directories in one pass
         self.api_specs = []
@@ -91,11 +90,8 @@ class BiomeAgent(BaseAgent):
                 api_spec = load_yaml_api(api_yaml)
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
-        logger.info(f"api specs: {self.api_specs[0]}")
 
-        # api_config = load(f'{self.root_folder}/api_agent.yaml')
         drafter_config={'provider': 'google', 'model': 'gemini-1.5-pro-001'}
-        # finalizer_config = api_config["finalizer_config"]
         specs = self.api_specs
 
         super().__init__(context, tools, **kwargs)
@@ -108,6 +104,7 @@ class BiomeAgent(BaseAgent):
 
         # Add a direct console log to debug
         logger.info(f"drafter config (root logger): {drafter_config}")
+        logger.info(f"api specs: {self.api_specs[0].keys()}")
 
         try:
             self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, apis=specs)

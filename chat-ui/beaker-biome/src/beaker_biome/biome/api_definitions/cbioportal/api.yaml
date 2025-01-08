@@ -13,7 +13,7 @@ description: |
 documentation: !load documentation/cbioportal.json
 cache_body: 
     default: true 
-instructions: |
+proofread_instructions: |
     This API is through Open API Spec (Swagger). You will be provided the schema. 
     All requests go to the following URL: https://www.cbioportal.org/api
     That is the base URL for all requests. There are not very many studies (less than 1000) 

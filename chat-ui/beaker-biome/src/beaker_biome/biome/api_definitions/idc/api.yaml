@@ -10,7 +10,7 @@ description: |
     - Harmonized: All of the images and image-derived data in IDC is harmonized into standard DICOM representation
 documentation: !load documentation/idc.md
 cache_key: "api_assistant_idc_yaml"
-instructions: |
+proofread_instructions: |
     Be sure to import and instantiate the client for the Imaging Data Commons API:
     ```python
     from idc_index import index

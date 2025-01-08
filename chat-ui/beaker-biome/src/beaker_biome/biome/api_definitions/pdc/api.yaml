@@ -14,7 +14,7 @@ description: |
     * Distributes controlled access data, such as the patient-specific protein fasta sequence databases, with dbGaP authorization and eRA Commons authentication.
 documentation: !load documentation/pdc_schema.graphql
 cache_key: "api_assistant_pdc_graphql"
-instructions: |
+proofread_instructions: |
     This API is through GraphQL. You will be provided the schema. 
     All requests go to the following URL: https://pdc.cancer.gov/graphql
     Make all GraphQL requests to that URL. 
