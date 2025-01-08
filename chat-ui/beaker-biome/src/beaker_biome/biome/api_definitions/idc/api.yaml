@@ -8,10 +8,14 @@ description: |
     - Commercial-friendly: >95% of the data in IDC is covered by the permissive CC-BY license, which allows commercial reuse (small subset of data is covered by the CC-NC license); each file in IDC is tagged with the license to make it easier for you to understand and follow the rules
     - Cloud-based: All of the data in IDC is available from both Google and AWS public buckets: fast and free to download, no out-of-cloud egress fees
     - Harmonized: All of the images and image-derived data in IDC is harmonized into standard DICOM representation
-documentation:
-    file: "idc.md"
+raw_documentation: !load documentation/idc.md
+examples: !load documentation/examples.md
 cache_key: "api_assistant_idc_yaml"
-instructions: |
+documentation: |
+    {raw_documentation}
+
+    # Additional Instructions:
+    
     Be sure to import and instantiate the client for the Imaging Data Commons API:
     ```python
     from idc_index import index
@@ -21,5 +25,3 @@ instructions: |
     Here are some examples of how to use the API:
     {examples}
 
-examples: 
-    file: examples.md

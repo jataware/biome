@@ -15,16 +15,31 @@ from beaker_kernel.lib.context import BaseContext
 import google.generativeai as genai
 from google.generativeai import caching
 
-import pathlib
-
+from pathlib import Path
 from adhoc_api.tool import AdhocApi
-from .yaml_loader import load, MessageLogger
+from adhoc_api.loader import load_yaml_api
 
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
 
 JSON_OUTPUT = False
+
+class MessageLogger():
+    def __init__(self, context):
+        self.context = context 
+    def info(self, message):
+        self.context.send_response("iopub",
+            "gemini_info", {
+                "body": message
+            },
+        ) 
+    def error(self, message):
+        self.context.send_response("iopub",
+            "gemini_error", {
+                "body": message
+            },
+        ) 
 
 class BiomeAgent(BaseAgent):
     """
@@ -61,12 +76,26 @@ class BiomeAgent(BaseAgent):
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
-        self.root_folder = pathlib.Path(__file__).resolve().parent
+        self.root_folder = Path(__file__).resolve().parent
+        
+        api_def_dir = os.path.join(self.root_folder, 'api_definitions')
 
-        api_config = load(f'{self.root_folder}/api_agent.yaml')
-        drafter_config = api_config["drafter_config"]
-        finalizer_config = api_config["finalizer_config"]
-        specs = api_config["api_specs"]
+        # Get API specs and directories in one pass
+        self.api_specs = []
+        self.api_directories = {}
+        for d in os.listdir(api_def_dir):
+            api_dir = os.path.join(api_def_dir, d)
+            if os.path.isdir(api_dir):
+                api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
+                api_spec = load_yaml_api(api_yaml)
+                self.api_specs.append(api_spec)
+                self.api_directories[api_spec['name']] = d
+
+        # Note: not all providers support ttl_seconds
+        ttl_seconds = 1800
+        drafter_config_gemini={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        specs = self.api_specs
 
         super().__init__(context, tools, **kwargs)
         sleep(5)
@@ -76,21 +105,14 @@ class BiomeAgent(BaseAgent):
         
         self.logger = MessageLogger(self.context)
 
-        # Add a direct console log to debug
-        logger.info(f"drafter config (root logger): {drafter_config}")
-
         try:
-            self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, finalizer_config=finalizer_config, apis=specs)
+            self.api = AdhocApi(logger=logger, drafter_config=[drafter_config_anthropic, drafter_config_gemini], apis=specs)
         except ValueError as e:
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
         self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
         self.api_list = [spec['name'] for spec in specs]
-
-        # Get the directories of the APIs
-        # the directories are found inside the api_definitions folder we need to have a dictionary that maps the API name to the directory
-        self.api_directories = {spec['name']: spec['directory'] for spec in specs}
 
     async def auto_context(self):
         return """You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 

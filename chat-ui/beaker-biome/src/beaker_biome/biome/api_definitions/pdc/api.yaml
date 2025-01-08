@@ -12,16 +12,17 @@ description: |
     * Application programming interface (API) provides cloud-agnostic data access and allows third parties to extend the functionality beyond the PDC.
     * A highly structured workspace that serves as a private user data store and also data submission portal.
     * Distributes controlled access data, such as the patient-specific protein fasta sequence databases, with dbGaP authorization and eRA Commons authentication.
-documentation:
-    file: "pdc_schema.graphql"
+raw_documentation: !load documentation/pdc_schema.graphql
+examples: !load documentation/examples.md
 cache_key: "api_assistant_pdc_graphql"
-instructions: |
+documentation: |
+    {raw_documentation}
+
+    # Additional Instructions:
+    
     This API is through GraphQL. You will be provided the schema. 
     All requests go to the following URL: https://pdc.cancer.gov/graphql
     Make all GraphQL requests to that URL. 
 
     Here are some examples of how to use the API:
     {examples}
-
-examples: 
-    file: examples.md
