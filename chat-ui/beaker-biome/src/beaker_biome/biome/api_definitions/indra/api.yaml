@@ -11,9 +11,14 @@ description: >
     data scientists, and healthcare professionals to explore and analyze rich biomedical data efficiently, supporting 
     advancements in drug discovery, clinical decision-making, and research. With its robust architecture, the INDRA CoGEx 
     Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
-documentation: !load documentation/indra.json
+raw_documentation: !load documentation/indra.json
+examples: !load documentation/examples.md
 cache_key: "api_assistant_indra_json"
-proofread_instructions: |
+documentation: |
+    {raw_documentation}
+
+    # Additional Instructions:
+    
     You should make use of the python requests library to interact with the API.
     Note that the base URL of the API is 'https://discovery.indra.bio/api/'
     
@@ -33,6 +38,3 @@ proofread_instructions: |
     ```
     Here are some examples of how to use the API:
     {examples}
-
-examples: 
-    file: !load documentation/examples.md

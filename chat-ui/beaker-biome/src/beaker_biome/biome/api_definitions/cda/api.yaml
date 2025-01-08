@@ -54,9 +54,14 @@ description: >
 
     ## Data Standards Services (DSS)
     The DSS provides us with harmonized values mapped to the data sources above. In our current release, DSS has provided values for: ethnicity, file_format, morphology, primary_diagnosis, race, species, therapeutic_agent, source_material_type (cancer/normal), treatment_type, and vital_status.
-documentation: !load documentation/cda.yaml
+raw_documentation: !load documentation/cda.yaml
+examples: !load documentation/examples.md
 cache_key: api_assistant_cda_yaml
-proofread_instructions: |
+documentation: |
+    {raw_documentation}
+
+    # Additional Instructions:
+    
     Typically metadata retrieved from CDA will locate the raw data files via Data Repository Service (DRS) URIs.
     DRS URIs are not to the data itself, but will return metadata about the location of the data.
     The location metadata (which should include the actual data download URL) can be retrieved by using the drs_uri_info tool if it is available,
@@ -70,5 +75,3 @@ proofread_instructions: |
     Here are some examples of how to use the API:
     {examples}
 
-examples: 
-    file: !load documentation/examples.md

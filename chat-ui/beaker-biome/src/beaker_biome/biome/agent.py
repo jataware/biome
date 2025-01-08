@@ -104,7 +104,8 @@ class BiomeAgent(BaseAgent):
 
         # Add a direct console log to debug
         logger.info(f"drafter config (root logger): {drafter_config}")
-        logger.info(f"api specs: {self.api_specs[0].keys()}")
+        for spec in self.api_specs:
+            logger.info(f"spec name {spec['name']}: {spec['documentation'][-100:]}")
 
         try:
             self.api = AdhocApi(logger=self.logger, drafter_config=drafter_config, apis=specs)

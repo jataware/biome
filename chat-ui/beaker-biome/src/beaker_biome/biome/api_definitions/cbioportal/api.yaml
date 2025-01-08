@@ -10,10 +10,15 @@ description: |
     Institute, Princess Margaret Cancer Centre in Toronto, Children's 
     Hospital of Philadelphia, Caris Life Sciences, The Hyve and SE4BIO 
     in the Netherlands, and Bilkent University in Ankara, Turkey.
-documentation: !load documentation/cbioportal.json
+raw_documentation: !load documentation/cbioportal.json
+examples: !load documentation/examples.md
 cache_body: 
     default: true 
-proofread_instructions: |
+documentation: |
+    {raw_documentation}
+
+    # Additional Instructions:
+    
     This API is through Open API Spec (Swagger). You will be provided the schema. 
     All requests go to the following URL: https://www.cbioportal.org/api
     That is the base URL for all requests. There are not very many studies (less than 1000) 
@@ -23,6 +28,3 @@ proofread_instructions: |
 
     Here are some examples of how to use the API:
     {examples}
-
-examples: 
-    file: !load documentation/examples.md
