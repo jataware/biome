@@ -4,8 +4,7 @@ description: |
     platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
     The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG), 
     including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
-documentation:
-    file: gdc.md
+documentation: !load documentation/gdc.md
 cache_key: api_assistant_gdc_faceted
 instructions: |
     You will be given python code to query the GDC API. 
@@ -24,6 +23,6 @@ instructions: |
     Here are some examples of how to use the API:
     {examples}
 facets: 
-    file: facets.txt
+    file: !load documentation/facets.txt
 examples: 
-    file: examples.md
+    file: !load documentation/examples.md

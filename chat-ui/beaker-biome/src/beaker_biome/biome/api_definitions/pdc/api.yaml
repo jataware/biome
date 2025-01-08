@@ -12,8 +12,7 @@ description: |
     * Application programming interface (API) provides cloud-agnostic data access and allows third parties to extend the functionality beyond the PDC.
     * A highly structured workspace that serves as a private user data store and also data submission portal.
     * Distributes controlled access data, such as the patient-specific protein fasta sequence databases, with dbGaP authorization and eRA Commons authentication.
-documentation:
-    file: "pdc_schema.graphql"
+documentation: !load documentation/pdc_schema.graphql
 cache_key: "api_assistant_pdc_graphql"
 instructions: |
     This API is through GraphQL. You will be provided the schema. 
@@ -24,4 +23,4 @@ instructions: |
     {examples}
 
 examples: 
-    file: examples.md
+    file: !load documentation/examples.md

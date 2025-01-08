@@ -107,3 +107,35 @@ if samples_response.status_code == 200:
             if len(details['protein_changes']) > 5:
                 print(f"  ... and {len(details['protein_changes'])-5} more changes")
 ```
+
+
+## Example 3: Query for studies related to colorectal cancer using the cancerTypeId 'coadread'.
+
+```
+import requests
+import pandas as pd
+
+# cBioPortal API base URL
+base_url = "https://www.cbioportal.org/api"
+
+# Endpoint to fetch studies
+endpoint = "/studies"
+
+# Parameters for the query
+params = {"cancerTypeId": "coadread"}
+
+# Make the API request
+response = requests.get(base_url + endpoint, params=params)
+
+# Check for successful response
+response.raise_for_status()
+
+# Parse the JSON response
+studies = response.json()
+
+# Create a pandas DataFrame from the results
+df = pd.DataFrame(studies)
+
+# Print the DataFrame
+print(df)
+```

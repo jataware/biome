@@ -20,6 +20,8 @@ services:
       - TOOL_ENABLED_ASK_USER=true
       - TOOL_ENABLED_RUN_CODE=false
       - PYTHONBREAKPOINT=debugpy.breakpoint
+    env_file:
+      - ../.env
     volumes:
       - .:/jupyter
       - ../.env:/jupyter/.env
