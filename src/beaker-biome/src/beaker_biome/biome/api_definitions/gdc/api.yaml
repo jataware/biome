@@ -52,5 +52,8 @@ documentation: |
     and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
     the wildcard operator so it might not be as specific as they would like.
 
+    If a user asks you to filter based on the type of cancer, it is often productive to filter on 
+    disease type, primary diagnosis, or primary site.
+
     Here are some examples of how to use the API:
     {examples}
