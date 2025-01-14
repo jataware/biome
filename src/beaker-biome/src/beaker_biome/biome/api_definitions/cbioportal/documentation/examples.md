@@ -139,3 +139,58 @@ df = pd.DataFrame(studies)
 # Print the DataFrame
 print(df)
 ```
+
+
+## Example 4: Fetch and filter studies related to Acute Myeloid Leukemia (AML) from cBioPortal API.
+
+```
+import requests
+import pandas as pd
+
+def fetch_aml_studies():
+    # Base URL for cBioPortal API
+    base_url = "https://www.cbioportal.org/api"
+    
+    # Get all studies
+    response = requests.get(f"{base_url}/studies")
+    
+    if response.status_code != 200:
+        raise Exception(f"API request failed with status code {response.status_code}")
+    
+    # Get all studies as JSON
+    studies = response.json()
+    
+    # Filter for AML related studies
+    aml_studies = []
+    for study in studies:
+        # Convert all fields to lowercase for case-insensitive search
+        study_id = study.get('studyId', '').lower()
+        name = study.get('name', '').lower()
+        cancer_type = study.get('cancerTypeId', '').lower()
+        description = study.get('description', '').lower()
+        
+        # Check if 'aml' appears in any of the relevant fields
+        if any('aml' in field for field in [study_id, name, cancer_type, description]):
+            aml_studies.append({
+                'studyId': study['studyId'],
+                'name': study['name'],
+                'description': study.get('description', 'N/A'),
+                'cancerTypeId': study.get('cancerTypeId', 'N/A'),
+                'sampleCount': study.get('allSampleCount', 0),
+                'status': study.get('status', 'N/A'),
+                'publicStudy': study.get('publicStudy', False)
+            })
+    
+    # Convert to DataFrame for better display
+    df = pd.DataFrame(aml_studies)
+    
+    # Sort by sample count descending
+    df = df.sort_values('sampleCount', ascending=False)
+    
+    return df
+
+# Execute the function
+aml_studies_df = fetch_aml_studies()
+print(f"Found {len(aml_studies_df)} AML-related studies")
+print(aml_studies_df)
+```

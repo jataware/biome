@@ -6,9 +6,19 @@ description: |
     including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
 raw_documentation: !load documentation/gdc.md
 facets: !load documentation/facets.txt
+mappings: !load documentation/gdc_mappings.json
 examples: !load documentation/examples.md
 cache_key: api_assistant_gdc_faceted
 documentation: |
+
+    # GDC API Documentation
+
+    Below you will find the GDC API documentation. Note that 
+    there are several endpoints available--some are discussed in the `Search and Retrieval`
+    section, and others are discussed in the `Data Analysis` section.
+
+    When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
+
     {raw_documentation}
 
     # Additional Instructions:
@@ -20,11 +30,27 @@ documentation: |
     If you download a file by file-id, the output will be TSV.
     Save the file with the proper extension.
 
-    Ensure filters align to the facets provided.
-    A list of filters and their respective choices are as follows, between backticks:
+    When filtering you should rely on the fields provided for a given endpoint in the following mapping.
+    This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
+
+    ```
+    {mappings}
+    ```
+
+    These are the fields that are available for filtering and also the fields that can be returned. You can use
+    the facets to filter the fields that are available for a given endpoint.
+
+    A list of fields and their respective choices/facets are as follows:
+
     ```
     {facets}
     ```
+
+    Note this list of facets may be incomplete as it changes over time. Remember to consult it
+    when you are filtering. If you are unsure about options available for a given field, you should consider
+    just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
+    and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
+    the wildcard operator so it might not be as specific as they would like.
 
     Here are some examples of how to use the API:
     {examples}

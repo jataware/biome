@@ -767,3 +767,92 @@ except json.JSONDecodeError as e:
     print("Response content:", response_stat5a.text)
     print("Response content:", response_stat5b.text)
 ```
+
+
+## Example 15: Get all clinical data (cases) from PDC and filter for those that have external references to GDC. Return the results as a pandas dataframe.
+
+```
+import requests
+import json
+import pandas as pd
+from pandas import json_normalize
+
+url = 'https://pdc.cancer.gov/graphql'
+
+# Define the GraphQL query
+query = """
+query FilteredClinicalDataPaginated($offset_value: Int, $limit_value: Int, $source: String!) {
+    getPaginatedUIClinical(
+        offset: $offset_value,
+        limit: $limit_value,
+        source: $source
+    ) {
+        total
+        uiClinical {
+            case_id
+            case_submitter_id
+            externalReferences {
+    					reference_resource_shortname
+    					reference_entity_location
+    				}
+        }
+        pagination {
+            count
+            total
+            pages
+            size
+        }
+    }
+}
+"""
+
+# Set initial query variables
+offset_value = 0
+limit_value = 3993  # Fetch 1000 records per request
+source = "PDC"
+
+# Initialize list to store all case IDs
+all_case_ids = []
+
+total_cases = 3993  # Total number of cases to fetch
+
+while offset_value < total_cases:
+    variables = {
+        "offset_value": offset_value,
+        "limit_value": limit_value,
+        "source": source
+    }
+
+    # Make the API request
+    response = requests.post(url, json={'query': query, 'variables': variables})
+
+    if response.status_code == 200:
+        data = response.json()
+        
+        # Extract case IDs
+        cases = data['data']['getPaginatedUIClinical']['uiClinical']
+        all_case_ids.extend([case['case_id'] for case in cases])
+        
+        # Increment offset for next page
+        offset_value += limit_value
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        break
+
+# Print total number of case IDs fetched
+print(f"Total cases fetched: {len(all_case_ids)}")
+
+pdc_cases_in_gdc = []
+
+for case in data['data']['getPaginatedUIClinical']['uiClinical']:
+  for exref in case['externalReferences']:
+    if exref.get('reference_resource_shortname', '') == 'GDC':
+      case['gdc_case_id'] = exref['reference_entity_location'].split('cases/')[1].strip('\r')
+      pdc_cases_in_gdc.append(case)
+
+print(f"Found {len(pdc_cases_in_gdc)} cases that have external references to GDC.")
+
+pdc_in_gdc_df = pd.DataFrame(json_normalize(pdc_cases_in_gdc))
+pdc_in_gdc_df.head()
+```

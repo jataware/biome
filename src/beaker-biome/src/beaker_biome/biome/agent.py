@@ -111,7 +111,10 @@ class BiomeAgent(BaseAgent):
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
-        self.add_context(f"The APIs available to you are: \n{[spec['name'] for spec in specs]}")
+        self.add_context(f"The APIs that you have specialized tooling for are: \n{[spec['name'] for spec in specs]}. However, you can " \
+                         f"utilize other APIs as well, you just CANNOT use the `draft_api_code` or `consult_api_docs` tools to interact with them." \
+                          "For example, you can use the `run_code` tool to interact with other APIs by writing your own code to do so, e.g. using the `requests` library "\
+                          "or using Biopython, etc.")
         self.api_list = [spec['name'] for spec in specs]
 
     async def auto_context(self):
