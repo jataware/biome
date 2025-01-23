@@ -5,10 +5,11 @@ EXPOSE 8888
 RUN apt update && apt install -y lsof
 
 # Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel debugpy
+RUN pip install --upgrade --no-cache-dir hatch pip debugpy
 
-# Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip beaker-kernel debugpy
+# Install beaker-kernel from dev branch
+# RUN pip install git+https://github.com/jataware/beaker-kernel.git@dev
+RUN pip install beaker-kernel==1.8.12
 
 USER jupyter
 WORKDIR /jupyter
