@@ -8,13 +8,11 @@ services:
     build: .
     ports:
       - "8888:8888"
-      - "5678:5678"
     environment:
       - DEBUG=1
       - LOGLEVEL=INFO
       - JUPYTER_SERVER=http://jupyter:8888
       - JUPYTER_TOKEN=89f73481102c46c0bc13b2998f9a4fce
-      - OPENAI_API_KEY
       - PYTHONPATH=/jupyter
       - ENABLE_CHECKPOINTS=true
       - TOOL_ENABLED_ASK_USER=true
@@ -23,20 +21,20 @@ services:
     env_file:
       - .env
     volumes:
-      - ./src:/jupyter
+      - ./src/biome:/jupyter/src/biome
       - .env:/jupyter/.env
       - .beaker.conf:/jupyter/.beaker.conf
-    command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
+    # command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     networks:
       - beaker
-  ui:
-    image: node:20
-    user: "node"
-    volumes:
-      - ./src:/ui
-    working_dir: "/ui"
-    ports:
-      - "8080:8080"
-    command: "sh -c 'npm install && npm run serve'"
-    networks:
-      - beaker
+  # ui:
+  #   image: node:20
+  #   user: "node"
+  #   volumes:
+  #     - ./src:/ui
+  #   working_dir: "/ui"
+  #   ports:
+  #     - "8080:8080"
+  #   command: "sh -c 'npm install && npm run serve'"
+  #   networks:
+  #     - beaker

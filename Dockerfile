@@ -1,23 +1,46 @@
-FROM python:3.10
+FROM python:3.11.5
 RUN useradd -m jupyter
+RUN useradd -m user
 EXPOSE 8888
 
 RUN apt update && apt install -y lsof
 
 # Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip debugpy
+RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy
 
 # Install beaker-kernel from dev branch
 # RUN pip install git+https://github.com/jataware/beaker-kernel.git@dev
-RUN pip install beaker-kernel==1.8.12
+# RUN pip install beaker-kernel==1.8.
+COPY --chown=1000:1000 . /jupyter
+RUN chown -R 1000:1000 /jupyter
 
-USER jupyter
+RUN pip install --no-build-isolation /jupyter/beaker_kernel-1.9.0a2-py3-none-any.whl
+
+RUN pip install \
+    archytas~=1.3.11 \
+    requests \
+    google-generativeai \
+    PyYAML \
+    adhoc-api~=1.0.0 \
+    idc-index \
+    seaborn \
+    biopython \
+    boto3 \
+    google-cloud-storage
+
+RUN pip install --no-build-isolation -e /jupyter
+
+RUN mkdir -m 777 /var/run/beaker
+
 WORKDIR /jupyter
 
-COPY ./src/beaker-biome /jupyter/beaker-biome
-USER root
-RUN chown -R jupyter:users /jupyter/beaker-biome
+# Set default server env variables
+ENV BEAKER_AGENT_USER=jupyter
+ENV BEAKER_SUBKERNEL_USER=user
+ENV BEAKER_RUN_PATH=/var/run/beaker
+ENV BEAKER_APP=biome.app.BiomeApp
 
-USER jupyter
+#ENV CONFIG_TYPE=session
 
-RUN pip install -e /jupyter/beaker-biome
+# Service
+CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
