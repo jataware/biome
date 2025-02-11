@@ -97,6 +97,13 @@ class BiomeAgent(BaseAgent):
         drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
         specs = self.api_specs
 
+        instructions_dir = os.path.join(self.root_folder, 'instructions')
+        # join all the files in the instructions directory into a single string
+        self.instructions = ""
+        for file in os.listdir(instructions_dir):
+            with open(os.path.join(instructions_dir, file), 'r') as f:
+                self.instructions += f.read()
+
         super().__init__(context, tools, **kwargs)
         sleep(5)
         
@@ -111,14 +118,44 @@ class BiomeAgent(BaseAgent):
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
-        self.add_context(f"The APIs that you have specialized tooling for are: \n{[spec['name'] for spec in specs]}. However, you can " \
-                         f"utilize other APIs as well, you just CANNOT use the `draft_api_code` or `consult_api_docs` tools to interact with them." \
-                          "For example, you can use the `run_code` tool to interact with other APIs by writing your own code to do so, e.g. using the `requests` library "\
-                          "or using Biopython, etc.")
+        self.add_context(f"""You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
+        help them choose which APIs to use or to help them query them. 
+
+        You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
+        for later use, etc. Be extremely CAREFUL about this.
+
+        If you need to print something, be extremely CAREFUL--don't print the whole thing!
+
+        You must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
+
+        Users may ask you to load and munge data and many other tasks.
+        
+        Try to identify all of the steps needed, and all of the tools, but do not assume the user wants to do all of the steps at once.
+        
+        If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
+
+        Additionally, there are certain queries that you can make via Biopython or simply using requests to Entrez, NCBI's database. Here are some specific
+        instructions and examples of how to do this:
+
+        ```
+        {self.instructions}
+        ```
+
+        When responding to user queries where those instructions are relevant, you should use the `run_code` tool to execute the code and return the results.
+        """)
+        
+        self.add_context(f"""Importantly, you have special tooling for a set of core Biome APIs.
+        The APIs that you have specialized tooling for are: \n{[spec['name'] for spec in specs]}. For these APIs you should 
+        utilize the `draft_api_code` and `consult_api_docs` tools before using the `run_code` tool to ensure that you obtain expert level
+        information about how to interact with the API. 
+        
+        However, you can utilize other APIs as well, you just CANNOT use the `draft_api_code` or `consult_api_docs` tools to interact with them.
+        For example, you can use the `run_code` tool to interact with other APIs by writing your own code to do so, e.g. using the `requests` library 
+        or using Biopython, etc.""")
         self.api_list = [spec['name'] for spec in specs]
 
     async def auto_context(self):
-        return """You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
+        return self.add_context("""You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
         help them choose which APIs to use or to help them query them. 
 
         You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
@@ -139,7 +176,16 @@ class BiomeAgent(BaseAgent):
         Make sure you understand all the steps needed to complete the task. Try to run all of the steps at once.
 
         If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
-        """        
+
+        Additionally, there are certain queries that you can make via Biopython or simply using requests to Entrez, NCBI's database. Here are some specific
+        instructions and examples of how to do this:
+
+        ```
+        {self.instructions}
+        ```
+
+        When responding to user queries where those instructions are relevant, you should use the `run_code` tool to execute the code and return the results.
+        """)
 
     @tool()
     async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
