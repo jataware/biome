@@ -14,7 +14,8 @@ RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy
 COPY --chown=1000:1000 . /jupyter
 RUN chown -R 1000:1000 /jupyter
 
-RUN pip install --no-build-isolation /jupyter/beaker_kernel-1.9.0a2-py3-none-any.whl
+RUN pip install --no-build-isolation /jupyter/beaker_kernel-1.9.0a5-py3-none-any.whl
+RUN pip install --no-build-isolation /jupyter/archytas-1.3.11-py3-none-any.whl
 
 RUN pip install \
     archytas~=1.3.11 \
@@ -26,7 +27,8 @@ RUN pip install \
     seaborn \
     biopython \
     boto3 \
-    google-cloud-storage
+    google-cloud-storage \
+    PyPDF2~=3.0.1
 
 RUN pip install --no-build-isolation -e /jupyter
 

@@ -25,7 +25,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "beaker-kernel~=1.9.0a2",
+  "beaker-kernel~=1.9.0a5",
   "archytas~=1.3.11",
   "requests",
   "google-generativeai",
@@ -36,6 +36,7 @@ dependencies = [
   "biopython",
   "boto3",
   "google-cloud-storage",
+  "PyPDF2~=3.0.1",
 ]
 
 [project.urls]
