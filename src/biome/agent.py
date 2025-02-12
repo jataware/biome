@@ -41,37 +41,26 @@ class MessageLogger():
             },
         ) 
 
+# Load docstrings at module level
+def load_docstring(filename):
+    root_folder = Path(__file__).resolve().parent
+    with open(os.path.join(root_folder, 'prompts', filename), 'r') as f:
+        return f.read()
+
+def with_docstring(filename):
+    """Decorator to set a function's docstring from a file"""
+    docstring = load_docstring(filename)
+    def decorator(func):
+        func.__doc__ = docstring
+        return func
+    return decorator
+
+DRAFT_API_CODE_DOC = load_docstring('draft_api_code.md')
+CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
+
 class BiomeAgent(BaseAgent):
     """
-    You are a chat assistant that helps the analyst user with their questions. You are running inside of the Analyst UI which is a chat application
-    sitting on top of a Jupyter notebook. This means the user will not be looking at code and will expect you to run code under the hood. Of course,
-    power users may end up inspecting the code you you end up running and editing it.
-
-    You have the ability to look up information regarding the environment via the tools that are provided. You should use these tools whenever are not able to
-    satisfy the request to a high level of reliability. You should avoid guessing at how to do something in favor of using the provided tools to look up more
-    information. Do not make assumptions, always check the documentation instead of assuming.
-
-    You are currently working in the Biome app. The Biome app is a collection of data sources where a data source is a profiled website targeted specifically
-    at cancer research. The user can add new data sources or may ask you to browser the data sources and return relevant datasets or other info. An example
-    of a flow could be looking through all the data sources, picking one, finding a dataset using the URL, and then finally loading that dataset into a pandas
-    dataframe.
-
-    You must be extremely careful about what you print to stdout when running code--be cognizant of the size and make sure you don't print out huge things!
-    Never, ever just print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
-    for later use, etc.
-
-    When you use a tool you must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
-    You do not need to include the class name, just the method. For example you should not indicate `BiomeAgent.draft_api_code` but rather just `draft_api_code`.
-
-    A very common workflow is to use the `draft_api_code` tool or the `consult_api_docs` tool to get code to interact with an API. 
-    Once you have the code, you can use the `BiomeAgent__run_code` tool to execute the code. If you work out something tricky
-    on behalf of the user, let's capture your success: you should ask the user if they would like to use the `add_example` 
-    tool to add the code as an example to the API's documentation.
-
-    You will often be asked to integrate information from multiple sources to answer a question. For example, you may be asked to find a dataset
-    from one API and integrate it with information from another API. In this case, you should be explicit about the steps needed to accomplish the task
-    and where the information from each API is used. When you summarize your findings or results you should be clear about which information
-    came from which API.
+    You are the Biome Agent, a chat assistant that helps users with biomedical research tasks.
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
@@ -118,116 +107,18 @@ class BiomeAgent(BaseAgent):
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
-        self.add_context(f"""You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
-        help them choose which APIs to use or to help them query them. 
-
-        You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
-        for later use, etc. Be extremely CAREFUL about this.
-
-        If you need to print something, be extremely CAREFUL--don't print the whole thing!
-
-        You must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
-
-        Users may ask you to load and munge data and many other tasks.
-        
-        Try to identify all of the steps needed, and all of the tools, but do not assume the user wants to do all of the steps at once.
-        
-        If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
-
-        Additionally, there are certain queries that you can make via Biopython or simply using requests to Entrez, NCBI's database. Here are some specific
-        instructions and examples of how to do this:
-
-        ```
-        {self.instructions}
-        ```
-
-        When responding to user queries where those instructions are relevant, you should use the `run_code` tool to execute the code and return the results.
-        """)
-        
-        self.add_context(f"""Importantly, you have special tooling for a set of core Biome APIs.
-        The APIs that you have specialized tooling for are: \n{[spec['name'] for spec in specs]}. For these APIs you should 
-        utilize the `draft_api_code` and `consult_api_docs` tools before using the `run_code` tool to ensure that you obtain expert level
-        information about how to interact with the API. 
-        
-        However, you can utilize other APIs as well, you just CANNOT use the `draft_api_code` or `consult_api_docs` tools to interact with them.
-        For example, you can use the `run_code` tool to interact with other APIs by writing your own code to do so, e.g. using the `requests` library 
-        or using Biopython, etc.""")
         self.api_list = [spec['name'] for spec in specs]
 
-    async def auto_context(self):
-        return self.add_context("""You are an assistent that is intended to assist users various biomedical information tasks. You may be asked to 
-        help them choose which APIs to use or to help them query them. 
-
-        You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
-        for later use, etc. Be extremely CAREFUL about this.
-
-        If you need to print something, be extremely CAREFUL--don't print the whole thing!
-
-        You must ALWAYS indicate which tool you are using by explicitly stating the tool name in your thinking. Wrap the tool name in backticks.
-
-        Users may ask you to load and munge data and many other tasks.
-        Try to identify all of the steps needed, and all of the tools. Assume the user wants to do all of the steps at once.
-        
-        If the user asks to extract something from a set of documents, you can use the Palimpzest family of tools to do this. First, generate a schema for the extraction. 
-        Then, if necessary filter the data to only include the relevant documents. Next, convert the dataset to the schema that was generated. 
-        Finally, execute the workload to extract the information from the dataset. You may need to use multiple tools to accomplish this, including the ability to 
-        register datasets, setting the input source, filtering datasets, convert datasets, generating schemas, and executing workloads.
-
-        Make sure you understand all the steps needed to complete the task. Try to run all of the steps at once.
-
-        If the results of a API search yields no results, you should use the `consult_api_docs` tool to check that you are querying the API correctly.
-
-        Additionally, there are certain queries that you can make via Biopython or simply using requests to Entrez, NCBI's database. Here are some specific
-        instructions and examples of how to do this:
-
-        ```
-        {self.instructions}
-        ```
-
-        When responding to user queries where those instructions are relevant, you should use the `run_code` tool to execute the code and return the results.
-        """)
+        # Load prompt files and set the Agent context
+        prompts_dir = os.path.join(self.root_folder, 'prompts')
+        with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
+            template = f.read()
+            self.__doc__ = template.format(api_list=self.api_list, instructions=self.instructions)
+            self.add_context(self.__doc__)
 
     @tool()
+    @with_docstring('draft_api_code.md')
     async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        """
-        Drafts python code for an API request given a specified goal, such as a query for a specific study. You can use this tool to 
-        get code to interact with the APIs that are available to you. When the user asks you to use an API and you are unsure how to do so, you should
-        be sure to use this tool. Once you've learned how to do common tasks with an API you may not need this tool, but for accomplishing
-        new tasks, you should use this tool. 
-        
-        The way this tool functions is that it will provide the goal to an external agent, which we refer to as the "drafter". 
-        The drafter has access to the API documentation for the API in question. The drafter will then generate the code to perform the desired operation. 
-        However, the drafter requires a very specific goal in order to do their job and does not have the ability to guess or infer. 
-        Therefore, you must provide a very specific goal. It also does not have awareness of information outside of what you provide in the goal. 
-        Therefore, if you have run code previously that returned information such as names of studies, `ids` of datasets, etc, you must provide that 
-        information in the goal if it is needed to perform the desired operation.
-
-        If you are asked to query for something specific, e.g. a study, you MUST provide the relevant `id` as part of the goal if you have access to it.
-        Most APIs allow you to easily query by `id` so this is often possible to utilize.
-        For example, if you are asked to find a dataset and you have the `id` of the dataset, you should provide that in the goal.
-        Be as SPECIFIC as possible as this will help you get a more accurate and timely result. Do not be vague, provide
-        VERBOSE goals so that the drafter of the code has all the information needed to do their job.
-
-        The code that is drafted will generally be a complete, small program including relevant imports and other boilerplate code. Much of this 
-        may already be implemented in the code you have run previously; if that is the case you should not repeat it. Feel free to streamline the code
-        generated by removing any unnecessary steps before sending it to the `BiomeAgent__run_code` tool.
-
-        You may want to use the consult_api_docs tool to ask questions of the API before running this tool to help refine your goal!
-
-        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks. 
-        
-        You MUST also be explicit about the goal in your thinking.
-
-        Args:
-            api (str): The name of the API to use
-            goal (str): The task to be performed by the API request. This should be as specific as possible and include any relevant details such as the `ids` or other parameters that should be used to get the desired result.
-
-        Returns:
-            str: Depending on the user defined configuration will do one of two things.
-                 Either A) return the raw generated code. Or B) Will attempt to run the code and return the result or
-                 any errors that occurred (along with the original code). if an error is returned, you may consider
-                 trying to fix the code yourself rather than reusing the tool.
-        """
         self.logger.info("using api")
         logger.info(f"using api: {api}")
         try: 
@@ -239,26 +130,9 @@ class BiomeAgent(BaseAgent):
             self.logger.error(str(e))
             return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
 
-
     @tool()
+    @with_docstring('consult_api_docs.md')
     async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        """
-        This tool is used to ask a question of an API. It allows you to ask a question of an API's documentation and get results in
-        natural language, which may include code snippets or other information that you can then use to write code to interact with the API 
-        (e.g. using the `BiomeAgent__run_code` tool). You can also use this information to refine your goal when using the `draft_api_code` tool.
-
-        You can ask questions related to endpoints, payloads, etc. For example, you can ask "What are the endpoints for this API?"
-        or "What payload do I need to send to this API?" or "How do I query for datasets by keyword?" etc, etc.
-
-        If you use this tool, you MUST indicate so in your thinking. Wrap the tool name in backticks.
-
-        Args:
-            api (str): The name of the API to use
-            query (str): The question you want to ask about the API.
-
-        Returns:
-            str: returns instructions on how to utilize the API based on the question asked.
-        """
         self.logger.info("asking api")
         logger.info(f"asking api: {api}")
         try:
@@ -517,3 +391,21 @@ class BiomeAgent(BaseAgent):
             list: The list of available APIs.
         """
         return self.api_list
+
+
+    @tool(autosummarize=True)
+    async def extract_pdf(self, pdf_path: str, agent: AgentRef) -> str:
+        """
+        Extract the text from a PDF file using PyPDF2. Note that if this tool
+        fails for some reason you can fall back to using the `run_code` tool to
+        extract the text using your own generated code.
+
+        Args:
+            pdf_path (str): The path to the PDF file to extract text from.
+
+        Returns:
+            str: The extracted text from the PDF file.
+        """
+        code = agent.context.get_code("extract_pdf", {'pdf_path': pdf_path})
+        response = await agent.context.evaluate(code)
+        return response["return"]
