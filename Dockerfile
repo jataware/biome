@@ -10,14 +10,11 @@ RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy
 
 # Install beaker-kernel from dev branch
 # RUN pip install git+https://github.com/jataware/beaker-kernel.git@dev
-# RUN pip install beaker-kernel==1.8.
 COPY --chown=1000:1000 . /jupyter
 RUN chown -R 1000:1000 /jupyter
 
-RUN pip install --no-build-isolation /jupyter/beaker_kernel-1.9.0a5-py3-none-any.whl
-RUN pip install --no-build-isolation /jupyter/archytas-1.3.11-py3-none-any.whl
-
 RUN pip install \
+    beaker-kernel~=1.9.0 \
     archytas~=1.3.11 \
     requests \
     google-generativeai \
