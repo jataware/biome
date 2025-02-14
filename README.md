@@ -6,17 +6,6 @@ The goal of Biome is to seamlessly combine the ability to find research data wit
 
 Biome is being developed under ARPA-H's [Biomedical Data Fabric (BDF) Toolbox](https://arpa-h.gov/news-and-events/arpa-h-announces-effort-develop-single-data-system-biomedical-research) program.
 
-- - -
-
-Workflow screen recording (at 2x speed) 
-
-https://github.com/user-attachments/assets/4f08307b-dc60-4d90-a52e-6f6962dde76e
-
-
-Notebook workflow and editing 
-
-https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
-
 
 ## Requirements
 
@@ -63,27 +52,19 @@ docker compose down
 
 ## Usage
 
-Visit http://localhost:8080/chat in the browser to use the chat interface.
+Visit `http://localhost:8888` in the browser to use the Biome interface.
 
-Visit http://localhost:8080/notebook to use the notebook interface.
 
-Both can be toggled within the UI itself as well, with persistent sessions.
+## Demo Videos (outdated...)
 
-### Development
+Workflow screen recording (at 2x speed) 
 
-#### Docker
+https://github.com/user-attachments/assets/4f08307b-dc60-4d90-a52e-6f6962dde76e
 
-`docker compose build` or `docker compose up --build` are usually sufficient
-for rebuilding containers when their dependencies have been updated,
-but use `docker compose build --no-cache` if you want to force everything to rebuild.
-If a container doesn't have hot-reloading, it's usually enough to just the container
-down and up again to have the changes reflected.
 
-## Architecture
+Notebook workflow and editing 
 
-### Services 
-
-- Biome UI (8080): Notebook and chat support through Beaker
+https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
 
 
 ## Funding
