@@ -14,7 +14,7 @@ COPY --chown=1000:1000 . /jupyter
 RUN chown -R 1000:1000 /jupyter
 
 RUN pip install \
-    beaker-kernel~=1.9.0 \
+    beaker-kernel~=1.9.1 \
     archytas~=1.3.11 \
     requests \
     google-generativeai \
