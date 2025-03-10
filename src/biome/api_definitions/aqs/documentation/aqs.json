@@ -1,0 +1,4779 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "AQS Data API",
+      "description": "These are the specifications for the AQS API version 2. Remaining to do \n * Add more services\n  * Verify return descriptions are correct",
+      "version": "1.2.1",
+      "termsOfService": "https://aqs.epa.gov/aqsweb/documents/data_api.html#terms",
+      "contact": {
+        "name": "US EPA Air Quality System API v2",
+        "email": "aqsdatamart@epa.gov",
+        "url": "https://aqs.epa.gov/aqsweb/documents/data_api.html"
+      }
+    },
+    "externalDocs": {
+      "description": "Find out more about the Open API Specification",
+      "url": "https://github.com/OAI/OpenAPI-Specification"
+    },
+    "host": "aqs.epa.gov",
+    "basePath": "/data/api",
+    "schemes": [
+      "https"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "tags": [
+      {
+        "name": "sampleData",
+        "description": "Returns sample (raw) data"
+      },
+      {
+        "name": "dailyData",
+        "description": "Returns daily summary data"
+      },
+      {
+        "name": "annualData",
+        "description": "Returns annual summary data"
+      },
+      {
+        "name": "qaAnnualPerformanceEvaluations",
+        "description": "Returns pairs of data (known and measured values) at several concentration levels"
+      },
+      {
+        "name": "list",
+        "description": "Returns lists of valid values for data entry elsewhere"
+      },
+      {
+        "name": "available",
+        "description": "Ping to see if system is on-line"
+      },
+      {
+        "name": "qaCollocatedAssessments",
+        "description": "Returns QA collocated assessment data"
+      },
+      {
+        "name": "qaPepAudits",
+        "description": "Returns QA PEP audit data"
+      },
+      {
+        "name": "qaFlowRateAudits",
+        "description": "Returns QA flow rate audit data"
+      },
+      {
+        "name": "qaFlowRateVerifications",
+        "description": "Returns QA flow rate verification data"
+      },
+      {
+        "name": "qaBlanks",
+        "description": "Returns QA blank data"
+      },
+      {
+        "name": "qaOnePointQcRawData",
+        "description": "Returns QA one point QC raw data"
+      },
+      {
+        "name": "monitors",
+        "description": "Returns monitor data"
+      },
+      {
+        "name": "metaData",
+        "description": "Returns meta data for a service"
+      },
+      {
+        "name": "register",
+        "description": "Create an account"
+      },
+      {
+        "name": "transactionsSample",
+        "description": "Returns data in AQS transaction format"
+      },
+      {
+        "name": "transactionsQaAnnualPerformanceEvaluations",
+        "description": "Returns pairs of data QA at several concentration levels in the submission (transaction) format for AQS"
+      }
+    ],
+    "parameters": {
+      "userParam": {
+        "name": "email",
+        "in": "query",
+        "description": "User ID (email address)",
+        "required": true,
+        "type": "string",
+        "x-example": "test@aqs.api"
+      },
+      "pwParam": {
+        "name": "key",
+        "in": "query",
+        "description": "Key",
+        "required": true,
+        "type": "string",
+        "x-example": "test"
+      },
+      "paramParam": {
+        "name": "param",
+        "in": "query",
+        "description": "Parameter code.  Enter a 5-digit AQS parameter code  (or multiple codes separated by commas).  Example 44201,88101,88502. Use the list/parametersByClass service for valid parameter codes. (e.g., https://aqs.epa.gov/data/api/list/parametersByClass?email=test@aqs.api&key=test&pc=CRITERIA)\n",
+        "required": true,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5,
+          "pattern": "^[0-9][0-9][0-9][0-9][0-9]$"
+        },
+        "collectionFormat": "csv",
+        "x-example": "88101,44201"
+      },
+      "optionalParam": {
+        "name": "param",
+        "in": "query",
+        "description": "Parameter code.  Enter a 5-digit AQS parameter code  (or multiple codes separated by commas).  Example 44201,88101,88502. Use the list/parametersByClass service for valid parameter codes. (e.g., https://aqs.epa.gov/data/api/list/parametersByClass?email=test@aqs.api&key=test&pc=CRITERIA)\n",
+        "required": false,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5,
+          "pattern": "^[0-9][0-9][0-9][0-9][0-9]$"
+        },
+        "collectionFormat": "csv",
+        "x-example": "88101,44201"
+      },    
+      "stateParam": {
+        "name": "state",
+        "in": "query",
+        "description": "State FIPS code - must be two digits including leading zero  Use the list/states service for a list of state codes (e.g., https://aqs.epa.gov/data/api/list/states?email=test@aqs.api&key=test).\n",
+        "required": true,
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2,
+        "pattern": "^[0-9][0-9]$",
+        "x-example": "16"
+      },
+      "countyParam": {
+        "name": "county",
+        "in": "query",
+        "description": "County FIPS code - must be three digits including leading zeroes.",
+        "required": true,
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 3,
+        "pattern": "^[0-9][0-9][0-9]$",
+        "x-example": "001"
+      },
+      "siteParam": {
+        "name": "site",
+        "in": "query",
+        "description": "Site number - must be four digits including leading zeroes.",
+        "required": true,
+        "type": "string",
+        "minLength": 4,
+        "maxLength": 4,
+        "pattern": "^[0-9][0-9][0-9][0-9]$",
+        "x-example": "0010"
+      },
+      "pocParam": {
+        "name": "poc",
+        "in": "query",
+        "description": "Parameter Occurrence Code - the monitor number.",
+        "required": true,
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2,
+        "x-example": "1"
+      },
+      "unitsParam": {
+        "name": "units",
+        "in": "query",
+        "description": "Units of measure",
+        "required": false,
+        "type": "string",
+        "enum": [
+            "standard",
+            "reported"
+        ],
+        "default": "standard",
+        "x-example": "standard"
+      },
+      "CBSAParam": {
+        "name": "cbsa",
+        "in": "query",
+        "description": "CBSA code - must be five digits including leading zeroes.  Use list/cbsas to find the CSA codes.",
+        "required": true,
+        "type": "string",
+        "minLength": 5,
+        "maxLength": 5,
+        "pattern": "^[0-9][0-9][0-9][0-9][0-9]$",
+        "x-example": "14260"
+      },
+      "minlatParam": {
+        "name": "minlat",
+        "in": "query",
+        "description": "Minimum Latitude - the southernmost extent of a bounding box query.",
+        "required": true,
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180,
+        "x-example": 43.6
+      },
+      "maxlatParam": {
+        "name": "maxlat",
+        "in": "query",
+        "description": "Maximum Latitude - the northernmost extent of a bounding box query.",
+        "required": true,
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180,
+        "x-example": 43.7
+      },
+      "minlonParam": {
+        "name": "minlon",
+        "in": "query",
+        "description": "Minimum Longitude - the westernmost extent of a bounding box query. Use negative values for the western hemisphere.  And -70 is less than -60.\n",
+        "required": true,
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180,
+        "x-example": -116.5
+      },
+      "maxlonParam": {
+        "name": "maxlon",
+        "in": "query",
+        "description": "Maximum Longitude - the westernmost extent of a bounding box query. Use negative values for the western hemisphere.\n",
+        "required": true,
+        "type": "number",
+        "minimum": -180,
+        "maximum": 180,
+        "x-example": -116.0
+      },
+      "bdateParam": {
+        "name": "bdate",
+        "in": "query",
+        "description": "Begin date of data (YYYYMMDD).  For example 20100101.",
+        "required": true,
+        "type": "integer",
+        "minimum": 19000101,
+        "minLength": 8,
+        "maximum": 21991231,
+        "maxLength": 8,
+        "pattern": "^(19|20|21)[0-9]{2}(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])$",
+        "x-example": 20180301
+      },
+      "edateParam": {
+        "name": "edate",
+        "in": "query",
+        "description": "End date of data (YYYYMMDD).  For example 20101231.",
+        "required": true,
+        "type": "integer",
+        "minimum": 19000101,
+        "minLength": 8,
+        "maximum": 21991231,
+        "maxLength": 8,
+        "pattern": "^(19|20|21)[0-9]{2}(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])$",
+        "x-example": 20180331
+      },
+      "cbdateParam": {
+        "name": "cbdate",
+        "in": "query",
+        "description": "Beginning of window to look for changed data (YYYYMMDD).  For example,  to get data for 2010 that last changed in March of 2011, use these parameters. bdate = 20100101, edate = 20101231, cbdate = 20110301, cedate = 20110331.\n",
+        "required": false,
+        "type": "integer",
+        "minimum": 19000101,
+        "minLength": 8,
+        "maximum": 21991231,
+        "maxLength": 8,
+        "pattern": "^(19|20|21)[0-9]{2}(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])$",
+        "x-example": 20180101
+      },
+      "cedateParam": {
+        "name": "cedate",
+        "in": "query",
+        "description": "End of window to look for changed data (YYYYMMDD).  For example,  to get data for 2010 that last changed in March of 2011, use these parameters. bdate = 20100101, edate = 20101231, cbdate = 20110301, cedate = 20110331.\n",
+        "required": false,
+        "type": "integer",
+        "minimum": 19000101,
+        "minLength": 8,
+        "maximum": 21991231,
+        "maxLength": 8,
+        "pattern": "^(19|20|21)[0-9]{2}(0[1-9]|1[0-2])([0-2][1-9]|3[0-1])$",
+        "x-example": 20190430
+      },
+      "pqaoParam": {
+        "name": "pqao",
+        "in": "query",
+        "description": "Code for the primary quality assurance organization - up to 4 digits",
+        "required": true,
+        "type": "string",
+        "x-example": "0511"
+      },
+      "agencyParam": {
+        "name": "agency",
+        "in": "query",
+        "description": "Code for the monitoring agency - up to 4 digits",
+        "required": true,
+        "type": "string",
+        "x-example": "0511"
+      },
+      "serviceParam": {
+        "name": "service",
+        "in": "query",
+        "description": "Service name",
+        "required": true,
+        "type": "string",
+        "x-example": "sampleData"
+      }
+    },
+    "paths": {
+      "/sampleData/byState": {
+        "get": {
+          "tags": [
+            "sampleData"
+          ],
+          "summary": "Returns data for a single state",
+          "description": "Returns sample data matching the variables provided.\n",
+          "operationId": "sampleDataByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/sampleData/byCounty": {
+        "get": {
+          "tags": [
+            "sampleData"
+          ],
+          "summary": "Returns data for a single county",
+          "description": "Returns sample data matching the variables provided.\n",
+          "operationId": "sampleDataByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/sampleData/bySite": {
+        "get": {
+          "tags": [
+            "sampleData"
+          ],
+          "summary": "Returns data for a single monitoring site",
+          "description": "Returns sample data matching the variables provided.\n",
+          "operationId": "sampleDataBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/sampleData/byCBSA": {
+        "get": {
+          "tags": [
+            "sampleData"
+          ],
+          "summary": "Returns data for a single CBSA (metropolitan area)",
+          "description": "Returns sample data matching the variables provided.\n",
+          "operationId": "sampleDataByCBSA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/CBSAParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/sampleData/byBox": {
+        "get": {
+          "tags": [
+            "sampleData"
+          ],
+          "summary": "Returns data within a latitude / longitude bounding box",
+          "description": "Returns sample data matching the variables provided.\n",
+          "operationId": "sampleDataByBox",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/minlatParam"
+            },
+            {
+              "$ref": "#/parameters/maxlatParam"
+            },
+            {
+              "$ref": "#/parameters/minlonParam"
+            },
+            {
+              "$ref": "#/parameters/maxlonParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/dailyData/byState": {
+        "get": {
+          "tags": [
+            "dailyData"
+          ],
+          "summary": "Returns daily summary data for a single state",
+          "description": "Provides data aggregated to a daily summary matching the variables provided.\n",
+          "operationId": "dailyDataByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/dailyData/byCounty": {
+        "get": {
+          "tags": [
+            "dailyData"
+          ],
+          "summary": "Returns daily summary data for a single county",
+          "description": "Provides data aggregated to a daily summary matching the variables provided.\n",
+          "operationId": "dailyDataByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/dailyData/bySite": {
+        "get": {
+          "tags": [
+            "dailyData"
+          ],
+          "summary": "Returns daily summary data for a single monitoring site",
+          "description": "Provides data aggregated to a daily summary matching the variables provided.\n",
+          "operationId": "dailyDataBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/dailyData/byCBSA": {
+        "get": {
+          "tags": [
+            "dailyData"
+          ],
+          "summary": "Returns daily summary data for a single CBSA (metropolitan area)",
+          "description": "Provides data aggregated to a daily summary matching the variables provided.\n",
+          "operationId": "dalyDataByCBSA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/CBSAParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/dailyData/byBox": {
+        "get": {
+          "tags": [
+            "dailyData"
+          ],
+          "summary": "Returns daily summary data within a latitude / longitude bounding box",
+          "description": "Provides data aggregated to a daily summary matching the variables provided.\n",
+          "operationId": "dalyDataByBox",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/minlatParam"
+            },
+            {
+              "$ref": "#/parameters/maxlatParam"
+            },
+            {
+              "$ref": "#/parameters/minlonParam"
+            },
+            {
+              "$ref": "#/parameters/maxlonParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/annualData/byState": {
+        "get": {
+          "tags": [
+            "annualData"
+          ],
+          "summary": "Returns annual summary data for a single state",
+          "description": "Provides data aggregated to an annual summary matching the variables provided.\n",
+          "operationId": "annualDataByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/annualData/byCounty": {
+        "get": {
+          "tags": [
+            "annualData"
+          ],
+          "summary": "Returns annual summary data for a single county",
+          "description": "Provides data aggregated to an annual summary matching the variables provided.\n",
+          "operationId": "annualDataByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/annualData/bySite": {
+        "get": {
+          "tags": [
+            "annualData"
+          ],
+          "summary": "Returns annual summary data for a single monitoring site",
+          "description": "Provides data aggregated to an annual summary matching the variables provided.\n",
+          "operationId": "annualDataBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/annualData/byCBSA": {
+        "get": {
+          "tags": [
+            "annualData"
+          ],
+          "summary": "Returns annual summary data for a single CBSA (metropolitan area)",
+          "description": "Provides data aggregated to an annual summary matching the variables provided.\n",
+          "operationId": "annualDataByCBSA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/CBSAParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/annualData/byBox": {
+        "get": {
+          "tags": [
+            "annualData"
+          ],
+          "summary": "Returns annual summary data within a latitude / longitude bounding box",
+          "description": "Provides data aggregated to an annual summary matching the variables provided.\n",
+          "operationId": "annualDataByBox",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/minlatParam"
+            },
+            {
+              "$ref": "#/parameters/maxlatParam"
+            },
+            {
+              "$ref": "#/parameters/minlonParam"
+            },
+            {
+              "$ref": "#/parameters/maxlonParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      },
+      "/qaAnnualPerformanceEvaluations/bySite": {
+        "get": {
+          "tags": [
+            "qaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data for a single site",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided.\n",
+          "operationId": "qaAnnualPerformanceEvaluationsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaAnnualPerformanceEvaluations/byCounty": {
+        "get": {
+          "tags": [
+            "qaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data for a single county",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided.\n",
+          "operationId": "qaAnnualPerformanceEvaluationsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaAnnualPerformanceEvaluations/byState": {
+        "get": {
+          "tags": [
+            "qaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data for a single state",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided.\n",
+          "operationId": "qaAnnualPerformanceEvaluationsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaAnnualPerformanceEvaluations/byPQAO": {
+        "get": {
+          "tags": [
+            "qaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data for a given Primary Quality Assurance Organization",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided.\n",
+          "operationId": "qaAnnualPerformanceEvaluationsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaAnnualPerformanceEvaluations/byMA": {
+        "get": {
+          "tags": [
+            "qaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data for a single Monitoring Agency",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided.\n",
+          "operationId": "qaAnnualPerformanceEvaluationsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/states": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of state codes",
+          "description": "AQS uses FIPS codes for identifying states and counties.  This service provides the code for each state.  Note, when using a code _always_ include leading zeroes.\n",
+          "operationId": "listStates",
+            "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],  
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/countiesByState": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of county codes in the provided state",
+          "description": "AQS uses FIPS codes for identifying states and counties.  This service provides the code for each county in a given state.  Note, when using a code _always_ include leading zeroes.\n",
+          "operationId": "listCountiesByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },  
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/sitesByCounty": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of site numbers in the given county",
+          "description": "Each site (monitoring station) within a county has a unique 4 digit number.  This service provides a list of all sites within the given county.  The leading zeroes are part of the site number and the numbers do not have to be sequential.\n",
+          "operationId": "listSitesByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }, 
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/cbsas": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of CBSA (metro area) codes",
+          "description": "AQS uses Census codes for identifying metro areas (CBSAs, or Core Based Statistical Areas).   This service provides the code for each CBSA.   Note, when using a code _always_ include leading zeroes.\n",
+          "operationId": "listCBSAs",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],          
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/classes": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of classes (groups) of parameters",
+          "description": "This service returns the list of AQS parameter classes.  A parameter class is a grouping of parameters, like Criteria or Meteorological.\n",
+          "operationId": "listClasses",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],          
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/parametersByClass": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of parameter codes in the provided class.  \"ALL\" is a valid class.",
+          "description": "Returns a list of parameter codes in the provided class.  \"ALL\" is a valid class that will return all AQS parameters.  The parameter codes in AQS are specific to the system.  We cannot use CAS or other schemes because they do not provide a direct mapping to measurements reported to AQS.\n",
+          "operationId": "listParametersByClass",
+          "produces": [
+            "application/json",
+            "text/csv"
+          ],
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "name": "pc",
+              "in": "query",
+              "description": "Parameter class",
+              "required": true,
+              "type": "string",
+              "default": "ALL"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/list/pqaos": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of primary quality assurance organization codes",
+          "description": "Returns a list of primary quality assurance organization codes.\n",
+          "operationId": "listPqaos",
+          "produces": [
+            "application/json",
+            "text/csv"
+          ],
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },    
+      "/list/mas": {
+        "get": {
+          "tags": [
+            "list"
+          ],
+          "summary": "Returns a list of monitoring agency codes",
+          "description": "Returns a list of monitoring agency codes.\n",
+          "operationId": "listMas",
+          "produces": [
+            "application/json",
+            "text/csv"
+          ],
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],        
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },     
+      "/qaCollocatedAssessments/byState": {
+        "get": {
+          "tags": [
+            "qaCollocatedAssessments"
+          ],
+          "summary": "Returns QA collocated assessment data by state",
+          "operationId": "qaCollocatedAssessmentsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaCollocatedAssessments/byCounty": {
+        "get": {
+          "tags": [
+            "qaCollocatedAssessments"
+          ],
+          "summary": "Returns QA collocated assessment data by county",
+          "operationId": "qaCollocatedAssessmentsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaCollocatedAssessments/bySite": {
+        "get": {
+          "tags": [
+            "qaCollocatedAssessments"
+          ],
+          "summary": "Returns QA collocated assessment data by site",
+          "operationId": "qaCollocatedAssessmentsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaCollocatedAssessments/byPQAO": {
+        "get": {
+          "tags": [
+            "qaCollocatedAssessments"
+          ],
+          "summary": "Returns QA collocated assessment data by primary quality assurance organization code",
+          "operationId": "qaCollocatedAssessmentsByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaCollocatedAssessments/byMA": {
+        "get": {
+          "tags": [
+            "qaCollocatedAssessments"
+          ],
+          "summary": "Returns QA collocated assessment data by monitoring agency code",
+          "operationId": "qaCollocatedAssessmentsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaPepAudits/byState": {
+        "get": {
+          "tags": [
+            "qaPepAudits"
+          ],
+          "summary": "Returns QA PEP audit data by state",
+          "operationId": "qaPepAuditsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaPepAudits/byCounty": {
+        "get": {
+          "tags": [
+            "qaPepAudits"
+          ],
+          "summary": "Returns QA PEP audit data by county",
+          "operationId": "qaPepAuditsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaPepAudits/bySite": {
+        "get": {
+          "tags": [
+            "qaPepAudits"
+          ],
+          "summary": "Returns QA PEP audit data by site",
+          "operationId": "qaPepAuditsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaPepAudits/byPQAO": {
+        "get": {
+          "tags": [
+            "qaPepAudits"
+          ],
+          "summary": "Returns QA PEP audit data by primary quality assurance organization code",
+          "operationId": "qaPepAuditsByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaPepAudits/byMA": {
+        "get": {
+          "tags": [
+            "qaPepAudits"
+          ],
+          "summary": "Returns QA PEP audit data by monitoring agency code",
+          "operationId": "qaPepAuditsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateAudits/byState": {
+        "get": {
+          "tags": [
+            "qaFlowRateAudits"
+          ],
+          "summary": "Returns QA flow rate audits data by state",
+          "operationId": "qaFlowRateAuditsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateAudits/byCounty": {
+        "get": {
+          "tags": [
+            "qaFlowRateAudits"
+          ],
+          "summary": "Returns QA flow rate audits data by county",
+          "operationId": "qaFlowRateAuditsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateAudits/bySite": {
+        "get": {
+          "tags": [
+            "qaFlowRateAudits"
+          ],
+          "summary": "Returns QA flow rate audits data by site",
+          "operationId": "qaFlowRateAuditsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateAudits/byPQAO": {
+        "get": {
+          "tags": [
+            "qaFlowRateAudits"
+          ],
+          "summary": "Returns QA flow rate audits data by primary quality assurance organization code",
+          "operationId": "qaFlowRateAuditsByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateAudits/byMA": {
+        "get": {
+          "tags": [
+            "qaFlowRateAudits"
+          ],
+          "summary": "Returns QA flow rate audits data by monitoring agency code",
+          "operationId": "qaFlowRateAuditsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateVerifications/byState": {
+        "get": {
+          "tags": [
+            "qaFlowRateVerifications"
+          ],
+          "summary": "Returns QA flow rate verification data by state",
+          "operationId": "qaFlowRateVerificationsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateVerifications/byCounty": {
+        "get": {
+          "tags": [
+            "qaFlowRateVerifications"
+          ],
+          "summary": "Returns QA flow rate verification data by county",
+          "operationId": "qaFlowRateVerificationsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateVerifications/bySite": {
+        "get": {
+          "tags": [
+            "qaFlowRateVerifications"
+          ],
+          "summary": "Returns QA flow rate verification data by site",
+          "operationId": "qaFlowRateVerificationsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateVerifications/byPQAO": {
+        "get": {
+          "tags": [
+            "qaFlowRateVerifications"
+          ],
+          "summary": "Returns QA flow rate verification data by primary quality assurance organization code",
+          "operationId": "qaFlowRateVerificationsByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaFlowRateVerifications/byMA": {
+        "get": {
+          "tags": [
+            "qaFlowRateVerifications"
+          ],
+          "summary": "Returns QA flow rate verification by monitoring agency code",
+          "operationId": "qaFlowRateVerificationsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaBlanks/byState": {
+        "get": {
+          "tags": [
+            "qaBlanks"
+          ],
+          "summary": "Returns QA blank data by state",
+          "operationId": "qaBlanksByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaBlanks/byCounty": {
+        "get": {
+          "tags": [
+            "qaBlanks"
+          ],
+          "summary": "Returns QA blank data by county",
+          "operationId": "qaBlanksByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaBlanks/bySite": {
+        "get": {
+          "tags": [
+            "qaBlanks"
+          ],
+          "summary": "Returns QA blank data by site",
+          "operationId": "qaBlanksBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaBlanks/byPQAO": {
+        "get": {
+          "tags": [
+            "qaBlanks"
+          ],
+          "summary": "Returns QA blank data by primary quality assurance organization code",
+          "operationId": "qaBlanksByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaBlanks/byMA": {
+        "get": {
+          "tags": [
+            "qaBlanks"
+          ],
+          "summary": "Returns QA blank data by monitoring agency code",
+          "operationId": "qaBlanksByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/qaOnePointQcRawData/byState": {
+        "get": {
+          "tags": [
+            "qaOnePointQcRawData"
+          ],
+          "summary": "Returns QA one point QC raw data by state",
+          "operationId": "qaOnePointQcRawDataByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/qaOnePointQcRawData/byCounty": {
+        "get": {
+          "tags": [
+            "qaOnePointQcRawData"
+          ],
+          "summary": "Returns QA one point QC raw data by county",
+          "operationId": "qaOnePointQcRawDataByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/qaOnePointQcRawData/bySite": {
+        "get": {
+          "tags": [
+            "qaOnePointQcRawData"
+          ],
+          "summary": "Returns QA one point QC raw data by site",
+          "operationId": "qaOnePointQcRawDataBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/qaOnePointQcRawData/byPQAO": {
+        "get": {
+          "tags": [
+            "qaOnePointQcRawData"
+          ],
+          "summary": "Returns QA one point QC raw data by primary quality assurance organization code",
+          "operationId": "qaOnePointQcRawData",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/qaOnePointQcRawData/byMA": {
+        "get": {
+          "tags": [
+            "qaOnePointQcRawData"
+          ],
+          "summary": "Returns QA one point QC raw data by monitoring agency code",
+          "operationId": "qaOnePointQcRawDataByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/transactionsSample/byState": {
+        "get": {
+          "tags": [
+            "transactionsSample"
+          ],
+          "summary": "Returns AQS sample (raw data) input transactions",
+          "description": "Returns RD transactions matching the provided filters.\n",
+          "operationId": "transactionsSampleByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/unitsParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/transactionsSample/byCounty": {
+        "get": {
+          "tags": [
+            "transactionsSample"
+          ],
+          "summary": "Returns AQS sample (raw data) input transactions",
+          "description": "Returns RD transactions matching the provided filters.\n",
+          "operationId": "transactionsSampleByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/unitsParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/transactionsSample/bySite": {
+        "get": {
+          "tags": [
+            "transactionsSample"
+          ],
+          "summary": "Returns AQS sample (raw data) input transactions",
+          "description": "Returns RD transactions matching the provided filters.\n",
+          "operationId": "transactionsSampleBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/unitsParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/transactionsSample/byPOC": {
+        "get": {
+          "tags": [
+            "transactionsSample"
+          ],
+          "summary": "Returns AQS sample (raw data) input transactions",
+          "description": "Returns RD transactions matching the provided filters.\n",
+          "operationId": "transactionsSampleByPOC",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/unitsParam"
+            },
+            {
+              "$ref": "#/parameters/pocParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },	
+      "/transactionsSample/byMA": {
+        "get": {
+          "tags": [
+            "transactionsSample"
+          ],
+          "summary": "Returns AQS sample (raw data) input transactions",
+          "description": "Returns RD transactions matching the provided filters.\n",
+          "operationId": "transactionsSampleByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/unitsParam"
+            },		  
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/transactionsQaAnnualPerformanceEvaluations/bySite": {
+        "get": {
+          "tags": [
+            "transactionsQaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data in AQS transaction format for a single site",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided in AQS transaction format.\n",
+          "operationId": "transactionsQaAnnualPerformanceEvaluationsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/transactionsQaAnnualPerformanceEvaluations/byCounty": {
+        "get": {
+          "tags": [
+            "transactionsQaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data in AQS transaction format for a single county",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided in AQS transaction format.\n",
+          "operationId": "transactionsQaAnnualPerformanceEvaluationsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/transactionsQaAnnualPerformanceEvaluations/byState": {
+        "get": {
+          "tags": [
+            "transactionsQaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data in AQS transaction format for a single State",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided in AQS transaction format.\n",
+          "operationId": "transactionsQaAnnualPerformanceEvaluationsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/transactionsQaAnnualPerformanceEvaluations/byPQAO": {
+        "get": {
+          "tags": [
+            "transactionsQaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data in AQS transaction format for a give Primary Quality Assurance Organization",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided in AQS transaction format.\n",
+          "operationId": "transactionsQaAnnualPerformanceEvaluationsByPQAO",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/pqaoParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/transactionsQaAnnualPerformanceEvaluations/byMA": {
+        "get": {
+          "tags": [
+            "transactionsQaAnnualPerformanceEvaluations"
+          ],
+          "summary": "Returns QA Annual Performance Evaluation data in AQS transaction format for a single Monitoring Agency",
+          "description": "Provides pairs of data (known and measured values) at several concentration levels matching the variables provided in AQS transaction format.\n",
+          "operationId": "transactionsQaAnnualPerformanceEvaluationsByMA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/paramParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/agencyParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/monitors/byState": {
+        "get": {
+          "tags": [
+            "monitors"
+          ],
+          "summary": "Returns monitor data by state",
+          "operationId": "monitorsByState",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/optionalParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },    
+      "/monitors/byCounty": {
+        "get": {
+          "tags": [
+            "monitors"
+          ],
+          "summary": "Returns monitor data by county",
+          "operationId": "monitorsByCounty",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/optionalParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            }
+          ],
+          "responses": {
+             "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      }, 
+      "/monitors/bySite": {
+        "get": {
+          "tags": [
+            "monitors"
+          ],
+          "summary": "Returns monitor data by site",
+          "operationId": "monitorsBySite",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/optionalParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/stateParam"
+            },
+            {
+              "$ref": "#/parameters/countyParam"
+            },
+            {
+              "$ref": "#/parameters/siteParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },         
+      "/monitors/byCBSA": {
+        "get": {
+          "tags": [
+            "monitors"
+          ],
+          "summary": "Returns monitor data by site",
+          "operationId": "monitorsByCBSA",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/optionalParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/CBSAParam"
+            }
+          ],       
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },         
+      "/monitors/byBox": {
+        "get": {
+          "tags": [
+            "monitors"
+          ],
+          "summary": "Returns monitor data within a latitude / longitude bounding box",
+          "operationId": "monitorsByBox",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/optionalParam"
+            },
+            {
+              "$ref": "#/parameters/bdateParam"
+            },
+            {
+              "$ref": "#/parameters/edateParam"
+            },
+            {
+              "$ref": "#/parameters/cbdateParam"
+            },
+            {
+              "$ref": "#/parameters/cedateParam"
+            },
+            {
+              "$ref": "#/parameters/minlatParam"
+            },
+            {
+              "$ref": "#/parameters/maxlatParam"
+            },
+            {
+              "$ref": "#/parameters/minlonParam"
+            },
+            {
+              "$ref": "#/parameters/maxlonParam"
+            }
+          ],        
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },    
+      "/metaData/fieldsByService": {
+        "get": {
+          "tags": [
+            "metaData"
+          ],
+          "summary": "Returns meta data for each service",
+          "operationId": "metaDataFields",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            },
+            {
+              "$ref": "#/parameters/serviceParam"
+            }
+          ],        
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },  
+      "/metaData/isAvailable": {
+        "get": {
+          "tags": [
+            "metaData"
+          ],
+          "summary": "Ping to see if API service is working",
+          "operationId": "metaDataAvailable",
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      }, 
+      "/metaData/revisionHistory": {
+        "get": {
+          "tags": [
+            "metaData"
+          ],
+          "summary": "Returns notices to changes to services, documentation, web pages, historical data, etc.",
+          "operationId": "revisionHistory",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],        
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      }, 
+       "/metaData/issues": {
+        "get": {
+          "tags": [
+            "metaData"
+          ],
+          "summary": "Returns known issues with the API",
+          "operationId": "issues",
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            },
+            {
+              "$ref": "#/parameters/pwParam"
+            }
+          ],        
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },  
+      "/signup": {
+        "get": {
+          "tags": [
+            "register"
+          ],
+          "summary": "Request an account by providing an email address",
+          "description": "Service will send an email to the provided address with verification link and password.",
+          "operationId": "requestAccount",
+  
+  
+          "produces": [
+            "text/csv"
+          ],
+          "parameters": [
+            {
+              "$ref": "#/parameters/userParam"
+            }
+          ],
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          },
+          "security": [
+            {
+              "aqs_api_auth": []
+            }
+          ]
+        }
+      },
+      "/serviceAvailable": {
+        "get": {
+          "tags": [
+            "available"
+          ],
+          "summary": "Ping to see if the service is working",
+          "description": "This service returns the timestamp if the system is available.",
+          "operationId": "serviceAvailable",
+          "responses": {
+            "200": {
+              "$ref": "#/responses/SuccessfulRequest"
+            },
+            "400": {
+              "$ref": "#/responses/BadRequest"
+            },
+            "422": {
+              "$ref": "#/responses/ServiceNotFound"
+            },
+            "500": {
+              "$ref": "#/responses/SystemError"
+            },
+            "503": {
+              "$ref": "#/responses/SystemDown"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "SuccessfulRequest": {
+        "description": "Successful request.  A JSON object is returned.  There are two arrays in the returned object.  First is a Header array that contains one object with a summary information about the request.  Second is a Data array that will contain an object for each 'row' of returned data.  Specific schemas for each data object can be viewed by using the _metaData/fieldsByService_ service.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "Header": {
+              "type": "array",
+              "items": { "type": "object"}
+            },
+            "Data": {
+              "type": "array",
+              "items": { "type": "object"}
+            }
+          }
+        }
+      },
+      "ServiceNotFound": {
+        "description": "The requested service was not found.  The endpoint is correct but there is likely a typo in the specific service name.  A JSON object with a header array containing a specific error is returned.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "Header": {
+              "type": "array",
+              "items": { "type": "object"}
+            },
+            "Data": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad request. Some of the query criteria (variables or values) entered are invalid.  A JSON object with a header array containing a specific error is returned.  If you did not receive a specific error (some browsers trap 400 responses), things to check include: all required query parameters have been included; the date formats are correct (YYYYMMDD with no punctuation); codes have been used where expected (e.g., state code, duration code).\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "Header": {
+              "type": "array",
+              "items": { "type": "object"}
+            },
+            "Data": {
+              "type": "array"
+            }
+          }
+        }
+      },
+      "SystemError": {
+        "description": "Internal error.  We are experiencing unexpected problems. Please send an email to aqsdatamart@epa.gov to let us know about the problem. Provide as much information a you can.  Particularly helpful are the request URL and the time of the request.\n"
+      },
+      "SystemDown": {
+        "description": "Our API is down.  We have weekly scheduled maintenance Sundays from 1800 - 2359 eastern standard time (GMT-5).  If you are getting this message outside that time window,  we are experiencing unexpected problems.  You may check our news feed at http://www3.epa.gov/airquality/airdata/rssairdata.xml  or email aqsdatamart@epa.gov for additional information.\n"
+      }
+    },
+    "securityDefinitions": {
+      "aqs_api_auth": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "key"
+      }
+    },
+    "definitions": {
+      "Data": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "string",
+            "example": "SELECT * FROM table_name WHERE params=values"
+          }
+        }
+      },
+      "List": {
+        "type": "object",
+        "required": [
+          "code",
+          "value"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "01"
+          },
+          "value": {
+            "type": "string",
+            "example": "Alabama"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "transactionID": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
