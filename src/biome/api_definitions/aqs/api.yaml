@@ -22,18 +22,19 @@ documentation: |
     
     This API is through Open API Spec (Swagger). You will be provided the schema. 
     All requests go to the following URL: https://aqs.epa.gov/data/api
-    That is the base URL for all requests. Daily/yearly data can only be accessed one year at a time. If working for that in year/decade ranges, prefer to use the annualData endpoints, as the daily data may be too large to fit in an LLM's context.
+    That is the base URL for all requests. 
+
+    To use the AQS API, you need to provide an email and an API key;
+    always retrieve the credentials from environment variables:
+    - Email: os.environ.get("API_EPA_AQS_EMAIL")
+    - API Key: os.environ.get("API_EPA_AQS")
+    Always use the credentials from those environment variables- do not use placeholder values from the openapi spec (ie dont use your_email@example.com, test@email.com nor your_api_key).
+    No need to prompt the user for these values, just use the environment variables; let the user know if you're unable to use them.
+    
+    Daily/yearly data can only be accessed one year at a time. If working for that in year/decade ranges, prefer to use the annualData endpoints, as the daily data may be too large to fit in an LLM's context.
     If the user requests data for a year range, you will need to make multiple requests to the API- potentially sampling in between, or creating averages, to not make requests for every single year in the range.
     For AQS, the monitoring agencies are required to report the measured data, along with metadata about the site and monitoring equipment and associated quality assurance data to AQS. AQS and its predecessors have been accepting and storing this data for more than 50 years and currently contains more than 3 billion measurements.
     The earliest sample in the data set is from 1957. Year 1980 marks the beginning of nationally consistent operational and quality assurance procedures.
-
-    To use the API, you need to provide an email and an API key. When writing code to access this API, 
-    retrieve these credentials from environment variables:
-    - Email: Use os.environ.get("API_EPA_AQS_EMAIL")
-    - API Key: Use os.environ.get("API_EPA_AQS")
-
-    Always use the email from the environment variable `API_EPA_AQS_EMAIL` and the API key from the environment variable `API_EPA_AQS`, do not use placeholder values from the openapi spec (ie dont use your_email@example.com, test@email.com nor your_api_key).
-    No need to prompt the user for these values, just use the environment variables; let the user know if you're unable to use them.
 
     Measured entities in the AQS data set are referred to as parameters, the code specific to AQS. (The terms “pollutants” and “substances” are not completely appropriate as some things measured are not pollutants, e.g., carbon, nor substances, e.g., wind speed.)
     If you need to get the list of parameter codes, you can use the following request:
