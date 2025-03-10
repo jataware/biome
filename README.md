@@ -38,7 +38,6 @@ You can leave the rest of the variables as is, unless you're doing a custom depl
 
 You'll also need to create a `.beaker.conf` file in the root of the project directory. See `.beaker.conf.template` for an example. 
 When running on Docker, the file is already mounted by default (see `docker-compose.yaml`). This file selects the provider, or base agent, to be used. The environment variables are used to support the multi-agent API integration; currently at least Gemini and Anthropic keys are required. In the future this will become configurable.
-Update the .beaker.conf values with...
 
 ### Initialization
 
