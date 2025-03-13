@@ -1,0 +1,42 @@
+name: "FDA Generally Recognized as Safe (GRAS) API"
+cache_key: api_assistant_gras_csv
+description: |
+  You have access to the FDA Generally Recognized as Safe (GRAS) API.
+  You may use this tool to check for food additives introductions or changes.
+  Use this tool to answer questions such as:
+  In which year was  "Pea fiber" food additive/preservative introduced into the US food supply?
+cache_body: 
+    default: true 
+examples: !load documentation/examples.md
+documentation: |
+    You have access to the FDA Generally Recognized as Safe (GRAS) API, which is a csv file data with notices filed from the FDA GRAS database from years 1998 to 2024.
+    You may use this to check for food additives introductions, and correlate with other data sources for analysis.
+
+    "GRAS" is an acronym for the phrase Generally Recognized As Safe.
+    Under sections 201(s) and 409 of the Federal Food, Drug, and Cosmetic Act,
+    any substance that is intentionally added to food is a food additive.
+
+    # Additional Instructions:
+    Use the raw csv notices file to answer questions about GRAS substances. Load the file from:
+
+    - /jupyter/data/fda-gras/GRASNotices.csv
+
+    These are the columns available (separated by semicolons, some newlines/spaces):
+      GRAS Notice (GRN) No.	; Substance; Intended Use; Basis; Notifier;	Notifier Address;	
+      Date of filing;	GRN Part 1;	GRN Part 2;	GRN Part 3;	GRN Part 4;	GRN Part 5;	GRN Part 6;	GRN Part 7;
+      Date of closure; Date of correction letter;	FDA's Letter;	Date additional correspondence;	Additional correspondence;
+      Date additinoal correspondence 2;	Additional correspondence 2; Date additional correspondence 3;
+      Additional correspondence 3; Date additional correspondence 4; Additional correspondence 4;
+      Resubmission; Resubmitted; Notes;	Related submission 
+
+    The Gras Notice GRN No is wrapped by spredsheet-software-like function..
+    Example:
+    =T("1")  for "GRAS Notice (GRN) No." = 1
+
+    The file which was downloaded from FDA GRAS Notices; http://www.hfpappexternal.fda.gov/scripts/fdcc/?set=GRASNotices;
+    File last updated by FDA on 3/3/2025.
+
+    # Additional Instructions:
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}

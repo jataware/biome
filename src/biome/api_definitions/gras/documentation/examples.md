@@ -1,0 +1,25 @@
+## Example 1: Is there any FDA GRAS notice for "Dioctyl sodium sulfosuccinate" as an additive?
+
+```
+import pandas as pd
+
+# Load GRAS notices data
+df = pd.read_csv('/jupyter/data/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
+
+# print head
+print(f"First 5 rows of GRAS notices:")
+print(df.head())
+
+# Search for notices containing Dioctyl sodium sulfosuccinate (case insensitive)
+search_term = 'Dioctyl sodium sulfosuccinate'
+
+print(f"Searching for notices containing {search_term}...")
+
+matches = df[df['Substance'].str.contains(search_term, case=False, na=False)]
+
+# Display relevant columns
+if len(matches) > 0:
+    print(matches[['GRAS Notice (GRN) No.', 'Substance', 'Date of filing', "FDA's Letter"]])
+else:
+    print(f"No GRAS notices found for {search_term}")
+```
