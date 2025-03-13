@@ -36,6 +36,11 @@ documentation: |
     The file which was downloaded from FDA GRAS Notices; http://www.hfpappexternal.fda.gov/scripts/fdcc/?set=GRASNotices;
     File last updated by FDA on 3/3/2025.
 
+    If the "FDA's Letter" column contains " FDA has no questions" it means the FDA did not challenge the notice, closest thing to "approved".
+    Id the "FDA's Letter" column contains "FDA has questions" or "Pending", or similar, it means the FDA has questions about the notice, and the notice is not approved yet.
+    If the "FDA's Letter" column contains "Notice does not provide a basis for a GRAS determination"- it means it challenged the notice, and the notice was not approved.
+    Use the stats of the "FDA's Letter" column to know if a food additive is actually approved to be introduced into the US food supply or not.
+
     # Additional Instructions:
 
     Here are some examples of how to use the API, if applicable:
