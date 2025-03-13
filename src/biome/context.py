@@ -28,5 +28,6 @@ class BiomeContext(BaseContext):
         command = self.get_code("setup", {
             "aqs_api_key": os.environ.get("API_EPA_AQS"),
             "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),
+            "openfda_faers_api_key": os.environ.get("API_OPENFDA"),
         })
         await self.execute(command)

@@ -66,6 +66,29 @@ Notebook workflow and editing
 
 https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
 
+## Data Sources with API credentials
+
+Some sources require API credentials to be set in the `.env` file, see `env.sample` for the applicable sources and variables that need to be set.
+At this time, the following authenticated APIs are supported:
+- AQS (Air Quality System)
+  - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com 
+
+## Data Files
+
+Large data files are stored using Git LFS in the `data/` directory. To work with these files:
+
+1. Install Git LFS: https://git-lfs.com/
+2. After cloning the repository, run: `git lfs pull` to download the actual data files
+
+### Census Housing Survey Data
+
+This project includes data from the American Housing Survey (AHS) 2023 National Public Use File (PUF). The data is stored in:
+
+```
+data/census/ahs/2023/national_puf/
+```
+
+Source: U.S. Department of Housing and Urban Development (HUD) and U.S. Census Bureau, American Housing Survey. For more information, visit: https://www.census.gov/programs-surveys/ahs/data.html
 
 ## Funding
 

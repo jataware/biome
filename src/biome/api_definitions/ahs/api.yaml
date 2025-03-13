@@ -1,0 +1,68 @@
+name: "Census American Housing Survey (AHS)"
+cache_key: api_assistant_census_ahs_files
+description: |
+  You have access to knowledge to all the Census Housing survey data, every 2 years from the
+  year 1999 to 2023. You can use this API for answering questions on american housing, specifically their
+  housing conditions (mold, water problems, etc), which can be used to correlate to health conditions,
+  or other purposes.
+
+more_instructions: !load documentation/docs.md
+examples: !load documentation/examples.md
+cache_body: 
+    default: true 
+documentation: |
+    You have access to a file-based Census American Housing Survey
+    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `/jupyter/data/census-ahs` directory.
+    The housing files are located and named per year as follows:
+    - /jupyter/data/census-ahs/survey_2023.csv
+    - /jupyter/data/census-ahs/survey_2021.csv
+    - ...
+    - /jupyter/data/census-ahs/survey_1999.csv
+    the more recent onces are at the metropolitan area level, while older ones
+    are only avaiable at the national level. Use whichever year files you need, depending
+    on the user question.
+
+    {more_instructions}
+
+    In particular, we have the household data file, which means we
+    have the OMB13CBSA as a constantly availablecolumn to identify geographic area of survey(
+    State-based Metropolitan and Micropolitan Statistical Areas). Pre-2015 have more geographical
+    column/information. Don't try to use state/county/etc if those are not present on 
+    the census housing file for that year.
+    
+    Try to alreay have planned which columns you need for each, in order to process less columns/excess data since
+    merging both datasets will result in more than 1000 columns. Plan it out, select relevant columns 
+    (list the column names once filtered to knkow which are available),
+    then merge the datasets with those columns selected.
+
+    Once you identify columns of interest available, you can use this csv codebook dictionary that explains what each column code means:
+
+    - /jupyter/data/census-ahs/census_ahs_codebook.csv
+
+    from the codebook,you can use the "Variable" column to  match the variable you have access to (say "OMB13CBSA") and use the column "Response Codes" to get
+    the meaning of the codes or the numeric code range values, for other types of variables.
+
+    you may open it and use it at your discretion- usually better once you have some columns of interest
+    in order to select a subset of the codebook, since it is pretty big and confusing.
+
+    Don't try to find the codebook columns without checking if they are present, since
+    the codebook is very exhaustive and contains all the columns or other types of files.
+
+    You can also use knowledge on the usual column codenames from the census to answer questions, but ensure
+    to check the columns names with pandas (python lib) and _always_ check if the column
+    is present in the dataset itself instead of assuming it's present.
+
+    Instead of assuming a specific column exist, or if you wish to match with a specific column pattern,
+    try to compare substrings instead. For example, if you need data for mold, try
+    to check for the 'mold' substring in the column names, since these csv files sometimes append
+    soe prefixes.
+
+    The dataset csv files are a bit big, in the sense that they're in
+    wide format and contain too many columns. When planning what you need, select a subset
+    of the columns needed, including the geo/housing-characteristics columns for your analysis, 
+    but don't include the thousands of columns.
+
+    # Additional Instructions:
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}
