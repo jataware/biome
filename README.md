@@ -72,6 +72,8 @@ Some sources require API credentials to be set in the `.env` file, see `env.samp
 At this time, the following authenticated APIs are supported:
 - AQS (Air Quality System)
   - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com 
+- FAERS (subset of FDA Adverse Event Reporting System)
+  - Register for an API key at: https://open.fda.gov/apis/authentication/
 
 ## Data Files
 
@@ -85,7 +87,7 @@ Large data files are stored using Git LFS in the `data/` directory. To work with
 This project includes data from the American Housing Survey (AHS) 2023 National Public Use File (PUF). The data is stored in:
 
 ```
-data/census/ahs/2023/national_puf/
+data/census-ahs/
 ```
 
 Source: U.S. Department of Housing and Urban Development (HUD) and U.S. Census Bureau, American Housing Survey. For more information, visit: https://www.census.gov/programs-surveys/ahs/data.html
