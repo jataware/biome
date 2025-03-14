@@ -12,12 +12,12 @@ cache_body:
     default: true 
 documentation: |
     You have access to a file-based Census American Housing Survey
-    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `/jupyter/data/census-ahs` directory.
+    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `{DATASET_FILES_BASE_PATH}/census-ahs` directory.
     The housing files are located and named per year as follows:
-    - /jupyter/data/census-ahs/survey_2023.csv
-    - /jupyter/data/census-ahs/survey_2021.csv
+    - {DATASET_FILES_BASE_PATH}/census-ahs/survey_2023.csv
+    - {DATASET_FILES_BASE_PATH}/census-ahs/survey_2021.csv
     - ...
-    - /jupyter/data/census-ahs/survey_1999.csv
+    - {DATASET_FILES_BASE_PATH}/census-ahs/survey_1999.csv
     the more recent onces are at the metropolitan area level, while older ones
     are only avaiable at the national level. Use whichever year files you need, depending
     on the user question.
@@ -37,7 +37,7 @@ documentation: |
 
     Once you identify columns of interest available, you can use this csv codebook dictionary that explains what each column code means:
 
-    - /jupyter/data/census-ahs/census_ahs_codebook.csv
+    - {DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv
 
     from the codebook,you can use the "Variable" column to  match the variable you have access to (say "OMB13CBSA") and use the column "Response Codes" to get
     the meaning of the codes or the numeric code range values, for other types of variables.

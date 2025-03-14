@@ -7,7 +7,7 @@ import pandas as pd
 
 # Read codebook to get metro area meanings
 # ensure to set index_col=False, since the codebook has no index column
-codebook = pd.read_csv('/jupyter/data/census-ahs-2021/codebook.csv', dtype=str, index_col=False)
+codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
 
 # Find the row for OMB13CBSA
 ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -24,7 +24,7 @@ import pandas as pd
 def get_code_name(code):
     # Read codebook to get metro area meanings
     # ensure to set index_col=False, since the codebook has no index column
-    codebook = pd.read_csv('/jupyter/data/census-ahs-2021/codebook.csv', dtype=str, index_col=False)
+    codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
 
     # Find the row for OMB13CBSA
     ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -42,8 +42,7 @@ def get_code_name(code):
 ```
 import pandas as pd
 
-data_dir =  "/jupyter/data/census-ahs"
-
+data_dir =  "{DATASET_FILES_BASE_PATH}/census-ahs"
 
 def get_florida_mold_data():
     # Store results

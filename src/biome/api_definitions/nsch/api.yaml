@@ -9,15 +9,15 @@ cache_body:
     default: true 
 documentation: |
     You have access to file-based National Survey of Children's Health (NSCH) data
-    from 2016 to 2023, located under the `/jupyter/data/census-nsch` directory.
+    from 2016 to 2023, located under the `{DATASET_FILES_BASE_PATH}/census-nsch` directory.
     The NSCH files are located and named per year as follows:
-    - /jupyter/data/census-nsch/2023e_topical.sas7bdat
-    - /jupyter/data/census-nsch/2021e_topical.sas7bdat
-    - /jupyter/data/census-nsch/2019e_topical.sas7bdat
-    - /jupyter/data/census-nsch/2018e_topical.sas7bdat
-    - /jupyter/data/census-nsch/2017e_topical.sas7bdat
-    - /jupyter/data/census-nsch/2016e_topical.sas7bdat
-    - Codebook: /jupyter/data/census-nsch/nsch_dictionary_codebook.csv
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
+    - Codebook: {DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
 
     The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years 
     in the United States and the factors that may relate to their well-being. The survey includes data on physical and 
@@ -36,7 +36,7 @@ documentation: |
     To read these SAS7BDAT files with pandas, use:
     ```python
     import pandas as pd
-    filename = "/jupyter/data/census-nsch/2023e_topical.sas7bdat"
+    filename = "{DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
     df = pd.read_sas(filename, format="sas7bdat")
     ```
     
@@ -48,7 +48,7 @@ documentation: |
     1. Variable names may change slightly between survey years
     2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
       You'll need to use the nsch codebook to decode these variable response codes-
-      The codebook is available at /jupyter/data/census-nsch/nsch_dictionary_codebook.csv
+      The codebook is available at {DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
       You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
       The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
       In the codebook, the Question itself is under the "Question" column

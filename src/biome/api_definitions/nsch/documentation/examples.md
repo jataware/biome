@@ -5,7 +5,7 @@
 ```
 import pandas as pd
 
-df_2023 = pd.read_sas("/jupyter/data/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
+df_2023 = pd.read_sas("{DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
 
 existing_cols = df_2023.columns.tolist()
 print(existing_cols)
@@ -22,7 +22,7 @@ print(existing_cols)
 import pandas as pd
 
 # Read codebook with explicit parameters
-codebook = pd.read_csv("/jupyter/data/census-nsch/nsch_dictionary_codebook.csv", 
+codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", 
                        index_col=False)  # Ensure no column is used as index, since that would shift the columns/values!
 
 # Display the first few rows

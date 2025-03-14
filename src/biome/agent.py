@@ -68,6 +68,7 @@ class BiomeAgent(BaseAgent):
         self.root_folder = Path(__file__).resolve().parent
         
         api_def_dir = os.path.join(self.root_folder, 'api_definitions')
+        data_dir = (self.root_folder / ".." / "..").resolve() / "data"
 
         # Get API specs and directories in one pass
         self.api_specs = []
@@ -77,6 +78,9 @@ class BiomeAgent(BaseAgent):
             if os.path.isdir(api_dir):
                 api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
                 api_spec = load_yaml_api(api_yaml)
+
+                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
 
