@@ -14,9 +14,7 @@ The 2015 to 2023 public use files (PUFs) do not include many of the geographic i
 The 2015 to 2023 integrated national longitudinal sample PUFs (national PUFs) included two geographic variables: Census Division and OMB13CBSA, while the independent metropolitan area longitudinal oversample PUF (metropolitan area PUF) included OMB13CBSA only.
 For pre-2015 data, you can check other geographic variables in the codebook and see if they are present, and use them to answer questions and correlate data at a finer granularity (than just the much coarser statistical metropolitan areas)- some may even contain SMSA codes, which map to cities.
 
-Important: Remember, when using the codebook and loading with the pandas library, you need to set index_col=False, else the Variable column will be treated as the index column and the rest of the columns will shift!
-
-Remember that this will not work if you have set index_col=False, as the Variable column will be treated as the index column and the rest of the columns will shift!
+Important: Remember, when using the codebook and loading with the pandas library, you need to set index_col=False, else the  Variable column will be treated as the index column and the rest of the columns will shift!
 
 When wanting to do something like:
 ```

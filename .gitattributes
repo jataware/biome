@@ -1,2 +1,4 @@
 data/**/*.csv filter=lfs diff=lfs merge=lfs -text
 data/**/*.xlsx filter=lfs diff=lfs merge=lfs -text
+data/**/*.sas7bdat filter=lfs diff=lfs merge=lfs -text
+data/**/*.sas filter=lfs diff=lfs merge=lfs -text

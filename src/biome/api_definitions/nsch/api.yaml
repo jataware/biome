@@ -1,0 +1,82 @@
+name: "National Survey of Children's Health (NSCH)"
+cache_key: api_assistant_nsch_files
+description: |
+  You have access to knowledge from the National Survey of Children's Health (NSCH) data, available every year from 
+  2016 to 2023. This dataset API can help answer questions about children's health, healthcare access, family functioning, 
+  neighborhood characteristics, and social determinants of health for children aged 0-17 years in the United States.
+examples: !load documentation/examples.md
+cache_body: 
+    default: true 
+documentation: |
+    You have access to file-based National Survey of Children's Health (NSCH) data
+    from 2016 to 2023, located under the `/jupyter/data/census-nsch` directory.
+    The NSCH files are located and named per year as follows:
+    - /jupyter/data/census-nsch/2023e_topical.sas7bdat
+    - /jupyter/data/census-nsch/2021e_topical.sas7bdat
+    - /jupyter/data/census-nsch/2019e_topical.sas7bdat
+    - /jupyter/data/census-nsch/2018e_topical.sas7bdat
+    - /jupyter/data/census-nsch/2017e_topical.sas7bdat
+    - /jupyter/data/census-nsch/2016e_topical.sas7bdat
+    - Codebook: /jupyter/data/census-nsch/nsch_dictionary_codebook.csv
+
+    The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years 
+    in the United States and the factors that may relate to their well-being. The survey includes data on physical and 
+    mental health, access to quality health care, and the child's family, neighborhood, school, and social context.
+
+    The NSCH is also designed to assess the prevalence and impact of special health care needs among children in the US and 
+    explores the extent to which children with special health care needs (CSHCN) have medical homes,
+    adequate health insurance, access to needed services, and adequate care coordination.
+    Other topics may include functional difficulties, transition services,
+    shared decision-making, and satisfaction with care. 
+    Information is collected from parents or caregivers who know about the child's health.
+    It also examines the physical and emotional health of children ages 0-17 years of age.
+    These factors include access to - and quality of - health care, family interactions, parental health, 
+    neighborhood characteristics, as well as school and after-school experiences (example: child screen time).
+
+    To read these SAS7BDAT files with pandas, use:
+    ```python
+    import pandas as pd
+    filename = "/jupyter/data/census-nsch/2023e_topical.sas7bdat"
+    df = pd.read_sas(filename, format="sas7bdat")
+    ```
+    
+    The NSCH datasets include state identifiers (FIPSST) and other geographic information that can be used
+    for regional analysis. Check which geographic variables are available in each year's dataset before
+    attempting to use them.
+
+    When working with NSCH data, be aware that:
+    1. Variable names may change slightly between survey years
+    2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
+      You'll need to use the nsch codebook to decode these variable response codes-
+      The codebook is available at /jupyter/data/census-nsch/nsch_dictionary_codebook.csv
+      You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
+      The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
+      In the codebook, the Question itself is under the "Question" column
+
+    You'll see mentions of "screener" and "topical" in the code book- some screener properties are present in the topical files,
+    which makes it confusing, unfortunately.
+
+    Codebook columns:
+    ['Variable',  # => variable code/name
+    'Source',     # => source, a question category from "Topical", "Screener", "Operational"
+    'Topic',
+    'Survey Years',  => available in which file years (eg if 2016, 2017), only check for that variable in the corresponding files, may not be available in files for other years
+    'Response Code', => 1=Yes||2=No, etc
+    'Description',   => description of the question/variable
+    'Question',      => Question text as a human would ask it
+    'Type',
+    'Universe',
+    'Availability',
+    'Imputation Strategy',
+    'User Notes']
+
+    Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
+    try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
+    to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
+    Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
+    since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
+
+    # Additional Instructions:
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}
