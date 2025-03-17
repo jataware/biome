@@ -22,10 +22,13 @@ print(existing_cols)
 import pandas as pd
 
 # Read codebook with explicit parameters
-codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", 
-                       index_col=False)  # Ensure no column is used as index, since that would shift the columns/values!
 
+# Ensure index_col is FALSE, if not first column values disappear and the whole dataframe is shifted!
+codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", 
+                       index_col=False)  
 # Display the first few rows
 print(codebook.head())
+
+# and columns if needed
 print(codebook.columns.tolist())
 ```
