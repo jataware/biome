@@ -22,8 +22,8 @@ documentation: |
 
     To use the USDA FoodData Central API always retrieve the `api_key` query parameter from environment variables:
     - api_key: os.environ.get("API_USDA_FDC")
-    Do not use placeholder auth values from the OpenAPI spec (dont use YOUR_API_KEY) nor prompt the user for these values nor DEMO_KEY, only use the key from the environment variable!
-    anywhere you see YOUR_API_KEY, replace with os.environ.get("API_USDA_FDC")
+    Do not use placeholder auth values from the OpenAPI spec nor other values from the documentation, only use the key from the environment variable!
+    anywhere you see YOUR_API_KEY or DEMO_KEY, replace with os.environ.get("API_USDA_FDC")
 
     The FoodData Central API provides REST access to FoodData Central (FDC). It is intended primarily to assist application developers wishing to incorporate nutrient data into their applications or websites.
 
