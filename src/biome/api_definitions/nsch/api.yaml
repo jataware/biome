@@ -12,7 +12,9 @@ documentation: |
     from 2016 to 2023, located under the `{DATASET_FILES_BASE_PATH}/census-nsch` directory.
     The NSCH files are located and named per year as follows:
     - {DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
     - {DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
+    - {DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
     - {DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
     - {DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
     - {DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat

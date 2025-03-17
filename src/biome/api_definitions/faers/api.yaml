@@ -5,7 +5,6 @@ description: |
   The openFDA drug adverse event API returns data that has been collected from 
   the FDA Adverse Event Reporting System (FAERS), a database that contains 
   information on adverse event and medication error reports submitted to FDA.
-# raw_documentation: !load documentation/faers.json
 web_documentation: !load documentation/faers_web.md
 fields_reference: !load documentation/faers_fields_reference.csv
 examples: !load documentation/examples.md
