@@ -74,6 +74,8 @@ At this time, the following authenticated APIs are supported:
   - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com 
 - FAERS (subset of FDA Adverse Event Reporting System)
   - Register for an API key at: https://open.fda.gov/apis/authentication/
+- USDA FoodData Central
+  - Register for an API key at: https://fdc.nal.usda.gov/api-key-signup
 
 ## Data Files
 
@@ -81,16 +83,6 @@ Large data files are stored using Git LFS in the `data/` directory. To work with
 
 1. Install Git LFS: https://git-lfs.com/
 2. After cloning the repository, run: `git lfs pull` to download the actual data files
-
-### Census Housing Survey Data
-
-This project includes data from the American Housing Survey (AHS) 2023 National Public Use File (PUF). The data is stored in:
-
-```
-data/census-ahs/
-```
-
-Source: U.S. Department of Housing and Urban Development (HUD) and U.S. Census Bureau, American Housing Survey. For more information, visit: https://www.census.gov/programs-surveys/ahs/data.html
 
 ## Funding
 

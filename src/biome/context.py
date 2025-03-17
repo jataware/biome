@@ -29,5 +29,6 @@ class BiomeContext(BaseContext):
             "aqs_api_key": os.environ.get("API_EPA_AQS"),
             "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),
             "openfda_faers_api_key": os.environ.get("API_OPENFDA"),
+            "usda_fdc_api_key": os.environ.get("API_USDA_FDC"),
         })
         await self.execute(command)
