@@ -38,8 +38,28 @@ documentation: |
 
     Measured entities in the AQS data set are referred to as parameters (which includes pollutants/substances), and use integer codes specific to AQS.
 
-    If a monitor is scheduled to collect data and does not it will contain `null` data. This is a placeholder to let EPA know that more data will not be forthcoming.    AQS does place absolute limits on the values that can be submitted. However, these are fairly liberal limits- for many parameters, negative values are acceptable.
+    If a monitor is scheduled to collect data and does not it will contain `null` data. This is a placeholder to let EPA know that more data will not be forthcoming.    AQS does place absolute limits on the values that can be submitted.
+    However, these are fairly liberal limits- for many parameters, negative values are acceptable.
     AQS has a nominal quarterly reporting deadline: data must be reported by 90 days after the end of the calendar quarter in which they are collected.
+
+    If you need to inspect the data of a JSON response before processing, and you're dealing with annual data, or multi-daily data, or
+    for a geographic region that could yield too much data to process (or fit into an LLM context window), 
+
+    better use this endpoint:
+    ```
+    /metaData/fieldsByService?email={email}&key={key}&service=annualData
+    ```
+    (example above is checking shape of annualData endpoint). It will provide fields documentation for each property in the response.
+    If you use `print(response_data)` on a huge JSON response, you will not be able to proceed- you can also try checking the length as string,
+    and if that's too long, inspect whatever amount of characters that would be enough.
+    That is, never do:
+    ```
+    data = response.json()
+    print(data)
+    ```
+    instead, either use fieldsByService endpoint as described earlier, or use the Example 3 below (in the #Examples section) to generate a schema and inspect the data.
+
+    Also, parameter_name is not a property, usually, check `parameter` or `parameter_code` in responses.
 
     Here are some examples of how to use the API, if applicable:
     {examples}
