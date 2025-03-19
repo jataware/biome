@@ -32,11 +32,9 @@ The keys are defined at the top. All of the variables that are not necessary to 
 OPENAI_API_KEY=<your API key>
 GEMINI_API_KEY=<your API key>
 ANTHROPIC_API_KEY=<your API key>
-
-LLM_SERVICE_TOKEN=<your API key>
 ```
 
-Note--by default, Biome will use Anthropic as the LLM provider. You can adjust this by changing the `LLM_PROVIDER_IMPORT_PATH` variable and the `LLM_SERVICE_MODEL` variable. You can leave the rest of the variables as is, unless you're doing a custom deployment. Currently at least Gemini and Anthropic keys are required.
+Note--by default, Biome will use Anthropic as the LLM provider. You can adjust this by changing the `LLM_PROVIDER_IMPORT_PATH` variable and the `LLM_SERVICE_MODEL` variables. You can leave the rest of the variables as is, unless you're doing a custom deployment. Currently at least Gemini and Anthropic keys are required.
 
 If you wish to run Biome locally, outside of Docker you can install `beaker-kernel` then run `pip install -e .` from the root of the project directory. You'll then be able to run it via `beaker biome`.
 
