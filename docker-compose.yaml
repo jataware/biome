@@ -23,7 +23,7 @@ services:
     volumes:
       - ./src/biome:/jupyter/src/biome
       - .env:/root/.env
-      - .beaker.conf:/root/.beaker.conf
+      # - .beaker.conf:/root/.beaker.conf
     # command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     networks:
       - beaker
