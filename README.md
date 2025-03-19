@@ -34,9 +34,9 @@ GEMINI_API_KEY=<your API key>
 ANTHROPIC_API_KEY=<your API key>
 ```
 
-You can leave the rest of the variables as is, unless you're doing a custom deployment.
+Note--by default, Biome will use Anthropic as the LLM provider. You can adjust this by changing the `LLM_PROVIDER_IMPORT_PATH` variable and the `LLM_SERVICE_MODEL` variables. You can leave the rest of the variables as is, unless you're doing a custom deployment. Currently at least Gemini and Anthropic keys are required.
 
-You'll also need to create a `.beaker.conf` file in the root of the project directory. See `.beaker.conf.template` for an example. If running in Docker, you'll need to mount this file into the container and set your Beaker configuration there (namely, which provider to use and the key for it). This selects the base agent to be used. The environment variables are to support the multi-agent API integration; currently at least Gemini and Anthropic keys are required. In the future this will become configurable.
+If you wish to run Biome locally, outside of Docker you can install `beaker-kernel` then run `pip install -e .` from the root of the project directory. You'll then be able to run it via `beaker biome`.
 
 ### Initialization
 
