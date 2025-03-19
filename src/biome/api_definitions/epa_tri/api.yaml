@@ -1,0 +1,31 @@
+name: "EPA Toxic Release Inventory (TRI)"
+cache_key: api_assistant_epa_tri_files
+description: |
+  The Toxics Release Inventory (TRI) is a resource for learning about toxic chemical 
+  releases and pollution prevention activities reported by industrial and federal 
+  facilities. TRI data support informed decision-making by communities, 
+  government agencies, companies, and others.
+# more_instructions: !load documentation/docs.md
+examples: !load documentation/examples.md
+cache_body: 
+    default: true 
+documentation: |
+    You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv` file.
+    The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.
+    It also contains geospatial information such as latitude, longitude, state/zip, and even EPA region.
+
+    Open it with `pandas.read_csv('{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)`
+
+    The Toxics Release Inventory (TRI) is a resource for learning about toxic chemical releases and pollution prevention activities reported by industrial and federal facilities. TRI data support informed decision-making by communities, government agencies, companies, and others
+    The dataset contains this columns (separated by semicolons):
+    ```
+    TRI Facility Name;	TRI Facility ID;	Year;	Census Block Group;	ZIP Code;	City;	County;	State;
+    EPA Region;	Latitude;	Longitude;	Chemical Releases (lb);	Waste Managed (lb);	RSEI Hazard;
+    ```
+
+    Risk-Screening Environmental Indicators (RSEI) Model numbers are calculated for each facility and shown in the "RSEI Hazard" column.
+
+    # Additional Instructions:
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}

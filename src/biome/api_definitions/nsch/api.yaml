@@ -72,6 +72,14 @@ documentation: |
     'Imputation Strategy',
     'User Notes']
 
+    Open it with pandas like so:
+    ```
+    codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)
+    ```
+
+    The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
+    The FIPS Code column is called "FIPSST" and is available in all years.
+
     Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
     try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
     to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.

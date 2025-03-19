@@ -7,7 +7,7 @@ import pandas as pd
 
 # Read codebook to get metro area meanings
 # ensure to set index_col=False, since the codebook has no index column
-codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', index_col=False)
 
 # Find the row for OMB13CBSA
 ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -24,7 +24,7 @@ import pandas as pd
 def get_code_name(code):
     # Read codebook to get metro area meanings
     # ensure to set index_col=False, since the codebook has no index column
-    codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+    codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', index_col=False)
 
     # Find the row for OMB13CBSA
     ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -56,7 +56,7 @@ def get_florida_mold_data():
             # Read data file for year
             file_path = os.path.join(data_dir, f'survey_{year}.csv')
             
-            df = pd.read_csv(file_path, dtype=str, index_col=False)
+            df = pd.read_csv(file_path, index_col=False)
             
             # Find mold-related columns
             mold_cols = [col for col in df.columns if 'mold' in col.lower()]
@@ -78,7 +78,7 @@ def get_florida_mold_data():
             codebook_path = os.path.join(data_dir, 'census_ahs_codebook.csv')
             
             # ensure to pass index_col=False, else sometimes data shifts
-            codebook = pd.read_csv(codebook_path, dtype=str, index_col=False)
+            codebook = pd.read_csv(codebook_path, index_col=False)
             
             # Get Florida metro codes for the geographic identifier being used
             geo_col = geo_cols[len(geo_cols) - 1]

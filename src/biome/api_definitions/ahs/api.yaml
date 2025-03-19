@@ -64,5 +64,11 @@ documentation: |
 
     # Additional Instructions:
 
+    Read the CSV fiels with index_col=False, like so:
+    ```
+    codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+    ```
+    If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!
+
     Here are some examples of how to use the API, if applicable:
     {examples}
