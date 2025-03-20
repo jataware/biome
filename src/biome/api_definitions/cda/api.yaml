@@ -54,10 +54,10 @@ description: >
 
     ## Data Standards Services (DSS)
     The DSS provides us with harmonized values mapped to the data sources above. In our current release, DSS has provided values for: ethnicity, file_format, morphology, primary_diagnosis, race, species, therapeutic_agent, source_material_type (cancer/normal), treatment_type, and vital_status.
-raw_documentation: !load documentation/cda.yaml
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/cda.yaml
+examples: !load_yaml documentation/examples.yaml
 cache_key: api_assistant_cda_yaml
-documentation: |
+documentation: !fill |
     {raw_documentation}
 
     # Additional Instructions:
@@ -71,7 +71,3 @@ documentation: |
 
     You should make use of the python requests library to interact with the API.
     Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
-
-    Here are some examples of how to use the API:
-    {examples}
-
