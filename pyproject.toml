@@ -41,6 +41,7 @@ dependencies = [
   "folium~=0.19.5",
   "census~=0.8.23",
   "us~=3.2.0",
+  "xlrd~=2.0.1",
 ]
 
 [project.urls]
