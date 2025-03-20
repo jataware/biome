@@ -14,10 +14,17 @@ documentation: |
     The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.
     It also contains geospatial information such as latitude, longitude, state/zip, and even EPA region.
 
+    # Overview of the EPA TRI Dataset
     TRI tracks the waste management of certain toxic chemicals that may pose a threat to human health and the environment. U.S. facilities in different industry sectors must report annually how much of each chemical they release into the environment and/or managed through recycling, energy recovery and treatment, as well as any practices implemented to prevent or reduce the generation of chemical waste. 
 
-    In general, chemicals covered by the TRI Program are those that cause:
+   Contains information about toxic chemical releases reported by industrial and federal facilities; key features of this dataset include:
+    - Facility information: Names, IDs, geographic coordinates, and locations
+    - Chemical data: Chemical names and release amounts (in pounds)
+    - Geographic information: Latitude, longitude, state, county, EPA region, ZIP codes, and Census Block Groups
+    - Risk metrics: RSEI (Risk-Screening Environmental Indicators) Hazard scores
+    - Temporal coverage: 10 years of data (2014-2023)
 
+    In general, chemicals covered by the TRI Program are those that cause:
     - Cancer or other chronic human health effects
     - Significant adverse acute human health effects
     - Significant adverse environmental effects

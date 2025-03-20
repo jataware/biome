@@ -10,6 +10,7 @@ cache_body:
 documentation: |
     You have access to file-based National Survey of Children's Health (NSCH) data
     from 2016 to 2023, located under the `{DATASET_FILES_BASE_PATH}/census-nsch` directory.
+
     The NSCH files are located and named per year as follows:
     - {DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
     - {DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
@@ -77,6 +78,13 @@ documentation: |
     codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)
     ```
 
+    The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
+    - Physical and mental health conditions (asthma, allergies, ADHD, etc.)
+    - Access to healthcare
+    - Family, neighborhood, and social context
+    - Housing and environmental factors
+    - Insurance coverage and care coordination
+
     The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
     The FIPS Code column is called "FIPSST" and is available in all years.
 
@@ -85,6 +93,25 @@ documentation: |
     to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
     Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
     since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
+
+    # Key Variables for Health Conditions Analysis
+    ## Asthma and Allergies
+    - K2Q40A: Asthma diagnosis (1=Yes, 2=No)
+    - ALLERGIES: Allergies diagnosis (1=Yes, 2=No)
+    - ALLERGIES_CURR: Current allergies (1=Yes, 2=No)
+    ## Other Health Conditions
+    - K2Q31A: ADHD diagnosis
+    - K2Q32A: Depression diagnosis
+    - K2Q33A: Anxiety diagnosis
+    - DIABETES: Diabetes diagnosis
+    - AUTOIMMUNE: Autoimmune disease diagnosis
+    ## Housing and Environmental Factors
+    - K9Q41: Smoke inside home
+    - ACE1: Difficulty covering basics like food or housing
+    - FOODSIT: Food situation in household
+    - TENURE: Housing tenure (owned/rented)
+
+    Environmental factors are primarily self-reported by parents/caregivers.
 
     # Additional Instructions:
 

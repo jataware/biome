@@ -87,7 +87,7 @@ class BiomeAgent(BaseAgent):
         # Note: not all providers support ttl_seconds
         ttl_seconds = 1800
         drafter_config_gemini={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-7-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
         specs = self.api_specs
 
         instructions_dir = os.path.join(self.root_folder, 'instructions')

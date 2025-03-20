@@ -62,6 +62,55 @@ documentation: |
     of the columns needed, including the geo/housing-characteristics columns for your analysis, 
     but don't include the thousands of columns.
 
+    # Overview of the American Housing Survey (AHS)
+    The American Housing Survey (AHS) is a comprehensive national housing survey conducted by the U.S. Census Bureau. It provides detailed information about housing conditions, household characteristics, and neighborhood features across the United States.
+
+    ## Key Dataset Characteristics
+
+    ### Temporal Coverage
+    - Biennial surveys from 1999 to 2023
+    - Data is collected every two years, allowing for trend analysis
+    - Most recent survey available is from 2023
+
+    ### Geospatial Resolution
+    - Metropolitan area level using Core-Based Statistical Areas (CBSA codes)
+    - Recent surveys (post-2015) use 2013 OMB CBSA codes
+    - Older surveys (pre-2015) use different geographic identifiers (SMSA codes)
+    - County-level data is limited, especially in recent surveys
+    - Harris County/Houston Data: Available in older surveys (1999-2007) using SMSA code 3360, but not found in more recent surveys (2015-2023)
+
+    ### Housing Condition Variables
+    - Mold: Presence of mold in different areas of the home (basement, bathroom, bedroom, kitchen, living room)
+    - Water Leaks: Inside and outside water leaks, including specific sources (roof, plumbing, basement)
+    - Pests: Presence of rodents (rats, mice) and insects
+    - Air Quality: Indoor air quality ratings
+    - HVAC Systems: Heating and cooling system types and adequacy
+
+    ### Health-Related Variables
+    - Asthma: Recent surveys (2015, 2023) include questions about household members diagnosed with asthma
+    - Emergency Room Visits: Data on ER visits due to asthma
+    - Asthma Medication: Some surveys include information about asthma medication use
+
+    ### Household Composition
+    - Number of persons in household
+    - Presence of children (various age groups)
+    - Number of adults and elders
+
+    ### Limitations and Challenges
+    #### Geographic Specificity:
+    - Recent surveys (2015-2023) do not contain Houston/Harris County specific data
+    - Only metropolitan area level data is available in recent surveys
+
+    #### Data Consistency:
+    - Variable definitions and coding schemes change across survey years
+    - Some variables are only available in certain years
+
+    #### Direct Causality:
+    - The survey provides correlational data but cannot establish causal relationships between housing conditions and health outcomes
+
+    #### Sample Size:
+    - When filtering for specific conditions, sample sizes can become small, limiting statistical power
+
     # Additional Instructions:
 
     Read the CSV fiels with index_col=False, like so:
