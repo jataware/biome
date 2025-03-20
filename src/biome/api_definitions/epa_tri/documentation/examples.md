@@ -5,7 +5,7 @@
 import pandas as pd
 
 # Always the TRI csv with index_col=False param, since pandas is inferring the wrong index column and shifting the data without it
-df = pd.read_csv('{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', dtype=str, index_col=False)
+df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', dtype=str, index_col=False)
 
 # Filter for any entries containing 'Orange' in the County column
 # sample name without the county suffix, all uppercase and with correct spacing
@@ -25,7 +25,7 @@ print(orange_county.head())
 import pandas as pd
 
 # Load the TRI data
-tri_data = pd.read_csv('{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
 
 # Define respiratory/asthma related chemicals
 # Updated to match the actual format in the dataset (with CAS numbers)
@@ -77,7 +77,7 @@ result
 import pandas as pd
 
 # Load the data
-tri_data = pd.read_csv('{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
 
 print("Sample of County values:")
 print(tri_data['County'].unique()[:10])  # Print first 10 unique county values
@@ -127,7 +127,7 @@ if len(final_filtered) > 0:
 import pandas as pd
 
 # Load the TRI data
-tri_data = pd.read_csv('{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
 
 # List of respiratory-related chemicals
 respiratory_chemicals = [
@@ -171,7 +171,7 @@ print(result)
 import pandas as pd
 
 # Load the data
-file_path = '{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
 tri_data = pd.read_csv(file_path, low_memory=False)
 
 # Fix the numeric columns that might be stored as strings with commas
@@ -218,7 +218,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load and prepare data (assuming tri_data is already loaded and cleaned)
-file_path = '{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
 tri_data = pd.read_csv(file_path, low_memory=False)
 
 # Fix the numeric columns that might be stored as strings with commas
@@ -275,7 +275,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load and prepare data (assuming tri_data is already loaded and cleaned)
-file_path = '{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
 tri_data = pd.read_csv(file_path, low_memory=False)
 
 # Fix the numeric columns that might be stored as strings with commas
@@ -346,7 +346,7 @@ from folium.plugins import MarkerCluster
 import numpy as np
 
 # Load and prepare data (assuming tri_data is already loaded and cleaned)
-file_path = '{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
 tri_data = pd.read_csv(file_path, low_memory=False)
 
 # Fix the numeric columns that might be stored as strings with commas
@@ -424,7 +424,7 @@ import numpy as np
 from scipy.stats import pearsonr
 
 # Load and prepare data (assuming tri_data is already loaded and cleaned)
-file_path = '{DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'
 tri_data = pd.read_csv(file_path, low_memory=False)
 
 # Fix the numeric columns that might be stored as strings with commas

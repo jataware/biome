@@ -7,7 +7,7 @@ import pandas as pd
 
 # Read codebook to get metro area meanings
 # ensure to set index_col=False, since the codebook has no index column
-codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', index_col=False)
+codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
 
 # Find the row for OMB13CBSA
 ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -24,7 +24,7 @@ import pandas as pd
 def get_code_name(code):
     # Read codebook to get metro area meanings
     # ensure to set index_col=False, since the codebook has no index column
-    codebook = pd.read_csv('{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', index_col=False)
+    codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
 
     # Find the row for OMB13CBSA
     ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -42,7 +42,7 @@ def get_code_name(code):
 ```
 import pandas as pd
 
-data_dir =  "{DATASET_FILES_BASE_PATH}/census-ahs"
+data_dir =  "{{DATASET_FILES_BASE_PATH}}/census-ahs"
 
 def get_florida_mold_data():
     # Store results
@@ -148,7 +148,7 @@ import seaborn as sns
 from matplotlib.ticker import PercentFormatter
 
 # Load a sample of the AHS dataset (2023)
-file_path = '{DATASET_FILES_BASE_PATH}/census-ahs/survey_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'
 
 # Define columns of interest based on our exploration
 geo_cols = ['OMB13CBSA']
@@ -289,7 +289,7 @@ import pandas as pd
 import numpy as np
 
 # Load the AHS dataset (2023) with asthma-related variables
-file_path = '{DATASET_FILES_BASE_PATH}/census-ahs/survey_2023.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'
 
 # Define variables of interest
 asthma_vars = ['HHLDASTHMA']  # Household member ever diagnosed with asthma
@@ -358,7 +358,7 @@ import pandas as pd
 import numpy as np
 
 # Load the 2007 AHS dataset with Houston data
-file_path = '{DATASET_FILES_BASE_PATH}/census-ahs/survey_2007.csv'
+file_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2007.csv'
 
 # Define Houston SMSA code
 houston_smsa = '3360'
@@ -436,7 +436,7 @@ import pandas as pd
 import numpy as np
 
 # Load the codebook to find information about variables
-codebook_path = '{DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv'
+codebook_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv'
 codebook = pd.read_csv(codebook_path, dtype=str, index_col=False)
 
 # Define search terms related to asthma and respiratory health

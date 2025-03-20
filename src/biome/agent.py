@@ -79,7 +79,9 @@ class BiomeAgent(BaseAgent):
                 api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
                 api_spec = load_yaml_api(api_yaml)
 
+                # replace {DATASET_FILES_BASE_PATH} with the actual path; sanity check with both for now
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
 
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d

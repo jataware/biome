@@ -47,7 +47,7 @@ documentation: |
 
     better use this endpoint:
     ```
-    /metaData/fieldsByService?email={email}&key={key}&service=annualData
+    /metaData/fieldsByService?email={{email}}&key={{key}}&service=annualData
     ```
     (example above is checking shape of annualData endpoint). It will provide fields documentation for each property in the response.
     If you use `print(response_data)` on a huge JSON response, you will not be able to proceed- you can also try checking the length as string,
@@ -77,17 +77,17 @@ documentation: |
 
     Here is a sample of the output of a Raw Data request with one data point:
     ```
-        {
+        {{
             "Header": [
-            {
+            {{
                 "status": "success",
                 "request_time": "2018-06-13T07:45:01-04:00",
                 "url": "https://...",
                 "rows": 1
-            }
+            }}
             ],
             "Body": [
-            {
+            {{
                 "state_code": "01",
                 "county_code": "073",
                 "site_number": "0023",
@@ -113,9 +113,9 @@ documentation: |
                 "county_name": "Jefferson",
                 "date_of_last_change": "2017-05-30",
                 "cbsa_code": "13820"
-            }
+            }}
             ]
-        }
+        }}
     ```
 
     # Error Handling and Status Codes
@@ -124,19 +124,19 @@ documentation: |
     If the API is not able to parse your request it will return a status code of 400 and only the header, which will include an array of error messages instead of a row count.
     For example:
     ```
-        {
+        {{
         "Header": [
-        {
+        {{
             "status": "Failed",
             "request_time": "2018-06-13T08:05:46.588-04:00",
             "url": "https://...",
             "error": [
             "value is missing or the value is empty: param"
-        ]
-        }
+            ]
+            }}
         ],
         "Body": []
-    }
+        }}
     ```
 
     If the API is able to parse your request but no data matches your selections, it will return the 
@@ -144,17 +144,17 @@ documentation: |
     the status will be a message that no data matched your selection criteria,
     and the body will be empty.
     ```
-    {
+    {{
         "Header": [
-        {
+        {{
             "status": "No data matched your selection",
             "request_time": "2018-06-13T10:15:42-04:00",
             "url": "https://...",
             "rows": 0
-        }
+        }}
         ],
         "Body": []
-    }
+    }}
     ```
 
     # Request Limits and Terms of Service

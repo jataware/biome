@@ -1,0 +1,41 @@
+name: "Census ACS (American Community Survey) and SF1"
+cache_key: api_assistant_census_acs_json
+description: |
+  The Census ACS (American Community Survey) and SF1 (Decennial Census) API returns data that has been collected from 
+  the Census Bureau, a database that contains information on the population of the United States.
+  Use this to control for socioeconomic factors (or for other purposes).
+web_documentation: !load documentation/census_web.md
+sdk_documentation: !load documentation/census_sdk.md
+examples: !load documentation/examples.md
+cache_body: 
+    default: true 
+documentation: |
+    The American Community Survey (ACS) is an ongoing survey that provides data every 
+    year—giving communities the current information they need to make important decisions.
+    The ACS covers a broad range of topics about social, economic, housing, and demographic 
+    characteristics of the U.S. population. 
+
+    {web_documentation}
+
+    You will need an API Key to use the Census ACS API.
+    It is available in the environment variable:
+    - api_key: os.environ.get("API_CENSUS")
+
+    You have an api key, so you have access to the census pypi package, and also direct access to the census web api.
+    Prefer the pypi package if you can, it's easier to use.
+
+    Data ranges from 2005 to 2023.
+
+    {sdk_documentation}
+
+    ## For 1-year datasets when loading as file (may or may not apply when using python libraries...)
+    ### Variable Changes
+    Variables, and the values they represent, may change over time. Use the file in `{{DATASET_FILES_BASE_PATH}}/census-acs/2023-1yr-api-changes.csv` as a guide for which variables have changed from the prior year for 2023 ACS 1-Year Detailed Tables, Data Profiles and Subject Tables. See below for a description of each change type.
+    No Change - The variable has not changed from the prior year (most variables).
+    Updated - That variable has changed from the prior year and a matching variable for the current year has been found.
+    No Match - The variable has changed from the prior year and no matching or comparable variable has been found.
+
+    # Additional Instructions:
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}

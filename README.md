@@ -76,6 +76,8 @@ At this time, the following authenticated APIs are supported:
   - Register for an API key at: https://open.fda.gov/apis/authentication/
 - USDA FoodData Central
   - Register for an API key at: https://fdc.nal.usda.gov/api-key-signup
+- Census ACS (American Community Survey) and SF1
+  - Register for an API key at: https://api.census.gov/data/key_signup.html
 
 ## Data Files
 

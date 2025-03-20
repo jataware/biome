@@ -50,13 +50,13 @@ documentation: |
 
     POST REQUEST:
     ```
-    curl -XPOST -H "Content-Type:application/json" -d '{"pageSize":25}' https://api.nal.usda.gov/fdc/v1/foods/list?api_key=DEMO_KEY
-    curl -XPOST -H "Content-Type:application/json" -d '{"query":"Cheddar cheese"}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
-    curl -XPOST -H "Content-Type:application/json" -d "{\"query\":\"Cheddar cheese\"}" https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d '{{"pageSize":25}}' https://api.nal.usda.gov/fdc/v1/foods/list?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d '{{"query":"Cheddar cheese"}}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d "{{\"query\":\"Cheddar cheese\"}}" https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
     ```
 
     ```
-    curl -XPOST -H "Content-Type:application/json" -d '{"query": "Cheddar cheese", "dataType": ["Branded"], "sortBy": "fdcId", "sortOrder": "desc"}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d '{{"query": "Cheddar cheese", "dataType": ["Branded"], "sortBy": "fdcId", "sortOrder": "desc"}}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
     ```
     Note: The "dataType" parameter values need to be specified as an array.
 

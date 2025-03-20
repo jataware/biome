@@ -5,7 +5,7 @@
 ```
 import pandas as pd
 
-df_2023 = pd.read_sas("{DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
+df_2023 = pd.read_sas("{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
 
 existing_cols = df_2023.columns.tolist()
 print(existing_cols)
@@ -19,7 +19,7 @@ import pandas as pd
 # Read codebook with explicit parameters
 
 # Ensure index_col=FALSE, if not first column values disappear and the whole dataframe is shifted!
-codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)  
+codebook = pd.read_csv("{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)  
 # Display the first few rows
 print(codebook.head())
 
@@ -34,10 +34,10 @@ import pandas as pd
 import numpy as np
 
 # Read the codebook
-codebook = pd.read_csv("{DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)
+codebook = pd.read_csv("{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)
 
 # Read 2023 data 
-df = pd.read_sas("{DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
+df = pd.read_sas("{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
 
 # Find condition-related variables from codebook
 conditions = codebook[
@@ -85,7 +85,7 @@ import os
 from matplotlib.ticker import PercentFormatter
 
 # Set the path to the NSCH data directory
-nsch_dir = "{DATASET_FILES_BASE_PATH}/census-nsch/"
+nsch_dir = "{{DATASET_FILES_BASE_PATH}}/census-nsch/"
 
 # Function to load and prepare NSCH data for a specific year
 def load_nsch_data(year):
@@ -303,7 +303,7 @@ import os
 from matplotlib.ticker import PercentFormatter
 
 # Set the path to the NSCH data directory
-nsch_dir = "{DATASET_FILES_BASE_PATH}/census-nsch/"
+nsch_dir = "{{DATASET_FILES_BASE_PATH}}/census-nsch/"
 
 # Function to load and prepare NSCH data for a specific year
 def load_nsch_data(year):

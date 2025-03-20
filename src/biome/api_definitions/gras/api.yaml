@@ -19,7 +19,7 @@ documentation: |
     # Additional Instructions:
     Use the raw csv notices file to answer questions about GRAS substances. Load the file from:
 
-    - {DATASET_FILES_BASE_PATH}/fda-gras/GRASNotices.csv
+    - {{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv
 
     These are the columns available (separated by semicolons, some newlines/spaces):
       GRAS Notice (GRN) No.	; Substance; Intended Use; Basis; Notifier;	Notifier Address;	

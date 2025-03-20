@@ -7,6 +7,7 @@ os.environ.setdefault("API_EPA_AQS_EMAIL", "{{aqs_email}}")
 os.environ.setdefault("API_EPA_AQS", "{{aqs_api_key}}")
 os.environ.setdefault("API_OPENFDA", "{{openfda_faers_api_key}}")
 os.environ.setdefault("API_USDA_FDC", "{{usda_fdc_api_key}}")
+os.environ.setdefault("API_CENSUS", "{{census_api_key}}")
 
 formatter = IPython.get_ipython().display_formatter.formatters['text/plain']
 formatter.max_seq_length = 0

@@ -98,9 +98,9 @@ The order of these fields in the results can and will vary...
 For count queries (such as: https://api.fda.gov/drug/event.json?count=patient.reaction.reactionmeddrapt.exact), the results section will look something like the following:
 
 ```
-{
+{{
   "results": [
-    {
+    {{
       "term": "DRUG INEFFECTIVE",
       "count": 32584
     },
@@ -111,46 +111,46 @@ For count queries (such as: https://api.fda.gov/drug/event.json?count=patient.re
     {
       "term": "FATIGUE",
       "count": 23341
-    }
+    }}
   ]
-}
+}}
 ```
 
 
 # Download API fields Example
 ```
-{
-  "meta": {
+{{
+  "meta": {{
     "disclaimer": "openFDA is a beta research project and not for clinical use. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated.",
     "license": "http://open.fda.gov/license",
     "last_updated": "2015-12-19"
-  },
-  "results": {
-    "device": {
-      "event": {
+  }},
+  "results": {{
+    "device": {{
+      "event": {{
         "total_records": 33128,
         "export_date": "2015-12-19",
         "partitions": [
-          {
+          {{
             "size_mb": "0.56",
             "records": 795,
             "display_name": "2012 q2 (all)",
             "file": "http://download.open.fda.gov/device/event/2012q2/device-event-0001-of-0001.json.zip"
-          },
-          {
+          }},
+          {{
             "size_mb": "0.58",
             "records": 825,
             "display_name": "2012 q3 (all)",
             "file": "http://download.open.fda.gov/device/event/2012q3/device-event-0001-of-0001.json.zip"
-          },
-          {
+          }},
+          {{
             "…": "…"
-          }
+          }}
         ]
-      }
-    }
-  }
-}
+      }}
+    }}
+  }}
+}}
 ```
 
 # Construct Query Documentation

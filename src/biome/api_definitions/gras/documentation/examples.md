@@ -6,7 +6,7 @@
 import pandas as pd
 
 # Load GRAS notices data
-df = pd.read_csv('{DATASET_FILES_BASE_PATH}/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
+df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
 
 # print head
 print(f"First 5 rows of GRAS notices:")
