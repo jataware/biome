@@ -11,11 +11,11 @@ description: |
     real-time air quality data (it can take 6 months from the time 
     data is collected until it is in AQS). For real-time data, please use
     the AirNow API.
-raw_documentation: !load documentation/aqs.json
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/aqs.json
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     # OpenAPI Spec JSON:
     {raw_documentation}
 
@@ -261,8 +261,4 @@ documentation: |
         "Data": []
     }}
     ```
-
     Never simulate this API- if it is not available ask the user how to proceed.
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

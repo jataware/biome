@@ -4,10 +4,10 @@ description: |
   You have access to knowledge from the National Survey of Children's Health (NSCH) data, available every year from 
   2016 to 2023. This dataset API can help answer questions about children's health, healthcare access, family functioning, 
   neighborhood characteristics, and social determinants of health for children aged 0-17 years in the United States.
-examples: !load documentation/examples.md
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     You have access to file-based National Survey of Children's Health (NSCH) data
     from 2016 to 2023, located under the `{{DATASET_FILES_BASE_PATH}}/census-nsch` directory.
 
@@ -112,8 +112,3 @@ documentation: |
     - TENURE: Housing tenure (owned/rented)
 
     Environmental factors are primarily self-reported by parents/caregivers.
-
-    # Additional Instructions:
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

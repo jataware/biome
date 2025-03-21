@@ -5,11 +5,10 @@ description: |
   releases and pollution prevention activities reported by industrial and federal 
   facilities. TRI data support informed decision-making by communities, 
   government agencies, companies, and others.
-# more_instructions: !load documentation/docs.md
-examples: !load documentation/examples.md
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv` file.
     The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.
     It also contains geospatial information such as latitude, longitude, state/zip, and even EPA region.
@@ -99,8 +98,3 @@ documentation: |
     - develop program priorities and projects.
 
     Under various environmental laws (identified in the figure below), other EPA programs also collect information about regulated chemicals. Users looking for information not available in the TRI can check the databases associated with these other programs. The Clean Air Act's National Emissions Inventory (NEI), for example, can be used to find estimates of air releases for facilities that do not report to the TRI or for mobile sources such as cars, which are not covered by the TRI.
-
-    # Additional Instructions:
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

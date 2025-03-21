@@ -4,12 +4,12 @@ description: |
   The Census ACS (American Community Survey) and SF1 (Decennial Census) API returns data that has been collected from 
   the Census Bureau, a database that contains information on the population of the United States.
   Use this to control for socioeconomic factors (or for other purposes).
-web_documentation: !load documentation/census_web.md
-sdk_documentation: !load documentation/census_sdk.md
-examples: !load documentation/examples.md
+web_documentation: !load_txt documentation/census_web.md
+sdk_documentation: !load_txt documentation/census_sdk.md
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     The American Community Survey (ACS) is an ongoing survey that provides data every 
     year—giving communities the current information they need to make important decisions.
     The ACS covers a broad range of topics about social, economic, housing, and demographic 
@@ -34,8 +34,3 @@ documentation: |
     No Change - The variable has not changed from the prior year (most variables).
     Updated - That variable has changed from the prior year and a matching variable for the current year has been found.
     No Match - The variable has changed from the prior year and no matching or comparable variable has been found.
-
-    # Additional Instructions:
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

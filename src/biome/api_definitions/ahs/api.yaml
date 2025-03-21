@@ -5,12 +5,11 @@ description: |
   year 1999 to 2023. You can use this API for answering questions on american housing, specifically their
   housing conditions (mold, water problems, etc), which can be used to correlate to health conditions,
   or other purposes.
-
-more_instructions: !load documentation/docs.md
-examples: !load documentation/examples.md
+more_instructions: !load_txt documentation/docs.md
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     You have access to a file-based Census American Housing Survey
     (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `{{DATASET_FILES_BASE_PATH}}/census-ahs` directory.
     The housing files are located and named per year as follows:
@@ -118,6 +117,3 @@ documentation: |
     codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
     ```
     If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

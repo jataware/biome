@@ -1,0 +1,52 @@
+
+- query: "Calculate the poverty rate in Harris County, Texas- Descriptive analysis"
+  code: |
+    import pandas as pd
+    from census import Census
+    from us import states
+    import matplotlib.pyplot as plt
+
+    c = Census(os.environ.get("API_CENSUS"))
+
+    # Get ACS data for Harris County census tracts
+    harris_ses = c.acs5.get(
+        ('NAME', 'B19013_001E', 'B17001_002E', 'B25064_001E', 'B01003_001E'),
+        {'for': 'tract:*', 'in': f'state:{states.TX.fips} county:201'}
+    )
+
+    # Convert to DataFrame
+    harris_ses_df = pd.DataFrame(harris_ses)
+    harris_ses_df.columns = ['Name', 'Median_Income', 'Poverty_Count', 
+                            'Median_Rent', 'Population', 'state', 'county', 'tract']
+
+    # Calculate poverty rate
+    harris_ses_df['Poverty_Rate'] = harris_ses_df['Poverty_Count'] / harris_ses_df['Population'] * 100
+
+- query: "Calculate the poverty rate in Harris County, Texas- Stratified analysis"
+  code: |
+    import pandas as pd
+    from census import Census
+    from us import states
+    import matplotlib.pyplot as plt
+
+    c = Census(os.environ.get("API_CENSUS"))
+
+    # Get ACS data for Harris County census tracts
+    harris_ses = c.acs5.get(
+        ('NAME', 'B19013_001E', 'B17001_002E', 'B25064_001E', 'B01003_001E'),
+        {'for': 'tract:*', 'in': f'state:{states.TX.fips} county:201'}
+    )
+
+    # Convert to DataFrame
+    harris_ses_df = pd.DataFrame(harris_ses)
+    harris_ses_df.columns = ['Name', 'Median_Income', 'Poverty_Count', 
+                            'Median_Rent', 'Population', 'state', 'county', 'tract']
+
+    # Group census tracts by income quartiles
+    harris_ses_df['Income_Quartile'] = pd.qcut(harris_ses_df['Median_Income'], 4, labels=False)
+
+    # Analyze environmental exposures by income quartile
+    exposure_by_ses = pd.merge(environmental_data, harris_ses_df, on='tract')
+
+    # Calculate average exposures by income quartile
+    quartile_summary = exposure_by_ses.groupby('Income_Quartile')['PM25_Annual', 'Ozone_Days_Exceeded', 'TRI_Releases'].mean()

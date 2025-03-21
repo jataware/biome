@@ -11,12 +11,12 @@ description: |
     - Age-stratified data including children under 18
     - County-level resolution
     - Information on asthma, and other conditions
-user_guide: !load documentation/user_guide.md
-examples: !load documentation/examples.md
-api_examples: !load documentation/api_examples.md
+user_guide: !load_txt documentation/user_guide.md
+examples: !load_yaml documentation/examples.yaml
+api_examples: !load_txt documentation/api_examples.md
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     {user_guide}
 
     API key is optional, although using one will provide less rate-limiting.
@@ -25,6 +25,3 @@ documentation: |
 
     Sample GET request/response pairs:
     {api_examples}
-
-    Here are some examples of how to use the API, if applicable:
-    {examples}

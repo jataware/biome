@@ -3,11 +3,11 @@ cache_key: api_assistant_usda_foodcentral_json
 description: |
     This openapi is the primary place to obtain data from the USDA's FoodData Central (nutrition) database.
     It is intended to assist in incorporating nutrient data into any analysis we need.
-raw_documentation: !load documentation/foodcentral_openapi.json
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/foodcentral_openapi.json
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     This API is the primary place to obtain data from the USDA's FoodData Central database.
 
     # OpenAPI Spec JSON:
@@ -75,6 +75,3 @@ documentation: |
 
     ### SR Legacy
     Historic data on food components including nutrients derived from analyses, calculations, and published literature
-
-    # Here are some examples of how to use the API, if applicable:
-    {examples}

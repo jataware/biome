@@ -1,6 +1,4 @@
-
-You may use the household file to answer questions about american housing:
-
+You may use the household file to answer questions about american housing.
 Example questions you may answer:
 - What are the housing conditions relating to medical conditions such as asthma? You
   can check the air quality, water quality, mold, radon, and other conditions of the home.
