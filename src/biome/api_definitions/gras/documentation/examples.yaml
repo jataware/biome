@@ -1,4 +1,4 @@
-- query: "Is there any FDA GRAS notice for "Dioctyl sodium sulfosuccinate" as an additive?"
+- query: "Is there any FDA GRAS notice for Dioctyl sodium sulfosuccinate as an additive?"
   code: |
     import pandas as pd
 

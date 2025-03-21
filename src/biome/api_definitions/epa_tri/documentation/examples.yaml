@@ -65,7 +65,7 @@
 
     result
 
-- query: "When not finding results for a combined query, try a more systematic approach by finding items and counting length by one by one, in order to discover if there is matching data, but the query is not returning any results. This is to discover amonia references for the county of "HARRIS, TX"."
+- query: "When not finding results for a combined query, try a more systematic approach by finding items and counting length by one by one, in order to discover if there is matching data, but the query is not returning any results. This is to discover amonia references for the county of 'HARRIS, TX'."
   code: |
     import pandas as pd
 

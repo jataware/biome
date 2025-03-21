@@ -1,12 +1,12 @@
 name: "FDA Generally Recognized as Safe (GRAS) API"
 cache_key: api_assistant_gras_csv
-description: |
-  You have access to the FDA Generally Recognized as Safe (GRAS) API.
-  You may use this tool to check for food additives introductions or changes.
-  Use this tool to answer questions such as:
-  In which year was  "Pea fiber" food additive/preservative introduced into the US food supply?
+description: >
+    The FDA Generally Recognized as Safe (GRAS) API is a csv file (export) data with notices filed from the FDA GRAS database from years 1998 to 2024.
+    You may use this tool to check for food additives introductions or changes.
+    Use this tool to answer questions such as:
+    In which year was Pea fiber food additive/preservative introduced into the US food supply?
 cache_body: 
-    default: true 
+    default: true
 examples: !load_yaml documentation/examples.yaml
 documentation: !fill |
     You have access to the FDA Generally Recognized as Safe (GRAS) API, which is a csv file data with notices filed from the FDA GRAS database from years 1998 to 2024.
@@ -19,15 +19,15 @@ documentation: !fill |
     # Additional Instructions:
     Use the raw csv notices file to answer questions about GRAS substances. Load the file from:
 
-    - {{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv
+    {{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv
 
     These are the columns available (separated by semicolons, some newlines/spaces):
-      GRAS Notice (GRN) No.	; Substance; Intended Use; Basis; Notifier;	Notifier Address;	
-      Date of filing;	GRN Part 1;	GRN Part 2;	GRN Part 3;	GRN Part 4;	GRN Part 5;	GRN Part 6;	GRN Part 7;
-      Date of closure; Date of correction letter;	FDA's Letter;	Date additional correspondence;	Additional correspondence;
-      Date additinoal correspondence 2;	Additional correspondence 2; Date additional correspondence 3;
-      Additional correspondence 3; Date additional correspondence 4; Additional correspondence 4;
-      Resubmission; Resubmitted; Notes;	Related submission 
+    GRAS Notice (GRN) No.	; Substance; Intended Use; Basis; Notifier;	Notifier Address;	
+    Date of filing;	GRN Part 1;	GRN Part 2;	GRN Part 3;	GRN Part 4;	GRN Part 5;	GRN Part 6;	GRN Part 7;
+    Date of closure; Date of correction letter;	FDA's Letter;	Date additional correspondence;	Additional correspondence;
+    Date additinoal correspondence 2;	Additional correspondence 2; Date additional correspondence 3;
+    Additional correspondence 3; Date additional correspondence 4; Additional correspondence 4;
+    Resubmission; Resubmitted; Notes;	Related submission 
 
     The Gras Notice GRN No is wrapped by spredsheet-software-like function..
     Example:
