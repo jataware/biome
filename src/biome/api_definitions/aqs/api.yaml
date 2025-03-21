@@ -244,8 +244,25 @@ documentation: |
     in specific geographic areas like a county or region.
     The API's structure allows for flexible querying by location, time period, and 
     specific pollutants, making it a powerful tool for environmental health research.
-     However, users should be aware of specific parameter requirements and prepare 
-     for handling large volumes of data when working with densely monitored areas.
+    However, users should be aware of specific parameter requirements and prepare 
+    for handling large volumes of data when working with densely monitored areas.
+
+    Note: If/when using the `metaData/isAvailable` endpoint to check if the API is available,
+    use this sample response as guide:
+    ```
+    {{
+        "Header": [
+            {{
+                "status": "API service is up and running healthy. Status: connection_pool: size: 5, connections: 1, in use: 1, waiting_in_queue: 0",
+            "request_time": "2025-03-21T08:21:41-04:00",
+            "url": "http://aqs.epa.gov/api/metaData/isAvailable?email={{email}}.com&key={{key}}"
+            }}
+        ],
+        "Data": []
+    }}
+    ```
+
+    Never simulate this API- if it is not available ask the user how to proceed.
 
     Here are some examples of how to use the API, if applicable:
     {examples}
