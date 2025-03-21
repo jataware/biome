@@ -11,10 +11,10 @@ description: >
     data scientists, and healthcare professionals to explore and analyze rich biomedical data efficiently, supporting 
     advancements in drug discovery, clinical decision-making, and research. With its robust architecture, the INDRA CoGEx 
     Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
-raw_documentation: !load documentation/indra.json
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/indra.json
+examples: !load_yaml documentation/examples.yaml
 cache_key: "api_assistant_indra_json"
-documentation: |
+documentation: !fill |
     {raw_documentation}
 
     # Additional Instructions:
@@ -36,5 +36,3 @@ documentation: |
         "include_indirect": true
       }}'
     ```
-    Here are some examples of how to use the API:
-    {examples}
