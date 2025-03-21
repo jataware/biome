@@ -1,0 +1,30 @@
+name: "CDC Tracking Network"
+cache_key: api_assistant_cdc_tracking_network_json
+description: |
+    The National Environmental Public Health Tracking Network (Tracking Network) 
+    brings together health data and environmental data from national, state, county, 
+    and city sources and provides supporting information to make the data easier 
+    to understand.
+    The Tracking Network has data and information on environments and hazards, 
+    health effects, and population health.
+    This resource includes childhood emergency department visits and hospitalizations at the county level. It provides:
+    - Age-stratified data including children under 18
+    - County-level resolution
+    - Information on asthma, and other conditions
+user_guide: !load documentation/user_guide.md
+examples: !load documentation/examples.md
+api_examples: !load documentation/api_examples.md
+cache_body: 
+    default: true 
+documentation: |
+    {user_guide}
+
+    API key is optional, although using one will provide less rate-limiting.
+
+    Never simulate this API- if it is not available ask the user how to proceed.
+
+    Sample GET request/response pairs:
+    {api_examples}
+
+    Here are some examples of how to use the API, if applicable:
+    {examples}
