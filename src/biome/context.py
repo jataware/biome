@@ -31,5 +31,6 @@ class BiomeContext(BaseContext):
             "openfda_faers_api_key": os.environ.get("API_OPENFDA"),
             "usda_fdc_api_key": os.environ.get("API_USDA_FDC"),
             "census_api_key": os.environ.get("API_CENSUS"),
+            "cdc_tracking_network_api_key": os.environ.get("API_CDC_TRACKING_NETWORK"),
         })
         await self.execute(command)

@@ -1,17 +1,16 @@
 User Guide
 ---
-The Data Application Program Interface (API) is an additional way to query data stored by the Environmental Public Health Tracking Network. The API provides a standard URL interface with a Javascript Object Notation (JSON) formatted response. An error object is returned with an invalid call. An empty object is returned with no data.
+
+The API provides a standard URL interface with a (JSON) formatted response. An error object is returned with an invalid call. An empty object is returned with no data.
 
 # Introduction
 The Tracking Network’s environmental public health data are organized into three, tiered categories: content areas, indicators, and
-measures. The Tracking Network houses over 500 unique measures that are grouped under one or more indicators. Each indicator belongs to one or more content areas.
+measures. The Tracking Network houses over 500 unique measures that are grouped under one or more indicators. Each indicator belongs to one or more content areas:
+
 ```
-Content Area
-↓
-Indicator(s)
-↓
-Measure(s)
+Content Area -> Indicator(s) -> Measure(s)
 ```
+
 This user guide outlines the process of navigating from content areas to measures of interest, as well as determining desired location,
 times, and strata for the measures. This document contains four sections:
 - Functions: Definition and format of all currently available functions

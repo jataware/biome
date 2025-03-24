@@ -17,11 +17,17 @@ api_examples: !load_txt documentation/api_examples.md
 cache_body: 
     default: true 
 documentation: !fill |
-    {user_guide}
+    The Tracking Program collects, integrates, analyzes, and disseminates non-infectious disease, 
+    environmental, and socio-economic data from various sources. 
+    These include a collective of national, state, and local partners.
 
-    API key is optional, although using one will provide less rate-limiting.
+    This is an HTTP API, where the usage is free but rate-limiting is applied heavily when not using an API KEY.
+    You will need an API Key. It is available in the environment variable:
+    - apiToken: os.environ.get("API_CDC_TRACKING_NETWORK")
+
+    {user_guide}
 
     Never simulate this API- if it is not available ask the user how to proceed.
 
-    Sample GET request/response pairs:
+    The list of content areas is available at:
     {api_examples}
