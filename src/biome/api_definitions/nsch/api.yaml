@@ -75,7 +75,7 @@ documentation: !fill |
 
     Open it with pandas like so:
     ```
-    codebook = pd.read_csv("{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv", index_col=False)
+    codebook = pd.read_csv("{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
     ```
 
     The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
