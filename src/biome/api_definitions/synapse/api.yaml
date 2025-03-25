@@ -81,5 +81,5 @@ documentation: !fill |
     downloads_dir = Path(__file__).parent.parent / "downloads" / "synapse"
 
     syn = synapseclient.Synapse(cache_root_dir=downloads_dir) 
-    syn.login(authToken=os.environ.get("API_SYNAPSE")) 
+    syn.login(authToken=os.environ.get("API_SYNAPSE"))  # pass in the authToken on python client login!
     ```

@@ -78,6 +78,9 @@ At this time, the following authenticated APIs are supported:
   - Register for an API key at: https://fdc.nal.usda.gov/api-key-signup
 - Census ACS (American Community Survey) and SF1
   - Register for an API key at: https://api.census.gov/data/key_signup.html
+- Synapse (and nf.synapse.org Data Portal)
+  - Register for an API key at: https://accounts.synapse.org/register1?appId=synapse.org
+  - Go to User > Account Settings > Personal Access Token to create credentials
 
 ## Data Files
 
