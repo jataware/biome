@@ -10,11 +10,11 @@ description: |
     Institute, Princess Margaret Cancer Centre in Toronto, Children's 
     Hospital of Philadelphia, Caris Life Sciences, The Hyve and SE4BIO 
     in the Netherlands, and Bilkent University in Ankara, Turkey.
-raw_documentation: !load documentation/cbioportal.json
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/cbioportal.json
+examples: !load_yaml documentation/examples.yaml
 cache_body: 
     default: true 
-documentation: |
+documentation: !fill |
     {raw_documentation}
 
     # Additional Instructions:
@@ -25,6 +25,3 @@ documentation: |
     so if the user is searching for a specific study, you can just fetch all studies
     and then filter the list yourself since cbioportals filters are tricky. It is often most
     productive to simply filter based on the study name. 
-
-    Here are some examples of how to use the API:
-    {examples}

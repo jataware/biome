@@ -18,6 +18,7 @@ from google.generativeai import caching
 from pathlib import Path
 from adhoc_api.tool import AdhocApi
 from adhoc_api.loader import load_yaml_api
+from adhoc_api.uaii import gpt_4o, o3_mini, claude_35_sonnet, gemini_pro
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +83,10 @@ class BiomeAgent(BaseAgent):
 
         # Note: not all providers support ttl_seconds
         ttl_seconds = 1800
-        drafter_config_gemini={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        drafter_config_gemini =    {**gemini_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        drafter_config_anthropic = {**claude_35_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        contextualizer_config =    {**gpt_4o, 'api_key': os.environ.get("OPENAI_API_KEY")}
         specs = self.api_specs
 
         instructions_dir = os.path.join(self.root_folder, 'instructions')
@@ -102,7 +105,13 @@ class BiomeAgent(BaseAgent):
         self.logger = MessageLogger(self.context)
 
         try:
-            self.api = AdhocApi(logger=logger, drafter_config=[drafter_config_anthropic, drafter_config_gemini], apis=specs)
+            self.api = AdhocApi(
+                apis=specs,
+                drafter_config=[drafter_config_anthropic, drafter_config_gemini], 
+                curator_config=curator_config,
+                contextualizer_config=contextualizer_config,
+                logger=logger,
+            )
         except ValueError as e:
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None

@@ -19,7 +19,7 @@ RUN pip install \
     requests \
     google-generativeai \
     PyYAML \
-    adhoc-api~=1.0.0 \
+    adhoc-api~=2.0.2 \
     idc-index \
     seaborn \
     biopython \
