@@ -70,6 +70,7 @@ class BiomeAgent(BaseAgent):
         
         api_def_dir = os.path.join(self.root_folder, 'api_definitions')
         data_dir = (self.root_folder / ".." / "..").resolve() / "data"
+        print(f"data_dir: {data_dir}")
 
         # Get API specs and directories in one pass
         self.api_specs = []
@@ -79,11 +80,23 @@ class BiomeAgent(BaseAgent):
             if os.path.isdir(api_dir):
                 api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
                 api_spec = load_yaml_api(api_yaml)
+                
+                # if the name is "CDC Tracking Network" skip it and print that you're skipping it
+                if api_spec['name'] == 'CDC Tracking Network':
+                    print(f"Skipping {api_spec['name']} because it's not supported")
+                    continue
 
                 # replace {DATASET_FILES_BASE_PATH} with the actual path; sanity check with both for now
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
                 api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
-
+                
+                # Handle examples which is a list of objects with 'code' fields
+                if isinstance(api_spec['examples'], list):
+                    for example in api_spec['examples']:
+                        if 'code' in example and isinstance(example['code'], str):
+                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', f"data/{str(data_dir)}")
+                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', f"data/{str(data_dir)}")
+                
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
 
@@ -145,19 +158,19 @@ class BiomeAgent(BaseAgent):
             self.logger.error(str(e))
             return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
 
-    @tool()
-    @with_docstring('consult_api_docs.md')
-    async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        self.logger.info("asking api")
-        logger.info(f"asking api: {api}")
-        try:
-            results = self.api.ask_api(api, query)
-            return f"Here is the information I found about how to use the API: \n{results}"
-        except Exception as e:
-            if self.api is None:
-                return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
-            self.logger.error(str(e))
-            return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
+    # @tool()
+    # @with_docstring('consult_api_docs.md')
+    # async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    #     self.logger.info("asking api")
+    #     logger.info(f"asking api: {api}")
+    #     try:
+    #         results = self.api.ask_api(api, query)
+    #         return f"Here is the information I found about how to use the API: \n{results}"
+    #     except Exception as e:
+    #         if self.api is None:
+    #             return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
+    #         self.logger.error(str(e))
+    #         return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
     
     @tool(autosummarize=True)
     async def drs_uri_info(self, uris: list) -> list:
