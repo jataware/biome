@@ -1,0 +1,639 @@
+{
+  "openapi":"3.1.0",
+  "info":{
+     "title":"FastAPI",
+     "version":"0.1.0"
+  },
+  "paths":{
+     "/v1/echo":{
+        "put":{
+           "tags":[
+              "health"
+           ],
+           "summary":"Echo",
+           "description":"Echoes incoming POST or PUT body wrapped with in a hello world message JSON dictionary\n\nExample input JSON: {\"key1\": \"string value\", \"key2\": 100}\n\nExample response JSON: {\"Hello\": \"World\", \"body\": {\"key1\": \"string value\", \"key2\": 100}}",
+           "operationId":"echo_v1_echo_put",
+           "parameters":[
+              {
+                 "name":"body",
+                 "in":"query",
+                 "required":false,
+                 "schema":{
+                    "default":{
+                       
+                    },
+                    "title":"Body"
+                 }
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Echo V1 Echo Put"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "post":{
+           "tags":[
+              "health"
+           ],
+           "summary":"Echo",
+           "description":"Echoes incoming POST or PUT body wrapped with in a hello world message JSON dictionary\n\nExample input JSON: {\"key1\": \"string value\", \"key2\": 100}\n\nExample response JSON: {\"Hello\": \"World\", \"body\": {\"key1\": \"string value\", \"key2\": 100}}",
+           "operationId":"echo_v1_echo_put",
+           "parameters":[
+              {
+                 "name":"body",
+                 "in":"query",
+                 "required":false,
+                 "schema":{
+                    "default":{
+                       
+                    },
+                    "title":"Body"
+                 }
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Echo V1 Echo Put"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "get":{
+           "tags":[
+              "health"
+           ],
+           "summary":"Echo",
+           "description":"Echoes incoming POST or PUT body wrapped with in a hello world message JSON dictionary\n\nExample input JSON: {\"key1\": \"string value\", \"key2\": 100}\n\nExample response JSON: {\"Hello\": \"World\", \"body\": {\"key1\": \"string value\", \"key2\": 100}}",
+           "operationId":"echo_v1_echo_put",
+           "parameters":[
+              {
+                 "name":"body",
+                 "in":"query",
+                 "required":false,
+                 "schema":{
+                    "default":{
+                       
+                    },
+                    "title":"Body"
+                 }
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Echo V1 Echo Put"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/healthz":{
+        "get":{
+           "tags":[
+              "health"
+           ],
+           "summary":"Healthz",
+           "description":"Responds if the API server is up and ready to respond\n\nResponse output: \"OK\"",
+           "operationId":"healthz_healthz_get",
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"string",
+                          "title":"Response Healthz Healthz Get"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/harmonize":{
+        "post":{
+           "tags":[
+              "harmonization"
+           ],
+           "summary":"Harmonize",
+           "description":"Analyzes the submitted term variation content, routes to a\nharmonization service, and returns a ranked list (possibly empty)\nof harmonized terms from a standardized dictionary of permissible values.",
+           "operationId":"harmonize_v1_harmonize_post",
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/HarmonizationRequest"
+                    }
+                 }
+              },
+              "required":true
+           },
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HarmonizationResponse"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/cdes/mappings":{
+        "get":{
+           "tags":[
+              "introspection"
+           ],
+           "summary":"Mappings",
+           "description":"Returns mappings of CDE ids to harmonization standards",
+           "operationId":"mappings_v1_cdes_mappings_get",
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Mappings V1 Cdes Mappings Get"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/standards":{
+        "get":{
+           "tags":[
+              "introspection"
+           ],
+           "summary":"Standards",
+           "description":"Returns a JSON dictionary of oraganization to raw standards\ndictionary.  At a high level, standards are agreed upon terms that\nhave a set of permissible values.",
+           "operationId":"standards_v1_standards_get",
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Standards V1 Standards Get"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/cdes/{cde_id}":{
+        "get":{
+           "tags":[
+              "introspection"
+           ],
+           "summary":"Cdes",
+           "description":"Returns meta information for a specific CDE recognized by the api server",
+           "operationId":"cdes_v1_cdes__cde_id__get",
+           "parameters":[
+              {
+                 "name":"cde_id",
+                 "in":"path",
+                 "required":true,
+                 "schema":{
+                    "type":"integer",
+                    "title":"Cde Id"
+                 }
+              }
+           ],
+           "requestBody":{
+              "required":true,
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/HarmonizationRequest"
+                    }
+                 }
+              }
+           },
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HarmonizationResults"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        },
+        "post":{
+           "tags":[
+              "harmonization"
+           ],
+           "summary":"Cdes",
+           "description":"Will eventually harmonize for one specific CDE to support\nperformance benchmarking and harmonization evaluation",
+           "operationId":"cdes_v1_cdes__cde_id__post",
+           "parameters":[
+              {
+                 "name":"cde_id",
+                 "in":"path",
+                 "required":true,
+                 "schema":{
+                    "type":"integer",
+                    "title":"Cde Id"
+                 }
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Cdes V1 Cdes  Cde Id  Post"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/harmonize/datahub":{
+        "post":{
+           "tags":[
+              "harmonization",
+              "datahub"
+           ],
+           "summary":"Harmonize Datahub",
+           "description":"Harmonizes CDEs limited to those for DataHub standards.\nEnables performance benchmarking and harmonization evaluation specific to DataHub.",
+           "operationId":"harmonize_datahub_v1_harmonize_datahub_post",
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/HarmonizationRequest"
+                    }
+                 }
+              },
+              "required":true
+           },
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HarmonizationResponse"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/v1/harmonize/sage":{
+        "post":{
+           "tags":[
+              "harmonization",
+              "sage"
+           ],
+           "summary":"Harmonize Sagebn",
+           "description":"Harmonizes CDEs limited to those for Sage Bionetwork standards.\nEnables performance benchmarking and harmonization evaluation specific to Sage Bionetwork.",
+           "operationId":"harmonize_sagebn_v1_harmonize_sage_post",
+           "requestBody":{
+              "content":{
+                 "application/json":{
+                    "schema":{
+                       "$ref":"#/components/schemas/HarmonizationRequest"
+                    }
+                 }
+              },
+              "required":true
+           },
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HarmonizationResponse"
+                       }
+                    }
+                 }
+              },
+              "422":{
+                 "description":"Validation Error",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "$ref":"#/components/schemas/HTTPValidationError"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/lambda":{
+        "get":{
+           "tags":[
+              "aws"
+           ],
+           "summary":"Aws Lambda",
+           "description":"Endpoint designed for integration with AWS Lambda functions.",
+           "operationId":"aws_lambda_lambda_get",
+           "responses":{
+              "200":{
+                 "description":"Successful Response",
+                 "content":{
+                    "application/json":{
+                       "schema":{
+                          "type":"object",
+                          "title":"Response Aws Lambda Lambda Get"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     }
+  },
+  "components":{
+     "schemas":{
+        "HTTPValidationError":{
+           "properties":{
+              "detail":{
+                 "items":{
+                    "$ref":"#/components/schemas/ValidationError"
+                 },
+                 "type":"array",
+                 "title":"Detail"
+              }
+           },
+           "type":"object",
+           "title":"HTTPValidationError"
+        },
+        "HarmonizationRequest":{
+           "properties":{
+              "body":{
+                 "$ref":"#/components/schemas/HarmonizationVariation"
+              }
+           },
+           "type":"object",
+           "required":[
+              "body"
+           ],
+           "title":"HarmonizationRequest",
+           "examples":[
+              {
+                 "body":{
+                    "cde_id":100,
+                    "cde_version_id":-1,
+                    "data_commons_id":-1,
+                    "string_to_harmonize":"NB"
+                 }
+              }
+           ]
+        },
+        "HarmonizationResponse":{
+           "properties":{
+              "variation":{
+                 "type":"string",
+                 "title":"Variation",
+                 "default":{
+                    
+                 }
+              },
+              "top_harmonizations":{
+                 "items":{
+                    "$ref":"#/components/schemas/HarmonizedTerm"
+                 },
+                 "type":"array",
+                 "title":"Top Harmonizations",
+                 "default":[
+                    
+                 ]
+              },
+              "cde_id":{
+                 "type":"integer",
+                 "title":"Cde Id",
+                 "default":-1
+              },
+              "cde_key":{
+                 "type":"string",
+                 "title":"Cde Key",
+                 "default":""
+              }
+           },
+           "type":"object",
+           "title":"HarmonizationResponse"
+        },
+        "HarmonizationResults":{
+           "properties":{
+              "body":{
+                 "$ref":"#/components/schemas/HarmonizationResponse"
+              }
+           },
+           "type":"object",
+           "required":[
+              "body"
+           ],
+           "title":"HarmonizationResults",
+           "examples":[
+              {
+                 "body":{
+                    "cde_id":-1,
+                    "cde_key":"cde100",
+                    "top_harmonizations":[
+                       
+                    ],
+                    "variation":"original variation term"
+                 }
+              }
+           ]
+        },
+        "HarmonizationVariation":{
+           "properties":{
+              "string_to_harmonize":{
+                 "type":"string",
+                 "title":"String To Harmonize"
+              },
+              "data_commons_id":{
+                 "type":"integer",
+                 "title":"Data Commons Id"
+              },
+              "cde_id":{
+                 "type":"integer",
+                 "title":"Cde Id"
+              },
+              "cde_version_id":{
+                 "type":"string",
+                 "title":"Cde Version Id"
+              }
+           },
+           "type":"object",
+           "required":[
+              "string_to_harmonize",
+              "data_commons_id",
+              "cde_id",
+              "cde_version_id"
+           ],
+           "title":"HarmonizationVariation",
+           "examples":[
+              {
+                 "cde_id":100,
+                 "cde_version_id":-1,
+                 "data_commons_id":-1,
+                 "string_to_harmonize":"NB"
+              }
+           ]
+        },
+        "HarmonizedTerm":{
+           "properties":{
+              "option":{
+                 "type":"string",
+                 "title":"Option",
+                 "default":""
+              },
+              "confidence_score":{
+                 "type":"number",
+                 "title":"Confidence Score",
+                 "default":0.0
+              }
+           },
+           "type":"object",
+           "title":"HarmonizedTerm"
+        },
+        "ValidationError":{
+           "properties":{
+              "loc":{
+                 "items":{
+                    "anyOf":[
+                       {
+                          "type":"string"
+                       },
+                       {
+                          "type":"integer"
+                       }
+                    ]
+                 },
+                 "type":"array",
+                 "title":"Location"
+              },
+              "msg":{
+                 "type":"string",
+                 "title":"Message"
+              },
+              "type":{
+                 "type":"string",
+                 "title":"Error Type"
+              }
+           },
+           "type":"object",
+           "required":[
+              "loc",
+              "msg",
+              "type"
+           ],
+           "title":"ValidationError"
+        }
+     }
+  }
+}
