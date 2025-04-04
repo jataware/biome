@@ -81,7 +81,9 @@ At this time, the following authenticated APIs are supported:
 - Synapse (and nf.synapse.org Data Portal)
   - Register for an API key at: https://accounts.synapse.org/register1?appId=synapse.org
   - Go to User > Account Settings > Personal Access Token to create credentials
-
+- Netrias
+    - Request access from the Netrias team directly
+    
 ## Data Files
 
 Large data files are stored using Git LFS in the `data/` directory. To work with these files:

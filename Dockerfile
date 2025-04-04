@@ -13,21 +13,21 @@ RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy
 COPY --chown=1000:1000 . /jupyter
 RUN chown -R 1000:1000 /jupyter
 
-RUN pip install \
-    beaker-kernel~=1.9.1 \
-    archytas==1.3.11 \
-    requests \
-    google-generativeai \
-    PyYAML \
-    adhoc-api~=2.0.2 \
-    idc-index \
-    seaborn \
-    biopython \
-    boto3 \
-    google-cloud-storage \
-    PyPDF2~=3.0.1
+# RUN pip install \
+#     beaker-kernel~=1.9.1 \
+#     archytas==1.3.11 \
+#     requests \
+#     google-generativeai \
+#     PyYAML \
+#     adhoc-api~=2.0.2 \
+#     idc-index \
+#     seaborn \
+#     biopython \
+#     boto3 \
+#     google-cloud-storage \
+#     PyPDF2~=3.0.1
 
-RUN pip install --no-build-isolation -e /jupyter
+RUN pip install -e /jupyter
 
 RUN mkdir -m 777 /var/run/beaker
 
