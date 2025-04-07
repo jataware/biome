@@ -66,6 +66,30 @@ Notebook workflow and editing
 
 https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
 
+## Data Sources with API credentials
+
+Some sources require API credentials to be set in the `.env` file, see `env.sample` for the applicable sources and variables that need to be set.
+At this time, the following authenticated APIs are supported:
+- AQS (Air Quality System)
+  - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com 
+- FAERS (subset of FDA Adverse Event Reporting System)
+  - Register for an API key at: https://open.fda.gov/apis/authentication/
+- USDA FoodData Central
+  - Register for an API key at: https://fdc.nal.usda.gov/api-key-signup
+- Census ACS (American Community Survey) and SF1
+  - Register for an API key at: https://api.census.gov/data/key_signup.html
+- Synapse (and nf.synapse.org Data Portal)
+  - Register for an API key at: https://accounts.synapse.org/register1?appId=synapse.org
+  - Go to User > Account Settings > Personal Access Token to create credentials
+- Netrias
+    - Request access from the Netrias team directly
+    
+## Data Files
+
+Large data files are stored using Git LFS in the `data/` directory. To work with these files:
+
+1. Install Git LFS: https://git-lfs.com/
+2. After cloning the repository, run: `git lfs pull` to download the actual data files
 
 ## Funding
 

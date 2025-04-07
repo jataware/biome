@@ -1,0 +1,119 @@
+name: "Census American Housing Survey (AHS)"
+cache_key: api_assistant_census_ahs_files
+description: |
+  You have access to knowledge to all the Census Housing survey data, every 2 years from the
+  year 1999 to 2023. You can use this API for answering questions on american housing, specifically their
+  housing conditions (mold, water problems, etc), which can be used to correlate to health conditions,
+  or other purposes.
+more_instructions: !load_txt documentation/docs.md
+examples: !load_yaml documentation/examples.yaml
+cache_body: 
+    default: true 
+documentation: !fill |
+    You have access to a file-based Census American Housing Survey
+    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `{{DATASET_FILES_BASE_PATH}}/census-ahs` directory.
+    The housing files are located and named per year as follows:
+    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv
+    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2021.csv
+    - ...
+    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_1999.csv
+    the more recent onces are at the metropolitan area level, while older ones
+    are only avaiable at the national level. Use whichever year files you need, depending
+    on the user question.
+
+    {more_instructions}
+
+    In particular, we have the household data file, which means we
+    have the OMB13CBSA as a constantly availablecolumn to identify geographic area of survey(
+    State-based Metropolitan and Micropolitan Statistical Areas). Pre-2015 have more geographical
+    column/information. Don't try to use state/county/etc if those are not present on 
+    the census housing file for that year.
+    
+    Try to alreay have planned which columns you need for each, in order to process less columns/excess data since
+    merging both datasets will result in more than 1000 columns. Plan it out, select relevant columns 
+    (list the column names once filtered to knkow which are available),
+    then merge the datasets with those columns selected.
+
+    Once you identify columns of interest available, you can use this csv codebook dictionary that explains what each column code means:
+
+    - {{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv
+
+    from the codebook,you can use the "Variable" column to  match the variable you have access to (say "OMB13CBSA") and use the column "Response Codes" to get
+    the meaning of the codes or the numeric code range values, for other types of variables.
+
+    you may open it and use it at your discretion- usually better once you have some columns of interest
+    in order to select a subset of the codebook, since it is pretty big and confusing.
+
+    Don't try to find the codebook columns without checking if they are present, since
+    the codebook is very exhaustive and contains all the columns or other types of files.
+
+    You can also use knowledge on the usual column codenames from the census to answer questions, but ensure
+    to check the columns names with pandas (python lib) and _always_ check if the column
+    is present in the dataset itself instead of assuming it's present.
+
+    Instead of assuming a specific column exist, or if you wish to match with a specific column pattern,
+    try to compare substrings instead. For example, if you need data for mold, try
+    to check for the 'mold' substring in the column names, since these csv files sometimes append
+    soe prefixes.
+
+    The dataset csv files are a bit big, in the sense that they're in
+    wide format and contain too many columns. When planning what you need, select a subset
+    of the columns needed, including the geo/housing-characteristics columns for your analysis, 
+    but don't include the thousands of columns.
+
+    # Overview of the American Housing Survey (AHS)
+    The American Housing Survey (AHS) is a comprehensive national housing survey conducted by the U.S. Census Bureau. It provides detailed information about housing conditions, household characteristics, and neighborhood features across the United States.
+
+    ## Key Dataset Characteristics
+
+    ### Temporal Coverage
+    - Biennial surveys from 1999 to 2023
+    - Data is collected every two years, allowing for trend analysis
+    - Most recent survey available is from 2023
+
+    ### Geospatial Resolution
+    - Metropolitan area level using Core-Based Statistical Areas (CBSA codes)
+    - Recent surveys (post-2015) use 2013 OMB CBSA codes
+    - Older surveys (pre-2015) use different geographic identifiers (SMSA codes)
+    - County-level data is limited, especially in recent surveys
+    - Harris County/Houston Data: Available in older surveys (1999-2007) using SMSA code 3360, but not found in more recent surveys (2015-2023)
+
+    ### Housing Condition Variables
+    - Mold: Presence of mold in different areas of the home (basement, bathroom, bedroom, kitchen, living room)
+    - Water Leaks: Inside and outside water leaks, including specific sources (roof, plumbing, basement)
+    - Pests: Presence of rodents (rats, mice) and insects
+    - Air Quality: Indoor air quality ratings
+    - HVAC Systems: Heating and cooling system types and adequacy
+
+    ### Health-Related Variables
+    - Asthma: Recent surveys (2015, 2023) include questions about household members diagnosed with asthma
+    - Emergency Room Visits: Data on ER visits due to asthma
+    - Asthma Medication: Some surveys include information about asthma medication use
+
+    ### Household Composition
+    - Number of persons in household
+    - Presence of children (various age groups)
+    - Number of adults and elders
+
+    ### Limitations and Challenges
+    #### Geographic Specificity:
+    - Recent surveys (2015-2023) do not contain Houston/Harris County specific data
+    - Only metropolitan area level data is available in recent surveys
+
+    #### Data Consistency:
+    - Variable definitions and coding schemes change across survey years
+    - Some variables are only available in certain years
+
+    #### Direct Causality:
+    - The survey provides correlational data but cannot establish causal relationships between housing conditions and health outcomes
+
+    #### Sample Size:
+    - When filtering for specific conditions, sample sizes can become small, limiting statistical power
+
+    # Additional Instructions:
+
+    Read the CSV fiels with index_col=False, like so:
+    ```
+    codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+    ```
+    If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!

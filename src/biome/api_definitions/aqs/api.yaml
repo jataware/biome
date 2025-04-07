@@ -1,0 +1,264 @@
+name: "EPA Air Quality System"
+cache_key: api_assistant_aqs_json
+description: |
+    This API is the primary place to obtain row-level data 
+    from the EPA's Air Quality System (AQS) database. AQS contains 
+    ambient air sample data collected by state, local, tribal, and federal 
+    air pollution control agencies from thousands of monitors around the nation.
+    It also contains meteorological data, descriptive information about 
+    each monitoring station (including its geographic location and its operator),
+    and information about the quality of the samples. Note, AQS does not contain
+    real-time air quality data (it can take 6 months from the time 
+    data is collected until it is in AQS). For real-time data, please use
+    the AirNow API.
+raw_documentation: !load_txt documentation/aqs.json
+examples: !load_yaml documentation/examples.yaml
+cache_body: 
+    default: true 
+documentation: !fill |
+    # OpenAPI Spec JSON:
+    {raw_documentation}
+
+    # Additional Instructions:
+    
+    This API is through OpenAPI Spec (Swagger). You will be provided the schema. 
+    All requests go to the following URL: https://aqs.epa.gov/data/api
+    That is the base URL for all requests. 
+
+    To use the AQS API always retrieve the email/key credentials from environment variables:
+    - email: os.environ.get("API_EPA_AQS_EMAIL")
+    - api_key: os.environ.get("API_EPA_AQS")
+    Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variables.
+
+    Ensure you know the fields that come back from the OpenAPI spec in order to process the AQS data.
+    
+    Daily/yearly data can only be accessed one year at a time. If working for that in year/decade ranges, prefer to use the annualData endpoints, as the daily data may be too large to fit into context.
+    If the user requests data for a year range, you will need to make multiple requests to the API- potentially sampling in between, or creating averages, in order to not make requests for every single year in the range.
+    The earliest sample in the data set is from 1957. Year 1980 marks the beginning of nationally consistent operational and quality assurance procedures.
+
+    Measured entities in the AQS data set are referred to as parameters (which includes pollutants/substances), and use integer codes specific to AQS.
+
+    If a monitor is scheduled to collect data and does not it will contain `null` data. This is a placeholder to let EPA know that more data will not be forthcoming.    AQS does place absolute limits on the values that can be submitted.
+    However, these are fairly liberal limits- for many parameters, negative values are acceptable.
+    AQS has a nominal quarterly reporting deadline: data must be reported by 90 days after the end of the calendar quarter in which they are collected.
+
+    If you need to inspect the data of a JSON response before processing, and you're dealing with annual data, or multi-daily data, or
+    for a geographic region that could yield too much data to process (or fit into an LLM context window), 
+
+    better use this endpoint:
+    ```
+    /metaData/fieldsByService?email={{email}}&key={{key}}&service=annualData
+    ```
+    (example above is checking shape of annualData endpoint). It will provide fields documentation for each property in the response.
+    If you use `print(response_data)` on a huge JSON response, you will not be able to proceed- you can also try checking the length as string,
+    and if that's too long, inspect whatever amount of characters that would be enough.
+    That is, never do:
+    ```
+    data = response.json()
+    print(data)
+    ```
+    instead, either use fieldsByService endpoint as described earlier, or use the Example 3 below (in the #Examples section) to generate a schema and inspect the data.
+
+    IMPORTANT: `parameter_name` is not a property in the respponse usually, check `parameter` or `parameter_code` in responses first instead!
+
+    # Output Format for the AQS API - JSON
+    The only output format available from the services is JSON. This is in conformity with the 18f API standards for government.
+
+    The JSON response has two top-level elements. A header and a body. The header contains information about the request and the body contains the data.
+
+    The header contains the following elements:
+
+    - `status`. "SUCCESS" if the request returned data. "FAILED" if the request could not be processed. "No data matched your selection" if the request was processed but resulted in no data.
+    - `request_time`. The date and time (at the location of the server) when the request was received.
+    - `url`. The original URL that was submitted to make the request.
+    - `row`. The number of rows of data in the body object.
+    - `errors`. Any errors encountered when attempting to respond to the request.
+    The body is an array with one object per data row. The contents of the object will vary based on the request made. (E.g. the columns of data returned are different for each query.
+
+    Here is a sample of the output of a Raw Data request with one data point:
+    ```
+        {{
+            "Header": [
+            {{
+                "status": "success",
+                "request_time": "2018-06-13T07:45:01-04:00",
+                "url": "https://...",
+                "rows": 1
+            }}
+            ],
+            "Body": [
+            {{
+                "state_code": "01",
+                "county_code": "073",
+                "site_number": "0023",
+                "parameter_code": "88101",
+                "poc": 1.0,
+                "latitude": 33.0,
+                "longitude": -86.0,
+                "datum": "WGS84",
+                "parameter_name": "PM2.5 - Local Conditions",
+                "date_local": "2017-04-01",
+                "time_local": "00:00",
+                "date_gmt": "2017-04-01",
+                "time_gmt": "06:00",
+                "sample_measurement": 6.2,
+                "unit_of_measure": "Micrograms/cubic meter (LC)",
+                "detection_limit": 2.0,
+                "uncertainty": null,
+                "qualifiers": null,
+                "method_type": "FRM",
+                "method_code": "142",
+                "method_name": "BGI Models PQ200-VSCC or PQ200A-VSCC - Gravimetric",
+                "state_name": "Alabama",
+                "county_name": "Jefferson",
+                "date_of_last_change": "2017-05-30",
+                "cbsa_code": "13820"
+            }}
+            ]
+        }}
+    ```
+
+    # Error Handling and Status Codes
+    If the API is able to parse your request it will return the JSON described above and an HTTP status of 200.
+
+    If the API is not able to parse your request it will return a status code of 400 and only the header, which will include an array of error messages instead of a row count.
+    For example:
+    ```
+        {{
+        "Header": [
+        {{
+            "status": "Failed",
+            "request_time": "2018-06-13T08:05:46.588-04:00",
+            "url": "https://...",
+            "error": [
+            "value is missing or the value is empty: param"
+            ]
+            }}
+        ],
+        "Body": []
+        }}
+    ```
+
+    If the API is able to parse your request but no data matches your selections, it will return the 
+    JSON header and an HTTP status of 200. The row count will be zero, 
+    the status will be a message that no data matched your selection criteria,
+    and the body will be empty.
+    ```
+    {{
+        "Header": [
+        {{
+            "status": "No data matched your selection",
+            "request_time": "2018-06-13T10:15:42-04:00",
+            "url": "https://...",
+            "rows": 0
+        }}
+        ],
+        "Body": []
+    }}
+    ```
+
+    # Request Limits and Terms of Service
+    The API has the following limits imposed on request size:
+
+    - Length of time. All services (except Monitor) must have the end date (edate field) be in the same year as the begin date (bdate field).
+    - Number of parameters. Most services allow for the selection of multiple parameter codes (param field). A maximum of 5 parameter codes may be listed in a single request.
+
+    Please adhere to the following when using the API:
+
+    - _Limit the size of queries_. Our database contains billions of values and you may request more than you intend. If you are unsure of the amount of data, start small and work your way up. We request that you limit queries to 1,000,000 rows of data each. You can use the "observation count" field on the annualData service to determine how much data exists for a time-parameter-geography combination. If you have any questions or need advice, please contact us.
+    - _Limit the frequency of queries_. Our system can process a limited load. If scripting requests, please wait for one request to complete before submitting another and do not make more than 10 requests per minute. Also, we request a pause of 5 seconds between requests and adjust accordingly for response time and size.
+    If you violate these terms, we may disable your account without notice (but we will be in contact via the email address provided).
+
+    # Usage tips
+    This section contains suggestions for completing certain data related tasks and links to software tools using the API.
+
+    - Determine if or how much data exists for a time-parameter-geography combination:
+        - Retrieve data using the annualData service.
+        - If no records are returned, we do not have the data.
+        - If records are returned, use the observation count to determine the temporal and geographic distribution of the data.
+
+    - Monthly averages:
+        - AQS does not routinely calculate monthly aggregate statistics.
+        - If you need these, you must calculate them yourself.
+        - These can be calculated from the sample data or the daily data without loss of fidelity.
+
+    - Determine a single value for a site with collocated monitors:
+        - Many sites will have collocated monitors - monitors collecting the same parameter at the same time.
+        - The API currently provides only monitor level values. (We anticipate adding site-level values at some point.)
+        - For some criteria pollutants (PM2.5, ozone, lead, and NO2), the regulations define procedures for defining a single site-level value.
+        - For other pollutants, determining a single site-level value is left to the investigator.
+
+    # More Details
+    ## API Structure and Capabilities
+    - The EPA AQS API provides access to air quality data from monitoring stations across the US
+    - Data is available at multiple temporal resolutions: annual, quarterly, daily, and sample-level.
+    - Data can be queried at various geographic levels: state, county, site, CBSA, and bounding box
+    - The API returns data in JSON format with a standard structure
+    - Key pollutants relevant to asthma (ozone, PM2.5, NO2, SO2, CO) are available through the API
+    - Data can be used to analyze both acute exposures (daily data) and chronic exposures (annual data)
+    - Seasonal patterns in air quality can be correlated with seasonal patterns in asthma exacerbations
+    - The API enables spatial analysis to identify potential hotspots of poor air quality
+
+    ## Data Integration Strategies
+    - Geographic alignment: Use census tract or ZIP code as common geographic units
+    - Temporal alignment: Monthly aggregation captures seasonal patterns while managing data volume
+    - Spatial interpolation can estimate air quality values between monitoring stations
+    - Population-weighted averages can be used when aggregating to larger geographic areas
+    - A standardized spatial grid can facilitate integration with other environmental datasets
+
+    ## Key Parameters for Asthma Research
+    The API provides access to several air pollutants known to affect respiratory health:
+    ```
+    Parameter Code	Parameter Name	Relevance to Asthma
+    44201	Ozone	Major trigger for asthma attacks
+    88101	PM2.5	Can penetrate deep into lungs
+    81102	PM10	Can irritate airways
+    42602	Nitrogen Dioxide (NO2)	Common in vehicle emissions
+    42401	Sulfur Dioxide (SO2)	Industrial emissions linked to respiratory issues
+    42101	Carbon Monoxide	(CO)    Affects oxygen transport
+    ```
+
+    ## Key Endpoints and Parameters
+    The API offers several endpoint categories:
+
+    - Monitoring Sites: monitors/byCounty - Returns information about monitoring stations
+    - Daily Data: dailyData/byCounty - Daily measurements for parameters
+    - Annual Data: annualData/byCounty - Yearly aggregated measurements
+    - Sample Data: sampleData/byCounty - Individual sample measurements
+    - Metadata: Various endpoints for parameter codes, classes, etc.
+
+    All data requests require:
+    - Geographic parameters (state/county codes)
+    - Date parameters (bdate/edate in YYYYMMDD format)
+    - Parameter code for the pollutant
+
+    # Implementation Challenges and Solutions
+    - Date Parameter Requirements: Despite documentation suggesting otherwise, all data endpoints require explicit date parameters (bdate and edate), not just the year parameter.
+    - Data Volume Management: Harris County has numerous monitoring stations (we found 24,532 daily ozone records for 2022 alone), requiring efficient data aggregation strategies.
+    - Parameter Identification: The API requires specific parameter codes rather than names, necessitating lookup of these codes before querying data.
+
+    The EPA AQS API provides rich, detailed air quality data that can be invaluable 
+    for researching environmental factors affecting childhood asthma (and others).
+    By combining this data with health outcome data from other sources, researchers 
+    can develop comprehensive analyses of how air quality impacts respiratory health 
+    in specific geographic areas like a county or region.
+    The API's structure allows for flexible querying by location, time period, and 
+    specific pollutants, making it a powerful tool for environmental health research.
+    However, users should be aware of specific parameter requirements and prepare 
+    for handling large volumes of data when working with densely monitored areas.
+
+    Note: If/when using the `metaData/isAvailable` endpoint to check if the API is available,
+    use this sample response as guide:
+    ```
+    {{
+        "Header": [
+            {{
+                "status": "API service is up and running healthy. Status: connection_pool: size: 5, connections: 1, in use: 1, waiting_in_queue: 0",
+            "request_time": "2025-03-21T08:21:41-04:00",
+            "url": "http://aqs.epa.gov/api/metaData/isAvailable?email={{email}}.com&key={{key}}"
+            }}
+        ],
+        "Data": []
+    }}
+    ```
+    Never simulate this API- if it is not available ask the user how to proceed.

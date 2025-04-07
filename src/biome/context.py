@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any, Dict, List
+import os
 
 from beaker_kernel.lib.context import BaseContext
 from beaker_kernel.lib.subkernels.python import PythonSubkernel
@@ -24,9 +25,14 @@ class BiomeContext(BaseContext):
         This runs on setup and invokes the `procedures/python3/setup.py` script to 
         configure the environment appropriately.
         """
-        command = "\n".join(
-            [
-            self.get_code("setup"),
-            ]
-        )
+        command = self.get_code("setup", {
+            "aqs_api_key": os.environ.get("API_EPA_AQS"),
+            "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),
+            "openfda_faers_api_key": os.environ.get("API_OPENFDA"),
+            "usda_fdc_api_key": os.environ.get("API_USDA_FDC"),
+            "census_api_key": os.environ.get("API_CENSUS"),
+            "cdc_tracking_network_api_key": os.environ.get("API_CDC_TRACKING_NETWORK"),
+            "synapse_api_key": os.environ.get("API_SYNAPSE"),
+            "netrias_api_key": os.environ.get("NETRIAS_KEY"),
+        })
         await self.execute(command)

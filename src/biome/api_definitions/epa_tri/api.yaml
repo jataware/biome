@@ -1,0 +1,100 @@
+name: "EPA Toxic Release Inventory (TRI)"
+cache_key: api_assistant_epa_tri_files
+description: |
+  The Toxics Release Inventory (TRI) is a resource for learning about toxic chemical 
+  releases and pollution prevention activities reported by industrial and federal 
+  facilities. TRI data support informed decision-making by communities, 
+  government agencies, companies, and others.
+examples: !load_yaml documentation/examples.yaml
+cache_body: 
+    default: true 
+documentation: !fill |
+    You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv` file.
+    The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.
+    It also contains geospatial information such as latitude, longitude, state/zip, and even EPA region.
+
+    # Overview of the EPA TRI Dataset
+    TRI tracks the waste management of certain toxic chemicals that may pose a threat to human health and the environment. U.S. facilities in different industry sectors must report annually how much of each chemical they release into the environment and/or managed through recycling, energy recovery and treatment, as well as any practices implemented to prevent or reduce the generation of chemical waste. 
+
+    Contains information about toxic chemical releases reported by industrial and federal facilities; key features of this dataset include:
+    - Facility information: Names, IDs, geographic coordinates, and locations
+    - Chemical data: Chemical names and release amounts (in pounds)
+    - Geographic information: Latitude, longitude, state, county, EPA region, ZIP codes, and Census Block Groups
+    - Risk metrics: RSEI (Risk-Screening Environmental Indicators) Hazard scores
+    - Temporal coverage: 10 years of data (2014-2023)
+
+    In general, chemicals covered by the TRI Program are those that cause:
+    - Cancer or other chronic human health effects
+    - Significant adverse acute human health effects
+    - Significant adverse environmental effects
+
+    There are currently 799 individually listed chemicals and 33 chemical categories covered by the TRI Program. Facilities that manufacture, process or otherwise use these chemicals in amounts above established levels must submit annual reporting forms for each chemical. Note that the TRI chemical list doesn't include all toxic chemicals used in the U.S.
+
+    The Toxics Release Inventory (TRI) is a resource for learning about toxic chemical releases and pollution prevention activities reported by industrial and federal facilities. TRI data support informed decision-making by communities, government agencies, companies, and others.
+    
+    ## Data Dictionary:
+    - "TRI Facility Name": Name of the facility reporting chemical releases
+    - "TRI Facility ID": Unique identifier for the facility
+    - "Year": Reporting year (2014-2023)
+    - "Census Block Group": Geographic identifier for census block group
+    - "ZIP Code": Postal code of the facility
+    - "City": City where the facility is located
+    - "County": County where the facility is located- format: "COUNTY-NAME-ONLY, STATE 2-DIGIT CODE" (value in all caps)
+    - "State": State where the facility is located
+    - "EPA Region": EPA administrative region (numbered 1-10)
+    - "Latitude"/"Longitude": Geographic coordinates of the facility
+    - "Chemical": Name of the toxic chemical being reported
+    - "Releases (lb)": Total amount of chemical released to the environment in pounds
+    - "Waste Managed (lb)": Total amount of chemical waste managed in pounds
+    - "RSEI Hazard": Risk-Screening Environmental Indicators score, which measures the relative hazard of chemicals
+
+    ## Working with the Data:
+    1. When loading the data, ensure you specify the index_col=False parameter, since pandas is inferring the wrong index column and shifting the data without it:
+       ```python
+       import pandas as pd
+       tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+       ```
+       
+    2. Common data analysis tasks:
+       - Filter by year: `tri_data[tri_data['Year'] == 2023]`
+       - Filter by chemical: `tri_data[tri_data['Chemical'] == 'Lead']`
+       - Filter by state: `tri_data[tri_data['State'] == 'California']`
+       - Find top polluters: `tri_data.sort_values('Releases (lb)', ascending=False).head(10)`
+       - Analyze trends over time: `tri_data.groupby('Year')['Releases (lb)'].sum().plot()`
+       
+    3. Geospatial analysis:
+       - Create a map of facilities: Use latitude/longitude with libraries like folium or geopandas
+       - Regional analysis: Group by EPA Region or State to compare pollution levels
+       
+    4. Data quality considerations:
+       - Check for missing values: `tri_data.isnull().sum()`
+       - Some chemicals may have different reporting thresholds
+       - RSEI Hazard scores provide context on relative toxicity beyond just release amounts
+    
+    Since this dataset contains a column for EPA Region, we can use this when relating to other more anonymous data sources
+    that only use these properties- but do store latitude/longitude to correlate with the other data sources that have a higher resolution.
+
+    When checking for respiratory chemicals, always include the CAS number, not just the name- either that or check that the
+    non-CAS-included name you use is a substring of the value in the Chemical column when trying to make a match.
+    Example Chemical column values: Manganese compounds (N450), Ammonia (7664-41-7), Nitrate compounds (water dissociable) (N511)
+
+    # Web Documentation
+
+    ## What industries are included in the TRI?
+    Facilities that report to TRI are typically larger facilities involved in manufacturing, metal mining, electric power generation, chemical manufacturing and hazardous waste treatment. Not all industry sectors are covered by the TRI Program, and not all facilities in covered sectors are required to report to TRI.
+
+    The TRI Program is also different because the data it collects are:
+
+    - annual, collected each July and made publicly available online;
+    - multimedia, reflecting chemical emissions to air, water and land; and 
+    - broad, encompassing source reduction and other pollution prevention practices. 
+
+    Numerous EPA programs use TRI data and information to:
+
+    - provide a more complete picture of environmental performance at facilities and corporations;
+    - identify facilities that are potentially out of compliance with regulations or operating permits;
+    - support technical analysis for regulation;
+    - improve data quality across EPA; and
+    - develop program priorities and projects.
+
+    Under various environmental laws (identified in the figure below), other EPA programs also collect information about regulated chemicals. Users looking for information not available in the TRI can check the databases associated with these other programs. The Clean Air Act's National Emissions Inventory (NEI), for example, can be used to find estimates of air releases for facilities that do not report to the TRI or for mobile sources such as cars, which are not covered by the TRI.

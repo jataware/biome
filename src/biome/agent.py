@@ -7,17 +7,15 @@ import asyncio
 import os
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
-from typing import Any
+from typing import Any, List
 
 from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
 
-import google.generativeai as genai
-from google.generativeai import caching
-
 from pathlib import Path
 from adhoc_api.tool import AdhocApi
 from adhoc_api.loader import load_yaml_api
+from adhoc_api.uaii import gpt_4o, o3_mini, claude_37_sonnet, gemini_15_pro
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +62,11 @@ class BiomeAgent(BaseAgent):
     """
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
         self.root_folder = Path(__file__).resolve().parent
         
         api_def_dir = os.path.join(self.root_folder, 'api_definitions')
+        data_dir = (self.root_folder / ".." / "..").resolve() / "data"
+        print(f"data_dir: {data_dir}")
 
         # Get API specs and directories in one pass
         self.api_specs = []
@@ -77,13 +76,26 @@ class BiomeAgent(BaseAgent):
             if os.path.isdir(api_dir):
                 api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
                 api_spec = load_yaml_api(api_yaml)
+
+                # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
+                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
+
+                if 'examples' in api_spec and isinstance(api_spec['examples'], list):
+                    for example in api_spec['examples']:
+                        if 'code' in example and isinstance(example['code'], str):
+                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
+                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+
                 self.api_specs.append(api_spec)
                 self.api_directories[api_spec['name']] = d
 
         # Note: not all providers support ttl_seconds
         ttl_seconds = 1800
-        drafter_config_gemini={'provider': 'google', 'model': 'gemini-1.5-pro-001', 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic={'provider': 'anthropic', 'model': 'claude-3-5-sonnet-latest', 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        drafter_config_gemini =    {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        contextualizer_config =    {**gpt_4o, 'api_key': os.environ.get("OPENAI_API_KEY")}
         specs = self.api_specs
 
         instructions_dir = os.path.join(self.root_folder, 'instructions')
@@ -102,7 +114,13 @@ class BiomeAgent(BaseAgent):
         self.logger = MessageLogger(self.context)
 
         try:
-            self.api = AdhocApi(logger=logger, drafter_config=[drafter_config_anthropic, drafter_config_gemini], apis=specs)
+            self.api = AdhocApi(
+                apis=specs,
+                drafter_config=[drafter_config_anthropic, drafter_config_gemini], 
+                curator_config=curator_config,
+                contextualizer_config=contextualizer_config,
+                logger=logger,
+            )
         except ValueError as e:
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
@@ -129,7 +147,7 @@ class BiomeAgent(BaseAgent):
                 return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             self.logger.error(str(e))
             return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
-
+    
     @tool()
     @with_docstring('consult_api_docs.md')
     async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
@@ -144,8 +162,9 @@ class BiomeAgent(BaseAgent):
             self.logger.error(str(e))
             return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
     
-    @tool(autosummarize=True)
-    async def drs_uri_info(self, uris: list) -> list:
+
+    @tool()
+    async def drs_uri_info(self, uris: List[str]) -> List[dict]:
         """
         Get information about a DRS URI.
         Data Repository Service (DRS) URIs are used to provide a standard way to locate and access data objects in a cloud environment.
@@ -178,18 +197,19 @@ class BiomeAgent(BaseAgent):
 
         return responses
     
-    @tool(autosummarize=True)
-    async def add_example(self, api: str, code: str, description: str) -> str:
+    @tool()
+    async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
         """
-        Add a successful code example to the API's examples.md documentation file.
+        Add a successful code example to the API's examples.yaml documentation file.
         This tool should be used after successfully completing a task with an API to capture the working code for future reference.
 
-        The API names must match one of the names in the the agent's API list.
+        The API names must match one of the names in the agent's API list.
 
         Args:
             api (str): The name of the API the example is for
             code (str): The working, successful code to add as an example
-            description (str): A brief description of what the example demonstrates
+            query (str): A brief description of what the example demonstrates
+            notes (str, optional): Additional notes about the example, such as implementation details
 
         Returns:
             str: Message indicating success or failure of adding the example
@@ -199,38 +219,58 @@ class BiomeAgent(BaseAgent):
         
         try:
             api_folder = self.api_directories[api]
-            # Construct path to examples.md file
-            examples_path = os.path.join(self.root_folder, "api_definitions", api_folder, "documentation", "examples.md")
+            # Construct path to examples.yaml file
+            examples_path = os.path.join(self.root_folder, "api_definitions", api_folder, "documentation", "examples.yaml")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
-
-            # Create or append to examples.md
-            mode = 'a' if os.path.exists(examples_path) else 'w'
-            with open(examples_path, mode) as f:
-                if mode == 'w':
-                    f.write("# Examples\n\n")
+            
+            # Create new example entry as a dictionary
+            new_example = {
+                "query": query,
+                "code": code  # Will be formatted with block scalar style
+            }
+            
+            # Add notes if provided
+            if notes:
+                new_example["notes"] = notes
                 
-                # Get next example number
-                example_num = 1
-                if mode == 'a':
-                    with open(examples_path, 'r') as read_f:
-                        for line in read_f:
-                            if line.startswith('## Example'):
-                                example_num += 1
-
-                # Add the new example
-                f.write(f"\n\n## Example {example_num}: {description}\n\n")
-                f.write("```\n")
-                f.write(code)
-                f.write("\n```\n")
-
-            return f"Successfully added example {example_num} to {examples_path}"
+            # Read existing examples if file exists
+            examples = []
+            if os.path.exists(examples_path) and os.path.getsize(examples_path) > 0:
+                import yaml
+                with open(examples_path, 'r') as f:
+                    examples = yaml.safe_load(f) or []
+                    if not isinstance(examples, list):
+                        examples = []
+            
+            # Add new example
+            examples.append(new_example)
+            
+            # Write updated examples back to file
+            import yaml
+            
+            # Custom YAML dumper class that always uses block style for multiline strings
+            class BlockStyleDumper(yaml.SafeDumper):
+                pass
+            
+            # Always use block style (|) for strings with newlines
+            def represent_str_as_block(dumper, data):
+                if '\n' in data:
+                    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+                return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+            
+            BlockStyleDumper.add_representer(str, represent_str_as_block)
+            
+            with open(examples_path, 'w') as f:
+                yaml.dump(examples, f, Dumper=BlockStyleDumper, sort_keys=False, default_flow_style=False)
+                
+            return f"Successfully added example to {examples_path}"
 
         except Exception as e:
             self.logger.error(str(e))
             raise ValueError(f"Failed to add example: {str(e)}")
 
 
-    @tool(autosummarize=True)
+    @tool()
     async def get_available_apis(self) -> list:
         """
         Get list of APIs that the agent is designed to interact with.
@@ -241,7 +281,7 @@ class BiomeAgent(BaseAgent):
         return self.api_list
 
 
-    @tool(autosummarize=True)
+    @tool()
     async def extract_pdf(self, pdf_path: str, agent: AgentRef) -> str:
         """
         Extract the text from a PDF file using PyPDF2. Note that if this tool

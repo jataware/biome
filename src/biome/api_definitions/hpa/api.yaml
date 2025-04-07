@@ -32,11 +32,8 @@ description: |
     In addition the Human Protein Atlas has been appointed Global Core Biodata Resource (GCBR) 
     by the Global Biodata Coalition. The Human Protein Atlas consortium is mainly funded by the 
     Knut and Alice Wallenberg Foundation.
-raw_documentation: !load documentation/hpa_docs.md
-examples: !load documentation/examples.md
+raw_documentation: !load_txt documentation/hpa_docs.md
+examples: !load_yaml documentation/examples.yaml
 cache_key: "api_assistant_pdc_graphql"
-documentation: |
+documentation: !fill |
     {raw_documentation}
-
-        Here are some examples of how to use the API:
-    {examples}
