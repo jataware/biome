@@ -201,7 +201,7 @@ class BiomeAgent(BaseAgent):
     async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
         """
         Add a successful code example to the API's examples.yaml documentation file.
-        This tool may be used after successfully completing a task with an API to capture the working code for future reference.
+        This tool should be used after successfully completing a task with an API to capture the working code for future reference.
 
         The API names must match one of the names in the agent's API list.
 
@@ -222,11 +222,11 @@ class BiomeAgent(BaseAgent):
             # Construct path to examples.yaml file
             examples_path = os.path.join(self.root_folder, "api_definitions", api_folder, "documentation", "examples.yaml")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
-
-            # Create new example entry
+            
+            # Create new example entry as a dictionary
             new_example = {
                 "query": query,
-                "code": code
+                "code": code  # Will be formatted with block scalar style
             }
             
             # Add notes if provided
@@ -247,8 +247,21 @@ class BiomeAgent(BaseAgent):
             
             # Write updated examples back to file
             import yaml
+            
+            # Custom YAML dumper class that always uses block style for multiline strings
+            class BlockStyleDumper(yaml.SafeDumper):
+                pass
+            
+            # Always use block style (|) for strings with newlines
+            def represent_str_as_block(dumper, data):
+                if '\n' in data:
+                    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+                return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+            
+            BlockStyleDumper.add_representer(str, represent_str_as_block)
+            
             with open(examples_path, 'w') as f:
-                yaml.dump(examples, f, sort_keys=False, default_flow_style=False)
+                yaml.dump(examples, f, Dumper=BlockStyleDumper, sort_keys=False, default_flow_style=False)
                 
             return f"Successfully added example to {examples_path}"
 

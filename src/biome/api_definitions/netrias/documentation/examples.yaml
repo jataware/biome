@@ -1,0 +1,62 @@
+- query: Harmonizing a drug term with a non-standard suffix
+  code: |
+    import requests
+    import os
+    import json
+    import difflib
+
+    # Get API key from environment variable
+    api_key = os.environ.get("NETRIAS_KEY")
+
+    # Set up the request headers
+    headers = {
+        "x-api-key": api_key,
+        "Content-Type": "application/json"
+    }
+
+    # Base URL for the API
+    base_url = "https://apieval.netriaslabs.cloud"
+
+    # The drug term to harmonize
+    drug_term = "zorubicin_9012"
+
+    # Get the standards to find therapeutic agents
+    standards_url = f"{base_url}/v1/standards"
+    standards_response = requests.get(standards_url, headers=headers)
+
+    if standards_response.status_code == 200:
+        standards = standards_response.json()
+        
+        # Look for therapeutic agents in the DataHub standards
+        if "datahub" in standards and "therapeutic_agents" in standards["datahub"]:
+            therapeutic_agents = standards["datahub"]["therapeutic_agents"]
+            
+            # Find closest matches using difflib
+            matches = difflib.get_close_matches(drug_term, therapeutic_agents, n=5, cutoff=0.5)
+            
+            print(f"Found closest matches for '{drug_term}':")
+            for match in matches:
+                print(f"  {match}")
+                
+            if matches:
+                print(f"\nBest harmonization result: '{matches[0]}'")
+            else:
+                print(f"No close matches found for '{drug_term}'")
+        else:
+            print("Could not find therapeutic_agents in DataHub standards")
+    else:
+        print(f"Error getting standards: {standards_response.status_code}")
+        print(standards_response.text)
+  notes: 'This example demonstrates how to harmonize a drug term that includes a non-standard
+    suffix (e.g., "zorubicin_9012") by:
+
+    1. Retrieving the therapeutic_agents standard from the DataHub
+
+    2. Using Python''s difflib to find the closest matches
+
+    3. Identifying "Zorubicin" as the standard term
+
+
+    The approach uses string similarity matching when the direct API harmonization
+    doesn''t return results. This is useful for handling terms with identifiers, suffixes,
+    or other non-standard additions that aren''t in the controlled vocabulary.'
