@@ -40,6 +40,12 @@ If you wish to run Biome locally, outside of Docker you can install `beaker-kern
 
 ### Initialization
 
+First, fetch the large files from git lfs with:
+
+```
+git lfs pull
+```
+
 Starting the project with the following command: 
 ```
 docker compose up -d
