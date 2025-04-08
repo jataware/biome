@@ -25,9 +25,9 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "beaker-kernel~=1.9.3",
+  "beaker-kernel~=1.9.4",
   "archytas~=1.3.18",
-  "adhoc-api~=2.2.0",  
+  "adhoc-api~=2.3.0",
   "requests",
   "PyYAML",
   "idc-index",
