@@ -129,6 +129,12 @@ class BiomeAgent(BaseAgent):
             self.__doc__ = template.format(api_list=self.api_list, instructions=self.instructions)
             self.add_context(self.__doc__)
 
+    def log(self, event_type: str, content = None) -> None:
+        self.context.beaker_kernel.log(
+            event_type=f"agent_{event_type}",
+            content=content
+        )
+
     @tool()
     @with_docstring('draft_api_code.md')
     async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
