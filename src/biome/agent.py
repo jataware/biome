@@ -24,20 +24,15 @@ BIOME_URL = "http://biome_api:8082"
 JSON_OUTPUT = False
 
 class MessageLogger():
-    def __init__(self, context):
-        self.context = context 
+    def __init__(self, agent_log_function, print_logger):
+        self.agent_log = agent_log_function
+        self.print_logger = print_logger
     def info(self, message):
-        self.context.send_response("iopub",
-            "gemini_info", {
-                "body": message
-            },
-        ) 
+        self.agent_log("Drafting Agent", message)
     def error(self, message):
-        self.context.send_response("iopub",
-            "gemini_error", {
-                "body": message
-            },
-        ) 
+        self.print_logger.error(message)
+    def debug(self, message):
+        self.print_logger.debug(message)
 
 # Load docstrings at module level
 def load_docstring(filename):
@@ -63,7 +58,7 @@ class BiomeAgent(BaseAgent):
 
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         self.root_folder = Path(__file__).resolve().parent
-        
+
         api_def_dir = os.path.join(self.root_folder, 'api_definitions')
         data_dir = (self.root_folder / ".." / "..").resolve() / "data"
         print(f"data_dir: {data_dir}")
@@ -107,19 +102,19 @@ class BiomeAgent(BaseAgent):
 
         super().__init__(context, tools, **kwargs)
         sleep(5)
-        
+
         # Configure root logger
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
-        
-        self.logger = MessageLogger(self.context)
+
+        self.logger = MessageLogger(self.log, logger)
 
         try:
             self.api = AdhocApi(
                 apis=specs,
-                drafter_config=[drafter_config_anthropic, drafter_config_gemini], 
+                drafter_config=[drafter_config_anthropic, drafter_config_gemini],
                 curator_config=curator_config,
                 contextualizer_config=contextualizer_config,
-                logger=logger,
+                logger=self.logger,
             )
         except ValueError as e:
             self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
@@ -137,21 +132,19 @@ class BiomeAgent(BaseAgent):
     @tool()
     @with_docstring('draft_api_code.md')
     async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        self.logger.info("using api")
         logger.info(f"using api: {api}")
-        try: 
+        try:
             code = self.api.use_api(api, goal)
             return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
-            self.logger.error(str(e))
-            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal." 
-    
+            logger.error(str(e))
+            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
+
     @tool()
     @with_docstring('consult_api_docs.md')
     async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        self.logger.info("asking api")
         logger.info(f"asking api: {api}")
         try:
             results = self.api.ask_api(api, query)
@@ -159,7 +152,7 @@ class BiomeAgent(BaseAgent):
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
-            self.logger.error(str(e))
+            logger.error(str(e))
             return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
     
 
