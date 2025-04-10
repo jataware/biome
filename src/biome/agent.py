@@ -322,7 +322,7 @@ class BiomeAgent(BaseAgent):
 name: {datasource}
 description: {formatted_description}
 examples: !load_yaml documentation/examples.yaml
-cache_key: "api_assistant_{datasource_folder}"
+cache_key: "api_assistant_{datasource_name}"
 raw_documentation: !load_txt documentation/schema.json
 
 documentation: !fill |
