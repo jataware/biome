@@ -23,6 +23,8 @@ BIOME_URL = "http://biome_api:8082"
 
 JSON_OUTPUT = False
 
+DATASOURCES_FOLDER = "datasources"
+
 class MessageLogger():
     def __init__(self, agent_log_function, print_logger):
         self.agent_log = agent_log_function
@@ -54,12 +56,15 @@ CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
 class BiomeAgent(BaseAgent):
     """
     You are the Biome Agent, a chat assistant that helps users with biomedical research tasks.
-    """
 
+    A 'datasource' is defined as an API or dataset or general collection of knowledge that you have access to.
+
+    An API should be considered a type of datasource.
+    """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         self.root_folder = Path(__file__).resolve().parent
 
-        api_def_dir = os.path.join(self.root_folder, 'api_definitions')
+        api_def_dir = os.path.join(self.root_folder, DATASOURCES_FOLDER)
         data_dir = (self.root_folder / ".." / "..").resolve() / "data"
         print(f"data_dir: {data_dir}")
 
@@ -117,7 +122,7 @@ class BiomeAgent(BaseAgent):
                 logger=self.logger,
             )
         except ValueError as e:
-            self.add_context(f"The APIs failed to load for this reason: {str(e)}. Please inform the user immediately.")
+            self.add_context(f"The datasources failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
         self.api_list = [spec['name'] for spec in specs]
@@ -199,13 +204,13 @@ class BiomeAgent(BaseAgent):
     @tool()
     async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
         """
-        Add a successful code example to the API's examples.yaml documentation file.
-        This tool should be used after successfully completing a task with an API to capture the working code for future reference.
+        Add a successful code example to the datasource's examples.yaml documentation file.
+        This tool should be used after successfully completing a task with an datasource to capture the working code for future reference.
 
-        The API names must match one of the names in the agent's API list.
+        The API names must match one of the names in the agent's datasource list.
 
         Args:
-            api (str): The name of the API the example is for
+            api (str): The name of the datasource the example is for
             code (str): The working, successful code to add as an example
             query (str): A brief description of what the example demonstrates
             notes (str, optional): Additional notes about the example, such as implementation details
@@ -219,7 +224,7 @@ class BiomeAgent(BaseAgent):
         try:
             api_folder = self.api_directories[api]
             # Construct path to examples.yaml file
-            examples_path = os.path.join(self.root_folder, "api_definitions", api_folder, "documentation", "examples.yaml")
+            examples_path = os.path.join(self.root_folder, DATASOURCES_FOLDER, api_folder, "documentation", "examples.yaml")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
             
             # Create new example entry as a dictionary
@@ -270,12 +275,81 @@ class BiomeAgent(BaseAgent):
 
 
     @tool()
+    async def add_datasource(self,
+                             datasource: str,
+                             description: str,
+                             base_url: str,
+                             schema_location: str,
+                             agent: AgentRef,
+                             loop: LoopControllerRef,
+                             react_context: ReactContextRef) -> str:
+        """
+        Adds a datasource to the list of supported datasources usable within Biome.
+        This will be added to the API and data source list.
+
+        Args:
+            datasource (str): The name of the target data source or API that will be added.
+            description (str): A plain text description of what the data source is based on your knowledge of what the user is asking for, combined with their description if their description is relevant, or, if you do not know about the target data source. If the user does not provide any information, rely on what you know. Target a paragraph in length.
+            schema_location (str): A URL to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL to the schema.
+            base_url (str): The base URL for the datasource that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
+        Returns:
+            str: Message indicating success or failure of adding the datasource.
+        """
+        datasources_path = os.path.join(self.root_folder, DATASOURCES_FOLDER)
+        datasource_name = datasource.lower().replace(' ', '_')
+        datasource_folder = os.path.join(datasources_path, datasource_name)
+        if (os.path.isdir(datasource_folder)):
+            return f"Failed to add datasource: {datasource}: {DATASOURCES_FOLDER}/{datasource_folder} already exists."
+
+        try:
+            response = requests.get(schema_location)
+            if response.status_code != 200:
+                return f'Failed to get OpenAPI schema: {response.status_code}'
+            schema = response.content
+
+            documentation_folder = os.path.join(datasource_folder, 'documentation')
+            os.makedirs(documentation_folder, exist_ok=True)
+            with open(os.path.join(documentation_folder, 'schema.json'), 'w') as f:
+                f.write(str(schema))
+            with open(os.path.join(documentation_folder, 'examples.yaml'), 'a'):
+                pass
+
+        except Exception as e:
+            return f'Failed to get OpenAPI schema: {e}'
+
+        formatted_description = description.replace('\n', ' ')
+        template = f"""
+name: {datasource}
+description: {formatted_description}
+examples: !load_yaml documentation/examples.yaml
+cache_key: "api_assistant_{datasource_folder}"
+raw_documentation: !load_txt documentation/schema.json
+
+documentation: !fill |
+    The base URL for the service is `{base_url}`
+    Below is the OpenAPI schema for the desired service.
+
+    {{raw_documentation}}
+"""
+        with open(os.path.join(datasource_folder, 'api.yaml'), 'w') as f:
+            f.write(template)
+        try:
+            datasource_yaml = Path(os.path.join(datasource_folder, 'api.yaml'))
+            datasource_spec = load_yaml_api(datasource_yaml)
+            self.api_specs.append(datasource_spec)
+            self.api.add_api(datasource_spec)
+
+        except Exception as e:
+            return f"Failed to load adhoc_api: {e}"
+        return f'Successfully added {datasource} and it is now available for use.'
+
+    @tool()
     async def get_available_apis(self) -> list:
         """
-        Get list of APIs that the agent is designed to interact with.
+        Get list of datasources that the agent is designed to interact with.
 
         Returns:
-            list: The list of available APIs.
+            list: The list of available datasources.
         """
         return self.api_list
 

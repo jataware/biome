@@ -1,12 +1,12 @@
-definitions_root: ./api_definitions
+definitions_root: ./datasources
 drafter:
     model: models/gemini-1.5-pro-001
     ttl_seconds: 1800
 finalizer:
     model: gpt-4o
-default_cache_body: !fill | 
-    You will be given the entire API documentation. 
-    When you write code against this API, you should avail yourself of the appropriate query parameters, 
+default_cache_body: !fill |
+    You will be given the entire API documentation.
+    When you write code against this API, you should avail yourself of the appropriate query parameters,
     your understanding of the response model, and be cognizant that not all data is public and thus may require a token, etc.
     Unless you receive a 403 forbidden, assume the endpoints are unauthenticated.
     If the user says the API does not require authentication, OMIT code about tokens and token handling and token headers.
@@ -14,9 +14,9 @@ default_cache_body: !fill |
     When you are doing complex things try to break them down step by step and implement appropriate exception handling.
     You must NEVER print out the entire result of a workload or API search result. Always slice it and show just a subset to the user. You can save it as a variable
     for later use, etc.
-    
+
     {instructions}
-    
+
     Here is the documentation.
-    
+
     {documentation}
