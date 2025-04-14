@@ -13,7 +13,7 @@ Most of the time, you will only need to specify `instructions` for a new API to 
 Below is the default.
 
 ```yaml
-definitions_root: ./api_definitions
+definitions_root: ./datasources
 drafter:
     model: models/gemini-1.5-pro-001
     ttl_seconds: 1800
