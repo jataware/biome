@@ -279,10 +279,7 @@ class BiomeAgent(BaseAgent):
                              datasource: str,
                              description: str,
                              base_url: str,
-                             schema_location: str,
-                             agent: AgentRef,
-                             loop: LoopControllerRef,
-                             react_context: ReactContextRef) -> str:
+                             schema_location: str) -> str:
         """
         Adds a datasource to the list of supported datasources usable within Biome.
         This will be added to the API and data source list.
@@ -290,7 +287,7 @@ class BiomeAgent(BaseAgent):
         Args:
             datasource (str): The name of the target data source or API that will be added.
             description (str): A plain text description of what the data source is based on your knowledge of what the user is asking for, combined with their description if their description is relevant, or, if you do not know about the target data source. If the user does not provide any information, rely on what you know. Target a paragraph in length.
-            schema_location (str): A URL to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL to the schema.
+            schema_location (str): A URL or local filepath to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL or local filepath to the schema.
             base_url (str): The base URL for the datasource that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
         Returns:
             str: Message indicating success or failure of adding the datasource.
@@ -301,15 +298,20 @@ class BiomeAgent(BaseAgent):
         if (os.path.isdir(datasource_folder)):
             return f"Failed to add datasource: {datasource}: {DATASOURCES_FOLDER}/{datasource_folder} already exists."
 
+        logger.info(f'adding datasource {datasource} to {datasource_folder}')
         try:
-            response = requests.get(schema_location)
-            if response.status_code != 200:
-                return f'Failed to get OpenAPI schema: {response.status_code}'
-            schema = response.content
+            if schema_location.startswith('http'):
+                response = requests.get(schema_location)
+                if response.status_code != 200:
+                    return f'Failed to get OpenAPI schema: {response.status_code}'
+                schema = response.content.decode("utf-8")
+            else: 
+                with open(schema_location, 'r') as f:
+                    schema = f.read()
 
             documentation_folder = os.path.join(datasource_folder, 'documentation')
             os.makedirs(documentation_folder, exist_ok=True)
-            with open(os.path.join(documentation_folder, 'schema.json'), 'w') as f:
+            with open(os.path.join(documentation_folder, 'schema.yaml'), 'w') as f:
                 f.write(str(schema))
             with open(os.path.join(documentation_folder, 'examples.yaml'), 'a'):
                 pass
@@ -323,7 +325,7 @@ name: {datasource}
 description: {formatted_description}
 examples: !load_yaml documentation/examples.yaml
 cache_key: "api_assistant_{datasource_name}"
-raw_documentation: !load_txt documentation/schema.json
+raw_documentation: !load_txt documentation/schema.yaml
 
 documentation: !fill |
     The base URL for the service is `{base_url}`
@@ -340,11 +342,12 @@ documentation: !fill |
             self.api.add_api(datasource_spec)
 
         except Exception as e:
-            return f"Failed to load adhoc_api: {e}"
+            return f"Failed to add datasource: {e}"
+        logger.info(f'Successfully added {datasource} to {datasource_folder} and it is now available for use.')
         return f'Successfully added {datasource} and it is now available for use.'
 
     @tool()
-    async def get_available_apis(self) -> list:
+    async def get_available_datasources(self) -> list:
         """
         Get list of datasources that the agent is designed to interact with.
 
