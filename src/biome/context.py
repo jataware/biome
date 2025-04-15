@@ -1,14 +1,23 @@
 from typing import TYPE_CHECKING, Any, Dict, List
 import os
+import json
+import re
+import logging
 
-from beaker_kernel.lib.context import BaseContext
-from beaker_kernel.lib.subkernels.python import PythonSubkernel
+from pathlib import Path
 
-from .agent import BiomeAgent
+from beaker_kernel.lib.context import BaseContext, action
+from beaker_kernel.subkernels.python import PythonSubkernel
+from beaker_kernel.lib.types import Datasource, DatasourceAttachment
+
+from .agent import DATASOURCES_FOLDER, BiomeAgent
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
     from beaker_kernel.lib.agent import BaseAgent
+
+logger = logging.getLogger(__name__)
+
 
 class BiomeContext(BaseContext):
 
@@ -22,7 +31,7 @@ class BiomeContext(BaseContext):
 
     async def setup(self, context_info=None, parent_header=None):
         """
-        This runs on setup and invokes the `procedures/python3/setup.py` script to 
+        This runs on setup and invokes the `procedures/python3/setup.py` script to
         configure the environment appropriately.
         """
         command = self.get_code("setup", {
@@ -36,3 +45,93 @@ class BiomeContext(BaseContext):
             "netrias_api_key": os.environ.get("NETRIAS_KEY"),
         })
         await self.execute(command)
+
+    async def get_datasources(self) -> list[Datasource]:
+        """
+        fetch all of the adhoc-api datasources to pass to beaker.
+        """
+
+        # get list of keys not inherent to a datasource for the user-files category
+        attached_files = {}
+        for spec in self.agent.raw_specs:
+            attached_files[spec['name']] = []
+            for attachment_key in [
+                key for key in spec.keys() if key not in [
+                    "name",
+                    "slug",
+                    "description",
+                    "cache_key",
+                    "documentation",
+                    "examples",
+                    "cache_body"
+                ]
+            ]:
+                if not isinstance(spec[attachment_key], str):
+                    logger.warning(f"warning: key {attachment_key} on spec {spec['name']} is of type {type(spec[attachment_key])} and not str. ignoring and continuing")
+                    continue
+
+                # trim yaml tags since they will be readded at save time
+                # TODO: handle not-eliding documentation/
+                filepath_raw = re.sub(
+                        r'!load_[a-zA-Z]+',
+                        '',
+                        spec[attachment_key].strip()
+                    ).strip().replace('documentation/', '')
+
+                attached_files[spec['name']].append(DatasourceAttachment(
+                    name=attachment_key,
+                    filepath=filepath_raw,
+                    content=None,
+                    is_empty_file=False
+                ))
+
+        return [
+            Datasource(
+                uid_or_slug=spec['slug'],
+                name=spec['name'],
+                description=spec.get('description'),
+                source=spec.get('documentation').replace('!fill', ''),
+                attached_files=attached_files[spec['name']]
+            )
+            for spec in self.agent.raw_specs
+        ]
+
+    @action(action_name="save_datasource")
+    async def save_datasource(self, message):
+        content = message.content
+        
+        datasource = Datasource(
+            name=content.get('name'),
+            uid_or_slug=content.get('uid_or_slug'),
+            description=content.get('description'),
+            source=content.get('source'),
+            attached_files=[
+                DatasourceAttachment(
+                    name=payload['name'],
+                    filepath=payload['filepath']
+                ) 
+                for payload in content.get('attached_files')]
+        )
+
+        slug = datasource.uid_or_slug
+        indented_contents = ''.join([f"\n    {line}" for line in (datasource.source or "").splitlines()])
+
+        attached_files = [
+            f"{attachment.name}: !load_txt documentation/{attachment.filepath}\n" 
+            for attachment in datasource.attached_files or []
+        ]
+        file_payload = '\n'.join(attached_files)
+
+        api_yaml = f"""
+name: {datasource.name}
+description: {datasource.description}
+cache_key: api_assistant_{slug}
+
+{file_payload}
+
+documentation: !fill |
+{indented_contents}
+"""
+        fp = Path(self.agent.root_folder) / DATASOURCES_FOLDER / slug / 'api.yaml'
+        logger.info(f"would save to: {fp} \n\n with yaml\n\n{api_yaml}")
+

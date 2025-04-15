@@ -11,9 +11,10 @@ from typing import Any, List
 
 from beaker_kernel.lib.agent import BaseAgent
 from beaker_kernel.lib.context import BaseContext
+import yaml
 
 from pathlib import Path
-from adhoc_api.tool import AdhocApi
+from adhoc_api.tool import AdhocApi, ensure_name_slug_compatibility
 from adhoc_api.loader import load_yaml_api
 from adhoc_api.uaii import gpt_4o, o3_mini, claude_37_sonnet, gemini_15_pro
 
@@ -66,16 +67,29 @@ class BiomeAgent(BaseAgent):
 
         api_def_dir = os.path.join(self.root_folder, DATASOURCES_FOLDER)
         data_dir = (self.root_folder / ".." / "..").resolve() / "data"
+        self.data_dir = data_dir
         print(f"data_dir: {data_dir}")
 
         # Get API specs and directories in one pass
         self.api_specs = []
+        self.raw_specs = [] # no interpolation
         self.api_directories = {}
         for d in os.listdir(api_def_dir):
             api_dir = os.path.join(api_def_dir, d)
             if os.path.isdir(api_dir):
                 api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
                 api_spec = load_yaml_api(api_yaml)
+                # custom yaml loader to ignore tags to not pre-interpolate before editing
+                with open(api_yaml, 'r') as f:
+                    def ignore_tags(loader, tag_suffix, node):
+                        return tag_suffix + ' ' + node.value
+                    yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
+                    raw_spec = yaml.safe_load(f)
+                    try:
+                        ensure_name_slug_compatibility(raw_spec)
+                        self.raw_specs.append(raw_spec)
+                    except Exception as e:
+                        logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
 
                 # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
