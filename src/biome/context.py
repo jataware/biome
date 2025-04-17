@@ -53,7 +53,7 @@ class BiomeContext(BaseContext):
 
         # get list of keys not inherent to a datasource for the user-files category
         attached_files = {}
-        for spec in self.agent.raw_specs:
+        for (_, spec) in self.agent.raw_specs:
             attached_files[spec['name']] = []
             for attachment_key in [
                 key for key in spec.keys() if key not in [
@@ -88,50 +88,72 @@ class BiomeContext(BaseContext):
         return [
             Datasource(
                 uid_or_slug=spec['slug'],
+                url=str(yaml_location),
                 name=spec['name'],
                 description=spec.get('description'),
                 source=spec.get('documentation').replace('!fill', ''),
                 attached_files=attached_files[spec['name']]
             )
-            for spec in self.agent.raw_specs
+            for (yaml_location, spec) in self.agent.raw_specs
         ]
 
     @action(action_name="save_datasource")
     async def save_datasource(self, message):
         content = message.content
-        
+
         datasource = Datasource(
             name=content.get('name'),
             uid_or_slug=content.get('uid_or_slug'),
+            url=content.get('url'),
             description=content.get('description'),
             source=content.get('source'),
             attached_files=[
                 DatasourceAttachment(
                     name=payload['name'],
                     filepath=payload['filepath']
-                ) 
+                )
                 for payload in content.get('attached_files')]
         )
 
         slug = datasource.uid_or_slug
-        indented_contents = ''.join([f"\n    {line}" for line in (datasource.source or "").splitlines()])
+        indented_contents = ''.join(
+            [f"\n    {line}" for line in (datasource.source or "").splitlines()]
+        )
+        indented_description = ''.join(
+            [f"\n    {line}" for line in (datasource.description or "").splitlines()]
+        )
 
         attached_files = [
-            f"{attachment.name}: !load_txt documentation/{attachment.filepath}\n" 
+            f"{attachment.name}: !load_txt documentation/{attachment.filepath}\n"
             for attachment in datasource.attached_files or []
         ]
         file_payload = '\n'.join(attached_files)
 
         api_yaml = f"""
 name: {datasource.name}
-description: {datasource.description}
+slug: {slug}
 cache_key: api_assistant_{slug}
+examples: !load_yaml documentation/examples.yaml
+
+description: |
+    {indented_description.strip()}
 
 {file_payload}
 
 documentation: !fill |
-{indented_contents}
+    {indented_contents.strip()}
 """
-        fp = Path(self.agent.root_folder) / DATASOURCES_FOLDER / slug / 'api.yaml'
-        logger.info(f"would save to: {fp} \n\n with yaml\n\n{api_yaml}")
+        url = datasource.url
+        if url is None or url == "":
+            url = Path(slug) / 'api.yaml'
+        full_path = Path(self.agent.root_folder) / DATASOURCES_FOLDER / url
+        os.makedirs(str(full_path)[0:-9], exist_ok=True)
+        with open(full_path, 'w') as f:
+            f.write(api_yaml)
 
+        examples_path = f"{str(full_path)[0:-9]}/documentation/examples.yaml"
+        if not os.path.isfile(examples_path):
+            with open(examples_path, 'a') as f:
+                f.write('')
+        self.agent.fetch_specs()
+        self.agent.initialize_adhoc()

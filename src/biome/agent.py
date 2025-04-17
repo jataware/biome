@@ -65,52 +65,7 @@ class BiomeAgent(BaseAgent):
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         self.root_folder = Path(__file__).resolve().parent
 
-        api_def_dir = os.path.join(self.root_folder, DATASOURCES_FOLDER)
-        data_dir = (self.root_folder / ".." / "..").resolve() / "data"
-        self.data_dir = data_dir
-        print(f"data_dir: {data_dir}")
-
-        # Get API specs and directories in one pass
-        self.api_specs = []
-        self.raw_specs = [] # no interpolation
-        self.api_directories = {}
-        for d in os.listdir(api_def_dir):
-            api_dir = os.path.join(api_def_dir, d)
-            if os.path.isdir(api_dir):
-                api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
-                api_spec = load_yaml_api(api_yaml)
-                # custom yaml loader to ignore tags to not pre-interpolate before editing
-                with open(api_yaml, 'r') as f:
-                    def ignore_tags(loader, tag_suffix, node):
-                        return tag_suffix + ' ' + node.value
-                    yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
-                    raw_spec = yaml.safe_load(f)
-                    try:
-                        ensure_name_slug_compatibility(raw_spec)
-                        self.raw_specs.append(raw_spec)
-                    except Exception as e:
-                        logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
-
-                # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
-                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
-                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
-
-                if 'examples' in api_spec and isinstance(api_spec['examples'], list):
-                    for example in api_spec['examples']:
-                        if 'code' in example and isinstance(example['code'], str):
-                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
-                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
-
-                self.api_specs.append(api_spec)
-                self.api_directories[api_spec['name']] = d
-
-        # Note: not all providers support ttl_seconds
-        ttl_seconds = 1800
-        drafter_config_gemini =    {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
-        curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        contextualizer_config =    {**gpt_4o, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        specs = self.api_specs
+        self.fetch_specs()
 
         instructions_dir = os.path.join(self.root_folder, 'instructions')
         # join all the files in the instructions directory into a single string
@@ -127,6 +82,71 @@ class BiomeAgent(BaseAgent):
 
         self.logger = MessageLogger(self.log, logger)
 
+        self.initialize_adhoc()
+
+        # Load prompt files and set the Agent context
+        prompts_dir = os.path.join(self.root_folder, 'prompts')
+        with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
+            template = f.read()
+            self.__doc__ = template.format(api_list=self.api_list, instructions=self.instructions)
+            self.add_context(self.__doc__)
+
+    def fetch_specs(self):
+        api_def_dir = os.path.join(self.root_folder, DATASOURCES_FOLDER)
+        data_dir = (self.root_folder / ".." / "..").resolve() / "data"
+        self.data_dir = data_dir
+        print(f"data_dir: {data_dir}")
+
+        # Get API specs and directories in one pass
+        self.api_specs = []
+        self.raw_specs = [] # no interpolation
+        self.api_directories = {}
+        for d in os.listdir(api_def_dir):
+            if d == '.ipynb_checkpoints':
+                os.rmdir(os.path.join(api_def_dir, d))
+            api_dir = os.path.join(api_def_dir, d)
+            if os.path.isdir(api_dir):
+                api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
+                if not os.path.isfile(api_yaml):
+                    logger.warning(f"Ignoring malformed API: {api_yaml}")
+                    continue
+
+                api_spec = load_yaml_api(api_yaml)
+                # custom yaml loader to ignore tags to not pre-interpolate before editing
+                with open(api_yaml, 'r') as f:
+                    def ignore_tags(loader, tag_suffix, node):
+                        return tag_suffix + ' ' + node.value
+                    yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
+                    raw_spec = yaml.safe_load(f)
+                    try:
+                        ensure_name_slug_compatibility(raw_spec)
+                        self.raw_specs.append((os.path.join(d, 'api.yaml'), raw_spec))
+                    except Exception as e:
+                        logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
+
+                # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
+                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
+
+                if 'examples' in api_spec and isinstance(api_spec['examples'], list):
+                    for example in api_spec['examples']:
+                        if 'code' in example and isinstance(example['code'], str):
+                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
+                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+
+                ensure_name_slug_compatibility(api_spec)
+                self.api_specs.append(api_spec)
+                self.api_directories[api_spec['slug']] = d
+
+    def initialize_adhoc(self):
+        # Note: not all providers support ttl_seconds
+        ttl_seconds = 1800
+        drafter_config_gemini =    {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        contextualizer_config =    {**gpt_4o, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        specs = self.api_specs
+
         try:
             self.api = AdhocApi(
                 apis=specs,
@@ -139,14 +159,7 @@ class BiomeAgent(BaseAgent):
             self.add_context(f"The datasources failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
-        self.api_list = [spec['name'] for spec in specs]
-
-        # Load prompt files and set the Agent context
-        prompts_dir = os.path.join(self.root_folder, 'prompts')
-        with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
-            template = f.read()
-            self.__doc__ = template.format(api_list=self.api_list, instructions=self.instructions)
-            self.add_context(self.__doc__)
+        self.api_list = [spec['slug'] for spec in specs]
 
     def log(self, event_type: str, content = None) -> None:
         self.context.beaker_kernel.log(
@@ -319,7 +332,7 @@ class BiomeAgent(BaseAgent):
                 if response.status_code != 200:
                     return f'Failed to get OpenAPI schema: {response.status_code}'
                 schema = response.content.decode("utf-8")
-            else: 
+            else:
                 with open(schema_location, 'r') as f:
                     schema = f.read()
 
