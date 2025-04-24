@@ -51,6 +51,12 @@ def with_docstring(filename):
         return func
     return decorator
 
+# yaml loader that ignores !tag directives for getting raw yaml text from datasources
+def ignore_tags(loader, tag_suffix, node):
+    return tag_suffix + ' ' + node.value
+yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
+
+
 DRAFT_API_CODE_DOC = load_docstring('draft_api_code.md')
 CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
 
@@ -63,25 +69,19 @@ class BiomeAgent(BaseAgent):
     An API should be considered a type of datasource.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        self.root_folder = Path(__file__).resolve().parent
-
-        self.fetch_specs()
-
-        instructions_dir = os.path.join(self.root_folder, 'instructions')
-        # join all the files in the instructions directory into a single string
-        self.instructions = ""
-        for file in os.listdir(instructions_dir):
-            with open(os.path.join(instructions_dir, file), 'r') as f:
-                self.instructions += f.read()
-
-        super().__init__(context, tools, **kwargs)
-        sleep(5)
-
-        # Configure root logger
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
-
         self.logger = MessageLogger(self.log, logger)
 
+        self.root_folder = Path(__file__).resolve().parent
+        self.fetch_specs()
+
+        instructions_dir = Path(os.path.join(self.root_folder, 'instructions'))
+        self.instructions = "\n".join(
+            file.read_text()
+            for file in instructions_dir.iterdir() if file.is_file()
+        )
+
+        super().__init__(context, tools, **kwargs)
         self.initialize_adhoc()
 
         # Load prompt files and set the Agent context
@@ -92,37 +92,39 @@ class BiomeAgent(BaseAgent):
             self.add_context(self.__doc__)
 
     def fetch_specs(self):
-        api_def_dir = os.path.join(self.root_folder, DATASOURCES_FOLDER)
-        data_dir = (self.root_folder / ".." / "..").resolve() / "data"
-        self.data_dir = data_dir
-        print(f"data_dir: {data_dir}")
+        datasource_root = os.path.join(self.root_folder, DATASOURCES_FOLDER)
+
+        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
+        try:
+            data_dir = Path(data_dir_raw).resolve(strict=True)
+            logger.info(f"Using data_dir: {data_dir}")
+        except OSError as e:
+            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
+        self.data_dir = data_dir or ''
 
         # Get API specs and directories in one pass
         self.api_specs = []
         self.raw_specs = [] # no interpolation
         self.api_directories = {}
-        for d in os.listdir(api_def_dir):
-            if d == '.ipynb_checkpoints':
-                os.rmdir(os.path.join(api_def_dir, d))
-            api_dir = os.path.join(api_def_dir, d)
-            if os.path.isdir(api_dir):
-                api_yaml = Path(os.path.join(api_dir, 'api.yaml'))
-                if not os.path.isfile(api_yaml):
+        for datasource_dir in os.listdir(datasource_root):
+            if datasource_dir == '.ipynb_checkpoints':
+                os.rmdir(os.path.join(datasource_root, datasource_dir))
+
+            datasource_full_path = os.path.join(datasource_root, datasource_dir)
+            if os.path.isdir(datasource_full_path):
+                api_yaml = Path(os.path.join(datasource_full_path, 'api.yaml'))
+                if not api_yaml.is_file():
                     logger.warning(f"Ignoring malformed API: {api_yaml}")
                     continue
 
                 api_spec = load_yaml_api(api_yaml)
-                # custom yaml loader to ignore tags to not pre-interpolate before editing
-                with open(api_yaml, 'r') as f:
-                    def ignore_tags(loader, tag_suffix, node):
-                        return tag_suffix + ' ' + node.value
-                    yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
-                    raw_spec = yaml.safe_load(f)
-                    try:
-                        ensure_name_slug_compatibility(raw_spec)
-                        self.raw_specs.append((os.path.join(d, 'api.yaml'), raw_spec))
-                    except Exception as e:
-                        logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
+                raw_contents = api_yaml.read_text()
+                raw_spec = yaml.safe_load(raw_contents)
+                try:
+                    ensure_name_slug_compatibility(raw_spec)
+                    self.raw_specs.append((os.path.join(datasource_dir, 'api.yaml'), raw_spec))
+                except Exception as e:
+                    logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
 
                 # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
@@ -136,7 +138,7 @@ class BiomeAgent(BaseAgent):
 
                 ensure_name_slug_compatibility(api_spec)
                 self.api_specs.append(api_spec)
-                self.api_directories[api_spec['slug']] = d
+                self.api_directories[api_spec['slug']] = datasource_dir
 
     def initialize_adhoc(self):
         # Note: not all providers support ttl_seconds

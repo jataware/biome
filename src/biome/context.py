@@ -87,7 +87,7 @@ class BiomeContext(BaseContext):
 
         return [
             Datasource(
-                uid_or_slug=spec['slug'],
+                slug=spec['slug'],
                 url=str(yaml_location),
                 name=spec['name'],
                 description=spec.get('description'),
@@ -103,7 +103,7 @@ class BiomeContext(BaseContext):
 
         datasource = Datasource(
             name=content.get('name'),
-            uid_or_slug=content.get('uid_or_slug'),
+            slug=content.get('slug'),
             url=content.get('url'),
             description=content.get('description'),
             source=content.get('source'),
@@ -115,7 +115,7 @@ class BiomeContext(BaseContext):
                 for payload in content.get('attached_files')]
         )
 
-        slug = datasource.uid_or_slug
+        slug = datasource.slug
         indented_contents = ''.join(
             [f"\n    {line}" for line in (datasource.source or "").splitlines()]
         )
