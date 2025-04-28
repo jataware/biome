@@ -6,7 +6,7 @@ import logging
 
 from pathlib import Path
 
-from beaker_kernel.lib.context import BaseContext, action
+from beaker_kernel.lib.context import BeakerContext, action
 from beaker_kernel.subkernels.python import PythonSubkernel
 from beaker_kernel.lib.types import Datasource, DatasourceAttachment
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class BiomeContext(BaseContext):
+class BiomeContext(BeakerContext):
 
     SLUG = "biome"
     agent_cls: "BaseAgent" = BiomeAgent

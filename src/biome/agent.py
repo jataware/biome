@@ -9,7 +9,7 @@ import os
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
 from typing import Any, List
 
-from beaker_kernel.lib.agent import BaseAgent
+from beaker_kernel.lib.agent import BeakerAgent
 from beaker_kernel.lib.context import BaseContext
 import yaml
 
@@ -60,7 +60,7 @@ yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 DRAFT_API_CODE_DOC = load_docstring('draft_api_code.md')
 CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
 
-class BiomeAgent(BaseAgent):
+class BiomeAgent(BeakerAgent):
     """
     You are the Biome Agent, a chat assistant that helps users with biomedical research tasks.
 
@@ -99,8 +99,9 @@ class BiomeAgent(BaseAgent):
             data_dir = Path(data_dir_raw).resolve(strict=True)
             logger.info(f"Using data_dir: {data_dir}")
         except OSError as e:
+            data_dir = ''
             logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
-        self.data_dir = data_dir or ''
+        self.data_dir = data_dir
 
         # Get API specs and directories in one pass
         self.api_specs = []
