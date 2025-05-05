@@ -17,8 +17,8 @@ class BiomeApp(BeakerApp):
         "dev": {
             "title": "Dev interface",
         },
-        "datasource": {
-            "title": "Datasource Manager"
+        "integrations": {
+            "title": "Integrations Manager"
         }
     }
     default_context = {

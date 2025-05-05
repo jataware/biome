@@ -3,4 +3,4 @@ drafter:
     model: models/gemini-1.5-pro-001
     ttl_seconds: 1800
 finalizer:
-    model: gpt-4o
+    model: gpt-4.1
