@@ -1,0 +1,23 @@
+[project]
+name = "biome_rest"
+version = "0.1.0"
+description = "Rest interface exposing Biome integrations"
+readme = "readme.md"
+authors = [{ name = "Your Name", email = "your.email@example.com" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "pydantic>=2.11.3",
+ "pydantic-settings>=2.9.1",
+ "adhoc-api~=2.4.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
