@@ -46,6 +46,9 @@ class BiomeContext(BeakerContext):
         })
         await self.execute(command)
 
+    async def get_datasource_root(self) -> str:
+        return os.environ.get("BIOME_INTEGRATIONS_DIR", "")
+
     async def get_datasources(self) -> list[Datasource]:
         """
         fetch all of the adhoc-api datasources to pass to beaker.
