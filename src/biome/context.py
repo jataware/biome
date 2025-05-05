@@ -157,3 +157,4 @@ documentation: !fill |
                 f.write('')
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
+        self.agent.add_context(f"A new datasource has been added: `{slug}`. You may now use this with `draft_api_code`.")
