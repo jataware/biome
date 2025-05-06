@@ -23,10 +23,22 @@ services:
     volumes:
       - ./src/biome:/jupyter/src/biome
       - .env:/root/.env
-      # - .beaker.conf:/root/.beaker.conf
-    # command: "sh -c 'beaker dev watch --ip 0.0.0.0 '"
     networks:
       - beaker
+  rest_api:
+    build:
+      context: .
+      dockerfile: ./rest_api/Dockerfile
+    volumes:
+      - ./src/biome/datasources:/integrations
+      - ./data:/data
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    environment:
+      - BIOME_INTEGRATIONS_DIR=/integrations
+      - BIOME_DATA_DIR=/data
   # ui:
   #   image: node:20
   #   user: "node"

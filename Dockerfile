@@ -6,12 +6,13 @@ EXPOSE 8888
 RUN apt update && apt install -y lsof
 
 # Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy
+RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv
 
 # Install beaker-kernel from dev branch
 # RUN pip install git+https://github.com/jataware/beaker-kernel.git@dev
 COPY --chown=1000:1000 . /jupyter
-RUN chown -R 1000:1000 /jupyter
+
+RUN rm /jupyter/.beaker.conf
 
 # RUN pip install \
 #     beaker-kernel~=1.9.1 \
@@ -27,7 +28,7 @@ RUN chown -R 1000:1000 /jupyter
 #     google-cloud-storage \
 #     PyPDF2~=3.0.1
 
-RUN pip install -e /jupyter
+RUN uv pip install --system -v -e /jupyter
 
 RUN mkdir -m 777 /var/run/beaker
 
@@ -38,8 +39,6 @@ ENV BEAKER_AGENT_USER=jupyter
 ENV BEAKER_SUBKERNEL_USER=user
 ENV BEAKER_RUN_PATH=/var/run/beaker
 ENV BEAKER_APP=biome.app.BiomeApp
-
-#ENV CONFIG_TYPE=session
 
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
