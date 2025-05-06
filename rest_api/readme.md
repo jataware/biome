@@ -4,6 +4,10 @@ FastAPI service for exposing Biome Integrations through a REST interface.
 
 ## Deployment
 
+### Docker
+
+`docker-compose.yml` in the biome root will run this service with default values for env vars, requiring only `OPENAI_API_KEY` set in `.env` such as how `.env.sample` does it.
+
 ### Env Vars
 
 Be sure to set the following:
