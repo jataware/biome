@@ -13,6 +13,7 @@ RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv
 COPY --chown=1000:1000 . /jupyter
 
 RUN rm /jupyter/.beaker.conf
+RUN mkdir -p /root/.config/ && touch /root/.config/beaker.conf
 
 # RUN pip install \
 #     beaker-kernel~=1.9.1 \
@@ -39,6 +40,8 @@ ENV BEAKER_AGENT_USER=jupyter
 ENV BEAKER_SUBKERNEL_USER=user
 ENV BEAKER_RUN_PATH=/var/run/beaker
 ENV BEAKER_APP=biome.app.BiomeApp
+
+RUN ln -s /jupyter/src/biome/datasources /home/user/datasources
 
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]

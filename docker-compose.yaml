@@ -18,11 +18,12 @@ services:
       - TOOL_ENABLED_ASK_USER=true
       - TOOL_ENABLED_RUN_CODE=true
       - PYTHONBREAKPOINT=debugpy.breakpoint
+      - BIOME_INTEGRATIONS_DIR=/datasources
+      - BIOME_DATA_DIR=/jupyter/data
     env_file:
       - .env
     volumes:
       - ./src/biome:/jupyter/src/biome
-      - .env:/root/.env
     networks:
       - beaker
   rest_api:

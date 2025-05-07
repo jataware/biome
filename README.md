@@ -1,8 +1,8 @@
-# Biome 
+# Biome
 
 Biome is an AI powered platform for performing the next generation of biomedical research. It is currently in the prototype stage of development and is under active development.
 
-The goal of Biome is to seamlessly combine the ability to find research data with an ability to deeply analyze it--all from the same user interface. To accomplish this, Biome provides users both a chat and notebook style interface with specialized AI integrations under the hood that enable sophisticated interactions with a variety of biomedical data sources as well as domain specific software libraries and tools. 
+The goal of Biome is to seamlessly combine the ability to find research data with an ability to deeply analyze it--all from the same user interface. To accomplish this, Biome provides users both a chat and notebook style interface with specialized AI integrations under the hood that enable sophisticated interactions with a variety of biomedical data sources as well as domain specific software libraries and tools.
 
 Biome is being developed under ARPA-H's [Biomedical Data Fabric (BDF) Toolbox](https://arpa-h.gov/news-and-events/arpa-h-announces-effort-develop-single-data-system-biomedical-research) program.
 
@@ -11,7 +11,7 @@ Biome is being developed under ARPA-H's [Biomedical Data Fabric (BDF) Toolbox](h
 
 - docker-compose
 
-## Getting started 
+## Getting started
 
 Many environment variables will need to be defined. See `env.sample` for one to copy and paste, and/or consult the same thing inline below.
 
@@ -19,13 +19,12 @@ You will need to add the API keys.
 
 Copy all of `env.sample` to `.env` in the root of the project directory, then add the keys.
 
-Example:  
+Example:
 ```
 cp env.sample .env
 ```
 
 The keys are defined at the top. All of the variables that are not necessary to manually change have been omitted below with the ellipses.
-
 
 ```
 # API Keys
@@ -33,6 +32,10 @@ OPENAI_API_KEY=<your API key>
 GEMINI_API_KEY=<your API key>
 ANTHROPIC_API_KEY=<your API key>
 ```
+
+If running from Docker, leave the BIOME_DATA_DIR and BIOME_INTEGRATION_DIR values unset in .env, as the docker-compose defaults will be fine.
+
+If not running from Docker, ensure you set them with .env.
 
 Note--by default, Biome will use Anthropic as the LLM provider. You can adjust this by changing the `LLM_PROVIDER_IMPORT_PATH` variable and the `LLM_SERVICE_MODEL` variables. You can leave the rest of the variables as is, unless you're doing a custom deployment. Currently at least Gemini and Anthropic keys are required.
 
@@ -46,7 +49,7 @@ First, fetch the large files from git lfs with:
 git lfs pull
 ```
 
-Starting the project with the following command: 
+Starting the project with the following command:
 ```
 docker compose up -d
 ```
@@ -63,12 +66,12 @@ Visit `http://localhost:8888` in the browser to use the Biome interface.
 
 ## Demo Videos (outdated...)
 
-Workflow screen recording (at 2x speed) 
+Workflow screen recording (at 2x speed)
 
 https://github.com/user-attachments/assets/4f08307b-dc60-4d90-a52e-6f6962dde76e
 
 
-Notebook workflow and editing 
+Notebook workflow and editing
 
 https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
 
@@ -77,7 +80,7 @@ https://github.com/user-attachments/assets/6dea0820-2b3f-4f32-8a56-a2c8f5f70002
 Some sources require API credentials to be set in the `.env` file, see `env.sample` for the applicable sources and variables that need to be set.
 At this time, the following authenticated APIs are supported:
 - AQS (Air Quality System)
-  - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com 
+  - Register for an API key at: https://aqs.epa.gov/data/api/signup?email=myemail@example.com
 - FAERS (subset of FDA Adverse Event Reporting System)
   - Register for an API key at: https://open.fda.gov/apis/authentication/
 - USDA FoodData Central
@@ -89,7 +92,7 @@ At this time, the following authenticated APIs are supported:
   - Go to User > Account Settings > Personal Access Token to create credentials
 - Netrias
     - Request access from the Netrias team directly
-    
+
 ## Data Files
 
 Large data files are stored using Git LFS in the `data/` directory. To work with these files:

@@ -119,45 +119,49 @@ class BiomeContext(BeakerContext):
         )
 
         slug = datasource.slug
-        indented_contents = ''.join(
-            [f"\n    {line}" for line in (datasource.source or "").splitlines()]
-        )
-        indented_description = ''.join(
-            [f"\n    {line}" for line in (datasource.description or "").splitlines()]
-        )
+#         indented_contents = ''.join(
+#             [f"\n    {line}" for line in (datasource.source or "").splitlines()]
+#         )
+#         indented_description = ''.join(
+#             [f"\n    {line}" for line in (datasource.description or "").splitlines()]
+#         )
 
-        attached_files = [
-            f"{attachment.name}: !load_txt documentation/{attachment.filepath}\n"
-            for attachment in datasource.attached_files or []
-        ]
-        file_payload = '\n'.join(attached_files)
+#         attached_files = [
+#             f"{attachment.name}: !load_txt documentation/{attachment.filepath}\n"
+#             for attachment in datasource.attached_files or []
+#         ]
+#         file_payload = '\n'.join(attached_files)
 
-        api_yaml = f"""
-name: {datasource.name}
-slug: {slug}
-cache_key: api_assistant_{slug}
-examples: !load_yaml documentation/examples.yaml
+#         api_yaml = f"""
+# name: {datasource.name}
+# slug: {slug}
+# cache_key: api_assistant_{slug}
+# examples: !load_yaml documentation/examples.yaml
 
-description: |
-    {indented_description.strip()}
+# description: |
+#     {indented_description.strip()}
 
-{file_payload}
+# {file_payload}
 
-documentation: !fill |
-    {indented_contents.strip()}
-"""
-        url = datasource.url
-        if url is None or url == "":
-            url = Path(slug) / 'api.yaml'
-        full_path = Path(self.agent.root_folder) / DATASOURCES_FOLDER / url
-        os.makedirs(str(full_path)[0:-9], exist_ok=True)
-        with open(full_path, 'w') as f:
-            f.write(api_yaml)
+# documentation: !fill |
+#     {indented_contents.strip()}
+# """
+#         url = datasource.url
+#         if url is None or url == "":
+#             url = Path(slug) / 'api.yaml'
 
-        examples_path = f"{str(full_path)[0:-9]}/documentation/examples.yaml"
-        if not os.path.isfile(examples_path):
-            with open(examples_path, 'a') as f:
-                f.write('')
+#         yaml_file = Path(self.agent.root_folder) / DATASOURCES_FOLDER / str(url)
+#         yaml_path = Path(str(yaml_file)[0:-9])
+#         os.makedirs(yaml_path, exist_ok=True)
+#         with open(yaml_file, 'w') as f:
+#             f.write(api_yaml)
+
+#         examples_path = yaml_path / "documentation"
+#         examples_file = examples_path / "examples.yaml"
+#         if not os.path.isfile(examples_file):
+#             os.makedirs(examples_path, exist_ok=True)
+#             with open(examples_file, 'a') as f:
+#                 f.write('')
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new datasource has been added: `{slug}`. You may now use this with `draft_api_code`.")
