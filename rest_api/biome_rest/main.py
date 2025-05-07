@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Query, Path
 from pydantic import BaseModel
 
 from .integrations import initialize_adhoc
@@ -46,6 +46,10 @@ ListIntegrationsOutput = Annotated[
 
 @app.get("/list_integrations")
 def list_integrations() -> ListIntegrationsOutput:
+    """
+    Lists all integrations that Biome has access to. Each top-level key is an ID for an integration, and using that integration
+    with subsequent calls will send the request to the correct specialist agent.
+    """
     return {
         slug: {
             integration_data.get('name', integration_data["slug"]): integration_data["description"]
@@ -65,7 +69,22 @@ class IntegrationDocumentationOutput(BaseModel):
     }
 
 @app.get("/consult_integration_documentation/{integration}")
-def consult_integration_documentation(integration: str, query: str) -> IntegrationDocumentationOutput:
+def consult_integration_documentation(
+    integration: Annotated[
+        str,
+        Path(description="The integration to ask the query of. The available integrations are listed with the `/list_integrations` endpoint, and this parameter must be one of those integration IDs.")
+    ],
+    query: Annotated[
+        str,
+        Query(description="The query to ask of the integration, such as: asking `cbioportal` a query like `How would you go about finding RNA-seq z-scores for these studies?` or `fetch all AML studies`, or more broadly asking an integration `What sorts of questions can you help me with?`")
+    ]
+) -> IntegrationDocumentationOutput:
+    """
+    Asks a question to the given integration's specialist agent expecting an answer in the form of a
+    statement or explanation rather than code. This is useful for querying what an integration can be expected
+    to do, what the specialist agent has access to, how it would perform a task without necessarily doing it,
+    and other questions that are higher level that executing the task on the spot.
+    """
     raise_on_invalid_integration(integration)
     try:
         response = integrations.ask_api(integration, query)
@@ -102,7 +121,22 @@ if response.status_code == 200:
     }
 
 @app.get("/draft_integration_code/{integration}")
-def draft_integration_code(integration: str, query: str) -> IntegrationCodeOutput:
+def draft_integration_code(
+    integration: Annotated[
+        str,
+        Path(description="The integration to ask the query of. The available integrations are listed with the `/list_integrations` endpoint, and this parameter must be one of those integration IDs.")
+    ],
+    query: Annotated[
+        str,
+        Query(description="The task for the specialist agent to complete. For example, asking the integration `cbioportal` the query `Find colorectal cancer studies`.")
+    ]
+) -> IntegrationCodeOutput:
+    """
+    Sends a task to the given integration's specialist agent expecting an answer in the form of
+    valid python code. This code should be expected to complete the given task the specialist agent
+    was asked to perform, with no expectations about returned values or the format those returned values
+    take, if any.
+    """
     raise_on_invalid_integration(integration)
     try:
         response = integrations.use_api(integration, query)
