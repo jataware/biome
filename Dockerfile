@@ -8,25 +8,13 @@ RUN apt update && apt install -y lsof
 # Install debugpy for remote debugging
 RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv
 
-# Install beaker-kernel from dev branch
-# RUN pip install git+https://github.com/jataware/beaker-kernel.git@dev
 COPY --chown=1000:1000 . /jupyter
 
-RUN rm /jupyter/.beaker.conf
-
-# RUN pip install \
-#     beaker-kernel~=1.9.1 \
-#     archytas==1.3.11 \
-#     requests \
-#     google-generativeai \
-#     PyYAML \
-#     adhoc-api~=2.0.2 \
-#     idc-index \
-#     seaborn \
-#     biopython \
-#     boto3 \
-#     google-cloud-storage \
-#     PyPDF2~=3.0.1
+# may or may not exist. if running locally,
+# these would likely be present in project root.
+# they should **NOT** be included or present in the image build.
+RUN rm -f /jupyter/.beaker.conf
+RUN rm -f /jupyter/.env
 
 RUN uv pip install --system -v -e /jupyter
 
