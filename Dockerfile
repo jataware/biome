@@ -29,6 +29,10 @@ ENV BEAKER_RUN_PATH=/var/run/beaker
 ENV BEAKER_APP=biome.app.BiomeApp
 
 RUN ln -s /jupyter/src/biome/datasources /home/user/datasources
+# subkernel access / file pane
+RUN ln -s /jupyter/data /home/user/data
+# agent path resolution
+RUN ln -s /jupyter/data /home/jupyter/data
 
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
