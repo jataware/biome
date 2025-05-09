@@ -16,7 +16,7 @@ import yaml
 from pathlib import Path
 from adhoc_api.tool import AdhocApi, ensure_name_slug_compatibility
 from adhoc_api.loader import load_yaml_api
-from adhoc_api.uaii import gpt_4o, o3_mini, claude_37_sonnet, gemini_15_pro
+from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
 
 logger = logging.getLogger(__name__)
 
@@ -147,15 +147,15 @@ class BiomeAgent(BeakerAgent):
         drafter_config_gemini =    {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
         drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
         curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        contextualizer_config =    {**gpt_4o, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        gpt_41_config =            {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
         specs = self.api_specs
 
         try:
             self.api = AdhocApi(
                 apis=specs,
-                drafter_config=[drafter_config_anthropic, drafter_config_gemini],
+                drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
                 curator_config=curator_config,
-                contextualizer_config=contextualizer_config,
+                contextualizer_config=gpt_41_config,
                 logger=self.logger,
             )
         except ValueError as e:

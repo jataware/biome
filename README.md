@@ -26,6 +26,9 @@ cp env.sample .env
 
 The keys are defined at the top. All of the variables that are not necessary to manually change have been omitted below with the ellipses.
 
+If running from Docker, leave the BIOME_DATA_DIR and BIOME_INTEGRATION_DIR values unset in .env, as the docker-compose defaults will be fine.
+
+If not running from Docker, ensure you set them with .env.
 
 ```
 # API Keys

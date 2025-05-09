@@ -25,6 +25,10 @@ documentation: !fill |
     You will need an API Key. It is available in the environment variable:
     - apiToken: os.environ.get("API_CDC_TRACKING_NETWORK")
 
+    To fully understand specifics about what data is or is not available, 
+    you must run code against the API to see what features are available at
+    what level of geography.
+
     {user_guide}
 
     Never simulate this API- if it is not available ask the user how to proceed.
