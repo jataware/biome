@@ -91,7 +91,9 @@ At this time, the following authenticated APIs are supported:
   - Register for an API key at: https://accounts.synapse.org/register1?appId=synapse.org
   - Go to User > Account Settings > Personal Access Token to create credentials
 - Netrias
-    - Request access from the Netrias team directly
+  - Request access from the Netrias team directly
+- CDC Tracking Network
+  - Email nephtrackingsupport@cdc.gov with name, email and organization for an API token.
     
 ## Data Files
 
