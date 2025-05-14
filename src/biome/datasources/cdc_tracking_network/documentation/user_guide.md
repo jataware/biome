@@ -7,9 +7,7 @@ The API provides a standard URL interface with a (JSON) formatted response. An e
 The Tracking Network’s environmental public health data are organized into three, tiered categories: content areas, indicators, and
 measures. The Tracking Network houses over 500 unique measures that are grouped under one or more indicators. Each indicator belongs to one or more content areas:
 
-```
 Content Area -> Indicator(s) -> Measure(s)
-```
 
 This user guide outlines the process of navigating from content areas to measures of interest, as well as determining desired location,
 times, and strata for the measures. This document contains four sections:

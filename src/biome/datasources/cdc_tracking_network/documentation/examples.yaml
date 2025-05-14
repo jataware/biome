@@ -1,0 +1,138 @@
+- query: "Retrieve age-adjusted rate of emergency department visits for asthma per 10,000 population for all available counties for the year 2016."
+  code: |
+    import os
+    import requests
+    import pandas as pd
+
+    # --- Step 1: Get all content areas
+
+    url = "https://ephtracking.cdc.gov/apigateway/api/v1/contentareas/json"
+    params = {}
+    api_token = os.environ.get("API_CDC_TRACKING_NETWORK")
+    if api_token:
+        params["apiToken"] = api_token
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    content_area_data = response.json()
+    content_areas_df = pd.DataFrame(content_area_data)
+    print(content_areas_df.head(10))  # Show just the first 10 rows
+    print(f"Total content areas: {len(content_areas_df)}")
+
+    # --- Step 2: find the content area with asthma to get id & attributes
+
+    asthma_content_area = next((area for area in content_area_data if "asthma" in area["name"].lower()), None)
+    asthma_content_area_id = asthma_content_area["id"] if asthma_content_area else None
+
+    # --- Step 3: Find all the indicators for that asthma content area we identified
+
+    url = f"https://ephtracking.cdc.gov/apigateway/api/v1/indicators/{asthma_content_area_id}"
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    indicator_list = response.json()
+    indicators_df = pd.DataFrame(indicator_list)
+    print(f"Total indicators for Asthma: {len(indicators_df)}")
+    print(indicators_df[['id', 'name', 'shortName']])
+
+    # --- Step 4: Choose the indicator which has emergency department in its name
+
+    asthma_emergency_department_indicator = next((indicator for indicator in indicator_list if "emergency department" in indicator["name"].lower()), None)
+    asthma_emergency_department_indicator_id = asthma_emergency_department_indicator["id"] if asthma_emergency_department_indicator else None
+
+    # --- Step 5: Get measures for that indicator id
+
+    url = f"https://ephtracking.cdc.gov/apigateway/api/v1/measures/{asthma_emergency_department_indicator_id}"
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    measures_data = response.json()
+    measures_df = pd.DataFrame(measures_data)
+    print(f"Total measures for Emergency Department Visits For Asthma: {len(measures_df)}")
+    print(measures_df[['id', 'name', 'shortName']])
+
+    # --- Step 6: Find measure that mentions the user's original query (age-adjusted rate of emergency department visits for asthma per 10,000 population)
+
+    full_measure_name = "age-adjusted rate of emergency department visits for asthma per 10,000 population"
+
+    adjusted_rate_measures = measure for measure in measures_data if full_measure_name in measure["name"].lower()
+
+    # there may be multiple measures, one with exact match and others with additional parameters
+    # Maybe decide to ask user which one they prefer and not the ID of the one selected
+    # selecting first one for now
+    adjusted_rate_measure = next(adjusted_rate_measures, None)
+    measure_id = adjusted_rate_measure["id"] if adjusted_rate_measure else None
+
+    # --- Step 7: Get available geographic types for the measure
+    geo_types_url = f"https://ephtracking.cdc.gov/apigateway/api/v1/geographicTypes/{measure_id}"
+    geo_types_response = requests.get(geo_types_url, params=params)
+    print(f"Geographic types response status: {geo_types_response.status_code}")
+    geo_types = geo_types_response.json()
+    print(f"Available geographic types: {geo_types}")
+
+    # --- Step 8: Find county-level geographicTypeId (look for "County" in geographicType)
+    county_geo_type = next((g for g in geo_types if "county" in g["geographicType"].lower()), None)
+    if not county_geo_type:
+        raise Exception("No county-level geographic type found for this measure.")
+    geographic_type_id = county_geo_type["geographicTypeId"]
+
+    # --- Step 9: Get stratification levels for county, isSmoothed=0
+    isSmoothed = 0
+    strat_level_url = f"https://ephtracking.cdc.gov/apigateway/api/v1/stratificationlevel/{measure_id}/{geographic_type_id}/{isSmoothed}"
+
+    strat_levels_response = requests.get(strat_level_url, params=params)
+    print(f"Stratification levels response status: {strat_levels_response.status_code}")
+    strat_levels = strat_levels_response.json()
+    print(f"Available stratification levels: {strat_levels}")
+
+    # Use the first stratification level (usually geography only)
+    stratification_level_id = strat_levels[0]["id"]
+    print(f"Using stratification level ID: {stratification_level_id}")
+
+    # --- Step 10: Get all available counties for this measure
+    geo_items_url = f"https://ephtracking.cdc.gov/apigateway/api/v1/geographicItems/{measure_id}/{geographic_type_id}/0"
+    geo_items_response = requests.get(geo_items_url, params=params)
+    print(f"Geographic items response status: {geo_items_response.status_code}")
+    geo_items = geo_items_response.json()
+    print(f"Number of counties available: {len(geo_items)}")
+    print(f"Sample of counties: {geo_items[:3]}")  # Show just a few counties
+
+    county_ids = [str(item["childGeographicId"]) for item in geo_items]
+    geographic_items_filter = ",".join(county_ids)
+    print(f"Number of county IDs: {len(county_ids)}")
+
+    # --- Optional Step 11: Use top 10 counties for now since there's too many to
+    # query all data at once. Potentially show user the counties list and let them
+    # decide which ones to include
+    county_ids = county_ids[:10]
+
+    geographic_items_filter = ",".join(county_ids)
+    print(f"Using {len(county_ids)} counties for this query")
+
+    # --- Step 12: Get available temporal types for this measure and county
+
+    temporal_items_url = f"https://ephtracking.cdc.gov/apigateway/api/v1/temporalItems/{measure_id}/{geographic_type_id}/{geographic_type_id}/{geographic_items_filter}"
+    temporal_items_response = requests.get(temporal_items_url, params=params)
+    print(f"Temporal items response status: {temporal_items_response.status_code}")
+    temporal_items = temporal_items_response.json()
+    print(f"Available temporal items: {temporal_items}")
+
+    # Find the temporalId for year given by user
+    temporal_id_2016 = None
+    for t in temporal_items:
+        if t.get("temporal") == "2016":
+            temporal_id_2016 = t.get("temporalId")
+            break
+    print(f"Temporal ID for 2016: {temporal_id_2016}")
+
+    # --- Step 13: Query the data using POST to getCoreHolder
+    core_holder_url = f"https://ephtracking.cdc.gov/apigateway/api/v1/getCoreHolder/{measure_id}/{stratification_level_id}/0/0"
+    body = {
+        "geographicTypeIdFilter": str(geographic_type_id),
+        "geographicItemsFilter": geographic_items_filter,
+        "temporalTypeIdFilter": "1",  # Year
+        "temporalItemsFilter": str(temporal_id_2016),
+        "embedId": None
+    }
+    headers = {"Accept": "application/json"}
+    response = requests.post(core_holder_url, params=params, json=body, headers=headers)
