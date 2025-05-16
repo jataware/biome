@@ -57,8 +57,8 @@ def ignore_tags(loader, tag_suffix, node):
 yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 
 
-DRAFT_API_CODE_DOC = load_docstring('draft_api_code.md')
-CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
+DRAFT_API_CODE_DOC = load_docstring('draft_integration_code.md')
+CONSULT_API_DOCS_DOC = load_docstring('consult_integration_docs.md')
 
 class BiomeAgent(BeakerAgent):
     """
@@ -121,11 +121,6 @@ class BiomeAgent(BeakerAgent):
                 api_spec = load_yaml_api(api_yaml)
                 raw_contents = api_yaml.read_text()
                 raw_spec = yaml.safe_load(raw_contents)
-                try:
-                    ensure_name_slug_compatibility(raw_spec)
-                    self.raw_specs.append((os.path.join(datasource_dir, 'api.yaml'), raw_spec))
-                except Exception as e:
-                    logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
 
                 # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
@@ -136,6 +131,14 @@ class BiomeAgent(BeakerAgent):
                         if 'code' in example and isinstance(example['code'], str):
                             example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
                             example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+
+                try:
+                    ensure_name_slug_compatibility(raw_spec)
+                    # add the loaded examples in too, since we want that tag parsed but also the raw text as well
+                    raw_spec['loaded_examples'] = api_spec.get('examples', [])
+                    self.raw_specs.append((os.path.join(datasource_dir, 'api.yaml'), raw_spec))
+                except Exception as e:
+                    logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
 
                 ensure_name_slug_compatibility(api_spec)
                 self.api_specs.append(api_spec)
@@ -171,11 +174,11 @@ class BiomeAgent(BeakerAgent):
         )
 
     @tool()
-    @with_docstring('draft_api_code.md')
-    async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"using api: {api}")
+    @with_docstring('draft_integration_code.md')
+    async def draft_integration_code(self, integration: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+        logger.info(f"using integration: {integration}")
         try:
-            code = self.api.use_api(api, goal)
+            code = self.api.use_api(integration, goal)
             return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
         except Exception as e:
             if self.api is None:
@@ -184,18 +187,18 @@ class BiomeAgent(BeakerAgent):
             return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
 
     @tool()
-    @with_docstring('consult_api_docs.md')
-    async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"asking api: {api}")
+    @with_docstring('consult_integration_docs.md')
+    async def consult_integration_docs(self, integration: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+        logger.info(f"asking integration: {integration}")
         try:
-            results = self.api.ask_api(api, query)
+            results = self.api.ask_api(integration, query)
             return f"Here is the information I found about how to use the API: \n{results}"
         except Exception as e:
             if self.api is None:
                 return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             logger.error(str(e))
             return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
-    
+
 
     @tool()
     async def drs_uri_info(self, uris: List[str]) -> List[dict]:
@@ -206,7 +209,7 @@ class BiomeAgent(BeakerAgent):
 
         Args:
             uris (list): A list of DRS URIs to get information about. URIs should be of the form 'drs://<hostname>:<id_number>'.
-            
+
         Returns:
             list: The information from looking up each DRS URI.
         """
@@ -220,7 +223,7 @@ class BiomeAgent(BeakerAgent):
                 object_id = uri.split(":")[-1]
             except IndexError:
                 raise ValueError("Invalid DRS URI: Missing object ID")
-    
+
             # Get information about the object from the DRS server
             url = f"https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/{object_id}"
             response = requests.get(url)
@@ -230,7 +233,7 @@ class BiomeAgent(BeakerAgent):
             responses.append(response.json())
 
         return responses
-    
+
     @tool()
     async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
         """
@@ -250,23 +253,23 @@ class BiomeAgent(BeakerAgent):
         """
         if api not in self.api_list:
             raise ValueError(f"Error: the API name must match one of the names in the {self.api_list}. The API name provided was {api}.")
-        
+
         try:
             api_folder = self.api_directories[api]
             # Construct path to examples.yaml file
             examples_path = os.path.join(self.root_folder, DATASOURCES_FOLDER, api_folder, "documentation", "examples.yaml")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
-            
+
             # Create new example entry as a dictionary
             new_example = {
                 "query": query,
                 "code": code  # Will be formatted with block scalar style
             }
-            
+
             # Add notes if provided
             if notes:
                 new_example["notes"] = notes
-                
+
             # Read existing examples if file exists
             examples = []
             if os.path.exists(examples_path) and os.path.getsize(examples_path) > 0:
@@ -275,28 +278,28 @@ class BiomeAgent(BeakerAgent):
                     examples = yaml.safe_load(f) or []
                     if not isinstance(examples, list):
                         examples = []
-            
+
             # Add new example
             examples.append(new_example)
-            
+
             # Write updated examples back to file
             import yaml
-            
+
             # Custom YAML dumper class that always uses block style for multiline strings
             class BlockStyleDumper(yaml.SafeDumper):
                 pass
-            
+
             # Always use block style (|) for strings with newlines
             def represent_str_as_block(dumper, data):
                 if '\n' in data:
                     return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
                 return dumper.represent_scalar('tag:yaml.org,2002:str', data)
-            
+
             BlockStyleDumper.add_representer(str, represent_str_as_block)
-            
+
             with open(examples_path, 'w') as f:
                 yaml.dump(examples, f, Dumper=BlockStyleDumper, sort_keys=False, default_flow_style=False)
-                
+
             return f"Successfully added example to {examples_path}"
 
         except Exception as e:

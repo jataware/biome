@@ -66,7 +66,8 @@ class BiomeContext(BeakerContext):
                     "cache_key",
                     "documentation",
                     "examples",
-                    "cache_body"
+                    "cache_body",
+                    "loaded_examples"
                 ]
             ]:
                 if not isinstance(spec[attachment_key], str):
@@ -88,6 +89,9 @@ class BiomeContext(BeakerContext):
                     is_empty_file=False
                 ))
 
+        # manually load examples
+
+
         return [
             Datasource(
                 slug=spec['slug'],
@@ -95,7 +99,8 @@ class BiomeContext(BeakerContext):
                 name=spec['name'],
                 description=spec.get('description'),
                 source=spec.get('documentation').replace('!fill', ''),
-                attached_files=attached_files[spec['name']]
+                attached_files=attached_files[spec['name']],
+                examples=spec.get("loaded_examples", [])
             )
             for (yaml_location, spec) in self.agent.raw_specs
         ]
@@ -122,3 +127,4 @@ class BiomeContext(BeakerContext):
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new datasource has been added: `{slug}`. You may now use this with `draft_api_code`.")
+
