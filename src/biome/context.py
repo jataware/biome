@@ -10,7 +10,7 @@ from beaker_kernel.lib.context import BeakerContext, action
 from beaker_kernel.subkernels.python import PythonSubkernel
 from beaker_kernel.lib.types import Datasource, DatasourceAttachment
 
-from .agent import DATASOURCES_FOLDER, BiomeAgent
+from .agent import BiomeAgent
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -105,26 +105,17 @@ class BiomeContext(BeakerContext):
             for (yaml_location, spec) in self.agent.raw_specs
         ]
 
-    @action(action_name="save_datasource")
-    async def save_datasource(self, message):
+    @action(action_name="save_integration")
+    async def save_integration(self, message):
         content = message.content
-
-        datasource = Datasource(
-            name=content.get('name'),
-            slug=content.get('slug'),
-            url=content.get('url'),
-            description=content.get('description'),
-            source=content.get('source'),
-            attached_files=[
-                DatasourceAttachment(
-                    name=payload['name'],
-                    filepath=payload['filepath']
-                )
-                for payload in content.get('attached_files')]
-        )
-
-        slug = datasource.slug
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
-        self.agent.add_context(f"A new datasource has been added: `{slug}`. You may now use this with `draft_api_code`.")
+        self.agent.add_context(f"A new integration has been added: `{content.get('slug')}`. You may now use this with `draft_integration_code`.")
+
+    @action(action_name="add_example")
+    async def add_example(self, message):
+        content = message.content
+        self.agent.fetch_specs()
+        self.agent.initialize_adhoc()
+        self.agent.add_context(f"A new example has been added to `{content.get('slug')}.`")
 
