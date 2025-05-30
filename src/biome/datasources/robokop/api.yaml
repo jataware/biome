@@ -11,9 +11,6 @@ db_labels: !load_txt documentation/db_labels.txt
 
 db_relations: !load_txt documentation/db_relationship_types.txt
 
-documentation_remote: !load_txt documentation/remote.txt
-
-
 documentation: !fill |
     ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
 
@@ -24,7 +21,7 @@ documentation: !fill |
     from neo4j import GraphDatabase
 
     url = "bolt://localhost:7687"
-    session = GraphDatabase.driver(url, auth=('neo4j', 'password')).session()
+    session = GraphDatabase.driver(url, auth=('neo4j', 'neo4j')).session()
     '''
 
     Here is a list of all of the knowledge graph node labels:
@@ -46,3 +43,13 @@ documentation: !fill |
 
     IMPORTANT: If using the metadata JSON of the knowledge graph would help, use it to debug errors with your queries.
     The metadata JSON is located here: {{DATASET_FILES_BASE_PATH}}/robokop/meta_knowledge_graph.json
+
+  can you find me a gene that is related to both buprenorphine and tremor with robokop
+  can you plot a comparison of the edges connecting these two relations: brixadi (PUBCHEM.COMPOUND:9848990) and asterixis;
+
+
+  can you find me a gene that is related to both buprenorphine and asterixis with robokop
+
+  can you also find the gene related to both brixadi (PUBCHEM.COMPOUND:9848990) and asterixis and store that in a different variable?
+
+  can you plot a graph to compare these gene relations between the two drugs and tremors?
