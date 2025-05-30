@@ -43,13 +43,3 @@ documentation: !fill |
 
     IMPORTANT: If using the metadata JSON of the knowledge graph would help, use it to debug errors with your queries.
     The metadata JSON is located here: {{DATASET_FILES_BASE_PATH}}/robokop/meta_knowledge_graph.json
-
-  can you find me a gene that is related to both buprenorphine and tremor with robokop
-  can you plot a comparison of the edges connecting these two relations: brixadi (PUBCHEM.COMPOUND:9848990) and asterixis;
-
-
-  can you find me a gene that is related to both buprenorphine and asterixis with robokop
-
-  can you also find the gene related to both brixadi (PUBCHEM.COMPOUND:9848990) and asterixis and store that in a different variable?
-
-  can you plot a graph to compare these gene relations between the two drugs and tremors?
