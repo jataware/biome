@@ -40,6 +40,8 @@ services:
     environment:
       - BIOME_INTEGRATIONS_DIR=/integrations
       - BIOME_DATA_DIR=/data
+    networks:
+      - beaker
   # ui:
   #   image: node:20
   #   user: "node"

@@ -2,38 +2,67 @@
 
 FastAPI service for exposing Biome Integrations through a REST interface.
 
-## Deployment
+## Quick Start
 
-### Docker
-
-`docker-compose.yml` in the biome root will run this service with default values for env vars, requiring only `OPENAI_API_KEY` set in `.env` such as how `.env.sample` does it.
-
-### Env Vars
-
-Be sure to set the following:
-
-| Variable | Value |
-| --- | --- |
-| `OPENAI_API_KEY` | Used for the Biome agent |
-| `BIOME_INTEGRATIONS_DIR` | Point this to the folder that contains Biome's integrations. By default, it will be pointed to `../src/biome/datasources/ such that if you run this from project root it will be in the correct place. |
-| `BIOME_DATA_DIR` | Point this to the Git LFS large datasets used with Biome. By default, it will be pointed to `../data` such that if you run this from project root it will be in the correct place. |
-
-### Usage
-
-Run this service as you would any other FastAPI service.
-
-(FastAPI docs)[https://fastapi.tiangolo.com/#run-it]
-
-Install the dependencies with hatch/uv/poetry or any other pyproject.toml and run it with the correct environment variables.
-
-Example (hatch)
-
+1. **Start the REST API:**
+```bash
+# From project root
+docker-compose up rest_api
 ```
-$ hatch shell
-$ fastapi run biome_rest/main.py
+REST API will be available at http://localhost:8000
+
+2. **Test the MCP wrapper (optional):**
+```bash
+# In another terminal
+cd rest_api
+npx @modelcontextprotocol/inspector python mcp_server.py
+```
+MCP Inspector UI will be available at http://127.0.0.1:6274
+
+## Environment Setup
+
+Set `OPENAI_API_KEY` in a `.env` file (see `.env.sample` for example).
+
+## Local Development
+
+```bash
+cd rest_api
+pip install -e .
+fastapi run biome_rest/main.py
 ```
 
-## Endpoints
+## MCP Server
+
+**⚠️ Important: The REST API must be running first!**
+
+The MCP server is just a wrapper around the REST API that makes it easier for AI assistants to use.
+
+### For Testing:
+```bash
+# Make sure REST API is running first!
+npx @modelcontextprotocol/inspector python mcp_server.py
+```
+Then open http://127.0.0.1:6274
+
+### For Claude Desktop:
+Add to your Claude Desktop config:
+```json
+{
+  "mcpServers": {
+    "biome": {
+      "command": "python",
+      "args": ["/path/to/biome-oct-24/rest_api/mcp_server.py"]
+    }
+  }
+}
+```
+
+### Available Tools:
+- `biome_list_integrations` - Lists all integrations
+- `biome_consult_integration_documentation` - Ask questions about integrations  
+- `biome_draft_integration_code` - Generate Python code
+
+## REST API Endpoints
 
 #### GET `/list_integrations`
 
