@@ -1,0 +1,38 @@
+ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
+
+CRITICAL: Use the URL `https://robokop-automat.apps.renci.org/robokopkg/query` for TRAPI queries.
+
+CRITICAL: Use the URL `https://robokop-automat.apps.renci.org/robokopkg/cypher` for Neo4J Cypher queries.
+
+The Neo4J Cypher endpoint can be accessed and used as follows:
+
+'''
+import requests
+import json
+
+url = "https://robokop-automat.apps.renci.org/robokopkg/cypher"
+
+payload = json.dumps({
+    "query": "string"
+})
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)
+'''
+
+Here is a list of all of the knowledge graph node labels:
+
+```
+{db_labels}
+```
+
+Here is a list of all of the knowledge graph relationship types:
+
+```
+{db_relations}
+```
+
+IMPORTANT: Reference these when making your queries and think carefully about only using types that exist.

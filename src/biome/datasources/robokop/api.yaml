@@ -1,0 +1,48 @@
+
+name: Robokop
+slug: robokop
+cache_key: api_assistant_robokop
+examples: !load_yaml documentation/examples.yaml
+
+description: |
+    ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
+
+db_labels: !load_txt documentation/db_labels.txt
+
+db_relations: !load_txt documentation/db_relationship_types.txt
+
+documentation_remote: !load_txt documentation/remote.txt
+
+
+documentation: !fill |
+    ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
+
+    You have access to a local Neo4J instance. You can start a session with the following:
+
+    '''
+    import neo4j
+    from neo4j import GraphDatabase
+
+    url = "bolt://localhost:7687"
+    session = GraphDatabase.driver(url, auth=('neo4j', 'password')).session()
+    '''
+
+    Here is a list of all of the knowledge graph node labels:
+
+    IMPORTANT: When referencing node labels, make sure to quote them in backticks. For example,
+    biolink:BiologicalProcess should be `biolink:BiologicalProcess` as to be proper Cypher syntax.
+
+    ```
+    {db_labels}
+    ```
+
+    Here is a list of all of the knowledge graph relationship types:
+
+    ```
+    {db_relations}
+    ```
+
+    IMPORTANT: Reference these when making your queries and think carefully about only using types that exist.
+
+    IMPORTANT: If using the metadata JSON of the knowledge graph would help, use it to debug errors with your queries.
+    The metadata JSON is located here: {{DATASET_FILES_BASE_PATH}}/robokop/meta_knowledge_graph.json

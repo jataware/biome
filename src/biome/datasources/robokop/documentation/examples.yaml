@@ -1,0 +1,25 @@
+- query: "Find me a Biological Process or Activity, or a Gene, or a Pathway that is related to both Buprenorphine and Tremor"
+  code: |
+    import neo4j
+    from neo4j import GraphDatabase
+    
+    url = "bolt://localhost:7687"
+    session = GraphDatabase.driver(url, auth=('neo4j', 'password')).session()
+    
+    query = """
+    MATCH 
+        (n0_0:`biolink:ChemicalEntity`)-[r0_0]-(n1_0:`biolink:Gene`)-[r1_0]-(n2_0:`biolink:DiseaseOrPhenotypicFeature`)
+    WHERE 
+        n0_0.name IN ['Buprenorphine'] 
+        AND n2_0.name IN ['Tremor']
+    RETURN 
+        [startNode(r0_0),[type(r0_0),properties(r0_0)],endNode(r0_0)] as edge_1,
+        [startNode(r1_0),[type(r1_0),properties(r1_0)],endNode(r1_0)] as edge_2,
+        [n0_0.name, n1_0.name, n2_0.name] as node_names 
+    LIMIT 100
+    """
+    
+    list(session.run(query))
+    
+  notes: |
+    Finding a link between a drug and a symptom.
