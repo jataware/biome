@@ -2,6 +2,8 @@
 
 FastAPI service for exposing Biome Integrations through a REST interface.
 
+Make sure the MCP client has a timeout set to 30 seconds or higher!
+
 ## Quick Start
 
 1. **Start the REST API:**
@@ -59,7 +61,7 @@ Add to your Claude Desktop config:
 
 ### Available Tools:
 - `biome_list_integrations` - Lists all integrations
-- `biome_consult_integration_documentation` - Ask questions about integrations  
+- `biome_consult_integration_documentation` - Ask questions about integrations
 - `biome_draft_integration_code` - Generate Python code
 
 ## REST API Endpoints
