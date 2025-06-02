@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Default base URL for the Biome REST API
-DEFAULT_BASE_URL = "http://localhost:8000"
+DEFAULT_BASE_URL = "http://localhost:8001"
 
 class BiomeMCPServer:
     def __init__(self, base_url: str = DEFAULT_BASE_URL):
