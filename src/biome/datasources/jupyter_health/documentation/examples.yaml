@@ -1,0 +1,80 @@
+- query: "Get Patient Observations From Study (Blood Glucose)"
+  code: |
+    from jupyterhealth_client import Code
+    CGM = Code.BLOOD_GLUCOSE
+    
+    # pick patient id from above
+    patient_id = <patient id>
+    
+    df = jh_client.list_observations_df(patient_id=patient_id, study_id=study_id, limit=10_000, code=CGM)
+    
+    df
+  notes: |
+    Find patients first before doing this. Blood Glucose is used as an example.
+- query: "Review Patients In Study"
+  code: |
+    from dateutil.parser import parse as parse_date
+    
+    # show all the patients with study data I have access to:
+    print(f"Patients in study [{study['id']}] {study['name']}")
+    
+    for patient in jh_client.list_patients():
+        consents = jh_client.get_patient_consents(patient['id'])
+        consented = {
+            _study['id']: _study
+            for _study in consents['studies']
+        }
+        pending_consent = {
+            _study['id']: _study
+            for _study in consents['studiesPendingConsent']
+        }
+        if study_id not in consented and study_id not in pending_consent:
+            # ignore patients not in the study
+            continue
+        print(f"[{patient['id']}] {patient['nameFamily']}, {patient['nameGiven']}: {patient['telecomEmail']}")
+        if study_id in consented:
+            study_consent = consented[study_id]
+            for scope_consent in study_consent['scopeConsents']:
+                date = parse_date(scope_consent['consentedTime']).date()
+                print(f" - {scope_consent['code']['text']}, consented {date}")
+        if study_id in pending_consent:
+            study_pending_consent = pending_consent[study_id]
+            for scope_consent in study_pending_consent['pendingScopeConsents']:
+                print(f" - {scope_consent['code']['text']} (not consented)")
+  notes: |
+    We can review which patients are in the study, and which are invited to the study but haven't consented to data availability via the patient consents endpoint
+- query: "List Studies And Patients"
+  code: |
+    for study in jh_client.list_studies():
+        print(f"  - [{study['id']}] {study['name']} org:{study['organization']['name']}")
+    
+    # You may now fetch with jh_client.get_study(study_id)
+  notes: |
+    A study is associated with an organization and specific data requests.
+    
+    Practitioners have access to specific studies, e.g. via their organization membership.
+    
+    All studies that you have access to can be found as follows.
+- query: "List Organizations"
+  code: |
+    # construct a dict of all organizations
+    org_dict = {org['id']: org for org in jh_client.list_organizations()}
+    # populate a tree of children, from each organization's `partOf` reference to its parent
+    # the root org has id=0
+    
+    for org in org_dict.values():
+        parent_id = org['partOf']
+        if parent_id is not None:
+            parent = org_dict[parent_id]
+            parent.setdefault("child_ids", []).append(org['id'])
+    
+    def print_org(org, indent=''):
+        print(f"{indent}[{org['id']}] {org['name']}")
+        for org_id in org.get('child_ids', []):
+            print_org(org_dict[org_id], indent=" " * len(indent) + ">")
+    
+    
+    for org_id in org_dict[0]['child_ids']:
+        print_org(org_dict[org_id])
+  notes: |
+    JupyterHealth Exchange organizes data access and patients are associated with organizations, which may be in a hierarchy of institutions, departments, teams, etc.

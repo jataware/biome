@@ -1,0 +1,44 @@
+
+name: Data Commons
+slug: data_commons
+cache_key: api_assistant_undefined
+examples: !load_yaml documentation/examples.yaml
+
+description: |
+    Data Commons is an aggregator of public datasets and datasources across multiple fields, such as economics, demographics, health, sustainability, education, and equity.
+
+    The Data Commons Python API is a Python client library that enables developers to programmatically access nodes in the Data Commons knowledge graph. This package allows you to explore the structure of the graph, integrate statistics from the graph into data analysis workflows and much more.
+
+node: !load_txt documentation/node.md
+
+observation: !load_txt documentation/observation.md
+
+resolve: !load_txt documentation/resolve.md
+
+api: !load_txt documentation/api.md
+
+concepts: !load_txt documentation/concepts.md
+
+
+documentation: !fill |
+    The Data Commons Python API is a Python client library that enables developers to programmatically access nodes in the Data Commons knowledge graph. This package allows you to explore the structure of the graph, integrate statistics from the graph into data analysis workflows and much more.
+
+    IMPORTANT: You will need authentication for these requests; the user may have set a key in the environment variable DATA_COMMONS_KEY, which you can check with os.environ.get and ask them for if it is not set.
+
+    The API concepts are as follows:
+
+    {concepts}
+
+    ---
+
+    The API top-level overview is as follows
+
+    {api}
+
+    ---
+
+    {observation}
+
+    {resolve}
+
+    {node}

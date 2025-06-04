@@ -1,0 +1,48 @@
+
+name: Jupyter Health
+slug: jupyter_health
+cache_key: api_assistant_undefined
+examples: !load_yaml documentation/examples.yaml
+
+description: |
+    JupyterHealth is an open-source, modular platform that eliminates data silos by integrating real-time health data from wearables, IoT devices, mobile apps, and Electronic Health Records (EHRs) into a unified, secure, and AI-powered ecosystem. This should not be used for general requests but rather if the user specifically asks to use a JupyterHealth instance.
+
+jh-tutorial-cgm: !load_txt documentation/jh-tutorial-cgm.md
+
+jh-sample-charts: !load_txt documentation/jh-sample-charts.md
+
+jh-openhealth-bp: !load_txt documentation/jh-openhealth-bp.md
+
+api: !load_txt documentation/api.yaml
+
+
+documentation: !fill |
+    JupyterHealth is an open-source, modular platform that eliminates data silos by integrating real-time health data from wearables, IoT devices, mobile apps, and Electronic Health Records (EHRs) into a unified, secure, and AI-powered ecosystem. This should not be used for general requests but rather if the user specifically asks to use a JupyterHealth instance.
+
+    JupyterHealth authentication either comes from environment variables or can be passed in at use. If JHE_URL and JHE_TOKEN environment variables are set, that is all that is needed.
+
+    ```
+    from jupyterhealth_client import JupyterHealthClient
+
+    jh_client = JupyterHealthClient()
+    ```
+
+    Otherwise, ask the user for their instance details (URL and token) and instantiate as follows:
+
+    ```
+    from jupyterhealth_client import JupyterHealthClient
+
+    jh_client = JupyterHealthClient(url=URL, token=TOKEN)
+    ```
+
+    Some example workflows and API documentation is provided below:
+
+    {jh-tutorial-cgm}
+
+    {jh-sample-charts}
+
+    {jh-openhealth-bp}
+
+    And the raw API documentation is as follows:
+
+    {api}
