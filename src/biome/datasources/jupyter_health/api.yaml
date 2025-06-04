@@ -13,6 +13,8 @@ jh-sample-charts: !load_txt documentation/jh-sample-charts.md
 
 jh-openhealth-bp: !load_txt documentation/jh-openhealth-bp.md
 
+api: !load_txt documentation/api.md
+
 documentation: !fill |
     JupyterHealth is an open-source, modular platform that eliminates data silos by integrating real-time health data from wearables, IoT devices, mobile apps, and Electronic Health Records (EHRs) into a unified, secure, and AI-powered ecosystem. This should not be used for general requests but rather if the user specifically asks to use a JupyterHealth instance.
 
