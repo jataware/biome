@@ -1,8 +1,12 @@
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict
 import os
-import json
 import re
 import logging
+import json
+
+from jupyter_server.services.contents.filemanager import (
+    FileContentsManager,
+)
 
 from pathlib import Path
 
@@ -11,10 +15,12 @@ from beaker_kernel.subkernels.python import PythonSubkernel
 from beaker_kernel.lib.types import Datasource, DatasourceAttachment
 
 from .agent import BiomeAgent
+from .integration import write_integration
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
     from beaker_kernel.lib.agent import BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +63,7 @@ class BiomeContext(BeakerContext):
         # get list of keys not inherent to a datasource for the user-files category
         attached_files = {}
         for (_, spec) in self.agent.raw_specs:
-            attached_files[spec['name']] = []
+            attached_files[spec["name"]] = []
             for attachment_key in [
                 key for key in spec.keys() if key not in [
                     "name",
@@ -77,12 +83,12 @@ class BiomeContext(BeakerContext):
                 # trim yaml tags since they will be readded at save time
                 # TODO: handle not-eliding documentation/
                 filepath_raw = re.sub(
-                        r'!load_[a-zA-Z]+',
-                        '',
+                        r"!load_[a-zA-Z]+",
+                        "",
                         spec[attachment_key].strip()
-                    ).strip().replace('documentation/', '')
+                    ).strip().replace("documentation/", "")
 
-                attached_files[spec['name']].append(DatasourceAttachment(
+                attached_files[spec["name"]].append(DatasourceAttachment(
                     name=attachment_key,
                     filepath=filepath_raw,
                     content=None,
@@ -94,12 +100,12 @@ class BiomeContext(BeakerContext):
 
         return [
             Datasource(
-                slug=spec['slug'],
+                slug=spec["slug"],
                 url=str(yaml_location),
-                name=spec['name'],
-                description=spec.get('description'),
-                source=spec.get('documentation').replace('!fill', ''),
-                attached_files=attached_files[spec['name']],
+                name=spec["name"],
+                description=spec.get("description"),
+                source=spec.get("documentation").replace("!fill", ""),
+                attached_files=attached_files[spec["name"]],
                 examples=spec.get("loaded_examples", [])
             )
             for (yaml_location, spec) in self.agent.raw_specs
@@ -107,14 +113,18 @@ class BiomeContext(BeakerContext):
 
     @action(action_name="save_integration")
     async def save_integration(self, message):
+        manager = FileContentsManager()
         content = message.content
+        write_integration(manager, content)
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new integration has been added: `{content.get('slug')}`. You may now use this with `draft_integration_code`.")
 
     @action(action_name="add_example")
     async def add_example(self, message):
+        manager = FileContentsManager()
         content = message.content
+        write_integration(manager, content)
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new example has been added to `{content.get('slug')}.`")
