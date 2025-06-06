@@ -120,7 +120,6 @@ def format_integration(integration):
         "documentation": FillTag(integration.get("source"))
     }
     for file in integration.get("attached_files", []):
-        print('a')
         saved_fields[file.get("name")] = LoadTextTag(
             f"documentation/{file.get('filepath')}"
         )
@@ -142,3 +141,12 @@ def write_integration(manager, integration):
         create_file_model(format_integration(integration)),
         str(integration_yaml_path)
     )
+
+    for file in integration.get("attached_files", []):
+        # files that are not empty content have yet to be saved -- uploading can be handled by frontend.
+        # so if a tool creates a new file, it needs to be written here.
+        if (content := file.get("content", None)) is not None:
+            manager.save(
+                create_file_model(content),
+                str(base_path / "documentation" / file.get('filepath', 'invalid_filepath'))
+            )

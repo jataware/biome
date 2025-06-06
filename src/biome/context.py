@@ -15,7 +15,7 @@ from beaker_kernel.subkernels.python import PythonSubkernel
 from beaker_kernel.lib.types import Datasource, DatasourceAttachment
 
 from .agent import BiomeAgent
-from .integration import write_integration
+from .integration import create_folder_structure_for_integration, get_integration_folder, write_integration
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -51,9 +51,6 @@ class BiomeContext(BeakerContext):
             "netrias_api_key": os.environ.get("NETRIAS_KEY"),
         })
         await self.execute(command)
-
-    async def get_datasource_root(self) -> str:
-        return os.environ.get("BIOME_INTEGRATIONS_DIR", "")
 
     async def get_datasources(self) -> list[Datasource]:
         """
@@ -97,7 +94,6 @@ class BiomeContext(BeakerContext):
 
         # manually load examples
 
-
         return [
             Datasource(
                 slug=spec["slug"],
@@ -111,6 +107,25 @@ class BiomeContext(BeakerContext):
             for (yaml_location, spec) in self.agent.raw_specs
         ]
 
+    # frontend can request where to upload files to given a specific integration
+    @action(action_name="get_integration_root")
+    async def get_integration_root(self, message):
+        content = message.content
+        return str(
+            Path(os.environ.get("BIOME_INTEGRATIONS_DIR", "/"))
+            / get_integration_folder(content.get("integration"))
+        )
+
+    # handles a case of uploading a new file to a temporary, unsaved datasource
+    # that way the frontend can upload directly rather than sending it in an action message
+    @action(action_name="create_integration_folders_for_upload")
+    async def create_integration_folders_for_upload(self, message):
+        manager = FileContentsManager()
+        content = message.content
+        create_folder_structure_for_integration(manager, content.get("integration"))
+        return True
+
+    #
     @action(action_name="save_integration")
     async def save_integration(self, message):
         manager = FileContentsManager()
