@@ -5,6 +5,7 @@ import requests
 from time import sleep
 import asyncio
 import os
+import threading
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
 from typing import Any, List
@@ -17,6 +18,11 @@ from pathlib import Path
 from adhoc_api.tool import AdhocApi, ensure_name_slug_compatibility
 from adhoc_api.loader import load_yaml_api
 from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
+
+# from langchain_mcp_adapters.tools import load_mcp_tools
+# from langchain_mcp_adapters.client import MultiServerMCPClient
+
+from Bio import Entrez
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +62,22 @@ def ignore_tags(loader, tag_suffix, node):
     return tag_suffix + ' ' + node.value
 yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 
+def entrez_read(handle) -> dict:
+    sleep(0.25) # rate limits - recommended by entrez docs
+    results = Entrez.read(handle)
+    handle.close()
+    return results # type: ignore
 
 DRAFT_INTEGRATION_CODE_DOC = load_docstring('draft_integration_code.md')
 CONSULT_INTEGRATIONS_DOCS_DOC = load_docstring('consult_integration_docs.md')
+
+# MCP_SERVERS = {
+#     "biorxiv": {
+#         "command": "python",
+#         "transport": "stdio",
+#         "args": ["./src/mcp/biorxiv_server.py"]
+#     }
+# }
 
 class BiomeAgent(BeakerAgent):
     """
@@ -69,6 +88,25 @@ class BiomeAgent(BeakerAgent):
     An API should be considered a type of integration.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
+        # self.mcpFetchLoop = asyncio.new_event_loop()
+        # self.mcpFetchThread = threading.Thread(
+        #     target=self.mcpFetchLoop.run_forever,
+        #     name="MCP Fetch Thread",
+        #     daemon=True
+        # )
+        # self.mcpFetchThread.start()
+
+        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
+        try:
+            data_dir = Path(data_dir_raw).resolve(strict=True)
+            logger.info(f"Using data_dir: {data_dir}")
+        except OSError as e:
+            data_dir = Path('.')
+            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
+        self.data_dir = data_dir
+
+        self.initialize_entrez()
+
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
         self.logger = MessageLogger(self.log, logger)
 
@@ -81,6 +119,11 @@ class BiomeAgent(BeakerAgent):
             for file in instructions_dir.iterdir() if file.is_file()
         )
 
+        # client = MultiServerMCPClient(MCP_SERVERS)
+        # mcp_tools = asyncio.run_coroutine_threadsafe(
+        #     client.get_tools(),
+        #     self.mcpFetchLoop
+        # ).result()
         super().__init__(context, tools, **kwargs)
         self.initialize_adhoc()
 
@@ -91,17 +134,14 @@ class BiomeAgent(BeakerAgent):
             self.__doc__ = template.format(api_list=self.integration_list, instructions=self.instructions)
             self.add_context(self.__doc__)
 
+    def initialize_entrez(self):
+        if (entrez_email := os.environ.get("ENTREZ_EMAIL", None)):
+            Entrez.email = entrez_email
+        if (entrez_key := os.environ.get("ENTREZ_API_KEY", None)):
+            Entrez.api_key = entrez_key
+
     def fetch_specs(self):
         integration_root = os.path.join(self.root_folder, INTEGRATIONS_FOLDER)
-
-        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
-        try:
-            data_dir = Path(data_dir_raw).resolve(strict=True)
-            logger.info(f"Using data_dir: {data_dir}")
-        except OSError as e:
-            data_dir = ''
-            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
-        self.data_dir = data_dir
 
         # Get API specs and directories in one pass
         self.integration_specs = []
@@ -123,14 +163,14 @@ class BiomeAgent(BeakerAgent):
                 raw_spec = yaml.safe_load(raw_contents)
 
                 # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
-                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
-                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
+                api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(self.data_dir))
+                api_spec['documentation'] = api_spec['documentation'].replace('{{DATASET_FILES_BASE_PATH}}', str(self.data_dir))
 
                 if 'examples' in api_spec and isinstance(api_spec['examples'], list):
                     for example in api_spec['examples']:
                         if 'code' in example and isinstance(example['code'], str):
-                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
-                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
+                            example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(self.data_dir))
+                            example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(self.data_dir))
 
                 try:
                     ensure_name_slug_compatibility(raw_spec)
@@ -333,3 +373,180 @@ class BiomeAgent(BeakerAgent):
         code = agent.context.get_code("extract_pdf", {'pdf_path': pdf_path})
         response = await agent.context.evaluate(code)
         return response["return"]
+
+
+    def pubmed_search_ids(self, query):
+        results = entrez_read(Entrez.esearch(db="pubmed", term=query, retmax=25))
+        if (id_list := results.get("IdList", None)):
+            return id_list
+        return "No IDs returned for the given query."
+
+    def pubmed_fulltext(self, pmc_id):
+        try:
+            text = []
+            cursor = 0
+            while True:
+                response = Entrez.efetch(db="pmc", id=pmc_id, retstart=cursor, rettype="xml")
+                sleep(0.25)
+                body = response.read().decode('utf-8')
+                text.append(body)
+                if "[truncated]" in response or "Result too long" in body:
+                    cursor += len(body)
+                else:
+                    break
+            contents = "".join(text)
+            output_dir = self.data_dir / "pubmed"
+            fulltext_file = output_dir / f"{pmc_id}.fulltext.html"
+            os.makedirs(str(output_dir), exist_ok=True)
+            with open(fulltext_file, 'w') as f:
+                f.write(contents)
+            return contents
+        except Exception:
+            import traceback
+            logger.error(traceback.print_exc())
+
+    @tool()
+    async def pubmed_search(self, query: str):
+        """
+        Retrieves paper abstracts for a given PubMed query.
+        Relevant papers will be listed as their ID and associated abstracts.
+        Use this to find relevant papers and decide which papers to fetch
+        for what is relevant to the user query.
+
+        Try multiple formulations of the PubMed query to retrieve many papers.
+        If less than five papers are found, retry this tool to see if other formulations find more papers.
+
+
+        Args:
+            query (str): User query to search on PubMed.
+
+        Returns:
+            str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
+                 Use the full text PMC ID to fetch the full text of the paper.
+        """
+
+        paper_ids = self.pubmed_search_ids(query)
+        details = {}
+        for paper_id in paper_ids:
+            output_dir = self.data_dir / "pubmed"
+            os.makedirs(str(output_dir), exist_ok=True)
+            metadata_file = output_dir / f"{paper_id}.metadata.json"
+            if metadata_file.exists():
+                with open(metadata_file, 'r') as f:
+                    details[paper_id] = json.load(f)
+                    continue
+
+            try:
+                results = entrez_read(Entrez.efetch(db="pubmed", id=paper_id))
+                date_revised_raw = results["PubmedArticle"][0]["MedlineCitation"]["DateRevised"]
+                date_revised = "{}/{}/{}".format(
+                    *[str(date_revised_raw[field])
+                        for field in ["Year", "Month", "Day"]])
+                abstract = " ".join(results["PubmedArticle"][0]["MedlineCitation"]["Article"]["Abstract"]["AbstractText"])
+                title = results["PubmedArticle"][0]["MedlineCitation"]["Article"]["ArticleTitle"]
+
+                authors = list(filter(
+                    lambda author: '<invalid>' not in author,
+                    [
+                        f"{author.get('ForeName', '<invalid>')} {author.get('LastName', '<invalid>')}"
+                        for author in [
+                            dict(author_data)
+                            for author_data in results["PubmedArticle"][0]['MedlineCitation']['Article']['AuthorList']
+                        ]
+                    ]
+                ))
+
+                try:
+                    doi = [
+                        str(element) for element in
+                        filter(
+                            lambda xml_string: xml_string.attributes.get("IdType", None) == 'doi',
+                            results["PubmedArticle"][0]['PubmedData']['ArticleIdList']
+                        )
+                    ][0]
+                except IndexError:
+                    doi = "<not found>"
+
+                publication = results["PubmedArticle"][0]['MedlineCitation']['Article']['Journal']['Title']
+
+                try:
+                    related = entrez_read(Entrez.elink(dbfrom="pubmed", db="pmc", id=paper_id))
+                    pmc_full_text = related[0]["LinkSetDb"][0]["Link"][0]["Id"]
+                except Exception:
+                    pmc_full_text = "Not Available."
+
+                paper_details = {
+                    "date_revised": date_revised,
+                    "title": title,
+                    "abstract": abstract,
+                    "doi": doi,
+                    "authors": authors,
+                    "publication": publication,
+                    "pmc_full_text_id": pmc_full_text
+                }
+                details[paper_id] = paper_details
+
+                with open(metadata_file, "w") as f:
+                    json.dump(paper_details, f)
+            except Exception:
+                import traceback
+                logger.warning(f"Failed to read paper: {paper_id}")
+                logger.warning(traceback.print_exc())
+                logger.warning(results)
+        return details
+
+
+    @tool()
+    async def pubmed_get_fulltext(self, paper_ids: list[str]):
+        """
+        Fetch the fulltext of a given paper by its PMC ID. You can find a paper's PMC ID
+        by using the pubmed_search_ids tool and looking at the pmc_full_text_id field in the results.
+
+        If you are unsure if a paper is relevant, fetch it anyway and download the full text.
+        It is better to have more papers -- even if extraneous -- than less.
+
+        Args:
+            paper_ids (list[str]): List of PMC IDs to fetch fulltext of. Find this with `pubmed_search_ids`
+
+        Returns:
+            str: The status of the operation.
+        """
+        # don't dump all fulltexts into main agent context.
+        fulltexts = {
+            paper_id: self.pubmed_fulltext(paper_id)
+            for paper_id in paper_ids
+        }
+        return "Gathered relevant papers for analysis. You may now use the ask_about_papers tool for insight."
+
+    @tool()
+    async def ask_about_papers(self, query: str, agent: AgentRef, loop: LoopControllerRef):
+        """
+        Given a corpus of fetched papers with `pubmed_search`, ask a question to analyze the
+        collected papers and decide what's relevant and sort through the information.
+
+        An example workflow would be grabbing all of the relevant papers with `pubmed_search` to find IDs,
+        then get the full texts with `pubmed_get_fulltext` to gather them all -- and then finally, use this
+        tool to get insights over all of the collected fulltext papers.
+
+        You should return this full response, without any summarization, to the user.
+        Important: do not summarize or shorten the response of this tool.
+
+        Args:
+            query (str): The query to ask about all of the papers
+
+        Returns:
+            str: The answer from the agent.
+        """
+        from paperqa import Docs, Settings
+        docs = Docs()
+        settings = Settings(
+            llm="gpt-4.1-mini",
+            callbacks=["langsmith"]
+        )
+        output_dir = self.data_dir / "pubmed"
+        for paper in output_dir.glob('*.html'):
+            await docs.aadd(str(paper))
+        session = await docs.aquery(query, settings=settings)
+        logger.warning(session)
+        loop.set_state(loop.STOP_SUCCESS)
+        return str(session)
