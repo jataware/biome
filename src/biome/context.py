@@ -108,7 +108,6 @@ class BiomeContext(BeakerContext):
         ]
 
     # frontend can request where to upload files to given a specific integration
-    @action(action_name="get_integration_root")
     async def get_integration_root(self, message):
         content = message.content
         return str(
@@ -118,16 +117,15 @@ class BiomeContext(BeakerContext):
 
     # handles a case of uploading a new file to a temporary, unsaved datasource
     # that way the frontend can upload directly rather than sending it in an action message
-    @action(action_name="create_integration_folders_for_upload")
     async def create_integration_folders_for_upload(self, message):
         manager = FileContentsManager()
         content = message.content
         create_folder_structure_for_integration(manager, content.get("integration"))
         return True
 
-    #
-    @action(action_name="save_integration")
+
     async def save_integration(self, message):
+        logger.warning('called save_integration')
         manager = FileContentsManager()
         content = message.content
         write_integration(manager, content)
@@ -135,12 +133,12 @@ class BiomeContext(BeakerContext):
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new integration has been added: `{content.get('slug')}`. You may now use this with `draft_integration_code`.")
 
-    @action(action_name="add_example")
     async def add_example(self, message):
+        logger.warning('called add_example')
         manager = FileContentsManager()
         content = message.content
+        logger.warning(content)
         write_integration(manager, content)
         self.agent.fetch_specs()
         self.agent.initialize_adhoc()
         self.agent.add_context(f"A new example has been added to `{content.get('slug')}.`")
-
