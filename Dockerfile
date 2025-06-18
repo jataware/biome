@@ -18,6 +18,8 @@ RUN rm -f /jupyter/.env
 
 RUN uv pip install --system -v -e /jupyter
 
+RUN uv pip install --system --no-deps --upgrade /jupyter/beaker_kernel-1.11.2-py3-none-any.whl
+
 RUN mkdir -m 777 /var/run/beaker
 
 WORKDIR /jupyter
@@ -33,6 +35,10 @@ RUN ln -s /jupyter/src/biome/datasources /home/user/datasources
 RUN ln -s /jupyter/data /home/user/data
 # agent path resolution
 RUN ln -s /jupyter/data /home/jupyter/data
+
+RUN pip install --no-deps --upgrade "docstring-parser>=0.16"
+RUN pip install "paper-qa~=5.21.0"
+
 
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
