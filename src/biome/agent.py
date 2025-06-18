@@ -405,24 +405,32 @@ class BiomeAgent(BeakerAgent):
             import traceback
             logger.error(traceback.print_exc())
 
+    async def fetch_from_unpaywall(self, doi: str):
+        import aiohttp
+        from paperqa.clients.unpaywall import UnpaywallProvider
+        try:
+            async with aiohttp.ClientSession() as session:
+                provider = UnpaywallProvider()
+                details = provider.get_doc_details(doi, session)
+                return await details
+        except Exception:
+            raise ValueError("No PDF link found.")
+
     @tool()
     async def pubmed_search(self, query: str):
         """
-        Retrieves paper abstracts for a given PubMed query.
+        Retrieves paper abstracts for a given PubMed query, as well as fetching the fulltexts for later.
         Relevant papers will be listed as their ID and associated abstracts.
-        Use this to find relevant papers and decide which papers to fetch
-        for what is relevant to the user query.
 
         Try multiple formulations of the PubMed query to retrieve many papers.
         If less than five papers are found, retry this tool to see if other formulations find more papers.
-
 
         Args:
             query (str): User query to search on PubMed.
 
         Returns:
             str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
-                 Use the full text PMC ID to fetch the full text of the paper.
+                 Additionally, search results will be available for paperQA.
         """
 
         paper_ids = self.pubmed_search_ids(query)
@@ -442,7 +450,11 @@ class BiomeAgent(BeakerAgent):
                 date_revised = "{}/{}/{}".format(
                     *[str(date_revised_raw[field])
                         for field in ["Year", "Month", "Day"]])
-                abstract = " ".join(results["PubmedArticle"][0]["MedlineCitation"]["Article"]["Abstract"]["AbstractText"])
+                try:
+                    abstract = " ".join(results["PubmedArticle"][0]["MedlineCitation"]["Article"]["Abstract"]["AbstractText"])
+                except KeyError:
+                    abstract = "<not found>"
+
                 title = results["PubmedArticle"][0]["MedlineCitation"]["Article"]["ArticleTitle"]
 
                 authors = list(filter(
@@ -473,7 +485,18 @@ class BiomeAgent(BeakerAgent):
                     related = entrez_read(Entrez.elink(dbfrom="pubmed", db="pmc", id=paper_id))
                     pmc_full_text = related[0]["LinkSetDb"][0]["Link"][0]["Id"]
                 except Exception:
-                    pmc_full_text = "Not Available."
+                    pmc_full_text = None
+                    try:
+                        pdf_url = (await self.fetch_from_unpaywall(doi)).pdf_url
+                        if pdf_url is not None:
+                            response = requests.get(pdf_url)
+                            response.raise_for_status()
+                            output_dir = self.data_dir / "pubmed"
+                            fulltext_file = output_dir / f"{doi}.fulltext.pdf"
+                            with open(fulltext_file, 'w') as f:
+                                f.write(response.text)
+                    except Exception as e:
+                        logger.warning(f"{doi} -- Failed to get fulltext location - not in pubmed OR unpaywall")
 
                 paper_details = {
                     "date_revised": date_revised,
@@ -493,33 +516,41 @@ class BiomeAgent(BeakerAgent):
                 logger.warning(f"Failed to read paper: {paper_id}")
                 logger.warning(traceback.print_exc())
                 logger.warning(results)
+
+        for paper_id in details:
+            if (pmc_id := details[paper_id].get('pmc_full_text_id')) is not None:
+                self.pubmed_fulltext(pmc_id)
+
         return details
 
+    # a separate tool made sense when PMC was the only target --
+    # as such with unpaywall and other open access sources, we should
+    # generalize it further.
+
+    # @tool()
+    # async def pubmed_get_fulltext(self, paper_ids: list[str]):
+    #     """
+    #     Fetch the fulltext of a given paper by its PMC ID. You can find a paper's PMC ID
+    #     by using the pubmed_search_ids tool and looking at the pmc_full_text_id field in the results.
+
+    #     If you are unsure if a paper is relevant, fetch it anyway and download the full text.
+    #     It is better to have more papers -- even if extraneous -- than less.
+
+    #     Args:
+    #         paper_ids (list[str]): List of PMC IDs to fetch fulltext of. Find this with `pubmed_search_ids`
+
+    #     Returns:
+    #         str: The status of the operation.
+    #     """
+    #     # don't dump all fulltexts into main agent context.
+    #     fulltexts = {
+    #         paper_id: self.pubmed_fulltext(paper_id)
+    #         for paper_id in paper_ids
+    #     }
+    #     return "Gathered relevant papers for analysis. You may now use the ask_about_papers tool for insight."
 
     @tool()
-    async def pubmed_get_fulltext(self, paper_ids: list[str]):
-        """
-        Fetch the fulltext of a given paper by its PMC ID. You can find a paper's PMC ID
-        by using the pubmed_search_ids tool and looking at the pmc_full_text_id field in the results.
-
-        If you are unsure if a paper is relevant, fetch it anyway and download the full text.
-        It is better to have more papers -- even if extraneous -- than less.
-
-        Args:
-            paper_ids (list[str]): List of PMC IDs to fetch fulltext of. Find this with `pubmed_search_ids`
-
-        Returns:
-            str: The status of the operation.
-        """
-        # don't dump all fulltexts into main agent context.
-        fulltexts = {
-            paper_id: self.pubmed_fulltext(paper_id)
-            for paper_id in paper_ids
-        }
-        return "Gathered relevant papers for analysis. You may now use the ask_about_papers tool for insight."
-
-    @tool()
-    async def ask_about_papers(self, query: str, agent: AgentRef, loop: LoopControllerRef):
+    async def paperQA(self, query: str, agent: AgentRef, loop: LoopControllerRef):
         """
         Given a corpus of fetched papers with `pubmed_search`, ask a question to analyze the
         collected papers and decide what's relevant and sort through the information.
@@ -531,11 +562,14 @@ class BiomeAgent(BeakerAgent):
         You should return this full response, without any summarization, to the user.
         Important: do not summarize or shorten the response of this tool.
 
+        CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is.
+        CRITICAL: DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
+
         Args:
             query (str): The query to ask about all of the papers
 
         Returns:
-            str: The answer from the agent.
+            str: CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is. Include the DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
         """
         from paperqa import Docs, Settings
         docs = Docs()
@@ -546,7 +580,7 @@ class BiomeAgent(BeakerAgent):
         output_dir = self.data_dir / "pubmed"
         for paper in output_dir.glob('*.html'):
             await docs.aadd(str(paper))
+        for paper in output_dir.glob('*.pdf'):
+            await docs.aadd(str(paper))
         session = await docs.aquery(query, settings=settings)
-        logger.warning(session)
-        loop.set_state(loop.STOP_SUCCESS)
         return str(session)
