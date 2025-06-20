@@ -7,12 +7,12 @@ class BiomeApp(BeakerApp):
     name = "Biome"
 
     pages = {
-        'chat': {
-            "title": "Biome chat",
-            "default": True,
-        },
         "notebook": {
             "title": "Biome notebook",
+            "default": True,
+        },
+        'chat': {
+            "title": "Biome chat",
         },
         "dev": {
             "title": "Dev interface",
