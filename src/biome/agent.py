@@ -1,14 +1,10 @@
-import json
+
 import logging
-import re
 import requests
-from time import sleep
-import asyncio
 import os
-import threading
 
 from archytas.tool_utils import AgentRef, LoopControllerRef, ReactContextRef, tool
-from typing import Any, List
+from typing import List
 
 from beaker_kernel.lib.agent import BeakerAgent
 from beaker_kernel.lib.context import BaseContext
@@ -23,6 +19,8 @@ from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
 # from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from Bio import Entrez
+
+from biome.literature_review import LiteratureReviewAgent, PubmedSource
 
 logger = logging.getLogger(__name__)
 
@@ -62,11 +60,7 @@ def ignore_tags(loader, tag_suffix, node):
     return tag_suffix + ' ' + node.value
 yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 
-def entrez_read(handle) -> dict:
-    sleep(0.25) # rate limits - recommended by entrez docs
-    results = Entrez.read(handle)
-    handle.close()
-    return results # type: ignore
+
 
 DRAFT_INTEGRATION_CODE_DOC = load_docstring('draft_integration_code.md')
 CONSULT_INTEGRATIONS_DOCS_DOC = load_docstring('consult_integration_docs.md')
@@ -87,6 +81,8 @@ class BiomeAgent(BeakerAgent):
 
     An API should be considered a type of integration.
     """
+    litreview_agent: LiteratureReviewAgent
+
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         # self.mcpFetchLoop = asyncio.new_event_loop()
         # self.mcpFetchThread = threading.Thread(
@@ -105,6 +101,7 @@ class BiomeAgent(BeakerAgent):
             logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
         self.data_dir = data_dir
 
+        self.initialize_literature_review()
         self.initialize_entrez()
 
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
@@ -133,6 +130,10 @@ class BiomeAgent(BeakerAgent):
             template = f.read()
             self.__doc__ = template.format(api_list=self.integration_list, instructions=self.instructions)
             self.add_context(self.__doc__)
+
+    def initialize_literature_review(self):
+        self.litreview_agent = LiteratureReviewAgent(self.data_dir)
+        self.litreview_agent.add_source("pubmed", PubmedSource())
 
     def initialize_entrez(self):
         if (entrez_email := os.environ.get("ENTREZ_EMAIL", None)):
@@ -374,48 +375,6 @@ class BiomeAgent(BeakerAgent):
         response = await agent.context.evaluate(code)
         return response["return"]
 
-
-    def pubmed_search_ids(self, query):
-        results = entrez_read(Entrez.esearch(db="pubmed", term=query, retmax=25))
-        if (id_list := results.get("IdList", None)):
-            return id_list
-        return "No IDs returned for the given query."
-
-    def pubmed_fulltext(self, pmc_id):
-        try:
-            text = []
-            cursor = 0
-            while True:
-                response = Entrez.efetch(db="pmc", id=pmc_id, retstart=cursor, rettype="xml")
-                sleep(0.25)
-                body = response.read().decode('utf-8')
-                text.append(body)
-                if "[truncated]" in response or "Result too long" in body:
-                    cursor += len(body)
-                else:
-                    break
-            contents = "".join(text)
-            output_dir = self.data_dir / "pubmed"
-            fulltext_file = output_dir / f"{pmc_id}.fulltext.html"
-            os.makedirs(str(output_dir), exist_ok=True)
-            with open(fulltext_file, 'w') as f:
-                f.write(contents)
-            return contents
-        except Exception:
-            import traceback
-            logger.error(traceback.print_exc())
-
-    async def fetch_from_unpaywall(self, doi: str):
-        import aiohttp
-        from paperqa.clients.unpaywall import UnpaywallProvider
-        try:
-            async with aiohttp.ClientSession() as session:
-                provider = UnpaywallProvider()
-                details = provider.get_doc_details(doi, session)
-                return await details
-        except Exception:
-            raise ValueError("No PDF link found.")
-
     @tool()
     async def pubmed_search(self, query: str):
         """
@@ -432,122 +391,8 @@ class BiomeAgent(BeakerAgent):
             str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
                  Additionally, search results will be available for paperQA.
         """
+        return await self.litreview_agent.fetch_for_query("pubmed", query)
 
-        paper_ids = self.pubmed_search_ids(query)
-        details = {}
-        for paper_id in paper_ids:
-            output_dir = self.data_dir / "pubmed"
-            os.makedirs(str(output_dir), exist_ok=True)
-            metadata_file = output_dir / f"{paper_id}.metadata.json"
-            if metadata_file.exists():
-                with open(metadata_file, 'r') as f:
-                    details[paper_id] = json.load(f)
-                    continue
-
-            try:
-                results = entrez_read(Entrez.efetch(db="pubmed", id=paper_id))
-                date_revised_raw = results["PubmedArticle"][0]["MedlineCitation"]["DateRevised"]
-                date_revised = "{}/{}/{}".format(
-                    *[str(date_revised_raw[field])
-                        for field in ["Year", "Month", "Day"]])
-                try:
-                    abstract = " ".join(results["PubmedArticle"][0]["MedlineCitation"]["Article"]["Abstract"]["AbstractText"])
-                except KeyError:
-                    abstract = "<not found>"
-
-                title = results["PubmedArticle"][0]["MedlineCitation"]["Article"]["ArticleTitle"]
-
-                authors = list(filter(
-                    lambda author: '<invalid>' not in author,
-                    [
-                        f"{author.get('ForeName', '<invalid>')} {author.get('LastName', '<invalid>')}"
-                        for author in [
-                            dict(author_data)
-                            for author_data in results["PubmedArticle"][0]['MedlineCitation']['Article']['AuthorList']
-                        ]
-                    ]
-                ))
-
-                try:
-                    doi = [
-                        str(element) for element in
-                        filter(
-                            lambda xml_string: xml_string.attributes.get("IdType", None) == 'doi',
-                            results["PubmedArticle"][0]['PubmedData']['ArticleIdList']
-                        )
-                    ][0]
-                except IndexError:
-                    doi = "<not found>"
-
-                publication = results["PubmedArticle"][0]['MedlineCitation']['Article']['Journal']['Title']
-
-                try:
-                    related = entrez_read(Entrez.elink(dbfrom="pubmed", db="pmc", id=paper_id))
-                    pmc_full_text = related[0]["LinkSetDb"][0]["Link"][0]["Id"]
-                except Exception:
-                    pmc_full_text = None
-                    try:
-                        pdf_url = (await self.fetch_from_unpaywall(doi)).pdf_url
-                        if pdf_url is not None:
-                            response = requests.get(pdf_url)
-                            response.raise_for_status()
-                            output_dir = self.data_dir / "pubmed"
-                            fulltext_file = output_dir / f"{doi}.fulltext.pdf"
-                            with open(fulltext_file, 'w') as f:
-                                f.write(response.text)
-                    except Exception as e:
-                        logger.warning(f"{doi} -- Failed to get fulltext location - not in pubmed OR unpaywall")
-
-                paper_details = {
-                    "date_revised": date_revised,
-                    "title": title,
-                    "abstract": abstract,
-                    "doi": doi,
-                    "authors": authors,
-                    "publication": publication,
-                    "pmc_full_text_id": pmc_full_text
-                }
-                details[paper_id] = paper_details
-
-                with open(metadata_file, "w") as f:
-                    json.dump(paper_details, f)
-            except Exception:
-                import traceback
-                logger.warning(f"Failed to read paper: {paper_id}")
-                logger.warning(traceback.print_exc())
-                logger.warning(results)
-
-        for paper_id in details:
-            if (pmc_id := details[paper_id].get('pmc_full_text_id')) is not None:
-                self.pubmed_fulltext(pmc_id)
-
-        return details
-
-    # a separate tool made sense when PMC was the only target --
-    # as such with unpaywall and other open access sources, we should
-    # generalize it further.
-
-    # @tool()
-    # async def pubmed_get_fulltext(self, paper_ids: list[str]):
-    #     """
-    #     Fetch the fulltext of a given paper by its PMC ID. You can find a paper's PMC ID
-    #     by using the pubmed_search_ids tool and looking at the pmc_full_text_id field in the results.
-
-    #     If you are unsure if a paper is relevant, fetch it anyway and download the full text.
-    #     It is better to have more papers -- even if extraneous -- than less.
-
-    #     Args:
-    #         paper_ids (list[str]): List of PMC IDs to fetch fulltext of. Find this with `pubmed_search_ids`
-
-    #     Returns:
-    #         str: The status of the operation.
-    #     """
-    #     # don't dump all fulltexts into main agent context.
-    #     fulltexts = {
-    #         paper_id: self.pubmed_fulltext(paper_id)
-    #         for paper_id in paper_ids
-    #     }
-    #     return "Gathered relevant papers for analysis. You may now use the ask_about_papers tool for insight."
 
     @tool()
     async def paperQA(self, query: str, agent: AgentRef, loop: LoopControllerRef):
@@ -571,16 +416,4 @@ class BiomeAgent(BeakerAgent):
         Returns:
             str: CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is. Include the DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
         """
-        from paperqa import Docs, Settings
-        docs = Docs()
-        settings = Settings(
-            llm="gpt-4.1-mini",
-            callbacks=["langsmith"]
-        )
-        output_dir = self.data_dir / "pubmed"
-        for paper in output_dir.glob('*.html'):
-            await docs.aadd(str(paper))
-        for paper in output_dir.glob('*.pdf'):
-            await docs.aadd(str(paper))
-        session = await docs.aquery(query, settings=settings)
-        return str(session)
+        return await self.litreview_agent.paperQA(query)
