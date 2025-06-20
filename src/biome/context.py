@@ -12,7 +12,7 @@ from pathlib import Path
 
 from beaker_kernel.lib.context import BeakerContext, action
 from beaker_kernel.subkernels.python import PythonSubkernel
-from beaker_kernel.lib.types import Datasource, DatasourceAttachment
+from beaker_kernel.lib.types import Integration, IntegrationAttachment
 
 from .agent import BiomeAgent
 from .integration import create_folder_structure_for_integration, get_integration_folder, write_integration
@@ -52,12 +52,12 @@ class BiomeContext(BeakerContext):
         })
         await self.execute(command)
 
-    async def get_datasources(self) -> list[Datasource]:
+    async def get_integrations(self) -> list[Integration]:
         """
-        fetch all of the adhoc-api datasources to pass to beaker.
+        fetch all of the adhoc-api integrations to pass to beaker.
         """
 
-        # get list of keys not inherent to a datasource for the user-files category
+        # get list of keys not inherent to a integrations for the user-files category
         attached_files = {}
         for (_, spec) in self.agent.raw_specs:
             attached_files[spec["name"]] = []
@@ -85,7 +85,7 @@ class BiomeContext(BeakerContext):
                         spec[attachment_key].strip()
                     ).strip().replace("documentation/", "")
 
-                attached_files[spec["name"]].append(DatasourceAttachment(
+                attached_files[spec["name"]].append(IntegrationAttachment(
                     name=attachment_key,
                     filepath=filepath_raw,
                     content=None,
@@ -95,7 +95,7 @@ class BiomeContext(BeakerContext):
         # manually load examples
 
         return [
-            Datasource(
+            Integration(
                 slug=spec["slug"],
                 url=str(yaml_location),
                 name=spec["name"],
@@ -106,23 +106,6 @@ class BiomeContext(BeakerContext):
             )
             for (yaml_location, spec) in self.agent.raw_specs
         ]
-
-    # frontend can request where to upload files to given a specific integration
-    async def get_integration_root(self, message):
-        content = message.content
-        return str(
-            Path(os.environ.get("BIOME_INTEGRATIONS_DIR", "/"))
-            / get_integration_folder(content.get("integration"))
-        )
-
-    # handles a case of uploading a new file to a temporary, unsaved datasource
-    # that way the frontend can upload directly rather than sending it in an action message
-    async def create_integration_folders_for_upload(self, message):
-        manager = FileContentsManager()
-        content = message.content
-        create_folder_structure_for_integration(manager, content.get("integration"))
-        return True
-
 
     async def save_integration(self, message):
         logger.warning('called save_integration')

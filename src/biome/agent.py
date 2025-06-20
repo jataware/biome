@@ -278,7 +278,7 @@ class BiomeAgent(BeakerAgent):
             integration (str): The name of the target data source or API that will be added.
             description (str): A plain text description of what the data source is based on your knowledge of what the user is asking for, combined with their description if their description is relevant, or, if you do not know about the target data source. If the user does not provide any information, rely on what you know. Target a paragraph in length.
             schema_location (str): A URL or local filepath to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL or local filepath to the schema.
-            base_url (str): The base URL for the datasource that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
+            base_url (str): The base URL for the integration that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
         Returns:
             str: Message indicating success or failure of adding the integration.
         """
