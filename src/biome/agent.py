@@ -39,7 +39,7 @@ class MessageLogger():
 
 # Load docstrings at module level
 def load_docstring(filename):
-    root_folder = Path(__file__).resolve().parent
+    root_folder = Path(__file__).resolve().parent / 'adhoc_data'
     with open(os.path.join(root_folder, 'prompts', filename), 'r') as f:
         return f.read()
 
@@ -57,8 +57,8 @@ def ignore_tags(loader, tag_suffix, node):
 yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 
 
-DRAFT_INTEGRATION_CODE_DOC = load_docstring('draft_integration_code.md')
-CONSULT_INTEGRATIONS_DOCS_DOC = load_docstring('consult_integration_docs.md')
+# DRAFT_INTEGRATION_CODE_DOC = load_docstring('draft_integration_code.md')
+# CONSULT_INTEGRATIONS_DOCS_DOC = load_docstring('consult_integration_docs.md')
 
 class BiomeAgent(BeakerAgent):
     """
@@ -71,25 +71,25 @@ class BiomeAgent(BeakerAgent):
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
         self.logger = MessageLogger(self.log, logger)
-
-        self.root_folder = Path(__file__).resolve().parent
-        self.fetch_specs()
-
-        instructions_dir = Path(os.path.join(self.root_folder, 'instructions'))
-        self.instructions = "\n".join(
-            file.read_text()
-            for file in instructions_dir.iterdir() if file.is_file()
-        )
-
         super().__init__(context, tools, **kwargs)
-        self.initialize_adhoc()
 
-        # Load prompt files and set the Agent context
-        prompts_dir = os.path.join(self.root_folder, 'prompts')
-        with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
-            template = f.read()
-            self.__doc__ = template.format(api_list=self.integration_list, instructions=self.instructions)
-            self.add_context(self.__doc__)
+        # self.root_folder = Path(__file__).resolve().parent
+        # self.fetch_specs()
+
+        # instructions_dir = Path(os.path.join(self.root_folder, 'instructions'))
+        # self.instructions = "\n".join(
+        #     file.read_text()
+        #     for file in instructions_dir.iterdir() if file.is_file()
+        # )
+
+        # self.initialize_adhoc()
+
+        # # Load prompt files and set the Agent context
+        # prompts_dir = os.path.join(self.root_folder, 'prompts')
+        # with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
+        #     template = f.read()
+        #     self.__doc__ = template.format(api_list=self.integration_list, instructions=self.instructions)
+        #     self.add_context(self.__doc__)
 
     def fetch_specs(self):
         integration_root = os.path.join(self.root_folder, INTEGRATIONS_FOLDER)
