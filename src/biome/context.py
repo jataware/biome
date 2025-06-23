@@ -44,15 +44,15 @@ class BiomeContext(BeakerContext):
         curator_config = {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
         gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
 
-        super().__init__(beaker_kernel, self.agent_cls, config)
         # Initialize adhoc integration
-        self.integrations.append(AdhocIntegrationProvider.from_file_structure(
+        adhoc_integration = AdhocIntegrationProvider.from_file_structure(
             adhoc_path=ADHOC_DIR_PATH,
             drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
             curator_config=curator_config,
             contextualizer_config=gpt_41_config,
             logger=logger,
-        ))
+        )
+        super().__init__(beaker_kernel, self.agent_cls, config, integrations=[adhoc_integration])
 
         if not isinstance(self.subkernel, PythonSubkernel):
             raise ValueError("This context is only valid for Python.")

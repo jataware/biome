@@ -173,31 +173,31 @@ class BiomeAgent(BeakerAgent):
             content=content
         )
 
-    @tool()
-    @with_docstring('draft_integration_code.md')
-    async def draft_integration_code(self, integration: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"using integration: {integration}")
-        try:
-            code = self.api.use_api(integration, goal)
-            return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
-        except Exception as e:
-            if self.api is None:
-                return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
-            logger.error(str(e))
-            return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
+    # @tool()
+    # @with_docstring('draft_integration_code.md')
+    # async def draft_integration_code(self, integration: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    #     logger.info(f"using integration: {integration}")
+    #     try:
+    #         code = self.api.use_api(integration, goal)
+    #         return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
+    #     except Exception as e:
+    #         if self.api is None:
+    #             return "Do not attempt to fix this result: there is no API key for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
+    #         logger.error(str(e))
+    #         return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
 
-    @tool()
-    @with_docstring('consult_integration_docs.md')
-    async def consult_integration_docs(self, integration: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"asking integration: {integration}")
-        try:
-            results = self.api.ask_api(integration, query)
-            return f"Here is the information I found about how to use the API: \n{results}"
-        except Exception as e:
-            if self.api is None:
-                return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
-            logger.error(str(e))
-            return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
+    # @tool()
+    # @with_docstring('consult_integration_docs.md')
+    # async def consult_integration_docs(self, integration: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
+    #     logger.info(f"asking integration: {integration}")
+    #     try:
+    #         results = self.api.ask_api(integration, query)
+    #         return f"Here is the information I found about how to use the API: \n{results}"
+    #     except Exception as e:
+    #         if self.api is None:
+    #             return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
+    #         logger.error(str(e))
+    #         return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
 
 
     @tool()
