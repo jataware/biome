@@ -18,6 +18,10 @@ from adhoc_api.tool import AdhocApi, ensure_name_slug_compatibility
 from adhoc_api.loader import load_yaml_api
 from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
 
+from Bio import Entrez
+
+from biome.literature_review import LiteratureReviewAgent, PubmedSource
+
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
@@ -38,10 +42,9 @@ class MessageLogger():
         self.print_logger.debug(message)
 
 # Load docstrings at module level
-def load_docstring(filename):
+def load_docstring(filename: str):
     root_folder = Path(__file__).resolve().parent
-    with open(os.path.join(root_folder, 'prompts', filename), 'r') as f:
-        return f.read()
+    return (root_folder / 'prompts' / 'docstrings' / filename).read_text()
 
 def with_docstring(filename):
     """Decorator to set a function's docstring from a file"""
@@ -56,10 +59,6 @@ def ignore_tags(loader, tag_suffix, node):
     return tag_suffix + ' ' + node.value
 yaml.add_multi_constructor('', ignore_tags, yaml.SafeLoader)
 
-
-DRAFT_API_CODE_DOC = load_docstring('draft_api_code.md')
-CONSULT_API_DOCS_DOC = load_docstring('consult_api_docs.md')
-
 class BiomeAgent(BeakerAgent):
     """
     You are the Biome Agent, a chat assistant that helps users with biomedical research tasks.
@@ -69,27 +68,52 @@ class BiomeAgent(BeakerAgent):
     An API should be considered a type of datasource.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
+        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
+        try:
+            data_dir = Path(data_dir_raw).resolve(strict=True)
+            logger.info(f"Using data_dir: {data_dir}")
+        except OSError as e:
+            data_dir = Path('.')
+            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
+        self.data_dir = data_dir
+
+        self.initialize_literature_review()
+        self.initialize_entrez()
+
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
         self.logger = MessageLogger(self.log, logger)
 
         self.root_folder = Path(__file__).resolve().parent
         self.fetch_specs()
 
-        instructions_dir = Path(os.path.join(self.root_folder, 'instructions'))
-        self.instructions = "\n".join(
-            file.read_text()
-            for file in instructions_dir.iterdir() if file.is_file()
-        )
-
         super().__init__(context, tools, **kwargs)
         self.initialize_adhoc()
 
-        # Load prompt files and set the Agent context
-        prompts_dir = os.path.join(self.root_folder, 'prompts')
-        with open(os.path.join(prompts_dir, 'agent_prompt.md'), 'r') as f:
-            template = f.read()
-            self.__doc__ = template.format(api_list=self.api_list, instructions=self.instructions)
-            self.add_context(self.__doc__)
+        prompts_dir = self.root_folder / "prompts"
+        extra_agent_prompts_dir = prompts_dir / "agent"
+        main_agent_prompt = prompts_dir / "agent_prompt.md"
+
+        self.extra_agent_prompts = "\n".join(
+            file.read_text()
+            for file in extra_agent_prompts_dir.iterdir() if file.is_file()
+        )
+
+        self.__doc__ = main_agent_prompt.read_text().format(
+            api_list=self.api_list,
+            extra_prompts=self.extra_agent_prompts
+        )
+        self.add_context(self.__doc__)
+
+    def initialize_literature_review(self):
+        self.litreview_agent = LiteratureReviewAgent(self.data_dir)
+        self.litreview_agent.add_source("pubmed", PubmedSource())
+
+    def initialize_entrez(self):
+        if (entrez_email := os.environ.get("ENTREZ_EMAIL", None)):
+            Entrez.email = entrez_email
+        if (entrez_key := os.environ.get("ENTREZ_API_KEY", None)):
+            Entrez.api_key = entrez_key
+
 
     def fetch_specs(self):
         datasource_root = os.path.join(self.root_folder, DATASOURCES_FOLDER)
@@ -171,11 +195,10 @@ class BiomeAgent(BeakerAgent):
         )
 
     @tool()
-    @with_docstring('draft_api_code.md')
-    async def draft_api_code(self, api: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"using api: {api}")
+    @with_docstring('draft_integration_code.md')
+    async def draft_integration_code(self, integration: str, goal: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         try:
-            code = self.api.use_api(api, goal)
+            code = self.api.use_api(integration, goal)
             return f"Here is the code the drafter created to use the API to accomplish the goal: \n\n```\n{code}\n```"
         except Exception as e:
             if self.api is None:
@@ -184,11 +207,10 @@ class BiomeAgent(BeakerAgent):
             return f"An error occurred while using the API. The error was: {str(e)}. Please try again with a different goal."
 
     @tool()
-    @with_docstring('consult_api_docs.md')
-    async def consult_api_docs(self, api: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
-        logger.info(f"asking api: {api}")
+    @with_docstring('consult_integration_docs.md')
+    async def consult_integration_docs(self, integration: str, query: str, agent: AgentRef, loop: LoopControllerRef, react_context: ReactContextRef) -> str:
         try:
-            results = self.api.ask_api(api, query)
+            results = self.api.ask_api(integration, query)
             return f"Here is the information I found about how to use the API: \n{results}"
         except Exception as e:
             if self.api is None:
@@ -403,3 +425,47 @@ documentation: !fill |
         code = agent.context.get_code("extract_pdf", {'pdf_path': pdf_path})
         response = await agent.context.evaluate(code)
         return response["return"]
+
+
+    @tool()
+    async def pubmed_search(self, query: str):
+        """
+        Retrieves paper abstracts for a given PubMed query, as well as fetching the fulltexts for later.
+        Relevant papers will be listed as their ID and associated abstracts.
+
+        Try multiple formulations of the PubMed query to retrieve many papers.
+        If less than five papers are found, retry this tool to see if other formulations find more papers.
+
+        Args:
+            query (str): User query to search on PubMed.
+
+        Returns:
+            str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
+                 Additionally, search results will be available for paperQA.
+        """
+        return await self.litreview_agent.fetch_for_query("pubmed", query)
+
+
+    @tool()
+    async def paperQA(self, query: str, agent: AgentRef, loop: LoopControllerRef):
+        """
+        Given a corpus of fetched papers with `pubmed_search`, ask a question to analyze the
+        collected papers and decide what's relevant and sort through the information.
+
+        An example workflow would be grabbing all of the relevant papers with `pubmed_search` to find IDs,
+        then get the full texts with `pubmed_get_fulltext` to gather them all -- and then finally, use this
+        tool to get insights over all of the collected fulltext papers.
+
+        You should return this full response, without any summarization, to the user.
+        Important: do not summarize or shorten the response of this tool.
+
+        CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is.
+        CRITICAL: DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
+
+        Args:
+            query (str): The query to ask about all of the papers
+
+        Returns:
+            str: CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is. Include the DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
+        """
+        return await self.litreview_agent.paperQA(query)
