@@ -43,7 +43,8 @@ dependencies = [
   "xlrd~=2.0.1",
   "geopandas~=1.0.1",
   "scikit-learn~=1.6.1",
-  "synapseclient"
+  "synapseclient",
+  "paper-qa>=5"
 ]
 
 [project.urls]
