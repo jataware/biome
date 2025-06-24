@@ -47,15 +47,15 @@ class LiteratureReviewAgent:
         """
         docs = Docs()
         settings = Settings(
-            llm="gpt-4.1-mini",
+            llm=os.getenv("PAPERQA_LLM_MODEL"),
             callbacks=["langsmith"]
         )
         for path in self.source_dirs:
             output_dir = self.source_root / path
             for paper in output_dir.glob('*.html'):
-                await docs.aadd(str(paper))
+                await docs.aadd(paper)
             for paper in output_dir.glob('*.pdf'):
-                await docs.aadd(str(paper))
+                await docs.aadd(paper)
         session = await docs.aquery(query, settings=settings)
         return str(session)
 
