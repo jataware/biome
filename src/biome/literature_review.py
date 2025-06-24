@@ -47,9 +47,11 @@ class LiteratureReviewAgent:
         """
         docs = Docs()
         settings = Settings(
-            llm=os.getenv("PAPERQA_LLM_MODEL"),
+            llm=os.environ.get("PAPERQA_LLM_MODEL", "gpt-4.1-mini"),
             callbacks=["langsmith"]
         )
+        print("settings")
+        print(settings)
         for path in self.source_dirs:
             output_dir = self.source_root / path
             for paper in output_dir.glob('*.html'):
