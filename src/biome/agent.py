@@ -99,7 +99,7 @@ class BiomeAgent(BeakerAgent):
         )
 
         self.__doc__ = main_agent_prompt.read_text().format(
-            api_list=self.api_list,
+            api_list=self.integration_list,
             extra_prompts=self.extra_agent_prompts
         )
         self.add_context(self.__doc__)
