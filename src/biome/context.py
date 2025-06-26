@@ -44,10 +44,6 @@ class TestIntegrationProvider(BaseIntegrationProvider):
         return [asdict(i) for i in self.integrations]
     def get_integration(self, integration_id):
         pass
-    def add_integration(self, **payload):
-        pass
-    def add_resource(self, integration_id, **payload):
-        pass
     def list_resources(self, integration_id, resource_type=None):
         pass
     def get_resource(self, integration_id, resource_id):
