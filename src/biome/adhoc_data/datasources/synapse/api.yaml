@@ -1,31 +1,31 @@
 name: "NF Synapse"
-cache_key: api_assistant_synapse
+integration_type: api
 description: |
     The NF Synapse API is a RESTful API that allows you to interact with the Neurofibromatosis Data Portal.
     It additionally contains a Python client that can be used to interact with the API (on the package `synapseclient`, already installed in the environment).
     The code drafter has access both to the openapi spec, the web docs, and the python client documentation.
-raw_documentation: !load_txt documentation/SynapseOpenApiSpec.json
-web_docs: !load_txt documentation/web_docs.md
-examples: !load_yaml documentation/examples.yaml
-python_client: !load_txt documentation/nf_programmatic_webdocs.md
-cache_body: 
-    default: true 
-documentation: !fill |
+
+attachments:
+  raw_documentation: SynapseOpenApiSpec.json
+  web_docs: web_docs.md
+  python_client: nf_programmatic_webdocs.md
+
+prompt: |
     # OpenAPI Spec JSON:
-    {raw_documentation}
+    ${raw_documentation}
 
     # Additional Instructions:
-    
-    This API is through OpenAPI Spec. You have been provided the schema. 
+
+    This API is through OpenAPI Spec. You have been provided the schema.
     All requests go to the following URL: https://repo-prod.prod.sagebase.org
-    That is the base URL for all requests. 
+    That is the base URL for all requests.
 
     To use the Synapse API always retrieve the auth header token from the environment variable:
     - bearer token: os.environ.get("API_SYNAPSE")
     Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variables.
 
     Ensure you know the fields that come back from the OpenAPI spec in order to process the Synapse data.
-    
+
     Never simulate this API- if it is not available ask the user how to proceed.
 
     You will mostly have to use the /repo/v1 and /file/v1 paths.
@@ -41,12 +41,12 @@ documentation: !fill |
     You only have read/view/download assess/permissions- don't try to create or upload data- the openapi spec may have create/upload endpoints but do not use them.
 
     # More Web Docs:
-    {web_docs}
+    ${web_docs}
 
     # Example issuing a POST to search for `High throughput analysis of pNF cell lines` (omitting auth bearer token header; eg Authorization: Bearer <token>)
     ```
     POST https://repo-prod.prod.sagebase.org/repo/v1/search
-    {{
+    {
       "queryTerm": [
         "Blakeley"
       ],
@@ -55,11 +55,11 @@ documentation: !fill |
       "returnFields": [],
       "start": 0,
       "size": "10"
-    }}
+    }
     ```
 
     # Python Client
-    {python_client}
+    ${python_client}
 
     # About the NF synapse subdomain
 
@@ -80,6 +80,6 @@ documentation: !fill |
 
     downloads_dir = Path(__file__).parent.parent / "downloads" / "synapse"
 
-    syn = synapseclient.Synapse(cache_root_dir=downloads_dir) 
+    syn = synapseclient.Synapse(cache_root_dir=downloads_dir)
     syn.login(authToken=os.environ.get("API_SYNAPSE"))  # pass in the authToken on python client login!
     ```

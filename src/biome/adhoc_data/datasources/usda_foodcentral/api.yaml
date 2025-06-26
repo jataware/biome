@@ -1,24 +1,25 @@
 name: "USDA FoodData Central API"
-cache_key: api_assistant_usda_foodcentral_json
+integration_type: api
+
 description: |
     This openapi is the primary place to obtain data from the USDA's FoodData Central (nutrition) database.
     It is intended to assist in incorporating nutrient data into any analysis we need.
-raw_documentation: !load_txt documentation/foodcentral_openapi.json
-examples: !load_yaml documentation/examples.yaml
-cache_body: 
-    default: true 
-documentation: !fill |
+
+attachments:
+    raw_documentation: foodcentral_openapi.json
+
+prompt: |
     This API is the primary place to obtain data from the USDA's FoodData Central database.
 
     # OpenAPI Spec JSON:
 
-    {raw_documentation}
+    ${raw_documentation}
 
     # Additional Instructions:
-    
-    This API is through OpenAPI Spec (Swagger). You will be provided the schema. 
+
+    This API is through OpenAPI Spec (Swagger). You will be provided the schema.
     All requests go to the following URL: https://api.nal.usda.gov/fdc/v1/
-    That is the base URL for all requests. 
+    That is the base URL for all requests.
 
     To use the USDA FoodData Central API always retrieve the `api_key` query parameter from environment variables:
     - api_key: os.environ.get("API_USDA_FDC")
@@ -61,10 +62,10 @@ documentation: !fill |
     Note: The "dataType" parameter values need to be specified as an array.
 
     ## Data Type Comparison
-    ### Foundation Foods	
+    ### Foundation Foods
     Data and metadata on individual samples of commodity/commodity-derived minimally processed foods with insights into variability
 
-    ### Experimental Foods	
+    ### Experimental Foods
     Data on food published in peer-reviewed journals supported by or in collaboration with USDA
 
     ### Food and Nutrient Database for Dietary Studies (FNDDS)

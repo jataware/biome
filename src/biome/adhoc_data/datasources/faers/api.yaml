@@ -1,17 +1,18 @@
 name: "FDA drug adverse event FAERS API"
-cache_key: api_assistant_fda_openfda_faers_json
+integration_type: api
+
 description: |
   Drug Adverse Event Overview
-  The openFDA drug adverse event API returns data that has been collected from 
-  the FDA Adverse Event Reporting System (FAERS), a database that contains 
+  The openFDA drug adverse event API returns data that has been collected from
+  the FDA Adverse Event Reporting System (FAERS), a database that contains
   information on adverse event and medication error reports submitted to FDA.
-web_documentation: !load_txt documentation/faers_web.md
-fields_reference: !load_txt documentation/faers_fields_reference.csv
-examples: !load_yaml documentation/examples.yaml
-cache_body: 
-    default: true 
-documentation: !fill |
-    {web_documentation}
+
+attachments:
+  web_documentation: faers_web.md
+  fields_reference: faers_fields_reference.csv
+
+prompt: |
+    ${web_documentation}
 
     # Additional Instructions:
 
@@ -20,4 +21,4 @@ documentation: !fill |
     Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
 
     # Searchable Fields Reference:
-    {fields_reference}
+    ${fields_reference}

@@ -1,19 +1,20 @@
 name: "USGS Water Services API"
-cache_key: api_assistant_usgs_waterservices_json
+integration_type: api
+
 description: |
-    You can use this service to retrieve daily statistical data about the hundreds of 
+    You can use this service to retrieve daily statistical data about the hundreds of
     thousands of hydrologic sites served by the USGS. Especially crucial to analyze
     water quality to correlate with other data sources.
-web_documentation: !load_txt documentation/usgs_waterservices_web.md
-site_types: !load_txt documentation/site_types.md
-examples: !load_yaml documentation/examples.yaml
-cache_body: 
-    default: true 
-documentation: !fill |
-    You can use this service to retrieve daily statistical data about the hundreds of 
+
+attachments:
+    web_documentation: usgs_waterservices_web.md
+    site_types: site_types.md
+
+prompt: |
+    You can use this service to retrieve daily statistical data about the hundreds of
     thousands of hydrologic sites served by the USGS. Various output formats available, prefer JSON.
 
-    {web_documentation}
+    ${web_documentation}
 
     ### Site Types (siteType) minor filter codes
-    {site_types}
+    ${site_types}

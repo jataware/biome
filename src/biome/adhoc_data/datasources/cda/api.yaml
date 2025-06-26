@@ -1,4 +1,5 @@
 name: "Cancer Data Aggregator"
+integration_type: api
 description: |
     The Cancer Data Aggregator (CDA) is a service of the National Cancer Institutes' (NCI) Cancer Research Data Commons. We pull metadata for thousands of studies hosted at multiple data repositories across NCI, and make it available for search from a single tool so researchers can more easily find and reuse existing cancer research data. In between pulling and publishing, we thoroughly clean, harmonize, and cross-reference the metadata so you can easily do things like find subjects that have participated in multiple studies, discover data from a disease that was originally described in different ways at each repository, and compile all the data from your favorite program such as CPTAC - no matter where it ended up.
 
@@ -53,11 +54,10 @@ description: |
 
     ## Data Standards Services (DSS)
     The DSS provides us with harmonized values mapped to the data sources above. In our current release, DSS has provided values for: ethnicity, file_format, morphology, primary_diagnosis, race, species, therapeutic_agent, source_material_type (cancer/normal), treatment_type, and vital_status.
-raw_documentation: !load_txt documentation/cda.yaml
-examples: !load_yaml documentation/examples.yaml
-cache_key: api_assistant_cda_yaml
-documentation: !fill |
-    {raw_documentation}
+attachments:
+    raw_documentation: cda.yaml
+prompt: |
+    ${raw_documentation}
 
     # Additional Instructions:
 

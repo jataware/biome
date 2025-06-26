@@ -1,22 +1,23 @@
 name: "Census American Housing Survey (AHS)"
-cache_key: api_assistant_census_ahs_files
+integration_type: dataset
+
 description: |
   You have access to knowledge to all the Census Housing survey data, every 2 years from the
   year 1999 to 2023. You can use this API for answering questions on american housing, specifically their
   housing conditions (mold, water problems, etc), which can be used to correlate to health conditions,
   or other purposes.
-more_instructions: !load_txt documentation/docs.md
-examples: !load_yaml documentation/examples.yaml
-cache_body: 
-    default: true 
-documentation: !fill |
+
+attachments:
+  more_instructions: docs.md
+
+prompt: |
     You have access to a file-based Census American Housing Survey
-    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `{{DATASET_FILES_BASE_PATH}}/census-ahs` directory.
+    (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `${DATASET_FILES_BASE_PATH}/census-ahs` directory.
     The housing files are located and named per year as follows:
-    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv
-    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2021.csv
+    - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_2023.csv
+    - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_2021.csv
     - ...
-    - {{DATASET_FILES_BASE_PATH}}/census-ahs/survey_1999.csv
+    - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_1999.csv
     the more recent onces are at the metropolitan area level, while older ones
     are only avaiable at the national level. Use whichever year files you need, depending
     on the user question.
@@ -26,17 +27,17 @@ documentation: !fill |
     In particular, we have the household data file, which means we
     have the OMB13CBSA as a constantly availablecolumn to identify geographic area of survey(
     State-based Metropolitan and Micropolitan Statistical Areas). Pre-2015 have more geographical
-    column/information. Don't try to use state/county/etc if those are not present on 
+    column/information. Don't try to use state/county/etc if those are not present on
     the census housing file for that year.
-    
+
     Try to alreay have planned which columns you need for each, in order to process less columns/excess data since
-    merging both datasets will result in more than 1000 columns. Plan it out, select relevant columns 
+    merging both datasets will result in more than 1000 columns. Plan it out, select relevant columns
     (list the column names once filtered to knkow which are available),
     then merge the datasets with those columns selected.
 
     Once you identify columns of interest available, you can use this csv codebook dictionary that explains what each column code means:
 
-    - {{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv
+    - ${DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv
 
     from the codebook,you can use the "Variable" column to  match the variable you have access to (say "OMB13CBSA") and use the column "Response Codes" to get
     the meaning of the codes or the numeric code range values, for other types of variables.
@@ -58,7 +59,7 @@ documentation: !fill |
 
     The dataset csv files are a bit big, in the sense that they're in
     wide format and contain too many columns. When planning what you need, select a subset
-    of the columns needed, including the geo/housing-characteristics columns for your analysis, 
+    of the columns needed, including the geo/housing-characteristics columns for your analysis,
     but don't include the thousands of columns.
 
     # Overview of the American Housing Survey (AHS)
@@ -114,6 +115,6 @@ documentation: !fill |
 
     Read the CSV fiels with index_col=False, like so:
     ```
-    codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+    codebook = pd.read_csv('${DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
     ```
     If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!

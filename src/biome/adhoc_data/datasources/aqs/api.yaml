@@ -1,29 +1,30 @@
 name: "EPA Air Quality System"
-cache_key: api_assistant_aqs_json
+integration_type: api
+
 description: |
-    This API is the primary place to obtain row-level data 
-    from the EPA's Air Quality System (AQS) database. AQS contains 
-    ambient air sample data collected by state, local, tribal, and federal 
+    This API is the primary place to obtain row-level data
+    from the EPA's Air Quality System (AQS) database. AQS contains
+    ambient air sample data collected by state, local, tribal, and federal
     air pollution control agencies from thousands of monitors around the nation.
-    It also contains meteorological data, descriptive information about 
+    It also contains meteorological data, descriptive information about
     each monitoring station (including its geographic location and its operator),
     and information about the quality of the samples. Note, AQS does not contain
-    real-time air quality data (it can take 6 months from the time 
+    real-time air quality data (it can take 6 months from the time
     data is collected until it is in AQS). For real-time data, please use
     the AirNow API.
-raw_documentation: !load_txt documentation/aqs.json
-examples: !load_yaml documentation/examples.yaml
-cache_body: 
-    default: true 
-documentation: !fill |
+
+attachments:
+    raw_documentation: aqs.json
+
+prompt: |
     # OpenAPI Spec JSON:
-    {raw_documentation}
+    ${raw_documentation}
 
     # Additional Instructions:
-    
-    This API is through OpenAPI Spec (Swagger). You will be provided the schema. 
+
+    This API is through OpenAPI Spec (Swagger). You will be provided the schema.
     All requests go to the following URL: https://aqs.epa.gov/data/api
-    That is the base URL for all requests. 
+    That is the base URL for all requests.
 
     To use the AQS API always retrieve the email/key credentials from environment variables:
     - email: os.environ.get("API_EPA_AQS_EMAIL")
@@ -31,7 +32,7 @@ documentation: !fill |
     Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variables.
 
     Ensure you know the fields that come back from the OpenAPI spec in order to process the AQS data.
-    
+
     Daily/yearly data can only be accessed one year at a time. If working for that in year/decade ranges, prefer to use the annualData endpoints, as the daily data may be too large to fit into context.
     If the user requests data for a year range, you will need to make multiple requests to the API- potentially sampling in between, or creating averages, in order to not make requests for every single year in the range.
     The earliest sample in the data set is from 1957. Year 1980 marks the beginning of nationally consistent operational and quality assurance procedures.
@@ -43,7 +44,7 @@ documentation: !fill |
     AQS has a nominal quarterly reporting deadline: data must be reported by 90 days after the end of the calendar quarter in which they are collected.
 
     If you need to inspect the data of a JSON response before processing, and you're dealing with annual data, or multi-daily data, or
-    for a geographic region that could yield too much data to process (or fit into an LLM context window), 
+    for a geographic region that could yield too much data to process (or fit into an LLM context window),
 
     better use this endpoint:
     ```
@@ -77,17 +78,17 @@ documentation: !fill |
 
     Here is a sample of the output of a Raw Data request with one data point:
     ```
-        {{
+        {
             "Header": [
-            {{
+            {
                 "status": "success",
                 "request_time": "2018-06-13T07:45:01-04:00",
                 "url": "https://...",
                 "rows": 1
-            }}
+            }
             ],
             "Body": [
-            {{
+            {
                 "state_code": "01",
                 "county_code": "073",
                 "site_number": "0023",
@@ -113,9 +114,9 @@ documentation: !fill |
                 "county_name": "Jefferson",
                 "date_of_last_change": "2017-05-30",
                 "cbsa_code": "13820"
-            }}
+            }
             ]
-        }}
+        }
     ```
 
     # Error Handling and Status Codes
@@ -124,37 +125,35 @@ documentation: !fill |
     If the API is not able to parse your request it will return a status code of 400 and only the header, which will include an array of error messages instead of a row count.
     For example:
     ```
-        {{
-        "Header": [
-        {{
-            "status": "Failed",
-            "request_time": "2018-06-13T08:05:46.588-04:00",
-            "url": "https://...",
-            "error": [
-            "value is missing or the value is empty: param"
-            ]
-            }}
-        ],
-        "Body": []
-        }}
+        {
+            "Header": [{
+                "status": "Failed",
+                "request_time": "2018-06-13T08:05:46.588-04:00",
+                "url": "https://...",
+                "error": [
+                    "value is missing or the value is empty: param"
+                    ]
+            }],
+            "Body": []
+        }
     ```
 
-    If the API is able to parse your request but no data matches your selections, it will return the 
-    JSON header and an HTTP status of 200. The row count will be zero, 
+    If the API is able to parse your request but no data matches your selections, it will return the
+    JSON header and an HTTP status of 200. The row count will be zero,
     the status will be a message that no data matched your selection criteria,
     and the body will be empty.
     ```
-    {{
+    {
         "Header": [
-        {{
+        {
             "status": "No data matched your selection",
             "request_time": "2018-06-13T10:15:42-04:00",
             "url": "https://...",
             "rows": 0
-        }}
+        }
         ],
         "Body": []
-    }}
+    }
     ```
 
     # Request Limits and Terms of Service
@@ -237,28 +236,28 @@ documentation: !fill |
     - Data Volume Management: Harris County has numerous monitoring stations (we found 24,532 daily ozone records for 2022 alone), requiring efficient data aggregation strategies.
     - Parameter Identification: The API requires specific parameter codes rather than names, necessitating lookup of these codes before querying data.
 
-    The EPA AQS API provides rich, detailed air quality data that can be invaluable 
+    The EPA AQS API provides rich, detailed air quality data that can be invaluable
     for researching environmental factors affecting childhood asthma (and others).
-    By combining this data with health outcome data from other sources, researchers 
-    can develop comprehensive analyses of how air quality impacts respiratory health 
+    By combining this data with health outcome data from other sources, researchers
+    can develop comprehensive analyses of how air quality impacts respiratory health
     in specific geographic areas like a county or region.
-    The API's structure allows for flexible querying by location, time period, and 
+    The API's structure allows for flexible querying by location, time period, and
     specific pollutants, making it a powerful tool for environmental health research.
-    However, users should be aware of specific parameter requirements and prepare 
+    However, users should be aware of specific parameter requirements and prepare
     for handling large volumes of data when working with densely monitored areas.
 
     Note: If/when using the `metaData/isAvailable` endpoint to check if the API is available,
     use this sample response as guide:
     ```
-    {{
+    {
         "Header": [
-            {{
+            {
                 "status": "API service is up and running healthy. Status: connection_pool: size: 5, connections: 1, in use: 1, waiting_in_queue: 0",
             "request_time": "2025-03-21T08:21:41-04:00",
             "url": "http://aqs.epa.gov/api/metaData/isAvailable?email={{email}}.com&key={{key}}"
-            }}
+            }
         ],
         "Data": []
-    }}
+    }
     ```
     Never simulate this API- if it is not available ask the user how to proceed.
