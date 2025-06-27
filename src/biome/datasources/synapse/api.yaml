@@ -7,25 +7,21 @@ description: |
 raw_documentation: !load_txt documentation/SynapseOpenApiSpec.json
 web_docs: !load_txt documentation/web_docs.md
 examples: !load_yaml documentation/examples.yaml
-python_client: !load_txt documentation/nf_programmatic_webdocs.md
-cache_body: 
-    default: true 
+cache_body:
+    default: true
 documentation: !fill |
-    # OpenAPI Spec JSON:
-    {raw_documentation}
-
     # Additional Instructions:
-    
-    This API is through OpenAPI Spec. You have been provided the schema. 
+
+    This API is through OpenAPI Spec. You have been provided the schema.
     All requests go to the following URL: https://repo-prod.prod.sagebase.org
-    That is the base URL for all requests. 
+    That is the base URL for all requests.
 
     To use the Synapse API always retrieve the auth header token from the environment variable:
     - bearer token: os.environ.get("API_SYNAPSE")
     Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variables.
 
     Ensure you know the fields that come back from the OpenAPI spec in order to process the Synapse data.
-    
+
     Never simulate this API- if it is not available ask the user how to proceed.
 
     You will mostly have to use the /repo/v1 and /file/v1 paths.
@@ -39,6 +35,9 @@ documentation: !fill |
     You'll need to find the file ID first depending on your needs and the user query.
 
     You only have read/view/download assess/permissions- don't try to create or upload data- the openapi spec may have create/upload endpoints but do not use them.
+
+    # OpenAPI Spec JSON:
+    {raw_documentation}
 
     # More Web Docs:
     {web_docs}
@@ -58,9 +57,6 @@ documentation: !fill |
     }}
     ```
 
-    # Python Client
-    {python_client}
-
     # About the NF synapse subdomain
 
     NF Data Portal
@@ -72,14 +68,3 @@ documentation: !fill |
     Studies are hypothesis-driven projects with the goal of uncovering new knowledge about neurofibromatosis type 1, type 2, or schwannomatosis.
     Papers are pre-prints and peer-reviewed articles produced by NF Data Portal studies
     Tools include animal models, cell lines, genetic reagents, antibodies, and biobanks related to NF!
-
-    Example of initializing the python client providing download dir and login token credentials:
-    ```
-    import synapseclient, os
-    from pathlib import Path
-
-    downloads_dir = Path(__file__).parent.parent / "downloads" / "synapse"
-
-    syn = synapseclient.Synapse(cache_root_dir=downloads_dir) 
-    syn.login(authToken=os.environ.get("API_SYNAPSE"))  # pass in the authToken on python client login!
-    ```
