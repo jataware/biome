@@ -133,7 +133,10 @@ class BiomeAgent(BeakerAgent):
         self.api_directories = {}
         for datasource_dir in os.listdir(datasource_root):
             if datasource_dir == '.ipynb_checkpoints':
-                os.rmdir(os.path.join(datasource_root, datasource_dir))
+                try:
+                    os.rmdir(os.path.join(datasource_root, datasource_dir))
+                except IOError:
+                    pass
 
             datasource_full_path = os.path.join(datasource_root, datasource_dir)
             if os.path.isdir(datasource_full_path):
@@ -217,7 +220,7 @@ class BiomeAgent(BeakerAgent):
                 return "Do not attempt to fix this result: there is no API for the agent that creates the request. Inform the user that they need to specify GEMINI_API_KEY and consider this a successful tool invocation."
             logger.error(str(e))
             return f"An error occurred while asking the API. The error was: {str(e)}. Please try again with a different question."
-    
+
 
     @tool()
     async def drs_uri_info(self, uris: List[str]) -> List[dict]:
@@ -228,7 +231,7 @@ class BiomeAgent(BeakerAgent):
 
         Args:
             uris (list): A list of DRS URIs to get information about. URIs should be of the form 'drs://<hostname>:<id_number>'.
-            
+
         Returns:
             list: The information from looking up each DRS URI.
         """
@@ -242,7 +245,7 @@ class BiomeAgent(BeakerAgent):
                 object_id = uri.split(":")[-1]
             except IndexError:
                 raise ValueError("Invalid DRS URI: Missing object ID")
-    
+
             # Get information about the object from the DRS server
             url = f"https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/{object_id}"
             response = requests.get(url)
@@ -252,7 +255,7 @@ class BiomeAgent(BeakerAgent):
             responses.append(response.json())
 
         return responses
-    
+
     @tool()
     async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
         """
@@ -272,23 +275,23 @@ class BiomeAgent(BeakerAgent):
         """
         if api not in self.api_list:
             raise ValueError(f"Error: the API name must match one of the names in the {self.api_list}. The API name provided was {api}.")
-        
+
         try:
             api_folder = self.api_directories[api]
             # Construct path to examples.yaml file
             examples_path = os.path.join(self.root_folder, DATASOURCES_FOLDER, api_folder, "documentation", "examples.yaml")
             os.makedirs(os.path.dirname(examples_path), exist_ok=True)
-            
+
             # Create new example entry as a dictionary
             new_example = {
                 "query": query,
                 "code": code  # Will be formatted with block scalar style
             }
-            
+
             # Add notes if provided
             if notes:
                 new_example["notes"] = notes
-                
+
             # Read existing examples if file exists
             examples = []
             if os.path.exists(examples_path) and os.path.getsize(examples_path) > 0:
@@ -297,28 +300,28 @@ class BiomeAgent(BeakerAgent):
                     examples = yaml.safe_load(f) or []
                     if not isinstance(examples, list):
                         examples = []
-            
+
             # Add new example
             examples.append(new_example)
-            
+
             # Write updated examples back to file
             import yaml
-            
+
             # Custom YAML dumper class that always uses block style for multiline strings
             class BlockStyleDumper(yaml.SafeDumper):
                 pass
-            
+
             # Always use block style (|) for strings with newlines
             def represent_str_as_block(dumper, data):
                 if '\n' in data:
                     return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
                 return dumper.represent_scalar('tag:yaml.org,2002:str', data)
-            
+
             BlockStyleDumper.add_representer(str, represent_str_as_block)
-            
+
             with open(examples_path, 'w') as f:
                 yaml.dump(examples, f, Dumper=BlockStyleDumper, sort_keys=False, default_flow_style=False)
-                
+
             return f"Successfully added example to {examples_path}"
 
         except Exception as e:
