@@ -62,7 +62,7 @@ class BiomeContext(BeakerContext):
         gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
 
         # Initialize adhoc integration
-        adhoc_integration = AdhocIntegrationProvider.from_file_structure(
+        adhoc_integration = AdhocIntegrationProvider(
             adhoc_path=ADHOC_DIR_PATH,
             drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
             curator_config=curator_config,
