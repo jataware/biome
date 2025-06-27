@@ -7,7 +7,6 @@ description: |
 raw_documentation: !load_txt documentation/SynapseOpenApiSpec.json
 web_docs: !load_txt documentation/web_docs.md
 examples: !load_yaml documentation/examples.yaml
-python_client: !load_txt documentation/nf_programmatic_webdocs.md
 cache_body:
     default: true
 documentation: !fill |
