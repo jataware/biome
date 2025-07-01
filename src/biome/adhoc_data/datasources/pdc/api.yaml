@@ -1,26 +1,877 @@
-name: "Proteomics Data Commons"
-description: |
-    The objectives of the National Cancer Institute’s Proteomic Data Commons (PDC) are (1) to make cancer-related proteomic datasets easily accessible to the public, and (2) facilitate direct multiomics integration in support of precision medicine through interoperability with accompanying data resources (genomic and medical image datasets).
-    The PDC was developed to advance our understanding of how proteins help to shape the risk, diagnosis, development, progression, and treatment of cancer. In-depth analysis of proteomic data allows us to study both how and why cancer develops and to devise ways of personalizing treatment for patients using precision medicine.
-    The PDC is one of several repositories within the NCI Cancer Research Data Commons (CRDC), a secure cloud-based infrastructure featuring diverse data sets and innovative analytic tools – all designed to advance data-driven scientific discovery. The CRDC enables researchers to link proteomic data with other data sets (e.g., genomic and imaging data) and to submit, collect, analyze, store, and share data throughout the cancer data ecosystem.
-    Access to highly curated and standardized biospecimen, clinical and proteomic data with direct integration of accompanying data resources (genomic and medical image datasets).
-
-    Uses:
-    * Intuitive interface to filter, query, search, visualize and download the data and metadata.
-    * A common data harmonization pipeline to uniformly analyze all PDC data and provide advanced visualization of the quantitative information.
-    * Cloud based (Amazon Web Services) infrastructure facilitates interoperability with AWS based data analysis tools and platforms natively.
-    * Application programming interface (API) provides cloud-agnostic data access and allows third parties to extend the functionality beyond the PDC.
-    * A highly structured workspace that serves as a private user data store and also data submission portal.
-    * Distributes controlled access data, such as the patient-specific protein fasta sequence databases, with dbGaP authorization and eRA Commons authentication.
-
-attachments:
-    raw_documentation: pdc_schema.graphql
-
+description: "The objectives of the National Cancer Institute\u2019s Proteomic Data\
+  \ Commons (PDC) are (1) to make cancer-related proteomic datasets easily accessible\
+  \ to the public, and (2) facilitate direct multiomics integration in support of\
+  \ precision medicine through interoperability with accompanying data resources (genomic\
+  \ and medical image datasets).\nThe PDC was developed to advance our understanding\
+  \ of how proteins help to shape the risk, diagnosis, development, progression, and\
+  \ treatment of cancer. In-depth analysis of proteomic data allows us to study both\
+  \ how and why cancer develops and to devise ways of personalizing treatment for\
+  \ patients using precision medicine.\nThe PDC is one of several repositories within\
+  \ the NCI Cancer Research Data Commons (CRDC), a secure cloud-based infrastructure\
+  \ featuring diverse data sets and innovative analytic tools \u2013 all designed\
+  \ to advance data-driven scientific discovery. The CRDC enables researchers to link\
+  \ proteomic data with other data sets (e.g., genomic and imaging data) and to submit,\
+  \ collect, analyze, store, and share data throughout the cancer data ecosystem.\n\
+  Access to highly curated and standardized biospecimen, clinical and proteomic data\
+  \ with direct integration of accompanying data resources (genomic and medical image\
+  \ datasets).\n\nUses:\n* Intuitive interface to filter, query, search, visualize\
+  \ and download the data and metadata.\n* A common data harmonization pipeline to\
+  \ uniformly analyze all PDC data and provide advanced visualization of the quantitative\
+  \ information.\n* Cloud based (Amazon Web Services) infrastructure facilitates interoperability\
+  \ with AWS based data analysis tools and platforms natively.\n* Application programming\
+  \ interface (API) provides cloud-agnostic data access and allows third parties to\
+  \ extend the functionality beyond the PDC.\n* A highly structured workspace that\
+  \ serves as a private user data store and also data submission portal.\n* Distributes\
+  \ controlled access data, such as the patient-specific protein fasta sequence databases,\
+  \ with dbGaP authorization and eRA Commons authentication.\n"
+integration_type: api
+name: Proteomics Data Commons
 prompt: |
-    ${raw_documentation}
+  ${raw_documentation}
 
-    # Additional Instructions:
+  # Additional Instructions:
 
-    This API is through GraphQL. You will be provided the schema.
-    All requests go to the following URL: https://pdc.cancer.gov/graphql
-    Make all GraphQL requests to that URL.
+  This API is through GraphQL. You will be provided the schema.
+  All requests go to the following URL: https://pdc.cancer.gov/graphql
+  Make all GraphQL requests to that URL.
+resources:
+  07112af0-449d-4d88-b914-acba9f2ae57b:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to get raw mass spec data for the Georgetown Lung Cancer Proteomics Study
+      query = '''
+      {
+        getPaginatedUIFile(
+          study_name: "Georgetown Lung Cancer Proteomics Study",
+          data_category: "Raw Mass Spectra",
+          file_type: "Proprietary"
+        ) {
+          uiFiles {
+            file_id
+            file_name
+            file_type
+            file_size
+            md5sum
+            downloadable
+          }
+        }
+      }
+      '''
+
+      # Send the request
+      response = requests.post(url, json={'query': query})
+
+      # Check for successful response
+      if response.status_code == 200:
+          data = response.json()
+          file_info = data['data']['getPaginatedUIFile']['uiFiles']
+          print("Raw mass spec data for the Georgetown Lung Cancer Proteomics Study:")
+          print(json.dumps(file_info, indent=2))
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      Fetch raw mass spec data for a specific study using study name, data category, and file type in the Proteomics Data Commons (PDC).
+    resource_id: 07112af0-449d-4d88-b914-acba9f2ae57b
+    resource_type: example
+  0a702f8c-8715-4e12-a8f9-ad32621dbfcf:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to get detailed information about a case
+      query = '''
+      {
+        case(case_id: "9e8e8f51-d732-11ea-b1fd-0aad30af8a83") {
+          case_id
+          case_submitter_id
+          disease_type
+          primary_site
+          demographics {
+            gender
+            race
+            ethnicity
+            age_at_index
+          }
+          diagnoses {
+            diagnosis_id
+            diagnosis_submitter_id
+            tumor_stage
+            tumor_grade
+          }
+          samples {
+            sample_id
+            sample_submitter_id
+            sample_type
+          }
+        }
+      }
+      '''
+
+      # Send the request
+      response = requests.post(url, json={'query': query})
+
+      # Check for successful response
+      if response.status_code == 200:
+          data = response.json()
+          case_info = data['data']['case']
+          print("Detailed information about the case:")
+          print(json.dumps(case_info, indent=2))
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: Fetch detailed information about a case using its case ID in the Proteomics
+      Data Commons (PDC).
+    resource_id: 0a702f8c-8715-4e12-a8f9-ad32621dbfcf
+    resource_type: example
+  25f6b833-82fe-44fd-b8c8-bfbd6a7d2738:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to find studies with open standard data for processed mass spec
+      query = '''
+      {
+        getPaginatedUIFile(
+          data_category: "Processed Mass Spectra",
+          file_type: "Open Standard",
+          offset: 0,
+          limit: 10
+        ) {
+          uiFiles {
+            file_id
+            file_name
+            study_id
+            pdc_study_id
+          }
+        }
+      }
+      '''
+
+      # Send the request
+      response = requests.post(url, json={'query': query})
+
+      # Check for successful response
+      if response.status_code == 200:
+          data = response.json()
+          files = data['data']['getPaginatedUIFile']['uiFiles']
+          print("Studies with open standard data for processed mass spec:")
+          print(json.dumps(files, indent=2))
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      This example demonstrates how to query the Proteomics Data Commons for studies with open standard data for processed mass spec using the getPaginatedUIFile query.
+    resource_id: 25f6b833-82fe-44fd-b8c8-bfbd6a7d2738
+    resource_type: example
+  2af265a5-2548-4c2b-a3f8-cf853b2d4b0d:
+    code: |
+      import requests
+      import json
+
+      url = 'https://pdc.cancer.gov/graphql'
+
+      query = """
+      query ($gene_name: String!, $offset: Int, $limit: Int) {
+        getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: $offset, limit: $limit) {
+          total
+          uiGeneAliquotSpectralCounts {
+            aliquot_id
+            plex
+            experiment_type
+            spectral_count
+            distinct_peptide
+            unshared_peptide
+            precursor_area
+            log2_ratio
+          }
+        }
+      }
+      """
+
+      variables_stat5a = {
+          "gene_name": "STAT5A",
+          "offset": 0,
+          "limit": 10  # Retrieve the first 10 results
+      }
+
+      variables_stat5b = {
+          "gene_name": "STAT5B",
+          "offset": 0,
+          "limit": 10  # Retrieve the first 10 results
+      }
+
+      try:
+          response_stat5a = requests.post(url, json={'query': query, 'variables': variables_stat5a})
+          response_stat5a.raise_for_status()
+          data_stat5a = response_stat5a.json()
+
+          response_stat5b = requests.post(url, json={'query': query, 'variables': variables_stat5b})
+          response_stat5b.raise_for_status()
+          data_stat5b = response_stat5b.json()
+
+          print("STAT5A Protein Expression Data (First 10 Results):")
+          print(json.dumps(data_stat5a['data']['getPaginatedUIGeneAliquotSpectralCount']['uiGeneAliquotSpectralCounts'], indent=2))
+
+          print("\nSTAT5B Protein Expression Data (First 10 Results):")
+          print(json.dumps(data_stat5b['data']['getPaginatedUIGeneAliquotSpectralCount']['uiGeneAliquotSpectralCounts'], indent=2))
+
+      except requests.exceptions.RequestException as e:
+          print(f"An error occurred: {e}")
+      except json.JSONDecodeError as e:
+          print(f"Error decoding JSON response: {e}")
+          print("Response content:", response_stat5a.text)
+          print("Response content:", response_stat5b.text)
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      Retrieve quantitative mass spectrometry data for STAT5A and STAT5B proteins using the getPaginatedUIGeneAliquotSpectralCount query.
+    resource_id: 2af265a5-2548-4c2b-a3f8-cf853b2d4b0d
+    resource_type: example
+  75e500f5-31c0-4683-995b-26fc49d51426:
+    filepath: pdc_schema.graphql
+    integration: proteomics_data_commons
+    name: raw_documentation
+    resource_id: 75e500f5-31c0-4683-995b-26fc49d51426
+    resource_type: file
+  8708cae9-d62e-468d-9d78-3f61ac1913d6:
+    code: |
+      import requests
+      import json
+      import pandas as pd
+
+      url = 'https://pdc.cancer.gov/graphql'
+
+      # Updated query with correct schema
+      query = """
+      query ($gene_name: String!) {
+        getPaginatedUIGeneAliquotSpectralCount(
+          gene_name: $gene_name,
+          offset: 0,
+          limit: 100  # Increased limit to get more samples
+        ) {
+          total
+          uiGeneAliquotSpectralCounts {
+            aliquot_id
+            plex
+            experiment_type
+            spectral_count
+            distinct_peptide
+            unshared_peptide
+            precursor_area
+            log2_ratio
+            study_submitter_id
+          }
+        }
+      }
+      """
+
+      def get_protein_data(gene_name):
+          response = requests.post(url, json={'query': query, 'variables': {'gene_name': gene_name}})
+          response.raise_for_status()
+          data = response.json()
+
+          if 'data' in data and 'getPaginatedUIGeneAliquotSpectralCount' in data['data']:
+              results = data['data']['getPaginatedUIGeneAliquotSpectralCount']
+              samples = results['uiGeneAliquotSpectralCounts']
+
+              # Convert to DataFrame
+              df = pd.DataFrame(samples)
+              # Add gene name column
+              df['gene_name'] = gene_name
+              return df
+          return None
+
+      try:
+          # Get data for both proteins
+          stat5a_df = get_protein_data('STAT5A')
+          stat5b_df = get_protein_data('STAT5B')
+
+          # Combine the dataframes
+          combined_df = pd.concat([stat5a_df, stat5b_df], ignore_index=True)
+
+          # Display basic information about the dataset
+          print("DataFrame Info:")
+          print(combined_df.info())
+
+          print("\nFirst few rows of the dataset:")
+          print(combined_df.head())
+
+          print("\nSummary statistics:")
+          print(combined_df.describe())
+
+          # Save the DataFrame for later use
+          combined_df.to_csv('stat5_protein_data.csv', index=False)
+          print("\nData has been saved to 'stat5_protein_data.csv'")
+
+      except requests.exceptions.RequestException as e:
+          print(f"An error occurred: {e}")
+          if hasattr(e, 'response') and e.response is not None:
+              print("Response content:", e.response.text)
+      except json.JSONDecodeError as e:
+          print(f"Error decoding JSON response: {e}")
+          print("Response content:", response.text)
+    integration: proteomics_data_commons
+    notes: null
+    query: Load samples into a pandas dataframe
+    resource_id: 8708cae9-d62e-468d-9d78-3f61ac1913d6
+    resource_type: example
+  893e05e7-c0db-4482-aebe-1b09c9abfd4d:
+    code: |
+      import requests
+      import json
+
+      url = 'https://pdc.cancer.gov/graphql'
+      study_id = 'PDC000478'  # Using the PDC Study ID instead
+
+      query = """
+      query getStudyMetadata($pdc_study_id: String!) {
+        getPaginatedUIStudy(pdc_study_id: $pdc_study_id) {
+          uiStudies {
+            study_id
+            pdc_study_id
+            submitter_id_name
+            study_description
+            program_name
+            project_name
+            disease_type
+            primary_site
+            analytical_fraction
+            experiment_type
+            embargo_date
+            cases_count
+            aliquots_count
+            filesCount {
+              file_type
+              data_category
+              files_count
+            }
+            supplementaryFilesCount {
+              data_category
+              file_type
+              files_count
+            }
+            nonSupplementaryFilesCount {
+              data_category
+              file_type
+              files_count
+            }
+            contacts {
+              name
+              institution
+              email
+              url
+            }
+            versions {
+              number
+            }
+          }
+        }
+      }
+      """
+
+      variables = {
+        "pdc_study_id": study_id
+      }
+
+      try:
+        response = requests.post(url, json={'query': query, 'variables': variables})
+        response.raise_for_status()
+        data = response.json()
+        # Print a subset of the data
+        print(json.dumps(data['data']['getPaginatedUIStudy']['uiStudies'][0], indent=2))
+
+      except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+          print("Response content:", e.response.text)
+      except json.JSONDecodeError as e:
+        print(f"Error decoding JSON response: {e}")
+        print("Response content:", response.text)
+    integration: proteomics_data_commons
+    notes: null
+    query: Fetch all available metadata for a study using its PDC Study ID.
+    resource_id: 893e05e7-c0db-4482-aebe-1b09c9abfd4d
+    resource_type: example
+  ab5e4368-3fd8-49f9-83f0-389cc6912cfd:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to filter for studies with primary site "Lung"
+      query_lung = '''
+      {
+        getPaginatedUIStudy(primary_site: "Lung") {
+          uiStudies {
+            study_id
+            submitter_id_name
+            pdc_study_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      '''
+
+      # Define the GraphQL query to filter for studies with primary site "Bronchus and lung"
+      query_bronchus_and_lung = '''
+      {
+        getPaginatedUIStudy(primary_site: "Bronchus and lung") {
+          uiStudies {
+            study_id
+            submitter_id_name
+            pdc_study_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      '''
+
+      # Send the request for "Lung"
+      response_lung = requests.post(url, json={'query': query_lung})
+
+      # Send the request for "Bronchus and lung"
+      response_bronchus_and_lung = requests.post(url, json={'query': query_bronchus_and_lung})
+
+      # Combine the results from both queries
+      lung_cancer_studies = []
+
+      if response_lung.status_code == 200:
+          data_lung = response_lung.json()
+          lung_cancer_studies.extend(data_lung['data']['getPaginatedUIStudy']['uiStudies'])
+      else:
+          print(f"Error: {response_lung.status_code} - {response_lung.text}")
+
+      if response_bronchus_and_lung.status_code == 200:
+          data_bronchus_and_lung = response_bronchus_and_lung.json()
+          lung_cancer_studies.extend(data_bronchus_and_lung['data']['getPaginatedUIStudy']['uiStudies'])
+      else:
+          print(f"Error: {response_bronchus_and_lung.status_code} - {response_bronchus_and_lung.text}")
+
+      # Remove duplicates
+      lung_cancer_studies = {study['study_id']: study for study in lung_cancer_studies}.values()
+
+      # Print the number of studies found and the first 5 studies
+      print(f"Found {len(lung_cancer_studies)} studies with primary site 'Lung' or 'Bronchus and lung'.")
+      print(list(lung_cancer_studies)[:5])
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      This example demonstrates how to find lung cancer studies in the Proteomics Data Commons by querying for studies with primary sites 'Lung' and 'Bronchus and lung', and combining the results.
+    resource_id: ab5e4368-3fd8-49f9-83f0-389cc6912cfd
+    resource_type: example
+  b1057917-5943-4e63-a0e1-b1c2e12aa7a7:
+    code: |
+      import requests
+      import json
+
+      url = 'https://pdc.cancer.gov/graphql'
+
+      query = """
+      {
+        getPaginatedUIStudy(disease_type: "Acute Myeloid Leukemia") {
+          uiStudies {
+            study_id
+            submitter_id_name
+            pdc_study_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      """
+
+      try:
+          response = requests.post(url, json={'query': query})
+          response.raise_for_status()
+
+          # Process the response data
+          data = response.json()
+          studies = data['data']['getPaginatedUIStudy']['uiStudies']
+
+          # Output the results
+          print(f"Found {len(studies)} studies related to Acute Myeloid Leukemia.")
+          for study in studies[:5]:  # Print the first 5 studies
+              print(study)
+
+      except requests.exceptions.RequestException as e:
+          print(f"An error occurred: {e}")
+    integration: proteomics_data_commons
+    notes: null
+    query: Query PDC to find studies with a specific disease type (in this case 'Acute
+      Myeloid Leukemia')
+    resource_id: b1057917-5943-4e63-a0e1-b1c2e12aa7a7
+    resource_type: example
+  bf5e4934-19fe-4c99-b7c3-b3e37efd70a6:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to filter for studies with primary site "Lung" or "Bronchus and lung"
+      query_lung = '''
+      {
+        getPaginatedUIStudy(primary_site: "Lung") {
+          uiStudies {
+            study_id
+            submitter_id_name
+            pdc_study_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      '''
+
+      query_bronchus_and_lung = '''
+      {
+        getPaginatedUIStudy(primary_site: "Bronchus and lung") {
+          uiStudies {
+            study_id
+            submitter_id_name
+            pdc_study_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      '''
+
+      # Send the request for "Lung"
+      response_lung = requests.post(url, json={'query': query_lung})
+
+      # Send the request for "Bronchus and lung"
+      response_bronchus_and_lung = requests.post(url, json={'query': query_bronchus_and_lung})
+
+      lung_cancer_studies = []
+
+      # Check for successful response for "Lung"
+      if response_lung.status_code == 200:
+          data_lung = response_lung.json()
+          lung_cancer_studies.extend(data_lung['data']['getPaginatedUIStudy']['uiStudies'])
+      else:
+          print(f"Error: {response_lung.status_code} - {response_lung.text}")
+
+      # Check for successful response for "Bronchus and lung"
+      if response_bronchus_and_lung.status_code == 200:
+          data_bronchus_and_lung = response_bronchus_and_lung.json()
+          lung_cancer_studies.extend(data_bronchus_and_lung['data']['getPaginatedUIStudy']['uiStudies'])
+      else:
+          print(f"Error: {response_bronchus_and_lung.status_code} - {response_bronchus_and_lung.text}")
+
+      # Remove duplicates
+      lung_cancer_studies = {study['study_id']: study for study in lung_cancer_studies}.values()
+
+      print(f"Found {len(lung_cancer_studies)} studies with primary site 'Lung' or 'Bronchus and lung'.")
+      # Display the first few studies
+      for study in list(lung_cancer_studies)[:5]:
+          print(study)
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      Query the Proteomics Data Commons (PDC) to find studies with primary site 'Lung' or 'Bronchus and lung' using separate queries and combining results.
+    resource_id: bf5e4934-19fe-4c99-b7c3-b3e37efd70a6
+    resource_type: example
+  c31ddab5-2539-4005-8b92-1512ec8d12fc:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to get open standard data for a study
+      query = '''
+      {
+        getPaginatedUIFile(
+          study_name: "Georgetown Lung Cancer Proteomics Study",
+          file_type: "Open Standard"
+        ) {
+          uiFiles {
+            file_id
+            file_name
+            file_type
+            file_size
+            md5sum
+            downloadable
+          }
+        }
+      }
+      '''
+
+      # Send the request
+      response = requests.post(url, json={'query': query})
+
+      # Check for successful response
+      if response.status_code == 200:
+          data = response.json()
+          file_info = data['data']['getPaginatedUIFile']['uiFiles']
+          print("Open standard data for the study:")
+          print(json.dumps(file_info, indent=2))
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: Retrieve open standard data files for a specific study using the Proteomics
+      Data Commons (PDC) API.
+    resource_id: c31ddab5-2539-4005-8b92-1512ec8d12fc
+    resource_type: example
+  c68f970e-4d39-4979-bcf2-43a823490773:
+    code: |
+      import requests
+      import json
+
+      url = 'https://pdc.cancer.gov/graphql'
+
+      # Corrected query structure
+      query = """
+      query ($gene_name: String!) {
+        getPaginatedUIGeneAliquotSpectralCount(
+          gene_name: $gene_name,
+          offset: 0,
+          limit: 10
+        ) {
+          total
+          uiGeneAliquotSpectralCounts {
+            aliquot_id
+            plex
+            experiment_type
+            spectral_count
+            distinct_peptide
+            unshared_peptide
+            log2_ratio
+            study_submitter_id
+          }
+        }
+      }
+      """
+
+      def print_results(data, gene_name):
+          if 'data' in data and 'getPaginatedUIGeneAliquotSpectralCount' in data['data']:
+              results = data['data']['getPaginatedUIGeneAliquotSpectralCount']
+              total = results['total']
+              samples = results['uiGeneAliquotSpectralCounts']
+
+              print(f"\n{gene_name} Results:")
+              print(f"Total samples available: {total}")
+              print("\nSample details (first 10 samples):")
+
+              for i, sample in enumerate(samples):
+                  print(f"\nSample {i+1}:")
+                  print(f"  Study ID: {sample['study_submitter_id']}")
+                  print(f"  Experiment Type: {sample['experiment_type']}")
+                  print(f"  Spectral Count: {sample['spectral_count']}")
+                  print(f"  Distinct Peptides: {sample['distinct_peptide']}")
+                  print(f"  Unshared Peptides: {sample['unshared_peptide']}")
+                  print(f"  Log2 Ratio: {sample['log2_ratio']}")
+                  print(f"  Plex: {sample['plex']}")
+
+      try:
+          # Query STAT5A
+          response = requests.post(url, json={'query': query, 'variables': {'gene_name': 'STAT5A'}})
+          response.raise_for_status()
+          stat5a_data = response.json()
+          print_results(stat5a_data, 'STAT5A')
+
+          # Query STAT5B
+          response = requests.post(url, json={'query': query, 'variables': {'gene_name': 'STAT5B'}})
+          response.raise_for_status()
+          stat5b_data = response.json()
+          print_results(stat5b_data, 'STAT5B')
+
+      except requests.exceptions.RequestException as e:
+          print(f"An error occurred: {e}")
+          if hasattr(e.response, 'text'):
+              print("Response content:", e.response.text)
+      except json.JSONDecodeError as e:
+          print(f"Error decoding JSON response: {e}")
+          print("Response content:", response.text)
+    integration: proteomics_data_commons
+    notes: null
+    query: obtain quantitative data
+    resource_id: c68f970e-4d39-4979-bcf2-43a823490773
+    resource_type: example
+  d119d4cc-347e-40bc-b3d3-f17f6e1ee16e:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to get cases for the Georgetown Lung Cancer Proteomics Study using study name
+      query = '''
+      {
+        getPaginatedUICase(study_name: "Georgetown Lung Cancer Proteomics Study") {
+          uiCases {
+            case_id
+            case_submitter_id
+            disease_type
+            primary_site
+          }
+        }
+      }
+      '''
+
+      # Send the request for cases
+      response = requests.post(url, json={'query': query})
+
+      # Check for successful response for cases
+      if response.status_code == 200:
+          data_cases = response.json()
+          cases_info = data_cases['data']['getPaginatedUICase']['uiCases']
+          print("Cases information for the Georgetown Lung Cancer Proteomics Study:")
+          print(json.dumps(cases_info, indent=2))
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: Fetch all cases based on a study name
+    resource_id: d119d4cc-347e-40bc-b3d3-f17f6e1ee16e
+    resource_type: example
+  d2fde53a-0ba6-4c00-acaf-e27d4218480b:
+    code: |
+      import requests
+      import json
+
+      url = 'https://pdc.cancer.gov/graphql'
+
+      # Query for STAT5B protein expression data
+      query = """
+      query ($gene_name: String!) {
+        getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: 0, limit: 10) {
+          total
+          uiGeneAliquotSpectralCounts {
+            aliquot_id
+            plex
+            experiment_type
+            spectral_count
+            distinct_peptide
+            unshared_peptide
+            precursor_area
+            log2_ratio
+          }
+        }
+      }
+      """
+
+      variables = {
+          "gene_name": "STAT5B"
+      }
+
+      try:
+          response = requests.post(url, json={'query': query, 'variables': variables})
+          response.raise_for_status()
+          data = response.json()
+          print("STAT5B Protein Expression Data:")
+          print(json.dumps(data, indent=2))
+      except requests.exceptions.RequestException as e:
+          print(f"An error occurred: {e}")
+      except json.JSONDecodeError as e:
+          print(f"Error decoding JSON response: {e}")
+          print("Response content:", response.text)
+    integration: proteomics_data_commons
+    notes: null
+    query: obtain quantitative mass spec data on a specific protein (STAT5)
+    resource_id: d2fde53a-0ba6-4c00-acaf-e27d4218480b
+    resource_type: example
+  e5293d4f-52c8-414f-bfcd-3131b4000aa0:
+    code: |
+      import requests
+      import json
+
+      # Define the GraphQL endpoint
+      url = "https://pdc.cancer.gov/graphql"
+
+      # Define the GraphQL query to get the signed URL for the file
+      query = '''
+      query FilesDataQuery($file_name: String!, $study_id: String!) {
+        uiFilesPerStudy(file_name: $file_name, study_id: $study_id) {
+          file_id
+          file_name
+          signedUrl {
+            url
+          }
+        }
+      }
+      '''
+
+      # Set the variables for the query
+      variables = {
+          "file_name": "Ctrl_1-set_1-label_113-frac_2-F9.wiff",
+          "study_id": "17d5bccf-d028-11ea-b1fd-0aad30af8a83"
+      }
+
+      # Send the request
+      response = requests.post(url, json={'query': query, 'variables': variables})
+
+      # Check for successful response
+      if response.status_code == 200:
+          data = response.json()
+          signed_url = data['data']['uiFilesPerStudy'][0]['signedUrl']['url']
+          print(f"Signed URL for the file: {signed_url}")
+      else:
+          print(f"Error: {response.status_code} - {response.text}")
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      Retrieve a signed URL for downloading a specific file (e.g. raw mass spec file) in a study using the Proteomics Data Commons (PDC) API.
+    resource_id: e5293d4f-52c8-414f-bfcd-3131b4000aa0
+    resource_type: example
+  ed1fa5df-2d51-48ef-871b-b09abc5defc9:
+    code: "import requests\nimport json\nimport pandas as pd\nfrom pandas import json_normalize\n\
+      \nurl = 'https://pdc.cancer.gov/graphql'\n\n# Define the GraphQL query\nquery\
+      \ = \"\"\"\nquery FilteredClinicalDataPaginated($offset_value: Int, $limit_value:\
+      \ Int, $source: String!) {\n    getPaginatedUIClinical(\n        offset: $offset_value,\n\
+      \        limit: $limit_value,\n        source: $source\n    ) {\n        total\n\
+      \        uiClinical {\n            case_id\n            case_submitter_id\n\
+      \            externalReferences {\n              reference_resource_shortname\n\
+      \              reference_entity_location\n            }\n        }\n       \
+      \ pagination {\n            count\n            total\n            pages\n  \
+      \          size\n        }\n    }\n}\n\"\"\"\n\n# Set initial query variables\n\
+      offset_value = 0\nlimit_value = 3993  # Fetch 1000 records per request\nsource\
+      \ = \"PDC\"\n\n# Initialize list to store all case IDs\nall_case_ids = []\n\n\
+      total_cases = 3993  # Total number of cases to fetch\n\nwhile offset_value <\
+      \ total_cases:\n    variables = {\n        \"offset_value\": offset_value,\n\
+      \        \"limit_value\": limit_value,\n        \"source\": source\n    }\n\n\
+      \    # Make the API request\n    response = requests.post(url, json={'query':\
+      \ query, 'variables': variables})\n\n    if response.status_code == 200:\n \
+      \       data = response.json()\n        \n        # Extract case IDs\n     \
+      \   cases = data['data']['getPaginatedUIClinical']['uiClinical']\n        all_case_ids.extend([case['case_id']\
+      \ for case in cases])\n        \n        # Increment offset for next page\n\
+      \        offset_value += limit_value\n    else:\n        print(f\"Error: {response.status_code}\"\
+      )\n        print(response.text)\n        break\n\n# Print total number of case\
+      \ IDs fetched\nprint(f\"Total cases fetched: {len(all_case_ids)}\")\n\npdc_cases_in_gdc\
+      \ = []\n\nfor case in data['data']['getPaginatedUIClinical']['uiClinical']:\n\
+      \  for exref in case['externalReferences']:\n    if exref.get('reference_resource_shortname',\
+      \ '') == 'GDC':\n      case['gdc_case_id'] = exref['reference_entity_location'].split('cases/')[1].strip('\\\
+      r')\n      pdc_cases_in_gdc.append(case)\n\nprint(f\"Found {len(pdc_cases_in_gdc)}\
+      \ cases that have external references to GDC.\")\n\npdc_in_gdc_df = pd.DataFrame(json_normalize(pdc_cases_in_gdc))\n\
+      pdc_in_gdc_df.head()"
+    integration: proteomics_data_commons
+    notes: null
+    query: |-
+      Get all clinical data (cases) from PDC and filter for those that have external references to GDC. Return the results as a pandas dataframe.
+    resource_id: ed1fa5df-2d51-48ef-871b-b09abc5defc9
+    resource_type: example
+slug: proteomics_data_commons

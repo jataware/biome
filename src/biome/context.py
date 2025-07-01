@@ -5,9 +5,9 @@ import logging
 
 from pathlib import Path
 
-from beaker_kernel.lib.context import BeakerContext, action
+from beaker_kernel.lib.context import BeakerContext
 from beaker_kernel.subkernels.python import PythonSubkernel
-from beaker_kernel.lib.types import Integration, IntegrationAttachment
+from beaker_kernel.lib.types import Integration
 from beaker_kernel.lib.integrations.base import BaseIntegrationProvider
 from beaker_kernel.lib.integrations.adhoc import AdhocIntegrationProvider
 

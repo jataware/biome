@@ -1,31 +1,46 @@
-name: "CHIS California Asthma"
-integration_type: dataset
-
 description: |
   This dataset contains current asthma prevalence, the estimated percentage of
   Californians who have ever been diagnosed with asthma by a health care provider
   AND report they still have asthma and/or had an asthma episode or attack within
   the past 12 months, statewide and by county. The data are stratified by age group
   (all ages, 0-17, 18+, 0-4, 5-17, 18-64, 65+) and reported for 2-year periods.
-
+integration_type: dataset
+name: CHIS California Asthma
 prompt: |
-    You have access to a file-based California CHIS Data-Current Asthma Prevalence by County 2015-2022 file,
-    located at `${DATASET_FILES_BASE_PATH}/chis_california_asthma/current-asthma-prevalence-by-county-2015_2022.csv`.
+  You have access to a file-based California CHIS Data-Current Asthma Prevalence by County 2015-2022 file,
+  located at `${DATASET_FILES_BASE_PATH}/chis_california_asthma/current-asthma-prevalence-by-county-2015_2022.csv`.
 
-    open it like so:
-    ```python
-    import pandas as pd
-    df = pd.read_csv('${DATASET_FILES_BASE_PATH}/chis_california_asthma/current-asthma-prevalence-by-county-2015_2022.csv', encoding='latin1')
-    ```
+  open it like so:
+  ```python
+  import pandas as pd
+  df = pd.read_csv('${DATASET_FILES_BASE_PATH}/chis_california_asthma/current-asthma-prevalence-by-county-2015_2022.csv', encoding='latin1')
+  ```
 
-    This dataset contains current asthma prevalence, the estimated percentage of
-    Californians who have ever been diagnosed with asthma by a health care provider
-    AND report they still have asthma and/or had an asthma episode or attack within
-    the past 12 months, statewide and by county. The data are stratified by age group
-    (all ages, 0-17, 18+, 0-4, 5-17, 18-64, 65+) and reported for 2-year periods.
+  This dataset contains current asthma prevalence, the estimated percentage of
+  Californians who have ever been diagnosed with asthma by a health care provider
+  AND report they still have asthma and/or had an asthma episode or attack within
+  the past 12 months, statewide and by county. The data are stratified by age group
+  (all ages, 0-17, 18+, 0-4, 5-17, 18-64, 65+) and reported for 2-year periods.
 
-    The columns are: "COUNTY", "YEARS", "STRATA", "AGE GROUP", "CURRENT PREVALENCE", "95% CONFIDENCE INTERVAL", "COUNTIES GROUPED", "COMMENT"
+  The columns are: "COUNTY", "YEARS", "STRATA", "AGE GROUP", "CURRENT PREVALENCE", "95% CONFIDENCE INTERVAL", "COUNTIES GROUPED", "COMMENT"
 
-    "Agre Group" possible values are: "All Ages", "0-17 years", "18+ years", "0-4 years", "5-17 years", "18-64 years", "65+ years"
+  "Agre Group" possible values are: "All Ages", "0-17 years", "18+ years", "0-4 years", "5-17 years", "18-64 years", "65+ years"
 
-    You can use this API to answer questions on the current asthma prevalence in California by county and age group.
+  You can use this API to answer questions on the current asthma prevalence in California by county and age group.
+resources:
+  ca7ff323-7bef-489d-9d2c-760628f40825:
+    code: "import pandas as pd\nimport os\n\n# Define the file path using the correct\
+      \ filename\nfile_path = os.path.join('{{DATASET_FILES_BASE_PATH}}', 'chis_california_asthma',\
+      \ 'current-asthma-prevalence-by-county-2015_2022.csv')\n\ndf = pd.read_csv(file_path,\
+      \ encoding='latin1') # latin1 encoding has worked before, not specifying it\
+      \ hasn't\n\n# Check the column names to make sure we're using the right ones\n\
+      print(\"Column names:\", df.columns.tolist())\n\n# Display a sample of the data\
+      \ to understand its structure\nprint(\"\\nSample data:\")\nprint(df.head(2))\n\
+      \    "
+    integration: chis_california_asthma
+    notes: null
+    query: Open the california chis asthma dataset and display columns/first 2 rows
+      to understand the structure
+    resource_id: ca7ff323-7bef-489d-9d2c-760628f40825
+    resource_type: example
+slug: chis_california_asthma

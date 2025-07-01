@@ -1,58 +1,299 @@
-name: Genomics Data Commons
-integration_type: api
-
 description: |
-    The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational
-    platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
-    The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG),
-    including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
-
-attachments:
-    raw_documentation: gdc.md
-    facets: facets.txt
-    mappings: gdc_mappings.json
-
+  The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational
+  platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
+  The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG),
+  including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
+integration_type: api
+name: Genomics Data Commons
 prompt: |
-    # GDC API Documentation
+  # GDC API Documentation
 
-    Below you will find the GDC API documentation. Note that
-    there are several endpoints available--some are discussed in the `Search and Retrieval`
-    section, and others are discussed in the `Data Analysis` section.
+  Below you will find the GDC API documentation. Note that
+  there are several endpoints available--some are discussed in the `Search and Retrieval`
+  section, and others are discussed in the `Data Analysis` section.
 
-    When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
+  When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
 
-    ${raw_documentation}
+  ${raw_documentation}
 
-    # Additional Instructions:
+  # Additional Instructions:
 
-    You will be given python code to query the GDC API.
+  You will be given python code to query the GDC API.
 
-    When querying GDC, change the `format` from "TSV" to "JSON"
+  When querying GDC, change the `format` from "TSV" to "JSON"
 
-    If you download a file by file-id, the output will be TSV.
-    Save the file with the proper extension.
+  If you download a file by file-id, the output will be TSV.
+  Save the file with the proper extension.
 
-    When filtering you should rely on the fields provided for a given endpoint in the following mapping.
-    This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
+  When filtering you should rely on the fields provided for a given endpoint in the following mapping.
+  This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
 
-    ```
-    ${mappings}
-    ```
+  ```
+  ${mappings}
+  ```
 
-    These are the fields that are available for filtering and also the fields that can be returned. You can use
-    the facets to filter the fields that are available for a given endpoint.
+  These are the fields that are available for filtering and also the fields that can be returned. You can use
+  the facets to filter the fields that are available for a given endpoint.
 
-    A list of fields and their respective choices/facets are as follows:
+  A list of fields and their respective choices/facets are as follows:
 
-    ```
-    ${facets}
-    ```
+  ```
+  ${facets}
+  ```
 
-    Note this list of facets may be incomplete as it changes over time. Remember to consult it
-    when you are filtering. If you are unsure about options available for a given field, you should consider
-    just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
-    and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
-    the wildcard operator so it might not be as specific as they would like.
+  Note this list of facets may be incomplete as it changes over time. Remember to consult it
+  when you are filtering. If you are unsure about options available for a given field, you should consider
+  just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
+  and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
+  the wildcard operator so it might not be as specific as they would like.
 
-    If a user asks you to filter based on the type of cancer, it is often productive to filter on
-    disease type, primary diagnosis, or primary site.
+  If a user asks you to filter based on the type of cancer, it is often productive to filter on
+  disease type, primary diagnosis, or primary site.
+resources:
+  4b9845c7-d61b-440d-880e-b3d2b315a415:
+    filepath: facets.txt
+    integration: genomics_data_commons
+    name: facets
+    resource_id: 4b9845c7-d61b-440d-880e-b3d2b315a415
+    resource_type: file
+  56f47a1d-b966-4669-8ffd-c3b9de388afd:
+    code: |
+      import requests
+      import json
+      import pandas as pd
+      from pandas import json_normalize
+
+      # Define the fields to be returned
+      fields = [
+          "case_id",
+      ]
+
+      # Initialize pagination variables
+      all_cases = []
+      current_page = 1
+      page_size = 1000
+
+      while True:
+          # Construct the request parameters
+          params = {
+              "fields": ",".join(fields),
+              "format": "JSON",
+              "size": page_size,
+              "from": (current_page - 1) * page_size
+          }
+
+          # Send the request
+          response = requests.get(endpoint, params=params)
+
+          # Check for successful response
+          if response.status_code == 200:
+              data = response.json()
+              cases = data["data"]["hits"]
+              all_cases.extend(cases)
+              if len(cases) < page_size:
+                  break
+              current_page += 1
+          else:
+              print(f"Error: {response.status_code} - {response.text}")
+              break
+
+      # Convert the results to a DataFrame
+      all_cases_df = pd.DataFrame(json_normalize(all_cases))
+      print(f"There are {len(all_cases_df)} cases in GDC in total")
+      # Display the DataFrame
+      all_cases_df.head()
+    integration: genomics_data_commons
+    notes: null
+    query: |-
+      Get all cases from GDC with no filters. Fetch only the case ids and paginate through the results to fetch all available cases. Store the results as a dataframe
+    resource_id: 56f47a1d-b966-4669-8ffd-c3b9de388afd
+    resource_type: example
+  57f85658-1659-44e4-a9b8-ec9eb41f7aae:
+    code: |
+      import pandas as pd
+      from pandas import json_normalize
+
+      import requests
+      import json
+
+      # Define the endpoint and filters
+      endpoint = "https://api.gdc.cancer.gov/ssm_occurrences"
+      filters = {
+          "op": "and",
+          "content": [
+              {
+                  "op": "=",
+                  "content": {
+                      "field": "case.disease_type",
+                      "value": "*myeloid leukemia*"
+                  }
+              },
+              {
+                  "op": "in",
+                  "content": {
+                      "field": "ssm.consequence.transcript.gene.symbol",
+                      "value": ["JAK2"]
+                  }
+              }
+          ]
+      }
+
+      # Define the fields to be returned
+      fields = [
+          "ssm_id",
+          "ssm.consequence.transcript.gene.symbol",
+          "ssm.mutation_type",
+          "ssm.genomic_dna_change",
+          "ssm.consequence.transcript.aa_change",
+          "ssm.consequence.transcript.consequence_type",
+          "case.project.project_id",
+          "case.submitter_id",
+          "case.case_id",
+          "case.diagnoses.primary_diagnosis"
+      ]
+
+      # Construct the request parameters
+      params = {
+          "filters": json.dumps(filters),
+          "fields": ",".join(fields),
+          "format": "JSON",
+          "size": "1000"
+      }
+
+      # Send the request
+      response = requests.get(endpoint, params=params)
+      print(f"total hits: {response.json()['data']['pagination']['total']}")
+      all_ssms = response.json()['data']['hits']
+
+      ssms = pd.DataFrame(json_normalize(all_ssms))
+      ssms.head()
+    integration: genomics_data_commons
+    notes: null
+    query: Query the GDC for cases of myeloid leukemia with a JAK2 somatic mutation
+      and return the results as a pandas dataframe.
+    resource_id: 57f85658-1659-44e4-a9b8-ec9eb41f7aae
+    resource_type: example
+  74735957-03a3-4706-aa40-f8bf200553cc:
+    filepath: gdc.md
+    integration: genomics_data_commons
+    name: raw_documentation
+    resource_id: 74735957-03a3-4706-aa40-f8bf200553cc
+    resource_type: file
+  7a94f76a-0854-41a3-bb97-69a4dcbcaad9:
+    code: "import pandas as pd\nfrom pandas import json_normalize\n\nimport requests\n\
+      import json\n\n# Define the endpoint and filters\nendpoint = \"https://api.gdc.cancer.gov/ssm_occurrences\"\
+      \nfilters = {\n    \"op\": \"and\",\n    \"content\": [\n        {\n       \
+      \     \"op\": \"in\",\n            \"content\": {\n                \"field\"\
+      : \"case.primary_site\",\n                \"value\": [\"Bronchus and lung\"\
+      ]\n            }\n        },\n        {\n            \"op\": \"in\",\n     \
+      \       \"content\": {\n                \"field\": \"case.demographic.gender\"\
+      ,\n                \"value\": [\"male\"]\n            }\n        },\n      \
+      \  {\n            \"op\": \"<\",\n            \"content\": {\n             \
+      \   \"field\": \"case.diagnoses.age_at_diagnosis\",\n                \"value\"\
+      : 16436 # 45 years in days\n            }\n        },\n        {\n         \
+      \   \"op\": \"in\",\n            \"content\": {\n                \"field\":\
+      \ \"case.exposures.tobacco_smoking_status\",\n                \"value\": [\"\
+      Lifelong Non-smoker\"]\n            }\n        }\n    ]\n}\n\n# Define the fields\
+      \ to be returned\nfields = [\n    \"ssm_id\",\n    \"ssm.consequence.transcript.gene.symbol\"\
+      ,\n    \"ssm.mutation_type\",\n    \"ssm.genomic_dna_change\",\n    \"ssm.consequence.transcript.aa_change\"\
+      ,\n    \"ssm.consequence.transcript.consequence_type\",\n    \"case.project.project_id\"\
+      ,\n    \"case.submitter_id\",\n    \"case.case_id\",\n    \"case.diagnoses.primary_diagnosis\"\
+      ,\n    \"case.primary_site\",\n    \"case.demographic.gender\",\n    \"case.diagnoses.age_at_diagnosis\"\
+      ,\n    \"case.exposures.tobacco_smoking_status\"\n]\n\n# Construct the request\
+      \ parameters\nparams = {\n    \"filters\": json.dumps(filters),\n    \"fields\"\
+      : \",\".join(fields),\n    \"format\": \"JSON\",\n    \"size\": \"1000\"\n}\n\
+      \n# Send the request\nresponse = requests.get(endpoint, params=params)\n\n#\
+      \ Check for successful response\nif response.status_code == 200:\n    data =\
+      \ response.json()\n    # Extract and display the mutation data\n    mutations\
+      \ = data[\"data\"][\"hits\"]\n    print(f\"Found {len(mutations)} mutations\
+      \ in lung cancer cases for males under 45 who never smoked:\")\n    lung_mutation_df\
+      \ = pd.DataFrame(json_normalize(mutations))\nelse:\n    print(f\"Error: {response.status_code}\
+      \ - {response.text}\")\n  \nlung_mutation_df.head()"
+    integration: genomics_data_commons
+    notes: null
+    query: |-
+      Get simple somatic mutation occurrences (cases) from GDC where the primary site is bronchus and lung, the gender is male, the age at diagnosis is less than 45 years old, and the patient is a lifelong non-smoker. Return the results as a pandas dataframe.
+    resource_id: 7a94f76a-0854-41a3-bb97-69a4dcbcaad9
+    resource_type: example
+  9f1cc9a9-6acd-4797-b050-73afbaeb74c3:
+    code: |
+      import pandas as pd
+      from pandas import json_normalize
+
+      import requests
+      import json
+
+      # Define the endpoint and filters
+      endpoint = "https://api.gdc.cancer.gov/cases"
+      filters = {
+          "op": "=",
+          "content": {
+              "field": "disease_type",
+              "value": "*myeloid leukemia*"
+          }
+      }
+
+      # Define the fields to be returned
+      fields = [
+          "submitter_id",
+          "case_id",
+          "primary_site",
+          "disease_type",
+          "diagnoses.age_at_diagnosis",
+          "diagnoses.primary_diagnosis",
+          "demographic.gender",
+          "exposures.tobacco_smoking_status",
+          "files.file_id",
+          "files.file_name",
+          "files.data_type",
+          "files.experimental_strategy"
+      ]
+
+      # Initialize pagination variables
+      all_cases = []
+      current_page = 1
+      page_size = 1000
+
+      while True:
+          # Construct the request parameters
+          params = {
+              "filters": json.dumps(filters),
+              "fields": ",".join(fields),
+              "format": "JSON",
+              "size": page_size,
+              "from": (current_page - 1) * page_size
+          }
+
+          # Send the request
+          response = requests.get(endpoint, params=params)
+
+          # Check for successful response
+          if response.status_code == 200:
+              data = response.json()
+              cases = data["data"]["hits"]
+              all_cases.extend(cases)
+              if len(cases) < page_size:
+                  break
+              current_page += 1
+          else:
+              print(f"Error: {response.status_code} - {response.text}")
+              break
+
+      # Convert the results to a DataFrame
+      cases_df = pd.DataFrame(json_normalize(all_cases))
+      print(f"There are {len(cases_df)} cases in GDC for AML")
+      # Display the DataFrame
+      cases_df.head()
+    integration: genomics_data_commons
+    notes: null
+    query: |-
+      Get all cases where disease type is myeloid leukemia from GDC and return the results as a pandas dataframe. Paginate through the results to fetch all available cases
+    resource_id: 9f1cc9a9-6acd-4797-b050-73afbaeb74c3
+    resource_type: example
+  a96216e1-8a2b-4fab-90e8-565d1db62fbe:
+    filepath: gdc_mappings.json
+    integration: genomics_data_commons
+    name: mappings
+    resource_id: a96216e1-8a2b-4fab-90e8-565d1db62fbe
+    resource_type: file
+slug: genomics_data_commons

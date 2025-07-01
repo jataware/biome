@@ -1,58 +1,79 @@
-name: Netrias Harmonization API
-integration_type: api
-
 description: |
-    The Netrias Harmonization REST API leverages AI-driven harmonization approaches to standardize
-    cancer-related terminologies from the Cancer Data Service (CDS), managed by the Center for
-    Biomedical Informatics and Information Technology (CBIIT) at NIH.
+  The Netrias Harmonization REST API leverages AI-driven harmonization approaches to standardize
+  cancer-related terminologies from the Cancer Data Service (CDS), managed by the Center for
+  Biomedical Informatics and Information Technology (CBIIT) at NIH.
 
-    This API is designed to process and harmonize textual variations of terms, mapping them to
-    standardized terms defined in the CDS data model ontology (version 5.0.5). By utilizing
-    advanced machine learning techniques, the service enhances data consistency, improves
-    interoperability, and streamlines standardization for cancer research and biomedical
-    informatics applications.
+  This API is designed to process and harmonize textual variations of terms, mapping them to
+  standardized terms defined in the CDS data model ontology (version 5.0.5). By utilizing
+  advanced machine learning techniques, the service enhances data consistency, improves
+  interoperability, and streamlines standardization for cancer research and biomedical
+  informatics applications.
 
-    The API enables automated term reconciliation, ensuring uniform terminology across datasets
-    for more reliable data integration and analysis. The current intended application is for
-    harmonization of terms in study metadata from cancer researchers delivering research data
-    to the Cancer Research Data Commons.
+  The API enables automated term reconciliation, ensuring uniform terminology across datasets
+  for more reliable data integration and analysis. The current intended application is for
+  harmonization of terms in study metadata from cancer researchers delivering research data
+  to the Cancer Research Data Commons.
+integration_type: api
+name: Netrias Harmonization API
+prompt: "${raw_documentation}\n\n# Additional Instructions:\n\nThe REST API is accessible\
+  \ at https://apieval.netriaslabs.cloud/.\nIt uses API Keys to track access. It is\
+  \ just applied as an additional HTTP header `x-api-key: <KEY>`\n\n**IMPORTANT**:\
+  \ the API Key is available in the environment variable `NETRIAS_KEY`.\n\nFor CDS\
+  \ standard terms, commonly referred to as Common Data Elements or CDEs, with large\
+  \ numbers of permissible values,\nNetrias builds fine tuned LLMs from synthetically\
+  \ generated training data. If a CDE has a small number of permissible values,\n\
+  we apply in-context learning approaches where we craft a prompt to feed an LLM API\
+  \ chat endpoint (e.g. OpenAI) requesting it\ngenerate harmonizations with no or\
+  \ few examples. When used as a tool, this may lead to significant variations in\
+  \ response\nlatency as the fine tuned models may take some time to load into a GPU,\
+  \ tokenize the input, and infer the intended response.\n\nThe REST API also supports\
+  \ the harmonization of terms from ontologies supporting Sage Bionetworks' data repositories\
+  \ focused\non rare diseases and cancers. In a demonstration integration of the API\
+  \ with Sage's Synapse chatbot application the teams\nfocused on four types of variations.\
+  \ Here are some examples:\n\n1. Typos\n    a. neurofibromatisis type ! \u2192 Neurofibromatosis\
+  \ type 1\n    b. whole exme squencing \u2192 whole exome sequencing\n\n2. Exact\
+  \ synonyms\n    a. NF-1 \u2192 Neurofibromatosis type 1\n    b. WEX \u2192 whole\
+  \ exome sequencing\n\n3. Narrow synonyms\n    a. Watson Syndrome \u2192 Neurofibromatosis\
+  \ type 1\n    b. clinical whole-exome sequencing \u2192 whole exome sequencing\n\
+  \n4. Broad synonyms\n    a. NF \u2192 Neurofibromatosis type 1\n    b. DNA sequencing\
+  \ \u2192 whole exome sequencing\n"
+resources:
+  2030d84d-840e-44a1-89d4-f027e2158a31:
+    code: "import requests\nimport os\nimport json\nimport difflib\n\n# Get API key\
+      \ from environment variable\napi_key = os.environ.get(\"NETRIAS_KEY\")\n\n#\
+      \ Set up the request headers\nheaders = {\n    \"x-api-key\": api_key,\n   \
+      \ \"Content-Type\": \"application/json\"\n}\n\n# Base URL for the API\nbase_url\
+      \ = \"https://apieval.netriaslabs.cloud\"\n\n# The drug term to harmonize\n\
+      drug_term = \"zorubicin_9012\"\n\n# Get the standards to find therapeutic agents\n\
+      standards_url = f\"{base_url}/v1/standards\"\nstandards_response = requests.get(standards_url,\
+      \ headers=headers)\n\nif standards_response.status_code == 200:\n    standards\
+      \ = standards_response.json()\n    \n    # Look for therapeutic agents in the\
+      \ DataHub standards\n    if \"datahub\" in standards and \"therapeutic_agents\"\
+      \ in standards[\"datahub\"]:\n        therapeutic_agents = standards[\"datahub\"\
+      ][\"therapeutic_agents\"]\n        \n        # Find closest matches using difflib\n\
+      \        matches = difflib.get_close_matches(drug_term, therapeutic_agents,\
+      \ n=5, cutoff=0.5)\n        \n        print(f\"Found closest matches for '{drug_term}':\"\
+      )\n        for match in matches:\n            print(f\"  {match}\")\n      \
+      \      \n        if matches:\n            print(f\"\\nBest harmonization result:\
+      \ '{matches[0]}'\")\n        else:\n            print(f\"No close matches found\
+      \ for '{drug_term}'\")\n    else:\n        print(\"Could not find therapeutic_agents\
+      \ in DataHub standards\")\nelse:\n    print(f\"Error getting standards: {standards_response.status_code}\"\
+      )\n    print(standards_response.text)\n"
+    integration: netrias_harmonization_api
+    notes: |-
+      This example demonstrates how to harmonize a drug term that includes a non-standard suffix (e.g., "zorubicin_9012") by:
+      1. Retrieving the therapeutic_agents standard from the DataHub
+      2. Using Python's difflib to find the closest matches
+      3. Identifying "Zorubicin" as the standard term
 
-attachments:
-    raw_documentation: netrias.json
-
-prompt: |
-    ${raw_documentation}
-
-    # Additional Instructions:
-
-    The REST API is accessible at https://apieval.netriaslabs.cloud/.
-    It uses API Keys to track access. It is just applied as an additional HTTP header `x-api-key: <KEY>`
-
-    **IMPORTANT**: the API Key is available in the environment variable `NETRIAS_KEY`.
-
-    For CDS standard terms, commonly referred to as Common Data Elements or CDEs, with large numbers of permissible values,
-    Netrias builds fine tuned LLMs from synthetically generated training data. If a CDE has a small number of permissible values,
-    we apply in-context learning approaches where we craft a prompt to feed an LLM API chat endpoint (e.g. OpenAI) requesting it
-    generate harmonizations with no or few examples. When used as a tool, this may lead to significant variations in response
-    latency as the fine tuned models may take some time to load into a GPU, tokenize the input, and infer the intended response.
-
-    The REST API also supports the harmonization of terms from ontologies supporting Sage Bionetworks' data repositories focused
-    on rare diseases and cancers. In a demonstration integration of the API with Sage's Synapse chatbot application the teams
-    focused on four types of variations. Here are some examples:
-
-    1. Typos
-        a. neurofibromatisis type ! → Neurofibromatosis type 1
-        b. whole exme squencing → whole exome sequencing
-
-    2. Exact synonyms
-        a. NF-1 → Neurofibromatosis type 1
-        b. WEX → whole exome sequencing
-
-    3. Narrow synonyms
-        a. Watson Syndrome → Neurofibromatosis type 1
-        b. clinical whole-exome sequencing → whole exome sequencing
-
-    4. Broad synonyms
-        a. NF → Neurofibromatosis type 1
-        b. DNA sequencing → whole exome sequencing
-
+      The approach uses string similarity matching when the direct API harmonization doesn't return results. This is useful for handling terms with identifiers, suffixes, or other non-standard additions that aren't in the controlled vocabulary.
+    query: Harmonizing a drug term with a non-standard suffix
+    resource_id: 2030d84d-840e-44a1-89d4-f027e2158a31
+    resource_type: example
+  8242a126-8ef1-48de-aa94-e0ccc7e58a28:
+    filepath: netrias.json
+    integration: netrias_harmonization_api
+    name: raw_documentation
+    resource_id: 8242a126-8ef1-48de-aa94-e0ccc7e58a28
+    resource_type: file
+slug: netrias_harmonization_api

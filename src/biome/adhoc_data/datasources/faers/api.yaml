@@ -1,24 +1,71 @@
-name: "FDA drug adverse event FAERS API"
-integration_type: api
-
 description: |
   Drug Adverse Event Overview
   The openFDA drug adverse event API returns data that has been collected from
   the FDA Adverse Event Reporting System (FAERS), a database that contains
   information on adverse event and medication error reports submitted to FDA.
-
-attachments:
-  web_documentation: faers_web.md
-  fields_reference: faers_fields_reference.csv
-
+integration_type: api
+name: FDA drug adverse event FAERS API
 prompt: |
-    ${web_documentation}
+  ${web_documentation}
 
-    # Additional Instructions:
+  # Additional Instructions:
 
-    You will need an API Key to use any openFDA APIs. It is available in the environment variable:
-    - API Key: os.environ.get("API_OPENFDA")
-    Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
+  You will need an API Key to use any openFDA APIs. It is available in the environment variable:
+  - API Key: os.environ.get("API_OPENFDA")
+  Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
 
-    # Searchable Fields Reference:
-    ${fields_reference}
+  # Searchable Fields Reference:
+  ${fields_reference}
+resources:
+  66215565-2562-455a-aedc-80cdb06f6c1a:
+    filepath: faers_fields_reference.csv
+    integration: fda_drug_adverse_event_faers_api
+    name: fields_reference
+    resource_id: 66215565-2562-455a-aedc-80cdb06f6c1a
+    resource_type: file
+  a02272d5-d7da-4070-942e-750f5f5f9088:
+    code: |-
+      import requests
+      import os
+      import pandas as pd
+
+      # Base URL for the API
+      base_url = "https://api.fda.gov/drug/event.json?api_key=" + os.environ.get('API_OPENFDA')
+
+      # Query parameters
+      params = {
+          'count': 'patient.drug.medicinalproduct.exact',
+          'limit': 100  # Get top 100 medications by report count
+      }
+
+      # Make API request
+      response = requests.get(base_url, params=params)
+
+      # Convert to DataFrame
+      results = response.json()['results']
+      df = pd.DataFrame(results, columns=['term', 'count'])
+
+      # Sort by count in descending order
+      df = df.sort_values('count', ascending=False)
+
+      # Display top medications with highest adverse event counts
+      print("Top medications by adverse event count:")
+      print(df.head(10))
+
+      # Get medication with highest count
+      top_med = df.iloc[0]
+      print(f"\nMedication with highest number of adverse events:")
+      print(f"{top_med['term']}: {top_med['count']} reports")
+    integration: fda_drug_adverse_event_faers_api
+    notes: null
+    query: Can you tell me which medication have the highest adverse effects reported
+      from all of the available?
+    resource_id: a02272d5-d7da-4070-942e-750f5f5f9088
+    resource_type: example
+  f9afc1aa-371f-4318-9fb1-cd5030db39fe:
+    filepath: faers_web.md
+    integration: fda_drug_adverse_event_faers_api
+    name: web_documentation
+    resource_id: f9afc1aa-371f-4318-9fb1-cd5030db39fe
+    resource_type: file
+slug: fda_drug_adverse_event_faers_api

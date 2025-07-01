@@ -1,113 +1,287 @@
-name: "National Survey of Children's Health (NSCH)"
-integration_type: dataset
-
 description: |
-    You have access to knowledge from the National Survey of Children's Health (NSCH) data, available every year from
-    2016 to 2023. This dataset API can help answer questions about children's health, healthcare access, family functioning,
-    neighborhood characteristics, and social determinants of health for children aged 0-17 years in the United States.
-
+  You have access to knowledge from the National Survey of Children's Health (NSCH) data, available every year from
+  2016 to 2023. This dataset API can help answer questions about children's health, healthcare access, family functioning,
+  neighborhood characteristics, and social determinants of health for children aged 0-17 years in the United States.
+integration_type: dataset
+name: National Survey of Children's Health (NSCH)
 prompt: |
-    You have access to file-based National Survey of Children's Health (NSCH) data
-    from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.
+  You have access to file-based National Survey of Children's Health (NSCH) data
+  from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.
 
-    The NSCH files are located and named per year as follows:
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
-    - ${DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
-    - Codebook: ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+  The NSCH files are located and named per year as follows:
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
+  - Codebook: ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
 
-    The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years
-    in the United States and the factors that may relate to their well-being. The survey includes data on physical and
-    mental health, access to quality health care, and the child's family, neighborhood, school, and social context.
+  The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years
+  in the United States and the factors that may relate to their well-being. The survey includes data on physical and
+  mental health, access to quality health care, and the child's family, neighborhood, school, and social context.
 
-    The NSCH is also designed to assess the prevalence and impact of special health care needs among children in the US and
-    explores the extent to which children with special health care needs (CSHCN) have medical homes,
-    adequate health insurance, access to needed services, and adequate care coordination.
-    Other topics may include functional difficulties, transition services,
-    shared decision-making, and satisfaction with care.
-    Information is collected from parents or caregivers who know about the child's health.
-    It also examines the physical and emotional health of children ages 0-17 years of age.
-    These factors include access to - and quality of - health care, family interactions, parental health,
-    neighborhood characteristics, as well as school and after-school experiences (example: child screen time).
+  The NSCH is also designed to assess the prevalence and impact of special health care needs among children in the US and
+  explores the extent to which children with special health care needs (CSHCN) have medical homes,
+  adequate health insurance, access to needed services, and adequate care coordination.
+  Other topics may include functional difficulties, transition services,
+  shared decision-making, and satisfaction with care.
+  Information is collected from parents or caregivers who know about the child's health.
+  It also examines the physical and emotional health of children ages 0-17 years of age.
+  These factors include access to - and quality of - health care, family interactions, parental health,
+  neighborhood characteristics, as well as school and after-school experiences (example: child screen time).
 
-    To read these SAS7BDAT files with pandas, use:
-    ```python
-    import pandas as pd
-    filename = "${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
-    df = pd.read_sas(filename, format="sas7bdat")
-    ```
+  To read these SAS7BDAT files with pandas, use:
+  ```python
+  import pandas as pd
+  filename = "${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
+  df = pd.read_sas(filename, format="sas7bdat")
+  ```
 
-    The NSCH datasets include state identifiers (FIPSST) and other geographic information that can be used
-    for regional analysis. Check which geographic variables are available in each year's dataset before
-    attempting to use them.
+  The NSCH datasets include state identifiers (FIPSST) and other geographic information that can be used
+  for regional analysis. Check which geographic variables are available in each year's dataset before
+  attempting to use them.
 
-    When working with NSCH data, be aware that:
-    1. Variable names may change slightly between survey years
-    2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
-      You'll need to use the nsch codebook to decode these variable response codes-
-      The codebook is available at ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
-      You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
-      The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
-      In the codebook, the Question itself is under the "Question" column
+  When working with NSCH data, be aware that:
+  1. Variable names may change slightly between survey years
+  2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
+    You'll need to use the nsch codebook to decode these variable response codes-
+    The codebook is available at ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+    You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
+    The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
+    In the codebook, the Question itself is under the "Question" column
 
-    You'll see mentions of "screener" and "topical" in the code book- some screener properties are present in the topical files,
-    which makes it confusing, unfortunately.
+  You'll see mentions of "screener" and "topical" in the code book- some screener properties are present in the topical files,
+  which makes it confusing, unfortunately.
 
-    Codebook columns:
-    ['Variable',  # => variable code/name
-    'Source',     # => source, a question category from "Topical", "Screener", "Operational"
-    'Topic',
-    'Survey Years',  => available in which file years (eg if 2016, 2017), only check for that variable in the corresponding files, may not be available in files for other years
-    'Response Code', => 1=Yes||2=No, etc
-    'Description',   => description of the question/variable
-    'Question',      => Question text as a human would ask it
-    'Type',
-    'Universe',
-    'Availability',
-    'Imputation Strategy',
-    'User Notes']
+  Codebook columns:
+  ['Variable',  # => variable code/name
+  'Source',     # => source, a question category from "Topical", "Screener", "Operational"
+  'Topic',
+  'Survey Years',  => available in which file years (eg if 2016, 2017), only check for that variable in the corresponding files, may not be available in files for other years
+  'Response Code', => 1=Yes||2=No, etc
+  'Description',   => description of the question/variable
+  'Question',      => Question text as a human would ask it
+  'Type',
+  'Universe',
+  'Availability',
+  'Imputation Strategy',
+  'User Notes']
 
-    Open it with pandas like so:
-    ```
-    codebook = pd.read_csv("${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
-    ```
+  Open it with pandas like so:
+  ```
+  codebook = pd.read_csv("${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
+  ```
 
-    The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
-    - Physical and mental health conditions (asthma, allergies, ADHD, etc.)
-    - Access to healthcare
-    - Family, neighborhood, and social context
-    - Housing and environmental factors
-    - Insurance coverage and care coordination
+  The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
+  - Physical and mental health conditions (asthma, allergies, ADHD, etc.)
+  - Access to healthcare
+  - Family, neighborhood, and social context
+  - Housing and environmental factors
+  - Insurance coverage and care coordination
 
-    The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
-    The FIPS Code column is called "FIPSST" and is available in all years.
+  The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
+  The FIPS Code column is called "FIPSST" and is available in all years.
 
-    Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
-    try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
-    to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
-    Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
-    since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
+  Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
+  try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
+  to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
+  Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
+  since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
 
-    # Key Variables for Health Conditions Analysis
-    ## Asthma and Allergies
-    - K2Q40A: Asthma diagnosis (1=Yes, 2=No)
-    - ALLERGIES: Allergies diagnosis (1=Yes, 2=No)
-    - ALLERGIES_CURR: Current allergies (1=Yes, 2=No)
-    ## Other Health Conditions
-    - K2Q31A: ADHD diagnosis
-    - K2Q32A: Depression diagnosis
-    - K2Q33A: Anxiety diagnosis
-    - DIABETES: Diabetes diagnosis
-    - AUTOIMMUNE: Autoimmune disease diagnosis
-    ## Housing and Environmental Factors
-    - K9Q41: Smoke inside home
-    - ACE1: Difficulty covering basics like food or housing
-    - FOODSIT: Food situation in household
-    - TENURE: Housing tenure (owned/rented)
+  # Key Variables for Health Conditions Analysis
+  ## Asthma and Allergies
+  - K2Q40A: Asthma diagnosis (1=Yes, 2=No)
+  - ALLERGIES: Allergies diagnosis (1=Yes, 2=No)
+  - ALLERGIES_CURR: Current allergies (1=Yes, 2=No)
+  ## Other Health Conditions
+  - K2Q31A: ADHD diagnosis
+  - K2Q32A: Depression diagnosis
+  - K2Q33A: Anxiety diagnosis
+  - DIABETES: Diabetes diagnosis
+  - AUTOIMMUNE: Autoimmune disease diagnosis
+  ## Housing and Environmental Factors
+  - K9Q41: Smoke inside home
+  - ACE1: Difficulty covering basics like food or housing
+  - FOODSIT: Food situation in household
+  - TENURE: Housing tenure (owned/rented)
 
-    Environmental factors are primarily self-reported by parents/caregivers.
+  Environmental factors are primarily self-reported by parents/caregivers.
+resources:
+  118cc8be-f400-40e0-bac7-b10745d888fb:
+    code: "import pandas as pd\nimport numpy as np\n\n# Read the codebook\ncodebook\
+      \ = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
+      , index_col=False)\n\n# Read 2023 data \ndf = pd.read_sas(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat\"\
+      , format=\"sas7bdat\")\n\n# Find condition-related variables from codebook\n\
+      conditions = codebook[\n    (codebook['Variable'].str.contains('adhd|autism|asth',\
+      \ case=False, na=False)) &\n    (codebook['Source'] == 'Topical')\n][['Variable',\
+      \ 'Question', 'Response Code']]\n\n# Get condition variables that exist in our\
+      \ dataset\ncondition_vars = [var for var in conditions['Variable'] if var in\
+      \ df.columns]\n\n# Calculate prevalence for each condition\nresults = []\nfor\
+      \ var in condition_vars:\n    condition_info = conditions[conditions['Variable']\
+      \ == var].iloc[0]\n    \n    # Get counts and percentages\n    counts = df[var].value_counts()\n\
+      \    total = counts.sum()\n    percentages = (counts / total * 100).round(2)\n\
+      \    \n    # Add to results\n    results.append({\n        'Condition': condition_info['Question'],\n\
+      \        'Total_Responses': total,\n        'Yes_Count': counts.get(1, 0), \
+      \ # Assuming 1 = Yes\n        'Percentage': percentages.get(1, 0)\n    })\n\n\
+      # Create results dataframe\nresults_df = pd.DataFrame(results)\nresults_df =\
+      \ results_df.sort_values('Percentage', ascending=False)\n\nprint(results_df)\n"
+    integration: national_survey_of_children's_health_(nsch)
+    notes: null
+    query: Retrieve health conditions reported in the National Survey of Children's
+      Health, including ADHD, autism, and asthma.
+    resource_id: 118cc8be-f400-40e0-bac7-b10745d888fb
+    resource_type: example
+  4cdaa736-1ca8-4158-8d3f-60de680da7f3:
+    code: "import pandas as pd\n\n# Read codebook with explicit parameters\n\n# Ensure\
+      \ index_col=FALSE, if not first column values disappear and the whole dataframe\
+      \ is shifted!\ncodebook = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
+      , index_col=False)  \n# Display the first few rows\nprint(codebook.head())\n\
+      \n# and columns if needed\nprint(codebook.columns.tolist())\n"
+    integration: national_survey_of_children's_health_(nsch)
+    notes: null
+    query: Check the codebook columns head and available columns
+    resource_id: 4cdaa736-1ca8-4158-8d3f-60de680da7f3
+    resource_type: example
+  c9fb9487-5e03-4706-b0b9-3b051e61abab:
+    code: |
+      import pandas as pd
+
+      df_2023 = pd.read_sas("{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
+
+      existing_cols = df_2023.columns.tolist()
+      print(existing_cols)
+    integration: national_survey_of_children's_health_(nsch)
+    notes: null
+    query: Check the existing columns in the dataset to see if the screentime variable
+      and which geo columns are included.
+    resource_id: c9fb9487-5e03-4706-b0b9-3b051e61abab
+    resource_type: example
+  e2681d9f-b1b5-441b-9deb-bd203d9de6f4:
+    code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\
+      import seaborn as sns\nimport os\nfrom matplotlib.ticker import PercentFormatter\n\
+      \n# Set the path to the NSCH data directory\nnsch_dir = \"{{DATASET_FILES_BASE_PATH}}/census-nsch/\"\
+      \n\n# Function to load and prepare NSCH data for a specific year\ndef load_nsch_data(year):\n\
+      \    # Load the dataset\n    file_path = os.path.join(nsch_dir, f\"{year}e_topical.sas7bdat\"\
+      )\n    df = pd.read_sas(file_path)\n    \n    # Add year column\n    df['year']\
+      \ = year\n    \n    # Clean state FIPS codes\n    df['FIPSST_clean'] = df['FIPSST'].astype(str).str.strip(\"\
+      b'\").str.strip(\"'\")\n    \n    # Create binary health condition variables\n\
+      \    df['has_asthma'] = np.where(df['K2Q40A'] == 1, 1, 0)\n    \n    # Create\
+      \ binary environmental factor variables if they exist in the dataset\n    if\
+      \ 'K9Q41' in df.columns:\n        df['smoke_inside'] = np.where(df['K9Q41']\
+      \ == 1, 1, 0)\n    \n    if 'ACE1' in df.columns:\n        df['housing_insecurity']\
+      \ = np.where(df['ACE1'] >= 3, 1, 0)\n    \n    if 'FOODSIT' in df.columns:\n\
+      \        df['food_insecurity'] = np.where(df['FOODSIT'] >= 3, 1, 0)\n    \n\
+      \    if 'TENURE' in df.columns:\n        df['rented_housing'] = np.where(df['TENURE']\
+      \ == 3, 1, 0)\n    \n    return df\n\n# Load data for all available years (2016-2023)\n\
+      years = range(2016, 2024)\nnsch_data_by_year = {}\nfor year in years:\n    try:\n\
+      \        nsch_data_by_year[year] = load_nsch_data(year)\n        print(f\"Loaded\
+      \ NSCH data for {year}: {len(nsch_data_by_year[year])} records\")\n    except\
+      \ Exception as e:\n        print(f\"Error loading data for {year}: {e}\")\n\n\
+      # Create a mapping of FIPS codes to state names\nfips_to_state = {\n    '01':\
+      \ 'Alabama', '02': 'Alaska', '04': 'Arizona', '05': 'Arkansas', '06': 'California',\n\
+      \    '08': 'Colorado', '09': 'Connecticut', '10': 'Delaware', '11': 'District\
+      \ of Columbia',\n    '12': 'Florida', '13': 'Georgia', '15': 'Hawaii', '16':\
+      \ 'Idaho', '17': 'Illinois',\n    '18': 'Indiana', '19': 'Iowa', '20': 'Kansas',\
+      \ '21': 'Kentucky', '22': 'Louisiana',\n    '23': 'Maine', '24': 'Maryland',\
+      \ '25': 'Massachusetts', '26': 'Michigan', '27': 'Minnesota',\n    '28': 'Mississippi',\
+      \ '29': 'Missouri', '30': 'Montana', '31': 'Nebraska', '32': 'Nevada',\n   \
+      \ '33': 'New Hampshire', '34': 'New Jersey', '35': 'New Mexico', '36': 'New\
+      \ York',\n    '37': 'North Carolina', '38': 'North Dakota', '39': 'Ohio', '40':\
+      \ 'Oklahoma', '41': 'Oregon',\n    '42': 'Pennsylvania', '44': 'Rhode Island',\
+      \ '45': 'South Carolina', '46': 'South Dakota',\n    '47': 'Tennessee', '48':\
+      \ 'Texas', '49': 'Utah', '50': 'Vermont', '51': 'Virginia',\n    '53': 'Washington',\
+      \ '54': 'West Virginia', '55': 'Wisconsin', '56': 'Wyoming'\n}\n\n# 1. Analyze\
+      \ national trends in asthma prevalence over time\nasthma_trends = []\nfor year,\
+      \ df in nsch_data_by_year.items():\n    asthma_rate = df['has_asthma'].mean()\n\
+      \    asthma_trends.append({'Year': year, 'Asthma Rate': asthma_rate})\n\nasthma_trends_df\
+      \ = pd.DataFrame(asthma_trends)\n\n# Visualize national asthma trends\nplt.figure(figsize=(10,\
+      \ 6))\nsns.lineplot(x='Year', y='Asthma Rate', data=asthma_trends_df, marker='o',\
+      \ linewidth=2)\nplt.title('National Childhood Asthma Prevalence Trends (2016-2023)',\
+      \ fontsize=16)\nplt.xlabel('Year', fontsize=12)\nplt.ylabel('Proportion of Children\
+      \ with Asthma', fontsize=12)\nplt.grid(True, linestyle='--', alpha=0.7)\nplt.gca().yaxis.set_major_formatter(PercentFormatter(1.0))\n\
+      plt.tight_layout()\nplt.savefig('national_asthma_trends.png')\nplt.close()\n\
+      \n# 2. Analyze state-level asthma trends for selected states\n# Select a few\
+      \ states for comparison (including Texas)\nselected_states = ['Texas', 'California',\
+      \ 'New York', 'Florida', 'Illinois']\nselected_fips = [k for k, v in fips_to_state.items()\
+      \ if v in selected_states]\n\nstate_trends = []\nfor year, df in nsch_data_by_year.items():\n\
+      \    # Add state names\n    df['State'] = df['FIPSST_clean'].map(fips_to_state)\n\
+      \    \n    # Calculate asthma rates by state\n    state_asthma = df.groupby('State')['has_asthma'].mean().reset_index()\n\
+      \    state_asthma['Year'] = year\n    \n    # Filter for selected states\n \
+      \   selected_state_data = state_asthma[state_asthma['State'].isin(selected_states)]\n\
+      \    state_trends.append(selected_state_data)\n\nstate_trends_df = pd.concat(state_trends)\n\
+      \n# Visualize state-level asthma trends\nplt.figure(figsize=(12, 7))\nsns.lineplot(x='Year',\
+      \ y='has_asthma', hue='State', data=state_trends_df, marker='o', linewidth=2)\n\
+      plt.title('Childhood Asthma Prevalence Trends by State (2016-2023)', fontsize=16)\n\
+      plt.xlabel('Year', fontsize=12)\nplt.ylabel('Proportion of Children with Asthma',\
+      \ fontsize=12)\nplt.grid(True, linestyle='--', alpha=0.7)\nplt.gca().yaxis.set_major_formatter(PercentFormatter(1.0))\n\
+      plt.legend(title='State', bbox_to_anchor=(1.05, 1), loc='upper left')\nplt.tight_layout()\n\
+      plt.savefig('state_asthma_trends.png')\nplt.close()\n\n# 3. Analyze the relationship\
+      \ between environmental factors and asthma over time\n# Focus on smoke exposure\
+      \ inside the home\nsmoke_asthma_trends = []\nfor year, df in nsch_data_by_year.items():\n\
+      \    if 'smoke_inside' in df.columns:\n        # Calculate asthma rates by smoke\
+      \ exposure\n        smoke_yes_rate = df[df['smoke_inside'] == 1]['has_asthma'].mean()\n\
+      \        smoke_no_rate = df[df['smoke_inside'] == 0]['has_asthma'].mean()\n\
+      \        \n        smoke_asthma_trends.append({\n            'Year': year,\n\
+      \            'Smoke Exposure': 'Yes',\n            'Asthma Rate': smoke_yes_rate\n\
+      \        })\n        smoke_asthma_trends.append({\n            'Year': year,\n\
+      \            'Smoke Exposure': 'No',\n            'Asthma Rate': smoke_no_rate\n\
+      \        })\n\nsmoke_asthma_df = pd.DataFrame(smoke_asthma_trends)\n\n# Visualize\
+      \ the relationship between smoke exposure and asthma over time\nplt.figure(figsize=(12,\
+      \ 7))\nsns.lineplot(x='Year', y='Asthma Rate', hue='Smoke Exposure', data=smoke_asthma_df,\
+      \ marker='o', linewidth=2)\nplt.title('Childhood Asthma Rates by Smoke Exposure\
+      \ Inside Home (2016-2023)', fontsize=16)\nplt.xlabel('Year', fontsize=12)\n\
+      plt.ylabel('Proportion of Children with Asthma', fontsize=12)\nplt.grid(True,\
+      \ linestyle='--', alpha=0.7)\nplt.gca().yaxis.set_major_formatter(PercentFormatter(1.0))\n\
+      plt.legend(title='Smoke Inside Home', bbox_to_anchor=(1.05, 1), loc='upper left')\n\
+      plt.tight_layout()\nplt.savefig('smoke_asthma_trends.png')\nplt.close()\n\n\
+      # 4. Analyze the combined effect of multiple environmental factors on asthma\n\
+      # Create a risk score based on the number of environmental risk factors\n# For\
+      \ the most recent year (2023)\nrecent_data = nsch_data_by_year[2023]\n\n# Create\
+      \ a risk score (0-4) based on the number of environmental risk factors\nenv_factors\
+      \ = ['smoke_inside', 'housing_insecurity', 'food_insecurity', 'rented_housing']\n\
+      for factor in env_factors:\n    if factor not in recent_data.columns:\n    \
+      \    recent_data[factor] = 0  # Default to 0 if the column doesn't exist\n\n\
+      recent_data['env_risk_score'] = recent_data[env_factors].sum(axis=1)\n\n# Calculate\
+      \ asthma rates by risk score\nrisk_asthma = recent_data.groupby('env_risk_score')['has_asthma'].mean().reset_index()\n\
+      risk_asthma['env_risk_score'] = risk_asthma['env_risk_score'].astype(str)\n\n\
+      # Visualize asthma rates by environmental risk score\nplt.figure(figsize=(10,\
+      \ 6))\nsns.barplot(x='env_risk_score', y='has_asthma', data=risk_asthma, palette='viridis')\n\
+      plt.title('Asthma Rates by Number of Environmental Risk Factors (2023)', fontsize=16)\n\
+      plt.xlabel('Number of Environmental Risk Factors', fontsize=12)\nplt.ylabel('Proportion\
+      \ of Children with Asthma', fontsize=12)\nplt.grid(True, linestyle='--', alpha=0.7,\
+      \ axis='y')\nplt.gca().yaxis.set_major_formatter(PercentFormatter(1.0))\n\n\
+      # Add the actual percentages as text on the bars\nfor i, p in enumerate(plt.gca().patches):\n\
+      \    height = p.get_height()\n    plt.text(p.get_x() + p.get_width()/2., height\
+      \ + 0.005, f'{height:.1%}',\n            ha='center', fontsize=12)\n\nplt.tight_layout()\n\
+      plt.savefig('asthma_by_risk_score.png')\nplt.close()\n\n# 5. Create a summary\
+      \ table of findings\nprint(\"Summary of Findings:\")\nprint(f\"1. National Asthma\
+      \ Trend: The childhood asthma rate {'increased' if asthma_trends_df.iloc[-1]['Asthma\
+      \ Rate'] > asthma_trends_df.iloc[0]['Asthma Rate'] else 'decreased'} from {asthma_trends_df.iloc[0]['Asthma\
+      \ Rate']:.1%} in 2016 to {asthma_trends_df.iloc[-1]['Asthma Rate']:.1%} in 2023.\"\
+      )\n\n# Calculate the average difference in asthma rates between children exposed\
+      \ to smoke and those not exposed\navg_diff = smoke_asthma_df[smoke_asthma_df['Smoke\
+      \ Exposure'] == 'Yes']['Asthma Rate'].mean() - smoke_asthma_df[smoke_asthma_df['Smoke\
+      \ Exposure'] == 'No']['Asthma Rate'].mean()\nprint(f\"2. Smoke Exposure Impact:\
+      \ Children exposed to smoke inside the home had on average {avg_diff:.1%} higher\
+      \ asthma rates compared to those not exposed.\")\n\n# Calculate the ratio of\
+      \ asthma rates for highest vs. lowest risk scores\nif len(risk_asthma) > 1:\n\
+      \    highest_risk = risk_asthma['has_asthma'].max()\n    lowest_risk = risk_asthma['has_asthma'].min()\n\
+      \    risk_ratio = highest_risk / lowest_risk\n    print(f\"3. Environmental\
+      \ Risk Factors: Children with the highest number of environmental risk factors\
+      \ were {risk_ratio:.1f}x more likely to have asthma compared to those with the\
+      \ lowest number of risk factors.\")\n\n# Texas-specific findings\ntexas_data\
+      \ = state_trends_df[state_trends_df['State'] == 'Texas']\ntexas_trend = 'increased'\
+      \ if texas_data.iloc[-1]['has_asthma'] > texas_data.iloc[0]['has_asthma'] else\
+      \ 'decreased'\nprint(f\"4. Texas Trends: The childhood asthma rate in Texas\
+      \ {texas_trend} from {texas_data.iloc[0]['has_asthma']:.1%} in 2016 to {texas_data.iloc[-1]['has_asthma']:.1%}\
+      \ in 2023.\")\n"
+    integration: national_survey_of_children's_health_(nsch)
+    notes: null
+    query: |-
+      Analyze trends in childhood asthma and environmental factors over time (2016-2023) using NSCH data. Load multiple years of data, harmonize variables across years, and analyze the relationship between asthma prevalence and environmental factors like smoke exposure, housing insecurity, and food insecurity. Include state-level comparisons and create a composite environmental risk score. Do so specifically for Texas.
+    resource_id: e2681d9f-b1b5-441b-9deb-bd203d9de6f4
+    resource_type: example
+slug: national_survey_of_children's_health_(nsch)
