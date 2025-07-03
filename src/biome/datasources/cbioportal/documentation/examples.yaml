@@ -1,4 +1,7 @@
-- query: "Query and display all colorectal cancer studies from cBioPortal. This example searches for studies with cancer type IDs 'coadread', 'coad', and 'read' (representing colorectal adenocarcinoma, colon adenocarcinoma, and rectal adenocarcinoma respectively). For each study, it displays the name, study ID, description, and cancer type ID."
+- query: Query and display all colorectal cancer studies from cBioPortal. This example
+    searches for studies with cancer type IDs 'coadread', 'coad', and 'read' (representing
+    colorectal adenocarcinoma, colon adenocarcinoma, and rectal adenocarcinoma respectively).
+    For each study, it displays the name, study ID, description, and cancer type ID.
   code: |
     import requests
 
@@ -16,8 +19,8 @@
             print(f"Description: {study['description']}")
             print(f"Cancer Type ID: {study['cancerTypeId']}")
             print("-" * 80)
-
-- query: "Query mutation data from cBioPortal for a specific study (Genentech colorectal cancer study) and analyze mutations in key cancer genes (APC, TP53, KRAS, PIK3CA)"
+- query: Query mutation data from cBioPortal for a specific study (Genentech colorectal
+    cancer study) and analyze mutations in key cancer genes (APC, TP53, KRAS, PIK3CA)
   notes: |
     The example demonstrates how to:
     1. Get sample IDs for a study
@@ -102,9 +105,7 @@
                     print(f"  - {change}")
                 if len(details['protein_changes']) > 5:
                     print(f"  ... and {len(details['protein_changes'])-5} more changes")
-
-
-- query: "Query for studies related to colorectal cancer using the cancerTypeId 'coadread'."
+- query: Query for studies related to colorectal cancer using the cancerTypeId 'coadread'.
   code: |
     import requests
     import pandas as pd
@@ -132,9 +133,8 @@
 
     # Print the DataFrame
     print(df)
-
-
-- query: "Fetch and filter studies related to Acute Myeloid Leukemia (AML) from cBioPortal API."
+- query: Fetch and filter studies related to Acute Myeloid Leukemia (AML) from cBioPortal
+    API.
   code: |
     import requests
     import pandas as pd
@@ -185,9 +185,8 @@
     aml_studies_df = fetch_aml_studies()
     print(f"Found {len(aml_studies_df)} AML-related studies")
     print(aml_studies_df)
-
-
-- query: "This example demonstrates how to fetch and analyze mutation data for a specific study in cBioPortal"
+- query: This example demonstrates how to fetch and analyze mutation data for a specific
+    study in cBioPortal
   notes: |
     It shows:
     1. How to properly construct the API endpoint URL with sample list ID
@@ -252,9 +251,10 @@
     else:
         print(f"Error fetching mutations: {mutations_response.status_code}")
         print("Response:", mutations_response.text)
-
-
-- query: "Retrieve and analyze mutation data from multiple AML studies, including data processing and summary statistics. This example demonstrates how to fetch mutations across multiple studies, handle the nested JSON response, and create a comprehensive mutation dataset with key information."
+- query: Retrieve and analyze mutation data from multiple AML studies, including data
+    processing and summary statistics. This example demonstrates how to fetch mutations
+    across multiple studies, handle the nested JSON response, and create a comprehensive
+    mutation dataset with key information.
   code: |
     import requests
     import pandas as pd
@@ -349,9 +349,11 @@
 
         # Save to CSV
         combined_df.to_csv('all_aml_mutations.csv', index=False)
-
-
-- query: "Example showing how to retrieve and analyze the molecular profiles available for multiple studies from cBioPortal. The code demonstrates how to fetch metadata on the molecular profiles, organize them into DataFrames, and analyze specific information about each profile like the types of profiles available such as RNA expression."
+- query: Example showing how to retrieve and analyze the molecular profiles available
+    for multiple studies from cBioPortal. The code demonstrates how to fetch metadata
+    on the molecular profiles, organize them into DataFrames, and analyze specific
+    information about each profile like the types of profiles available such as RNA
+    expression.
   code: |
     import requests
     import pandas as pd
@@ -435,9 +437,8 @@
         ]
         print(f"\nRNA expression profiles for {first_study}:")
         print(rna_profiles[['molecularProfileId', 'name', 'datatype']].to_string())
-
-
-- query: "Example of how to fetch RNA-seq z-scores for STAT5A and STAT5B across multiple AML studies"
+- query: Example of how to fetch RNA-seq z-scores for STAT5A and STAT5B across multiple
+    AML studies
   notes: |
     This example demonstrates:
     1. How to properly fetch sample IDs for each study
@@ -587,3 +588,88 @@
 
     print("\nWide format example (first few rows):")
     print(stat5_all_studies_wide.head())
+- query: Extract mutation and expression data for key oncogenes in TCGA lung adenocarcinoma
+    for integrated analysis
+  code: |-
+    import requests
+    import pandas as pd
+
+    BASE_URL = "https://www.cbioportal.org/api"
+    STUDY_ID = "luad_tcga_gdc"  # TCGA Lung Adenocarcinoma
+    GENE_SYMBOLS = ["EGFR", "KRAS", "TP53", "STK11", "KEAP1"]
+
+    # 1. Get mutation molecular profile ID
+    profiles_url = f"{BASE_URL}/studies/{STUDY_ID}/molecular-profiles?projection=SUMMARY"
+    profiles = requests.get(profiles_url).json()
+    mutation_profiles = [p for p in profiles if p['molecularAlterationType'] == 'MUTATION_EXTENDED']
+    mutation_profile_id = mutation_profiles[0]['molecularProfileId']
+
+    # 2. Get gene information
+    genes_url = f"{BASE_URL}/genes/fetch?geneIdType=HUGO_GENE_SYMBOL&projection=SUMMARY"
+    genes_response = requests.post(genes_url, json=GENE_SYMBOLS)
+    genes = genes_response.json()
+    entrez_ids = [g['entrezGeneId'] for g in genes]
+
+    # 3. Get sample list for all cases
+    sample_lists_url = f"{BASE_URL}/studies/{STUDY_ID}/sample-lists?projection=SUMMARY"
+    sample_lists = requests.get(sample_lists_url).json()
+    all_sample_list = next(sl['stableId'] for sl in sample_lists if sl['category'] == 'all_cases_in_study')
+
+    # 4. Fetch mutations for target genes
+    mutations_url = f"{BASE_URL}/molecular-profiles/{mutation_profile_id}/mutations"
+    params = {"sampleListId": all_sample_list, "projection": "DETAILED"}
+    mutations_response = requests.get(mutations_url, params=params)
+    mutations = mutations_response.json()
+
+    # Filter for target genes
+    mutations = [m for m in mutations if m['entrezGeneId'] in entrez_ids]
+
+    # 5. Extract mutation data
+    mutation_data = []
+    for m in mutations:
+        mutation_data.append({
+            "sample_id": m['sampleId'],
+            "gene_symbol": m['gene']['hugoGeneSymbol'],
+            "protein_change": m.get('proteinChange', ''),
+            "mutation_type": m.get('mutationType', ''),
+            "chromosome": m.get('chr', ''),
+            "start_position": m.get('startPosition', ''),
+            "reference_allele": m.get('referenceAllele', ''),
+            "variant_allele": m.get('tumorSeqAllele', '')
+        })
+
+    mutations_df = pd.DataFrame(mutation_data)
+    print(f"Found {len(mutations_df)} mutations across {len(mutations_df['sample_id'].unique())} samples")
+    print(f"Mutation frequency by gene:")
+    print(mutations_df['gene_symbol'].value_counts())
+
+    # 6. Get expression data for the same genes
+    expr_profiles = [p for p in profiles if p['molecularAlterationType'] == 'MRNA_EXPRESSION']
+    expr_profile_id = expr_profiles[0]['molecularProfileId']
+
+    # Get expression sample list
+    expr_sample_list = next(sl['stableId'] for sl in sample_lists if 'mrna' in sl['category'].lower())
+    expr_samples_url = f"{BASE_URL}/sample-lists/{expr_sample_list}/sample-ids"
+    expr_sample_ids = requests.get(expr_samples_url).json()
+
+    # Fetch expression data
+    expr_url = f"{BASE_URL}/molecular-profiles/{expr_profile_id}/molecular-data/fetch"
+    expr_data = {"sampleIds": expr_sample_ids, "entrezGeneIds": entrez_ids}
+    expr_response = requests.post(expr_url, json=expr_data)
+    expression_data = expr_response.json()
+
+    # Convert to DataFrame
+    expr_df = pd.DataFrame(expression_data)
+    entrez_to_symbol = {g['entrezGeneId']: g['hugoGeneSymbol'] for g in genes}
+    expr_df['gene_symbol'] = expr_df['entrezGeneId'].map(entrez_to_symbol)
+    expr_df = expr_df[['sampleId', 'gene_symbol', 'value']].rename(columns={'sampleId': 'sample_id', 'value': 'expression'})
+
+    print(f"\nExpression data: {len(expr_df)} measurements across {len(expr_df['sample_id'].unique())} samples")
+    print("Ready for mutation-expression correlation analysis!")
+  notes: 'This example demonstrates the complete workflow for extracting both mutation
+    and expression data from the same study, which is essential for correlating genetic
+    alterations with their functional impact. The code handles the proper API endpoints,
+    sample list management, and data formatting needed for downstream analysis. Key
+    features: 1) Gets both mutation and expression profiles from the same study, 2)
+    Uses proper sample lists for each data type, 3) Formats data consistently for
+    integration, 4) Provides summary statistics for validation.'
