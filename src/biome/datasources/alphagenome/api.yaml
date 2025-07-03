@@ -1,12 +1,13 @@
-name: "AlphaGenome"
+name: alphagenome
+slug: alphagenome
 cache_key: api_assistant_alphagenome
 description: |
     AlphaGenome is a Google DeepMind AI model for analyzing DNA sequences, providing multimodal predictions of genomic features.
     It can analyze DNA sequences up to 1 million base pairs and offers predictions at single base-pair resolution.
     The model provides functional outputs including gene expression, splicing patterns, chromatin features, and contact maps.
     It offers both a Python client library and API access for genomic analysis.
-raw_documentation: !load_txt documentation/alphagenome_overview.md
-web_docs: !load_txt documentation/alphagenome_tutorials.md
+overview: !load_txt documentation/alphagenome_overview.md
+tutorials: !load_txt documentation/alphagenome_tutorials.md
 examples: !load_yaml documentation/examples.yaml
 cache_body:
     default: true
@@ -14,16 +15,9 @@ documentation: !fill |
     # Additional Instructions:
 
     AlphaGenome is a Python package and API service for genomic analysis. It requires an API key from Google DeepMind.
-    
-    ## Installation
-    ```bash
-    $ git clone https://github.com/google-deepmind/alphagenome.git
-    $ pip install ./alphagenome
-    ```
+    This API key is available to you in the environment variable `ALPHAGENOME_KEY`.
 
-    ## Authentication
-    To use the AlphaGenome API, you need an API key from Google DeepMind:
-    - API key: os.environ.get("ALPHAGENOME_API_KEY")
+    When drafting code, use the following pattern to access the API key: `os.environ.get("ALPHAGENOME_KEY")`.
     Do not use placeholder auth values, just use the environment variable.
 
     ## Key Features
@@ -42,18 +36,12 @@ documentation: !fill |
     - `alphagenome.visualization.plot_components`: Visualization tools
     - `alphagenome.interpretation`: Sequence interpretation tools
 
-    ## Usage Limitations
-    - Free for non-commercial use
-    - Suitable for smaller to medium-scale analyses (1000s of predictions)
-    - Not recommended for large-scale analyses requiring over 1 million predictions
-    - Query rates vary based on demand
-
     ## Example Usage
     ```python
     from alphagenome.data import genome
     from alphagenome.models import dna_client
     
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     interval = genome.Interval(chromosome='chr22', start=35677410, end=36725986)
@@ -78,11 +66,8 @@ documentation: !fill |
     - CHROMATIN: Chromatin feature predictions
     - CONTACT_MAPS: 3D genomic contact predictions
 
-    ## Citation
-    When using AlphaGenome, please cite the appropriate research papers as specified in the documentation.
-
     # Overview Documentation:
-    {raw_documentation}
+    {overview}
 
     # Tutorial Documentation:
-    {web_docs}
+    {tutorials}

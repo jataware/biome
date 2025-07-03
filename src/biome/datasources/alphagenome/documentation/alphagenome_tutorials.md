@@ -320,7 +320,7 @@ from alphagenome.models import dna_client
 import os
 
 # Setup
-API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+API_KEY = os.environ.get("ALPHAGENOME_KEY")
 model = dna_client.create(API_KEY)
 
 # Define genomic region

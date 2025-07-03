@@ -23,44 +23,6 @@ AlphaGenome can predict multiple types of genomic features simultaneously:
 - **Performance**: State-of-the-art performance across genomic prediction benchmarks
 - **Scalability**: Suitable for smaller to medium-scale analyses (1000s of predictions)
 
-## Installation and Setup
-
-### Prerequisites
-- Python 3.7+
-- Git
-- Internet connection for API access
-
-### Installation Steps
-```bash
-# Clone the repository
-git clone https://github.com/google-deepmind/alphagenome.git
-
-# Install the package
-pip install ./alphagenome
-```
-
-### Key Dependencies
-- matplotlib: For visualization
-- numpy: Numerical computing
-- pandas: Data manipulation
-- scipy: Scientific computing
-- grpcio: API communication
-- protobuf: Data serialization
-
-## API Access and Authentication
-
-### Getting an API Key
-1. Visit the AlphaGenome API portal
-2. Register for a free account (non-commercial use)
-3. Generate your API key
-4. Set the environment variable: `ALPHAGENOME_API_KEY`
-
-### Usage Limitations
-- **Free Tier**: Available for non-commercial use
-- **Rate Limits**: Query rates vary based on demand
-- **Scale Limits**: Not recommended for analyses requiring over 1 million predictions
-- **Commercial Use**: Requires separate licensing agreement
-
 ## Core Architecture
 
 ### Data Module (`alphagenome.data`)
@@ -159,27 +121,6 @@ print(f"Brain-related entries: {len(brain_entries)}")
 ```
 
 The ontology system enables precise tissue-specific predictions and cross-tissue comparative analysis.
-
-## Licensing and Citation
-
-### Software License
-- Apache 2.0 License for the software components
-- Creative Commons Attribution 4.0 for documentation
-- Note: This is not an official Google product
-
-### Citation Requirements
-When using AlphaGenome in research, please cite the appropriate papers as specified in the official documentation. Proper attribution is essential for continued development and support of the project.
-
-## Support and Community
-
-### Getting Help
-- **Email Support**: alphagenome@google.com
-- **Community Forum**: www.alphagenomecommunity.com
-- **Documentation**: www.alphagenomedocs.com
-- **GitHub Issues**: For bug reports and feature requests
-
-### Contributing
-The project welcomes contributions from the community. Please review the contribution guidelines in the repository for details on how to participate.
 
 ## Performance and Benchmarks
 

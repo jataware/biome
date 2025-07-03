@@ -5,7 +5,7 @@
     from alphagenome.models import dna_client
 
     # Setup AlphaGenome client
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
 
     # Define genomic interval
@@ -39,7 +39,7 @@
     import matplotlib.pyplot as plt
 
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
 
     # Define genomic interval and variant
@@ -97,7 +97,7 @@
     import pandas as pd
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # Define genomic interval
@@ -154,7 +154,7 @@
     import pandas as pd
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # Define genomic interval
@@ -227,7 +227,7 @@
     import matplotlib.pyplot as plt
 
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
 
     # Define genomic interval
@@ -312,7 +312,7 @@
     import pandas as pd
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # Define smaller interval for mutagenesis
@@ -405,7 +405,7 @@
     import pandas as pd
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # Define genomic interval
@@ -477,7 +477,7 @@
     import pandas as pd
 
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
 
     # Get comprehensive ontology metadata
@@ -539,7 +539,7 @@
     from alphagenome.models import dna_client
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # Create example VCF data
@@ -665,7 +665,7 @@
     import matplotlib.pyplot as plt
     
     # Setup
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # TAL1 locus definition (T-cell acute lymphocytic leukemia 1)
@@ -831,7 +831,7 @@
     import matplotlib.pyplot as plt
     
     # 1. Set up AlphaGenome model with API authentication
-    API_KEY = os.environ.get("ALPHAGENOME_API_KEY")
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
     model = dna_client.create(API_KEY)
     
     # 2. Define cancer mutation for analysis (EGFR L858R)
