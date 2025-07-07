@@ -28,7 +28,7 @@ BIOME_URL = "http://biome_api:8082"
 
 JSON_OUTPUT = False
 
-DATASOURCES_FOLDER = "datasources"
+INTEGRATIONS_FOLDER = "datasources"
 
 class MessageLogger():
     def __init__(self, agent_log_function, print_logger):
@@ -63,9 +63,9 @@ class BiomeAgent(BeakerAgent):
     """
     You are the Biome Agent, a chat assistant that helps users with biomedical research tasks.
 
-    A 'datasource' is defined as an API or dataset or general collection of knowledge that you have access to.
+    An 'integration' is defined as an API or dataset or general collection of knowledge that you have access to.
 
-    An API should be considered a type of datasource.
+    An API should be considered a type of integration.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
         data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
@@ -99,7 +99,7 @@ class BiomeAgent(BeakerAgent):
         )
 
         self.__doc__ = main_agent_prompt.read_text().format(
-            api_list=self.api_list,
+            api_list=self.integration_list,
             extra_prompts=self.extra_agent_prompts
         )
         self.add_context(self.__doc__)
@@ -116,7 +116,7 @@ class BiomeAgent(BeakerAgent):
 
 
     def fetch_specs(self):
-        datasource_root = os.path.join(self.root_folder, DATASOURCES_FOLDER)
+        integration_root = os.path.join(self.root_folder, INTEGRATIONS_FOLDER)
 
         data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
         try:
@@ -128,31 +128,27 @@ class BiomeAgent(BeakerAgent):
         self.data_dir = data_dir
 
         # Get API specs and directories in one pass
-        self.api_specs = []
+        self.integration_specs = []
         self.raw_specs = [] # no interpolation
-        self.api_directories = {}
-        for datasource_dir in os.listdir(datasource_root):
-            if datasource_dir == '.ipynb_checkpoints':
+        self.integration_directories = {}
+        for integration_dir in os.listdir(integration_root):
+            if integration_dir == '.ipynb_checkpoints':
+                os.rmdir(os.path.join(integration_root, integration_dir))
                 try:
                     os.rmdir(os.path.join(datasource_root, datasource_dir))
                 except IOError:
-                    pass
-
-            datasource_full_path = os.path.join(datasource_root, datasource_dir)
-            if os.path.isdir(datasource_full_path):
-                api_yaml = Path(os.path.join(datasource_full_path, 'api.yaml'))
-                if not api_yaml.is_file():
-                    logger.warning(f"Ignoring malformed API: {api_yaml}")
                     continue
 
-                api_spec = load_yaml_api(api_yaml)
-                raw_contents = api_yaml.read_text()
+            integration_full_path = os.path.join(integration_root, integration_dir)
+            if os.path.isdir(integration_full_path):
+                integration_yaml = Path(os.path.join(integration_full_path, 'api.yaml'))
+                if not integration_yaml.is_file():
+                    logger.warning(f"Ignoring malformed API: {integration_yaml}")
+                    continue
+
+                api_spec = load_yaml_api(integration_yaml)
+                raw_contents = integration_yaml.read_text()
                 raw_spec = yaml.safe_load(raw_contents)
-                try:
-                    ensure_name_slug_compatibility(raw_spec)
-                    self.raw_specs.append((os.path.join(datasource_dir, 'api.yaml'), raw_spec))
-                except Exception as e:
-                    logger.error(f"Failed to load datasource `{api_yaml}` from raw yaml: {e}")
 
                 # Replace {DATASET_FILES_BASE_PATH} with data_dir path; { and {{ to reduce mental overhead
                 api_spec['documentation'] = api_spec['documentation'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
@@ -164,9 +160,17 @@ class BiomeAgent(BeakerAgent):
                             example['code'] = example['code'].replace('{{DATASET_FILES_BASE_PATH}}', str(data_dir))
                             example['code'] = example['code'].replace('{DATASET_FILES_BASE_PATH}', str(data_dir))
 
+                try:
+                    ensure_name_slug_compatibility(raw_spec)
+                    # add the loaded examples in too, since we want that tag parsed but also the raw text as well
+                    raw_spec['loaded_examples'] = api_spec.get('examples', [])
+                    self.raw_specs.append((os.path.join(integration_dir, 'api.yaml'), raw_spec))
+                except Exception as e:
+                    logger.error(f"Failed to load integration `{integration_yaml}` from raw yaml: {e}")
+
                 ensure_name_slug_compatibility(api_spec)
-                self.api_specs.append(api_spec)
-                self.api_directories[api_spec['slug']] = datasource_dir
+                self.integration_specs.append(api_spec)
+                self.integration_directories[api_spec['slug']] = integration_dir
 
     def initialize_adhoc(self):
         # Note: not all providers support ttl_seconds
@@ -175,7 +179,7 @@ class BiomeAgent(BeakerAgent):
         drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
         curator_config =           {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
         gpt_41_config =            {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        specs = self.api_specs
+        specs = self.integration_specs
 
         try:
             self.api = AdhocApi(
@@ -189,7 +193,7 @@ class BiomeAgent(BeakerAgent):
             self.add_context(f"The datasources failed to load for this reason: {str(e)}. Please inform the user immediately.")
             self.api = None
 
-        self.api_list = [spec['slug'] for spec in specs]
+        self.integration_list = [spec['slug'] for spec in specs]
 
     def log(self, event_type: str, content = None) -> None:
         self.context.beaker_kernel.log(
@@ -257,15 +261,15 @@ class BiomeAgent(BeakerAgent):
         return responses
 
     @tool()
-    async def add_example(self, api: str, code: str, query: str, notes: str = None) -> str:
+    async def add_example(self, integration: str, code: str, query: str, notes: str = None) -> str:
         """
-        Add a successful code example to the datasource's examples.yaml documentation file.
-        This tool should be used after successfully completing a task with an datasource to capture the working code for future reference.
+        Add a successful code example to the integration's examples.yaml documentation file.
+        This tool should be used after successfully completing a task with an integration to capture the working code for future reference.
 
-        The API names must match one of the names in the agent's datasource list.
+        The API names must match one of the names in the agent's integration list.
 
         Args:
-            api (str): The name of the datasource the example is for
+            integration (str): The name of the integration the example is for
             code (str): The working, successful code to add as an example
             query (str): A brief description of what the example demonstrates
             notes (str, optional): Additional notes about the example, such as implementation details
@@ -273,9 +277,6 @@ class BiomeAgent(BeakerAgent):
         Returns:
             str: Message indicating success or failure of adding the example
         """
-        if api not in self.api_list:
-            raise ValueError(f"Error: the API name must match one of the names in the {self.api_list}. The API name provided was {api}.")
-
         try:
             api_folder = self.api_directories[api]
             # Construct path to examples.yaml file
@@ -285,7 +286,7 @@ class BiomeAgent(BeakerAgent):
             # Create new example entry as a dictionary
             new_example = {
                 "query": query,
-                "code": code  # Will be formatted with block scalar style
+                "notes": notes
             }
 
             # Add notes if provided
@@ -330,30 +331,24 @@ class BiomeAgent(BeakerAgent):
 
 
     @tool()
-    async def add_datasource(self,
-                             datasource: str,
+    async def add_integration(self,
+                             integration: str,
                              description: str,
                              base_url: str,
                              schema_location: str) -> str:
         """
-        Adds a datasource to the list of supported datasources usable within Biome.
+        Adds an integration to the list of supported integrations usable within Biome.
         This will be added to the API and data source list.
 
         Args:
-            datasource (str): The name of the target data source or API that will be added.
+            integration (str): The name of the target data source or API that will be added.
             description (str): A plain text description of what the data source is based on your knowledge of what the user is asking for, combined with their description if their description is relevant, or, if you do not know about the target data source. If the user does not provide any information, rely on what you know. Target a paragraph in length.
             schema_location (str): A URL or local filepath to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL or local filepath to the schema.
-            base_url (str): The base URL for the datasource that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
+            base_url (str): The base URL for the integration that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
         Returns:
-            str: Message indicating success or failure of adding the datasource.
+            str: Message indicating success or failure of adding the integration.
         """
-        datasources_path = os.path.join(self.root_folder, DATASOURCES_FOLDER)
-        datasource_name = datasource.lower().replace(' ', '_')
-        datasource_folder = os.path.join(datasources_path, datasource_name)
-        if (os.path.isdir(datasource_folder)):
-            return f"Failed to add datasource: {datasource}: {DATASOURCES_FOLDER}/{datasource_folder} already exists."
 
-        logger.info(f'adding datasource {datasource} to {datasource_folder}')
         try:
             if schema_location.startswith('http'):
                 response = requests.get(schema_location)
@@ -363,53 +358,29 @@ class BiomeAgent(BeakerAgent):
             else:
                 with open(schema_location, 'r') as f:
                     schema = f.read()
-
-            documentation_folder = os.path.join(datasource_folder, 'documentation')
-            os.makedirs(documentation_folder, exist_ok=True)
-            with open(os.path.join(documentation_folder, 'schema.yaml'), 'w') as f:
-                f.write(str(schema))
-            with open(os.path.join(documentation_folder, 'examples.yaml'), 'a'):
-                pass
-
         except Exception as e:
             return f'Failed to get OpenAPI schema: {e}'
 
-        formatted_description = description.replace('\n', ' ')
-        template = f"""
-name: {datasource}
-description: {formatted_description}
-examples: !load_yaml documentation/examples.yaml
-cache_key: "api_assistant_{datasource_name}"
-raw_documentation: !load_txt documentation/schema.yaml
-
-documentation: !fill |
-    The base URL for the service is `{base_url}`
-    Below is the OpenAPI schema for the desired service.
-
-    {{raw_documentation}}
-"""
-        with open(os.path.join(datasource_folder, 'api.yaml'), 'w') as f:
-            f.write(template)
-        try:
-            datasource_yaml = Path(os.path.join(datasource_folder, 'api.yaml'))
-            datasource_spec = load_yaml_api(datasource_yaml)
-            self.api_specs.append(datasource_spec)
-            self.api.add_api(datasource_spec)
-
-        except Exception as e:
-            return f"Failed to add datasource: {e}"
-        logger.info(f'Successfully added {datasource} to {datasource_folder} and it is now available for use.')
-        return f'Successfully added {datasource} and it is now available for use.'
+        # calls save_integration in context.py as an action after finishing
+        self.context.beaker_kernel.send_response(
+            "iopub", "add_integration", content={
+                "integration": integration,
+                "description": description,
+                "base_url": base_url,
+                "schema": schema
+            }
+        )
+        return f"Added integration `{integration}`."
 
     @tool()
-    async def get_available_datasources(self) -> list:
+    async def get_available_integrations(self) -> list:
         """
-        Get list of datasources that the agent is designed to interact with.
+        Get list of integrations that the agent is designed to interact with.
 
         Returns:
-            list: The list of available datasources.
+            list: The list of available integrations.
         """
-        return self.api_list
+        return self.integration_list
 
 
     @tool()
