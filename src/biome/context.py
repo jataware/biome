@@ -29,14 +29,14 @@ class TestIntegrationProvider(BaseIntegrationProvider):
     def __init__(self):
         self.integrations = [
             Integration(
-                "test_1",
-                "Test Integration 1",
-                "First Test Integration"
+                name="Test Integration 1",
+                description="First Test Integration",
+                provider="test"
             ),
             Integration(
-                "test_2",
-                "Test Integration 2",
-                "Second Test Integration"
+                name="Test Integration 2",
+                description="Second Test Integration",
+                provider="test"
             ),
         ]
         super().__init__(display_name="Biome Second Test Integration")

@@ -52,7 +52,7 @@ prompt: |
 resources:
   4b9845c7-d61b-440d-880e-b3d2b315a415:
     filepath: facets.txt
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     name: facets
     resource_id: 4b9845c7-d61b-440d-880e-b3d2b315a415
     resource_type: file
@@ -102,7 +102,7 @@ resources:
       print(f"There are {len(all_cases_df)} cases in GDC in total")
       # Display the DataFrame
       all_cases_df.head()
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     notes: null
     query: |-
       Get all cases from GDC with no filters. Fetch only the case ids and paginate through the results to fetch all available cases. Store the results as a dataframe
@@ -167,7 +167,7 @@ resources:
 
       ssms = pd.DataFrame(json_normalize(all_ssms))
       ssms.head()
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     notes: null
     query: Query the GDC for cases of myeloid leukemia with a JAK2 somatic mutation
       and return the results as a pandas dataframe.
@@ -175,7 +175,7 @@ resources:
     resource_type: example
   74735957-03a3-4706-aa40-f8bf200553cc:
     filepath: gdc.md
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     name: raw_documentation
     resource_id: 74735957-03a3-4706-aa40-f8bf200553cc
     resource_type: file
@@ -209,7 +209,7 @@ resources:
       \ in lung cancer cases for males under 45 who never smoked:\")\n    lung_mutation_df\
       \ = pd.DataFrame(json_normalize(mutations))\nelse:\n    print(f\"Error: {response.status_code}\
       \ - {response.text}\")\n  \nlung_mutation_df.head()"
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     notes: null
     query: |-
       Get simple somatic mutation occurrences (cases) from GDC where the primary site is bronchus and lung, the gender is male, the age at diagnosis is less than 45 years old, and the patient is a lifelong non-smoker. Return the results as a pandas dataframe.
@@ -284,7 +284,7 @@ resources:
       print(f"There are {len(cases_df)} cases in GDC for AML")
       # Display the DataFrame
       cases_df.head()
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     notes: null
     query: |-
       Get all cases where disease type is myeloid leukemia from GDC and return the results as a pandas dataframe. Paginate through the results to fetch all available cases
@@ -292,8 +292,8 @@ resources:
     resource_type: example
   a96216e1-8a2b-4fab-90e8-565d1db62fbe:
     filepath: gdc_mappings.json
-    integration: genomics_data_commons
+    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
     name: mappings
     resource_id: a96216e1-8a2b-4fab-90e8-565d1db62fbe
     resource_type: file
-slug: genomics_data_commons
+slug: 7f4da82e-9df8-4235-82cc-00dcbceea9e8

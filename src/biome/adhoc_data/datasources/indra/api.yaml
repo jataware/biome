@@ -75,7 +75,7 @@ resources:
 
       print("\nShared Pathways Response:")
       print(shared_pathways_response.json())
-    integration: indra_context_graph_extension_(cogex)
+    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
     notes: null
     query: |-
       Perform a gene pathway analysis for JAK2 to find associated pathways and shared pathways with other genes like STAT3, JAK3, and EGFR.
@@ -136,7 +136,7 @@ resources:
               for data in evidence_data.values():
                   all_pmids.update(data['pmids'])
               print(f"Total unique PMIDs: {len(all_pmids)}")
-    integration: indra_context_graph_extension_(cogex)
+    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
     notes: null
     query: Retrieve literature evidence related to AML using MeSH term queries, including
       child terms, and summarize the findings.
@@ -218,7 +218,7 @@ resources:
           print(f"Is kinase: {results['is_kinase']}")
           print(f"Is phosphatase: {results['is_phosphatase']}")
           print(f"Is transcription factor: {results['is_transcription_factor']}")
-    integration: indra_context_graph_extension_(cogex)
+    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
     notes: null
     query: |-
       This example demonstrates how to analyze the JAK2 gene using the INDRA CoGEx API to retrieve GO terms, pathway associations, and check if it is a kinase, phosphatase, or transcription factor.
@@ -226,8 +226,8 @@ resources:
     resource_type: example
   f49c8aa7-727e-444e-a3a2-314a5f0d6631:
     filepath: indra.json
-    integration: indra_context_graph_extension_(cogex)
+    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
     name: raw_documentation
     resource_id: f49c8aa7-727e-444e-a3a2-314a5f0d6631
     resource_type: file
-slug: indra_context_graph_extension_(cogex)
+slug: c3befe4c-07ef-445b-8bfc-32debea298bf

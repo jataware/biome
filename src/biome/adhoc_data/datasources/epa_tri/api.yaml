@@ -123,7 +123,7 @@ resources:
       \    plt.text(bar.get_x() + bar.get_width()/2., height + 0.5,\n            f'{height:.1f}M',\
       \ ha='center', va='bottom')\n\nplt.tight_layout()\nplt.savefig('top_zips_by_releases.png')\n\
       plt.show()\n"
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Analyzing and visualizing toxic releases by ZIP code. This example shows how to aggregate TRI data by geographic units (ZIP codes), calculate total releases and hazard scores, and create a bar chart visualization of the top areas with highest toxic releases.
@@ -145,7 +145,7 @@ resources:
       print(f"Found {len(orange_county)} toxic release records containing 'ORANGE, FL' in the County name.")
       print("\nSample of the data:")
       print(orange_county.head())
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: Open the TRI data file with index_col=False, since otherwise columns are
       shifted, and find data for Orange County, FL.
@@ -200,7 +200,7 @@ resources:
       ]]
 
       result
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Capture any asthma-respiratory related hazard incident from the TRI- EPA's Toxic Release Inventory data- you have access to this api. FOr now focus on problems in 2022, in the county of Harris, TX.
@@ -242,7 +242,7 @@ resources:
       \ in Toxic Releases')\nplt.xlabel('Year')\nplt.ylabel('Releases (Million lb)')\n\
       plt.legend()\nplt.grid(True, linestyle='--', alpha=0.7)\nplt.tight_layout()\n\
       plt.savefig('yearly_condition_trends.png')\nplt.show()\n"
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Identifying and analyzing chemicals related to specific health conditions. This example demonstrates how to filter TRI data for chemicals associated with a particular health condition (like asthma), calculate their proportion of total releases, and analyze trends over time. This approach can be adapted for various health conditions by modifying the list of relevant chemicals.
@@ -282,7 +282,7 @@ resources:
       \        fill_opacity=0.6,\n        opacity=0.8\n    ).add_to(marker_cluster)\n\
       \n# Save the map\nmap_file = 'facilities_map.html'\nm.save(map_file)\nprint(f\"\
       Interactive map saved to: {map_file}\")\n"
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Creating an interactive map of toxic release facilities. This example shows how to use the folium library to generate an interactive web map displaying the locations of facilities, with circle sizes proportional to release amounts and popup information showing detailed facility data. This visualization helps identify spatial patterns and hotspots of toxic releases.
@@ -328,7 +328,7 @@ resources:
       ]]
 
       print(result)
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Query to retrieve asthma-respiratory related hazard incidents from the EPA's TRI for the year 2022 in Harris County, TX.
@@ -365,7 +365,7 @@ resources:
       \ fraction', \n            fontsize=12, bbox=dict(boxstyle=\"round,pad=0.3\"\
       , fc=\"white\", ec=\"gray\", alpha=0.8))\n\nplt.tight_layout()\nplt.savefig('releases_vs_hazard.png')\n\
       plt.show()"
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Analyzing the relationship between release amounts and hazard scores. This example demonstrates how to investigate the correlation between the quantity of toxic releases and their associated RSEI Hazard scores using scatter plots, trend lines, and correlation statistics. This analysis helps understand whether larger releases necessarily correspond to higher health risks.
@@ -393,7 +393,7 @@ resources:
       \ Total Releases:\")\nfor i, (name, lat, lon, releases, hazard, chemicals, years)\
       \ in enumerate(facility_summary.head(10).values, 1):\n    print(f\"{i}. {name}:\
       \ {releases:,.2f} lb, RSEI Hazard: {hazard:,.2f}, Chemicals: {chemicals}\")\n"
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       Basic loading, cleaning, and summarizing of EPA TRI data for a specific county. This example demonstrates how to handle the comma-separated numeric values in the dataset, filter for a specific geographic area, and create a summary of facilities with their total releases, hazard scores, and chemical counts.
@@ -446,10 +446,10 @@ resources:
           result = result.sort_values('Releases (lb)', ascending=False)
           print("\nResults:")
           print(result.head())
-    integration: epa_toxic_release_inventory_(tri)
+    integration: f9653810-18ac-4108-a1ea-7f7c2e31274a
     notes: null
     query: |-
       When not finding results for a combined query, try a more systematic approach by finding items and counting length by one by one, in order to discover if there is matching data, but the query is not returning any results. This is to discover amonia references for the county of 'HARRIS, TX'.
     resource_id: e2bd90f9-24a6-41e5-a3ba-1aca807d8990
     resource_type: example
-slug: epa_toxic_release_inventory_(tri)
+slug: f9653810-18ac-4108-a1ea-7f7c2e31274a

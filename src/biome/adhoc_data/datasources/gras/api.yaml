@@ -57,9 +57,9 @@ resources:
           print(matches[['GRAS Notice (GRN) No.', 'Substance', 'Date of filing', "FDA's Letter"]])
       else:
           print(f"No GRAS notices found for {search_term}")
-    integration: fda_generally_recognized_as_safe_(gras)
+    integration: 2a6f1149-8ff2-4c21-b528-cbf8b18bf30e
     notes: null
     query: Is there any FDA GRAS notice for Dioctyl sodium sulfosuccinate as an additive?
     resource_id: fd30b48e-e83b-41a2-a969-49ebc58da112
     resource_type: example
-slug: fda_generally_recognized_as_safe_(gras)
+slug: 2a6f1149-8ff2-4c21-b528-cbf8b18bf30e

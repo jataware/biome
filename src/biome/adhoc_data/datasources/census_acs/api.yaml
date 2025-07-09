@@ -25,7 +25,7 @@ prompt: "The American Community Survey (ACS) is an ongoing survey that provides 
 resources:
   76813161-e3dd-400e-b1db-c6534c3fb484:
     filepath: census_web.md
-    integration: census_acs_(american_community_survey)_and_sf1
+    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
     name: web_documentation
     resource_id: 76813161-e3dd-400e-b1db-c6534c3fb484
     resource_type: file
@@ -39,7 +39,7 @@ resources:
       \ = ['Name', 'Median_Income', 'Poverty_Count', \n                        'Median_Rent',\
       \ 'Population', 'state', 'county', 'tract']\n\n# Calculate poverty rate\nharris_ses_df['Poverty_Rate']\
       \ = harris_ses_df['Poverty_Count'] / harris_ses_df['Population'] * 100\n"
-    integration: census_acs_(american_community_survey)_and_sf1
+    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
     notes: null
     query: Calculate the poverty rate in Harris County, Texas- Descriptive analysis
     resource_id: 93d4da90-fe43-4121-8e1b-d9d677637143
@@ -58,15 +58,15 @@ resources:
       exposure_by_ses = pd.merge(environmental_data, harris_ses_df, on='tract')\n\n\
       # Calculate average exposures by income quartile\nquartile_summary = exposure_by_ses.groupby('Income_Quartile')['PM25_Annual',\
       \ 'Ozone_Days_Exceeded', 'TRI_Releases'].mean()"
-    integration: census_acs_(american_community_survey)_and_sf1
+    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
     notes: null
     query: Calculate the poverty rate in Harris County, Texas- Stratified analysis
     resource_id: 9a1dd209-4e65-49af-a5cc-2f9d73cd8d4b
     resource_type: example
   cb8c091d-ff82-46d7-bdea-893aa5b0c6c5:
     filepath: census_sdk.md
-    integration: census_acs_(american_community_survey)_and_sf1
+    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
     name: sdk_documentation
     resource_id: cb8c091d-ff82-46d7-bdea-893aa5b0c6c5
     resource_type: file
-slug: census_acs_(american_community_survey)_and_sf1
+slug: 50e33776-2cc4-4b05-8135-4ff03d5d42b1

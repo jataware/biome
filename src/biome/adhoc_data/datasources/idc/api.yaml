@@ -26,7 +26,7 @@ resources:
       \ collection_id = 'cmb_aml'\n\"\"\"\n\ntry:\n    df_all_studies = client.sql_query(query_all_studies)\n\
       \    print(\"All studies in the 'cmb_aml' collection:\")\n    print(df_all_studies)\n\
       except Exception as e:\n    print(f\"An error occurred: {str(e)}\")\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: List all studies for a given collection
     resource_id: 090cdd92-54e0-4a30-82ab-a2e9c67b50c7
@@ -63,7 +63,7 @@ resources:
           print("\nTotal number of records:", len(df))
       except Exception as e:
           print(f"An error occurred: {str(e)}")
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Get slide microscopy data
     resource_id: 1be1fe03-4bb2-4240-a95e-96efb9c1d4d8
@@ -92,7 +92,7 @@ resources:
       \ 'cmb_aml')\n\"\"\"\n\ntry:\n    df_study = client.sql_query(query_study)\n\
       \    print(\"\\nStudy-level information:\")\n    print(df_study)\nexcept Exception\
       \ as e:\n    print(f\"An error occurred querying study data: {str(e)}\")\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Get additional information for microscopy data for a specific collection
     resource_id: 25d73a5f-adb2-495c-9588-8237bb39883d
@@ -104,7 +104,7 @@ resources:
       \ LIKE '%aml%'\n\"\"\"\n\ntry:\n    df_collections = client.sql_query(query)\n\
       \    print(\"Collections with 'aml' in their name:\")\n    print(df_collections)\n\
       except Exception as e:\n    print(f\"An error occurred: {str(e)}\")\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Find collections in the Imaging Data Commons with 'aml' in their name,
       likely related to Acute Myeloid Leukemia.
@@ -128,7 +128,7 @@ resources:
           print(df.columns.tolist())
       except Exception as e:
           print(f"An error occurred: {str(e)}")
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Get columns available in IDC index
     resource_id: 49f63b7d-8e99-4e88-ac9d-86db0d831a8f
@@ -157,7 +157,7 @@ resources:
       # Execute the download
       s5cmd_binary = client.s5cmdPath
       !{s5cmd_binary} --no-sign-request --endpoint-url https://s3.amazonaws.com run download_manifest.txt
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Download bone marrow biopsy images from the 'cmb_aml' collection for a
       specific study using IDC's public S3 bucket.
@@ -171,7 +171,7 @@ resources:
       \    df_studies = client.sql_query(query)\n    print(\"Studies in 'cptac_aml':\"\
       )\n    print(df_studies)\nexcept Exception as e:\n    print(f\"An error occurred:\
       \ {str(e)}\")\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Fetch studies for a given collection in the Imaging Data Commons (IDC),
       specifically for the 'cptac_aml' collection.
@@ -192,7 +192,7 @@ resources:
       """
       df = client.sql_query(query)
       print(df.head())
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Retrieve imagery URLs for the 'XR_Biopsy_BoneMarrow' study in the 'cmb_aml'
       collection from IDC.
@@ -200,7 +200,7 @@ resources:
     resource_type: example
   a155ea7d-f42f-4546-8d4c-b1135994ea47:
     filepath: idc.md
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     name: raw_documentation
     resource_id: a155ea7d-f42f-4546-8d4c-b1135994ea47
     resource_type: file
@@ -218,7 +218,7 @@ resources:
       plt.title('Bone Marrow Biopsy Image')
       plt.axis('off')
       plt.show()
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Basic plot of dicom image from file
     resource_id: bbfbce09-abfe-4565-a50b-6afc299df2d3
@@ -249,7 +249,7 @@ resources:
       No pixel data found in the DICOM file\")\n\nexcept Exception as e:\n    print(f\"\
       An error occurred: {str(e)}\")\nfinally:\n    # Clean up\n    if os.path.exists(local_file):\n\
       \        os.remove(local_file)\n    os.rmdir(temp_dir)\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Download and visualize a slide microscopy image with pydicom and matplotlib
     resource_id: c19b78ab-29cb-4be3-8069-1ef22302dfb2
@@ -265,7 +265,7 @@ resources:
       \        size_mb = df['series_size_MB'].iloc[0]\n        print(f\"\\nFile size:\
       \ {size_mb:.2f} MB\")\n        print(f\"Download URL: {url}\")\nexcept Exception\
       \ as e:\n    print(f\"An error occurred: {str(e)}\")\n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Query to get download URLs for bone marrow slides
     resource_id: dc0ce97c-46a2-406b-a582-a51be49367c9
@@ -285,7 +285,7 @@ resources:
       \ to a CSV file for further analysis\n    df.to_csv('aml_pathology_data.csv',\
       \ index=False)\n    print(\"\\nData has been saved to 'aml_pathology_data.csv'\"\
       )\n\nexcept Exception as e:\n    print(f\"An error occurred: {str(e)}\")   \n"
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Get slide microscopy data for a specific collection
     resource_id: e0279959-d257-438e-8513-fb40391082c1
@@ -339,9 +339,9 @@ resources:
 
       except Exception as e:
           print(f"\nError getting bucket information: {str(e)}")
-    integration: imaging_data_commons
+    integration: 43858948-4b58-4312-b281-7a65e9c0d38d
     notes: null
     query: Get list of files in an S3 bucket for a specific collection on IDC
     resource_id: f5ffd878-c1c9-46e9-b83c-6fd54fe975a5
     resource_type: example
-slug: imaging_data_commons
+slug: 43858948-4b58-4312-b281-7a65e9c0d38d

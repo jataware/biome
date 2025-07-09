@@ -59,7 +59,7 @@ resources:
       aml_studies_df = fetch_aml_studies()
       print(f"Found {len(aml_studies_df)} AML-related studies")
       print(aml_studies_df)
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: null
     query: Fetch and filter studies related to Acute Myeloid Leukemia (AML) from cBioPortal
       API.
@@ -202,7 +202,7 @@ resources:
 
       print("\nWide format example (first few rows):")
       print(stat5_all_studies_wide.head())
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: |
       This example demonstrates:
       1. How to properly fetch sample IDs for each study
@@ -222,7 +222,7 @@ resources:
     resource_type: example
   52adfa23-1b07-462e-968b-d09ed12848f0:
     filepath: cbioportal.json
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     name: cbioportal
     resource_id: 52adfa23-1b07-462e-968b-d09ed12848f0
     resource_type: file
@@ -280,7 +280,7 @@ resources:
       else:
           print(f"Error fetching mutations: {mutations_response.status_code}")
           print("Response:", mutations_response.text)
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: |
       It shows:
       1. How to properly construct the API endpoint URL with sample list ID
@@ -380,7 +380,7 @@ resources:
           ]
           print(f"\nRNA expression profiles for {first_study}:")
           print(rna_profiles[['molecularProfileId', 'name', 'datatype']].to_string())
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: null
     query: |-
       Example showing how to retrieve and analyze the molecular profiles available for multiple studies from cBioPortal. The code demonstrates how to fetch metadata on the molecular profiles, organize them into DataFrames, and analyze specific information about each profile like the types of profiles available such as RNA expression.
@@ -481,7 +481,7 @@ resources:
 
           # Save to CSV
           combined_df.to_csv('all_aml_mutations.csv', index=False)
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: null
     query: |-
       Retrieve and analyze mutation data from multiple AML studies, including data processing and summary statistics. This example demonstrates how to fetch mutations across multiple studies, handle the nested JSON response, and create a comprehensive mutation dataset with key information.
@@ -505,7 +505,7 @@ resources:
               print(f"Description: {study['description']}")
               print(f"Cancer Type ID: {study['cancerTypeId']}")
               print("-" * 80)
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: null
     query: |-
       Query and display all colorectal cancer studies from cBioPortal. This example searches for studies with cancer type IDs 'coadread', 'coad', and 'read' (representing colorectal adenocarcinoma, colon adenocarcinoma, and rectal adenocarcinoma respectively). For each study, it displays the name, study ID, description, and cancer type ID.
@@ -539,7 +539,7 @@ resources:
 
       # Print the DataFrame
       print(df)
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: null
     query: Query for studies related to colorectal cancer using the cancerTypeId 'coadread'.
     resource_id: c68b74b2-c97c-4cf5-b8b4-7e514db2db65
@@ -622,7 +622,7 @@ resources:
                       print(f"  - {change}")
                   if len(details['protein_changes']) > 5:
                       print(f"  ... and {len(details['protein_changes'])-5} more changes")
-    integration: cbioportal
+    integration: 26b8655b-4f68-4f70-bb30-5f1397dd201a
     notes: |
       The example demonstrates how to:
       1. Get sample IDs for a study
@@ -634,4 +634,4 @@ resources:
       Query mutation data from cBioPortal for a specific study (Genentech colorectal cancer study) and analyze mutations in key cancer genes (APC, TP53, KRAS, PIK3CA)
     resource_id: d54d8188-81f5-4fff-a641-230480369fe4
     resource_type: example
-slug: cbioportal
+slug: 26b8655b-4f68-4f70-bb30-5f1397dd201a

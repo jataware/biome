@@ -37,10 +37,10 @@ resources:
       print(\"Column names:\", df.columns.tolist())\n\n# Display a sample of the data\
       \ to understand its structure\nprint(\"\\nSample data:\")\nprint(df.head(2))\n\
       \    "
-    integration: chis_california_asthma
+    integration: fd660ac8-f7cc-477a-bbcb-38df4d330711
     notes: null
     query: Open the california chis asthma dataset and display columns/first 2 rows
       to understand the structure
     resource_id: ca7ff323-7bef-489d-9d2c-760628f40825
     resource_type: example
-slug: chis_california_asthma
+slug: fd660ac8-f7cc-477a-bbcb-38df4d330711

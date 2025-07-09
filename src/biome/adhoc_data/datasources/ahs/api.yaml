@@ -116,7 +116,7 @@ prompt: |
 resources:
   3a5b7607-80c5-44ae-a240-a9a388f78afd:
     filepath: docs.md
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     name: more_instructions
     resource_id: 3a5b7607-80c5-44ae-a240-a9a388f78afd
     resource_type: file
@@ -138,7 +138,7 @@ resources:
       code_pairs_dict = {k.strip(): v.strip() for k, v in (code_pair.split(":") for code_pair in code_pairs)}
 
       return code_pairs_dict.get(code)
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       Use the codebook to get the meaning of the codes for the OMB13CBSA variable, matching one code to the meaning by creating a dictionary of code:meaning pairs and returning the statistical metro area name for a given code
@@ -182,7 +182,7 @@ resources:
       Households without children: {asthma_by_children.get(0, 'N/A'):.1f}%\")\nprint(f\"\
       Difference: {asthma_by_children.get(1, 0) - asthma_by_children.get(0, 0):.1f}\
       \ percentage points\")\n"
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       Analyzing the relationship between housing conditions, asthma, and the presence of children using the 2023 American Housing Survey data. This code calculates and compares the prevalence of various housing conditions (mold, water leaks) in homes with and without reported asthma cases, and also examines the prevalence of asthma in households with and without children.
@@ -228,7 +228,7 @@ resources:
       )\n            print(f\"  - Households with 1-2 persons: {without_children:.1f}%\"\
       )\n            print(f\"  - Difference: {with_children - without_children:.1f}\
       \ percentage points\")\n"
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       Analyzing housing conditions in Houston, TX using the 2007 American Housing Survey data. This code identifies Houston records using the SMSA code, analyzes the prevalence of water leaks and pest problems, and compares these conditions between larger households (3+ persons, likely to have children) and smaller households (1-2 persons).
@@ -247,7 +247,7 @@ resources:
 
       # Return the Response Codes column
       ombs_row['Response Codes']
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: What is the meaning of the codes for the OMB13CBSA variable?
     resource_id: ad42a806-0e81-4e63-97cf-2f7aad6a1a35
@@ -301,7 +301,7 @@ resources:
       \ condition|hvac', case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('heat|cool|air\
       \ condition|hvac', case=False, na=False)\n]\n\nprint(f\"\\nFound {len(hvac_vars)}\
       \ variables related to heating and cooling systems\")"
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       Exploring the American Housing Survey codebook to identify variables related to asthma, respiratory health, and housing conditions. This code searches the codebook for terms related to asthma, air quality, pests, and HVAC systems, and provides a summary of available variables that could be relevant for analyzing the relationship between housing conditions and respiratory health.
@@ -375,7 +375,7 @@ resources:
       \ by Presence of Children:\")\nprint(summary_table[['Condition', 'With Children\
       \ (%)', 'Without Children (%)', 'Difference (percentage points)', 'Sample Size']].to_string(index=False,\
       \ float_format=lambda x: f\"{x:.1f}\"))\n"
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       Analyzing and visualizing the relationship between housing conditions (mold, water leaks) and the presence of children in households using the 2023 American Housing Survey data. This code creates a horizontal bar chart comparing the prevalence of various housing conditions in homes with and without children, and generates a summary table of the differences.
@@ -432,10 +432,10 @@ resources:
       \ as \"'6'\",\n            # that is why we strip them or sometimes compare\
       \ to substrings\n            combined_data[col] = combined_data[col].apply(convert_value)\n\
       \        \n        return combined_data\n    else:\n        return pd.DataFrame()\n"
-    integration: census_american_housing_survey_(ahs)
+    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
     notes: null
     query: |-
       I wonder if there are any trends for metro areas in Florida, US in which mold presence increased between years 2001 and 2011? Can you get the data for matching mold presence?
     resource_id: ea7d2aec-2d76-4b95-ae85-177db08ff019
     resource_type: example
-slug: census_american_housing_survey_(ahs)
+slug: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb

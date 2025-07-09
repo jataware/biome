@@ -74,7 +74,7 @@ prompt: |
 resources:
   0e410001-bac7-4cb7-9f32-b9064c64a4c1:
     filepath: foodcentral_openapi.json
-    integration: usda_fooddata_central_api
+    integration: a77cc48a-579a-4145-b1bd-80ad50d482ec
     name: raw_documentation
     resource_id: 0e410001-bac7-4cb7-9f32-b9064c64a4c1
     resource_type: file
@@ -99,9 +99,9 @@ resources:
           # Extract the first food item from the results
           food_item = data['foods'][0]
           food_item
-    integration: usda_fooddata_central_api
+    integration: a77cc48a-579a-4145-b1bd-80ad50d482ec
     notes: null
     query: Search for nutrients for raw acerola juice
     resource_id: 4164944f-a6d4-452c-a290-3ab7bd2e9d9e
     resource_type: example
-slug: usda_fooddata_central_api
+slug: a77cc48a-579a-4145-b1bd-80ad50d482ec

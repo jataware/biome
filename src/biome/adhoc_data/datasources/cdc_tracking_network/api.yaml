@@ -33,14 +33,14 @@ prompt: |
 resources:
   5b62b4c6-536c-4a8d-8e4b-bd295ac8ed72:
     filepath: api_examples.md
-    integration: cdc_tracking_network
+    integration: ba3db193-3d39-4793-a525-c569d31bd38b
     name: api_examples
     resource_id: 5b62b4c6-536c-4a8d-8e4b-bd295ac8ed72
     resource_type: file
   7c5e6353-7e1f-4639-91ee-9dc568887a69:
     filepath: user_guide.md
-    integration: cdc_tracking_network
+    integration: ba3db193-3d39-4793-a525-c569d31bd38b
     name: user_guide
     resource_id: 7c5e6353-7e1f-4639-91ee-9dc568887a69
     resource_type: file
-slug: cdc_tracking_network
+slug: ba3db193-3d39-4793-a525-c569d31bd38b

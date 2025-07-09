@@ -42,4 +42,4 @@ prompt: |
   You may use the python `us` library to convert FIPS codes to state and county names,
   and use pandas to read the tab-delimited text files.
 resources: {}
-slug: usgs_pesticide_national_synthesis_project
+slug: 19c8907f-cd98-4a3e-8d72-fe466b20087e

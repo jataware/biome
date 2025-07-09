@@ -59,7 +59,7 @@ resources:
       \ for '{drug_term}'\")\n    else:\n        print(\"Could not find therapeutic_agents\
       \ in DataHub standards\")\nelse:\n    print(f\"Error getting standards: {standards_response.status_code}\"\
       )\n    print(standards_response.text)\n"
-    integration: netrias_harmonization_api
+    integration: 495ac407-7042-4eda-95ca-e10850e00081
     notes: |-
       This example demonstrates how to harmonize a drug term that includes a non-standard suffix (e.g., "zorubicin_9012") by:
       1. Retrieving the therapeutic_agents standard from the DataHub
@@ -72,8 +72,8 @@ resources:
     resource_type: example
   8242a126-8ef1-48de-aa94-e0ccc7e58a28:
     filepath: netrias.json
-    integration: netrias_harmonization_api
+    integration: 495ac407-7042-4eda-95ca-e10850e00081
     name: raw_documentation
     resource_id: 8242a126-8ef1-48de-aa94-e0ccc7e58a28
     resource_type: file
-slug: netrias_harmonization_api
+slug: 495ac407-7042-4eda-95ca-e10850e00081

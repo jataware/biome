@@ -74,7 +74,7 @@ resources:
           print(json.dumps(file_info, indent=2))
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       Fetch raw mass spec data for a specific study using study name, data category, and file type in the Proteomics Data Commons (PDC).
@@ -128,7 +128,7 @@ resources:
           print(json.dumps(case_info, indent=2))
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Fetch detailed information about a case using its case ID in the Proteomics
       Data Commons (PDC).
@@ -172,7 +172,7 @@ resources:
           print(json.dumps(files, indent=2))
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       This example demonstrates how to query the Proteomics Data Commons for studies with open standard data for processed mass spec using the getPaginatedUIFile query.
@@ -236,7 +236,7 @@ resources:
           print(f"Error decoding JSON response: {e}")
           print("Response content:", response_stat5a.text)
           print("Response content:", response_stat5b.text)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       Retrieve quantitative mass spectrometry data for STAT5A and STAT5B proteins using the getPaginatedUIGeneAliquotSpectralCount query.
@@ -244,7 +244,7 @@ resources:
     resource_type: example
   75e500f5-31c0-4683-995b-26fc49d51426:
     filepath: pdc_schema.graphql
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     name: raw_documentation
     resource_id: 75e500f5-31c0-4683-995b-26fc49d51426
     resource_type: file
@@ -325,7 +325,7 @@ resources:
       except json.JSONDecodeError as e:
           print(f"Error decoding JSON response: {e}")
           print("Response content:", response.text)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Load samples into a pandas dataframe
     resource_id: 8708cae9-d62e-468d-9d78-3f61ac1913d6
@@ -402,7 +402,7 @@ resources:
       except json.JSONDecodeError as e:
         print(f"Error decoding JSON response: {e}")
         print("Response content:", response.text)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Fetch all available metadata for a study using its PDC Study ID.
     resource_id: 893e05e7-c0db-4482-aebe-1b09c9abfd4d
@@ -472,7 +472,7 @@ resources:
       # Print the number of studies found and the first 5 studies
       print(f"Found {len(lung_cancer_studies)} studies with primary site 'Lung' or 'Bronchus and lung'.")
       print(list(lung_cancer_studies)[:5])
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       This example demonstrates how to find lung cancer studies in the Proteomics Data Commons by querying for studies with primary sites 'Lung' and 'Bronchus and lung', and combining the results.
@@ -514,7 +514,7 @@ resources:
 
       except requests.exceptions.RequestException as e:
           print(f"An error occurred: {e}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Query PDC to find studies with a specific disease type (in this case 'Acute
       Myeloid Leukemia')
@@ -586,7 +586,7 @@ resources:
       # Display the first few studies
       for study in list(lung_cancer_studies)[:5]:
           print(study)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       Query the Proteomics Data Commons (PDC) to find studies with primary site 'Lung' or 'Bronchus and lung' using separate queries and combining results.
@@ -630,7 +630,7 @@ resources:
           print(json.dumps(file_info, indent=2))
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Retrieve open standard data files for a specific study using the Proteomics
       Data Commons (PDC) API.
@@ -706,7 +706,7 @@ resources:
       except json.JSONDecodeError as e:
           print(f"Error decoding JSON response: {e}")
           print("Response content:", response.text)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: obtain quantitative data
     resource_id: c68f970e-4d39-4979-bcf2-43a823490773
@@ -744,7 +744,7 @@ resources:
           print(json.dumps(cases_info, indent=2))
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: Fetch all cases based on a study name
     resource_id: d119d4cc-347e-40bc-b3d3-f17f6e1ee16e
@@ -790,7 +790,7 @@ resources:
       except json.JSONDecodeError as e:
           print(f"Error decoding JSON response: {e}")
           print("Response content:", response.text)
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: obtain quantitative mass spec data on a specific protein (STAT5)
     resource_id: d2fde53a-0ba6-4c00-acaf-e27d4218480b
@@ -832,7 +832,7 @@ resources:
           print(f"Signed URL for the file: {signed_url}")
       else:
           print(f"Error: {response.status_code} - {response.text}")
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       Retrieve a signed URL for downloading a specific file (e.g. raw mass spec file) in a study using the Proteomics Data Commons (PDC) API.
@@ -868,10 +868,10 @@ resources:
       r')\n      pdc_cases_in_gdc.append(case)\n\nprint(f\"Found {len(pdc_cases_in_gdc)}\
       \ cases that have external references to GDC.\")\n\npdc_in_gdc_df = pd.DataFrame(json_normalize(pdc_cases_in_gdc))\n\
       pdc_in_gdc_df.head()"
-    integration: proteomics_data_commons
+    integration: bcaf77af-17e1-4811-9520-64d48e198988
     notes: null
     query: |-
       Get all clinical data (cases) from PDC and filter for those that have external references to GDC. Return the results as a pandas dataframe.
     resource_id: ed1fa5df-2d51-48ef-871b-b09abc5defc9
     resource_type: example
-slug: proteomics_data_commons
+slug: bcaf77af-17e1-4811-9520-64d48e198988

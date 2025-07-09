@@ -63,8 +63,8 @@ prompt: |
 resources:
   19e60e0b-82e2-4af2-b6f2-212287b43277:
     filepath: docs.md
-    integration: nhanes_dietary_data
+    integration: a37bcc79-b195-4ade-bd08-2d44d558facd
     name: web_docs
     resource_id: 19e60e0b-82e2-4af2-b6f2-212287b43277
     resource_type: file
-slug: nhanes_dietary_data
+slug: a37bcc79-b195-4ade-bd08-2d44d558facd

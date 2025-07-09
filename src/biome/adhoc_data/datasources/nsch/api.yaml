@@ -128,7 +128,7 @@ resources:
       \ # Assuming 1 = Yes\n        'Percentage': percentages.get(1, 0)\n    })\n\n\
       # Create results dataframe\nresults_df = pd.DataFrame(results)\nresults_df =\
       \ results_df.sort_values('Percentage', ascending=False)\n\nprint(results_df)\n"
-    integration: national_survey_of_children's_health_(nsch)
+    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
     notes: null
     query: Retrieve health conditions reported in the National Survey of Children's
       Health, including ADHD, autism, and asthma.
@@ -140,7 +140,7 @@ resources:
       \ is shifted!\ncodebook = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
       , index_col=False)  \n# Display the first few rows\nprint(codebook.head())\n\
       \n# and columns if needed\nprint(codebook.columns.tolist())\n"
-    integration: national_survey_of_children's_health_(nsch)
+    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
     notes: null
     query: Check the codebook columns head and available columns
     resource_id: 4cdaa736-1ca8-4158-8d3f-60de680da7f3
@@ -153,7 +153,7 @@ resources:
 
       existing_cols = df_2023.columns.tolist()
       print(existing_cols)
-    integration: national_survey_of_children's_health_(nsch)
+    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
     notes: null
     query: Check the existing columns in the dataset to see if the screentime variable
       and which geo columns are included.
@@ -278,10 +278,10 @@ resources:
       \ 'decreased'\nprint(f\"4. Texas Trends: The childhood asthma rate in Texas\
       \ {texas_trend} from {texas_data.iloc[0]['has_asthma']:.1%} in 2016 to {texas_data.iloc[-1]['has_asthma']:.1%}\
       \ in 2023.\")\n"
-    integration: national_survey_of_children's_health_(nsch)
+    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
     notes: null
     query: |-
       Analyze trends in childhood asthma and environmental factors over time (2016-2023) using NSCH data. Load multiple years of data, harmonize variables across years, and analyze the relationship between asthma prevalence and environmental factors like smoke exposure, housing insecurity, and food insecurity. Include state-level comparisons and create a composite environmental risk score. Do so specifically for Texas.
     resource_id: e2681d9f-b1b5-441b-9deb-bd203d9de6f4
     resource_type: example
-slug: national_survey_of_children's_health_(nsch)
+slug: f7052ea8-d8f1-4203-b368-60fc23f02846

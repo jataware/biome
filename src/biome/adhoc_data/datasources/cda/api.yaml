@@ -111,8 +111,8 @@ prompt: |
 resources:
   5361ce45-01fb-4c16-aa22-31d5397a0bd1:
     filepath: cda.yaml
-    integration: cancer_data_aggregator
+    integration: 16fba0e0-bf97-4d4d-8989-aad9ef934319
     name: raw_documentation
     resource_id: 5361ce45-01fb-4c16-aa22-31d5397a0bd1
     resource_type: file
-slug: cancer_data_aggregator
+slug: 16fba0e0-bf97-4d4d-8989-aad9ef934319
