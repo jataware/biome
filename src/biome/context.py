@@ -68,7 +68,7 @@ class BiomeContext(BeakerContext):
             curator_config=curator_config,
             contextualizer_config=gpt_41_config,
             logger=logger,
-            display_name="Biome Specialist Agents"
+            display_name="Specialist Agents"
         )
         test_integration = TestIntegrationProvider()
         super().__init__(
