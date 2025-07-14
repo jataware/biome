@@ -1,114 +1,12 @@
+datatype: dataset
 description: |
   You have access to knowledge from the National Survey of Children's Health (NSCH) data, available every year from
   2016 to 2023. This dataset API can help answer questions about children's health, healthcare access, family functioning,
   neighborhood characteristics, and social determinants of health for children aged 0-17 years in the United States.
-integration_type: dataset
+img_url: null
+last_updated: null
 name: National Survey of Children's Health (NSCH)
-prompt: |
-  You have access to file-based National Survey of Children's Health (NSCH) data
-  from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.
-
-  The NSCH files are located and named per year as follows:
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
-  - Codebook: ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
-
-  The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years
-  in the United States and the factors that may relate to their well-being. The survey includes data on physical and
-  mental health, access to quality health care, and the child's family, neighborhood, school, and social context.
-
-  The NSCH is also designed to assess the prevalence and impact of special health care needs among children in the US and
-  explores the extent to which children with special health care needs (CSHCN) have medical homes,
-  adequate health insurance, access to needed services, and adequate care coordination.
-  Other topics may include functional difficulties, transition services,
-  shared decision-making, and satisfaction with care.
-  Information is collected from parents or caregivers who know about the child's health.
-  It also examines the physical and emotional health of children ages 0-17 years of age.
-  These factors include access to - and quality of - health care, family interactions, parental health,
-  neighborhood characteristics, as well as school and after-school experiences (example: child screen time).
-
-  To read these SAS7BDAT files with pandas, use:
-  ```python
-  import pandas as pd
-  filename = "${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
-  df = pd.read_sas(filename, format="sas7bdat")
-  ```
-
-  The NSCH datasets include state identifiers (FIPSST) and other geographic information that can be used
-  for regional analysis. Check which geographic variables are available in each year's dataset before
-  attempting to use them.
-
-  When working with NSCH data, be aware that:
-  1. Variable names may change slightly between survey years
-  2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
-    You'll need to use the nsch codebook to decode these variable response codes-
-    The codebook is available at ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
-    You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
-    The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
-    In the codebook, the Question itself is under the "Question" column
-
-  You'll see mentions of "screener" and "topical" in the code book- some screener properties are present in the topical files,
-  which makes it confusing, unfortunately.
-
-  Codebook columns:
-  ['Variable',  # => variable code/name
-  'Source',     # => source, a question category from "Topical", "Screener", "Operational"
-  'Topic',
-  'Survey Years',  => available in which file years (eg if 2016, 2017), only check for that variable in the corresponding files, may not be available in files for other years
-  'Response Code', => 1=Yes||2=No, etc
-  'Description',   => description of the question/variable
-  'Question',      => Question text as a human would ask it
-  'Type',
-  'Universe',
-  'Availability',
-  'Imputation Strategy',
-  'User Notes']
-
-  Open it with pandas like so:
-  ```
-  codebook = pd.read_csv("${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
-  ```
-
-  The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
-  - Physical and mental health conditions (asthma, allergies, ADHD, etc.)
-  - Access to healthcare
-  - Family, neighborhood, and social context
-  - Housing and environmental factors
-  - Insurance coverage and care coordination
-
-  The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
-  The FIPS Code column is called "FIPSST" and is available in all years.
-
-  Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
-  try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
-  to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
-  Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
-  since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
-
-  # Key Variables for Health Conditions Analysis
-  ## Asthma and Allergies
-  - K2Q40A: Asthma diagnosis (1=Yes, 2=No)
-  - ALLERGIES: Allergies diagnosis (1=Yes, 2=No)
-  - ALLERGIES_CURR: Current allergies (1=Yes, 2=No)
-  ## Other Health Conditions
-  - K2Q31A: ADHD diagnosis
-  - K2Q32A: Depression diagnosis
-  - K2Q33A: Anxiety diagnosis
-  - DIABETES: Diabetes diagnosis
-  - AUTOIMMUNE: Autoimmune disease diagnosis
-  ## Housing and Environmental Factors
-  - K9Q41: Smoke inside home
-  - ACE1: Difficulty covering basics like food or housing
-  - FOODSIT: Food situation in household
-  - TENURE: Housing tenure (owned/rented)
-
-  Environmental factors are primarily self-reported by parents/caregivers.
+provider: adhoc:specialist_agents
 resources:
   118cc8be-f400-40e0-bac7-b10745d888fb:
     code: "import pandas as pd\nimport numpy as np\n\n# Read the codebook\ncodebook\
@@ -128,7 +26,7 @@ resources:
       \ # Assuming 1 = Yes\n        'Percentage': percentages.get(1, 0)\n    })\n\n\
       # Create results dataframe\nresults_df = pd.DataFrame(results)\nresults_df =\
       \ results_df.sort_values('Percentage', ascending=False)\n\nprint(results_df)\n"
-    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
+    integration: 92d74583-521c-45e1-b65f-535b1501996d
     notes: null
     query: Retrieve health conditions reported in the National Survey of Children's
       Health, including ADHD, autism, and asthma.
@@ -140,7 +38,7 @@ resources:
       \ is shifted!\ncodebook = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
       , index_col=False)  \n# Display the first few rows\nprint(codebook.head())\n\
       \n# and columns if needed\nprint(codebook.columns.tolist())\n"
-    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
+    integration: 92d74583-521c-45e1-b65f-535b1501996d
     notes: null
     query: Check the codebook columns head and available columns
     resource_id: 4cdaa736-1ca8-4158-8d3f-60de680da7f3
@@ -153,7 +51,7 @@ resources:
 
       existing_cols = df_2023.columns.tolist()
       print(existing_cols)
-    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
+    integration: 92d74583-521c-45e1-b65f-535b1501996d
     notes: null
     query: Check the existing columns in the dataset to see if the screentime variable
       and which geo columns are included.
@@ -278,10 +176,117 @@ resources:
       \ 'decreased'\nprint(f\"4. Texas Trends: The childhood asthma rate in Texas\
       \ {texas_trend} from {texas_data.iloc[0]['has_asthma']:.1%} in 2016 to {texas_data.iloc[-1]['has_asthma']:.1%}\
       \ in 2023.\")\n"
-    integration: f7052ea8-d8f1-4203-b368-60fc23f02846
+    integration: 92d74583-521c-45e1-b65f-535b1501996d
     notes: null
     query: |-
       Analyze trends in childhood asthma and environmental factors over time (2016-2023) using NSCH data. Load multiple years of data, harmonize variables across years, and analyze the relationship between asthma prevalence and environmental factors like smoke exposure, housing insecurity, and food insecurity. Include state-level comparisons and create a composite environmental risk score. Do so specifically for Texas.
     resource_id: e2681d9f-b1b5-441b-9deb-bd203d9de6f4
     resource_type: example
-slug: f7052ea8-d8f1-4203-b368-60fc23f02846
+slug: adhocspecificationintegration_national_survey_of_children_s_health__nsch_
+source: |
+  You have access to file-based National Survey of Children's Health (NSCH) data
+  from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.
+
+  The NSCH files are located and named per year as follows:
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
+  - ${DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
+  - Codebook: ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+
+  The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years
+  in the United States and the factors that may relate to their well-being. The survey includes data on physical and
+  mental health, access to quality health care, and the child's family, neighborhood, school, and social context.
+
+  The NSCH is also designed to assess the prevalence and impact of special health care needs among children in the US and
+  explores the extent to which children with special health care needs (CSHCN) have medical homes,
+  adequate health insurance, access to needed services, and adequate care coordination.
+  Other topics may include functional difficulties, transition services,
+  shared decision-making, and satisfaction with care.
+  Information is collected from parents or caregivers who know about the child's health.
+  It also examines the physical and emotional health of children ages 0-17 years of age.
+  These factors include access to - and quality of - health care, family interactions, parental health,
+  neighborhood characteristics, as well as school and after-school experiences (example: child screen time).
+
+  To read these SAS7BDAT files with pandas, use:
+  ```python
+  import pandas as pd
+  filename = "${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
+  df = pd.read_sas(filename, format="sas7bdat")
+  ```
+
+  The NSCH datasets include state identifiers (FIPSST) and other geographic information that can be used
+  for regional analysis. Check which geographic variables are available in each year's dataset before
+  attempting to use them.
+
+  When working with NSCH data, be aware that:
+  1. Variable names may change slightly between survey years
+  2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
+    You'll need to use the nsch codebook to decode these variable response codes-
+    The codebook is available at ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+    You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
+    The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
+    In the codebook, the Question itself is under the "Question" column
+
+  You'll see mentions of "screener" and "topical" in the code book- some screener properties are present in the topical files,
+  which makes it confusing, unfortunately.
+
+  Codebook columns:
+  ['Variable',  # => variable code/name
+  'Source',     # => source, a question category from "Topical", "Screener", "Operational"
+  'Topic',
+  'Survey Years',  => available in which file years (eg if 2016, 2017), only check for that variable in the corresponding files, may not be available in files for other years
+  'Response Code', => 1=Yes||2=No, etc
+  'Description',   => description of the question/variable
+  'Question',      => Question text as a human would ask it
+  'Type',
+  'Universe',
+  'Availability',
+  'Imputation Strategy',
+  'User Notes']
+
+  Open it with pandas like so:
+  ```
+  codebook = pd.read_csv("${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
+  ```
+
+  The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:
+  - Physical and mental health conditions (asthma, allergies, ADHD, etc.)
+  - Access to healthcare
+  - Family, neighborhood, and social context
+  - Housing and environmental factors
+  - Insurance coverage and care coordination
+
+  The geographic resolution for this dataset is at the state level- it only contains state FIPS codes, not county FIPS codes.
+  The FIPS Code column is called "FIPSST" and is available in all years.
+
+  Instead of assuming a specific column or variable exists, or if you wish to match with a specific column pattern,
+  try to compare substrings instead if an exact match is not found. For example, if you need data related to asthma, try
+  to check for the 'asth' substring in the column names. Another example: children age may be under SC_AGE_YEARS (not CHILDREN_AGE), as another example.
+  Use the codebook, filter out variables or meanings, don't just assume a random color code column of, say, K6Q65A, exists
+  since it may have existed in previous or new years- the surveys change and the codes aren't obvious.
+
+  # Key Variables for Health Conditions Analysis
+  ## Asthma and Allergies
+  - K2Q40A: Asthma diagnosis (1=Yes, 2=No)
+  - ALLERGIES: Allergies diagnosis (1=Yes, 2=No)
+  - ALLERGIES_CURR: Current allergies (1=Yes, 2=No)
+  ## Other Health Conditions
+  - K2Q31A: ADHD diagnosis
+  - K2Q32A: Depression diagnosis
+  - K2Q33A: Anxiety diagnosis
+  - DIABETES: Diabetes diagnosis
+  - AUTOIMMUNE: Autoimmune disease diagnosis
+  ## Housing and Environmental Factors
+  - K9Q41: Smoke inside home
+  - ACE1: Difficulty covering basics like food or housing
+  - FOODSIT: Food situation in household
+  - TENURE: Housing tenure (owned/rented)
+
+  Environmental factors are primarily self-reported by parents/caregivers.
+url: null
+uuid: 92d74583-521c-45e1-b65f-535b1501996d

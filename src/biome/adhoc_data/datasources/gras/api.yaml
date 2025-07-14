@@ -1,11 +1,44 @@
+datatype: dataset
 description: |
   The FDA Generally Recognized as Safe (GRAS) is a csv file (export) data with notices filed from the FDA GRAS database from years 1998 to 2024.
   You may use this tool to check for food additives introductions or changes.
   Use this tool to answer questions such as:
   In which year was Pea fiber food additive/preservative introduced into the US food supply?
-integration_type: dataset
+img_url: null
+last_updated: null
 name: FDA Generally Recognized as Safe (GRAS)
-prompt: "You have access to the FDA Generally Recognized as Safe (GRAS), which is\
+provider: adhoc:specialist_agents
+resources:
+  fd30b48e-e83b-41a2-a969-49ebc58da112:
+    code: |-
+      import pandas as pd
+
+      # Load GRAS notices data
+      df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
+
+      # print head
+      print(f"First 5 rows of GRAS notices:")
+      print(df.head())
+
+      # Search for notices containing Dioctyl sodium sulfosuccinate (case insensitive)
+      search_term = 'Dioctyl sodium sulfosuccinate'
+
+      print(f"Searching for notices containing {search_term}...")
+
+      matches = df[df['Substance'].str.contains(search_term, case=False, na=False)]
+
+      # Display relevant columns
+      if len(matches) > 0:
+          print(matches[['GRAS Notice (GRN) No.', 'Substance', 'Date of filing', "FDA's Letter"]])
+      else:
+          print(f"No GRAS notices found for {search_term}")
+    integration: d83c8b7e-e51d-499a-8927-79f109fe3f66
+    notes: null
+    query: Is there any FDA GRAS notice for Dioctyl sodium sulfosuccinate as an additive?
+    resource_id: fd30b48e-e83b-41a2-a969-49ebc58da112
+    resource_type: example
+slug: adhocspecificationintegration_fda_generally_recognized_as_safe__gras_
+source: "You have access to the FDA Generally Recognized as Safe (GRAS), which is\
   \ a csv file data with notices filed from the FDA GRAS database from years 1998\
   \ to 2024.\nYou may use this to check for food additives introductions, and correlate\
   \ with other data sources for analysis.\n\n\"GRAS\" is an acronym for the phrase\
@@ -33,33 +66,5 @@ prompt: "You have access to the FDA Generally Recognized as Safe (GRAS), which i
   \ notice was not approved.\nUse the stats of the \"FDA's Letter\" column to know\
   \ if a food additive is actually approved to be introduced into the US food supply\
   \ or not.\n"
-resources:
-  fd30b48e-e83b-41a2-a969-49ebc58da112:
-    code: |-
-      import pandas as pd
-
-      # Load GRAS notices data
-      df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
-
-      # print head
-      print(f"First 5 rows of GRAS notices:")
-      print(df.head())
-
-      # Search for notices containing Dioctyl sodium sulfosuccinate (case insensitive)
-      search_term = 'Dioctyl sodium sulfosuccinate'
-
-      print(f"Searching for notices containing {search_term}...")
-
-      matches = df[df['Substance'].str.contains(search_term, case=False, na=False)]
-
-      # Display relevant columns
-      if len(matches) > 0:
-          print(matches[['GRAS Notice (GRN) No.', 'Substance', 'Date of filing', "FDA's Letter"]])
-      else:
-          print(f"No GRAS notices found for {search_term}")
-    integration: 2a6f1149-8ff2-4c21-b528-cbf8b18bf30e
-    notes: null
-    query: Is there any FDA GRAS notice for Dioctyl sodium sulfosuccinate as an additive?
-    resource_id: fd30b48e-e83b-41a2-a969-49ebc58da112
-    resource_type: example
-slug: 2a6f1149-8ff2-4c21-b528-cbf8b18bf30e
+url: null
+uuid: d83c8b7e-e51d-499a-8927-79f109fe3f66

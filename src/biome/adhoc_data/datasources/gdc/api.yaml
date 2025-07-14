@@ -1,58 +1,17 @@
+datatype: api
 description: |
   The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational
   platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
   The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG),
   including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
-integration_type: api
+img_url: null
+last_updated: null
 name: Genomics Data Commons
-prompt: |
-  # GDC API Documentation
-
-  Below you will find the GDC API documentation. Note that
-  there are several endpoints available--some are discussed in the `Search and Retrieval`
-  section, and others are discussed in the `Data Analysis` section.
-
-  When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
-
-  ${raw_documentation}
-
-  # Additional Instructions:
-
-  You will be given python code to query the GDC API.
-
-  When querying GDC, change the `format` from "TSV" to "JSON"
-
-  If you download a file by file-id, the output will be TSV.
-  Save the file with the proper extension.
-
-  When filtering you should rely on the fields provided for a given endpoint in the following mapping.
-  This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
-
-  ```
-  ${mappings}
-  ```
-
-  These are the fields that are available for filtering and also the fields that can be returned. You can use
-  the facets to filter the fields that are available for a given endpoint.
-
-  A list of fields and their respective choices/facets are as follows:
-
-  ```
-  ${facets}
-  ```
-
-  Note this list of facets may be incomplete as it changes over time. Remember to consult it
-  when you are filtering. If you are unsure about options available for a given field, you should consider
-  just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
-  and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
-  the wildcard operator so it might not be as specific as they would like.
-
-  If a user asks you to filter based on the type of cancer, it is often productive to filter on
-  disease type, primary diagnosis, or primary site.
+provider: adhoc:specialist_agents
 resources:
   4b9845c7-d61b-440d-880e-b3d2b315a415:
     filepath: facets.txt
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     name: facets
     resource_id: 4b9845c7-d61b-440d-880e-b3d2b315a415
     resource_type: file
@@ -102,7 +61,7 @@ resources:
       print(f"There are {len(all_cases_df)} cases in GDC in total")
       # Display the DataFrame
       all_cases_df.head()
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     notes: null
     query: |-
       Get all cases from GDC with no filters. Fetch only the case ids and paginate through the results to fetch all available cases. Store the results as a dataframe
@@ -167,7 +126,7 @@ resources:
 
       ssms = pd.DataFrame(json_normalize(all_ssms))
       ssms.head()
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     notes: null
     query: Query the GDC for cases of myeloid leukemia with a JAK2 somatic mutation
       and return the results as a pandas dataframe.
@@ -175,7 +134,7 @@ resources:
     resource_type: example
   74735957-03a3-4706-aa40-f8bf200553cc:
     filepath: gdc.md
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     name: raw_documentation
     resource_id: 74735957-03a3-4706-aa40-f8bf200553cc
     resource_type: file
@@ -209,7 +168,7 @@ resources:
       \ in lung cancer cases for males under 45 who never smoked:\")\n    lung_mutation_df\
       \ = pd.DataFrame(json_normalize(mutations))\nelse:\n    print(f\"Error: {response.status_code}\
       \ - {response.text}\")\n  \nlung_mutation_df.head()"
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     notes: null
     query: |-
       Get simple somatic mutation occurrences (cases) from GDC where the primary site is bronchus and lung, the gender is male, the age at diagnosis is less than 45 years old, and the patient is a lifelong non-smoker. Return the results as a pandas dataframe.
@@ -284,7 +243,7 @@ resources:
       print(f"There are {len(cases_df)} cases in GDC for AML")
       # Display the DataFrame
       cases_df.head()
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     notes: null
     query: |-
       Get all cases where disease type is myeloid leukemia from GDC and return the results as a pandas dataframe. Paginate through the results to fetch all available cases
@@ -292,8 +251,54 @@ resources:
     resource_type: example
   a96216e1-8a2b-4fab-90e8-565d1db62fbe:
     filepath: gdc_mappings.json
-    integration: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
     name: mappings
     resource_id: a96216e1-8a2b-4fab-90e8-565d1db62fbe
     resource_type: file
-slug: 7f4da82e-9df8-4235-82cc-00dcbceea9e8
+slug: adhocspecificationintegration_genomics_data_commons
+source: |
+  # GDC API Documentation
+
+  Below you will find the GDC API documentation. Note that
+  there are several endpoints available--some are discussed in the `Search and Retrieval`
+  section, and others are discussed in the `Data Analysis` section.
+
+  When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
+
+  ${raw_documentation}
+
+  # Additional Instructions:
+
+  You will be given python code to query the GDC API.
+
+  When querying GDC, change the `format` from "TSV" to "JSON"
+
+  If you download a file by file-id, the output will be TSV.
+  Save the file with the proper extension.
+
+  When filtering you should rely on the fields provided for a given endpoint in the following mapping.
+  This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
+
+  ```
+  ${mappings}
+  ```
+
+  These are the fields that are available for filtering and also the fields that can be returned. You can use
+  the facets to filter the fields that are available for a given endpoint.
+
+  A list of fields and their respective choices/facets are as follows:
+
+  ```
+  ${facets}
+  ```
+
+  Note this list of facets may be incomplete as it changes over time. Remember to consult it
+  when you are filtering. If you are unsure about options available for a given field, you should consider
+  just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
+  and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
+  the wildcard operator so it might not be as specific as they would like.
+
+  If a user asks you to filter based on the type of cancer, it is often productive to filter on
+  disease type, primary diagnosis, or primary site.
+url: null
+uuid: 39771f58-c791-43e8-a19d-c2095c338567

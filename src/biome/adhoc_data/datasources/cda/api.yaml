@@ -1,3 +1,4 @@
+datatype: api
 description: "The Cancer Data Aggregator (CDA) is a service of the National Cancer\
   \ Institutes' (NCI) Cancer Research Data Commons. We pull metadata for thousands\
   \ of studies hosted at multiple data repositories across NCI, and make it available\
@@ -92,9 +93,19 @@ description: "The Cancer Data Aggregator (CDA) is a service of the National Canc
   \ DSS has provided values for: ethnicity, file_format, morphology, primary_diagnosis,\
   \ race, species, therapeutic_agent, source_material_type (cancer/normal), treatment_type,\
   \ and vital_status.\n"
-integration_type: api
+img_url: null
+last_updated: null
 name: Cancer Data Aggregator
-prompt: |
+provider: adhoc:specialist_agents
+resources:
+  5361ce45-01fb-4c16-aa22-31d5397a0bd1:
+    filepath: cda.yaml
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    name: raw_documentation
+    resource_id: 5361ce45-01fb-4c16-aa22-31d5397a0bd1
+    resource_type: file
+slug: adhocspecificationintegration_cancer_data_aggregator
+source: |
   ${raw_documentation}
 
   # Additional Instructions:
@@ -108,11 +119,5 @@ prompt: |
 
   You should make use of the python requests library to interact with the API.
   Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
-resources:
-  5361ce45-01fb-4c16-aa22-31d5397a0bd1:
-    filepath: cda.yaml
-    integration: 16fba0e0-bf97-4d4d-8989-aad9ef934319
-    name: raw_documentation
-    resource_id: 5361ce45-01fb-4c16-aa22-31d5397a0bd1
-    resource_type: file
-slug: 16fba0e0-bf97-4d4d-8989-aad9ef934319
+url: null
+uuid: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3

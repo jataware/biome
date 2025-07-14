@@ -1,9 +1,46 @@
+datatype: api
 description: |
   This openapi is the primary place to obtain data from the USDA's FoodData Central (nutrition) database.
   It is intended to assist in incorporating nutrient data into any analysis we need.
-integration_type: api
+img_url: null
+last_updated: null
 name: USDA FoodData Central API
-prompt: |
+provider: adhoc:specialist_agents
+resources:
+  0e410001-bac7-4cb7-9f32-b9064c64a4c1:
+    filepath: foodcentral_openapi.json
+    integration: d5e56bdc-4ac0-4ad6-aebe-77a9096081ff
+    name: raw_documentation
+    resource_id: 0e410001-bac7-4cb7-9f32-b9064c64a4c1
+    resource_type: file
+  4164944f-a6d4-452c-a290-3ab7bd2e9d9e:
+    code: |-
+      import requests
+      import os
+
+      # Define the API endpoint and parameters
+      url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+
+      api_key = os.environ.get("API_USDA_FDC")
+
+      params = {'query': 'raw acerola juice', 'api_key': api_key}
+
+      # Make the request to the USDA FoodData Central API
+      response = requests.get(url, params=params)
+
+      # Check if the request was successful
+      if response.status_code == 200:
+          data = response.json()
+          # Extract the first food item from the results
+          food_item = data['foods'][0]
+          food_item
+    integration: d5e56bdc-4ac0-4ad6-aebe-77a9096081ff
+    notes: null
+    query: Search for nutrients for raw acerola juice
+    resource_id: 4164944f-a6d4-452c-a290-3ab7bd2e9d9e
+    resource_type: example
+slug: adhocspecificationintegration_usda_fooddata_central_api
+source: |
   This API is the primary place to obtain data from the USDA's FoodData Central database.
 
   # OpenAPI Spec JSON:
@@ -71,37 +108,5 @@ prompt: |
 
   ### SR Legacy
   Historic data on food components including nutrients derived from analyses, calculations, and published literature
-resources:
-  0e410001-bac7-4cb7-9f32-b9064c64a4c1:
-    filepath: foodcentral_openapi.json
-    integration: a77cc48a-579a-4145-b1bd-80ad50d482ec
-    name: raw_documentation
-    resource_id: 0e410001-bac7-4cb7-9f32-b9064c64a4c1
-    resource_type: file
-  4164944f-a6d4-452c-a290-3ab7bd2e9d9e:
-    code: |-
-      import requests
-      import os
-
-      # Define the API endpoint and parameters
-      url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
-
-      api_key = os.environ.get("API_USDA_FDC")
-
-      params = {'query': 'raw acerola juice', 'api_key': api_key}
-
-      # Make the request to the USDA FoodData Central API
-      response = requests.get(url, params=params)
-
-      # Check if the request was successful
-      if response.status_code == 200:
-          data = response.json()
-          # Extract the first food item from the results
-          food_item = data['foods'][0]
-          food_item
-    integration: a77cc48a-579a-4145-b1bd-80ad50d482ec
-    notes: null
-    query: Search for nutrients for raw acerola juice
-    resource_id: 4164944f-a6d4-452c-a290-3ab7bd2e9d9e
-    resource_type: example
-slug: a77cc48a-579a-4145-b1bd-80ad50d482ec
+url: null
+uuid: d5e56bdc-4ac0-4ad6-aebe-77a9096081ff

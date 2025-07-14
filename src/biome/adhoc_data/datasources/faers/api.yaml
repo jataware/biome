@@ -1,25 +1,17 @@
+datatype: api
 description: |
   Drug Adverse Event Overview
   The openFDA drug adverse event API returns data that has been collected from
   the FDA Adverse Event Reporting System (FAERS), a database that contains
   information on adverse event and medication error reports submitted to FDA.
-integration_type: api
+img_url: null
+last_updated: null
 name: FDA drug adverse event FAERS API
-prompt: |
-  ${web_documentation}
-
-  # Additional Instructions:
-
-  You will need an API Key to use any openFDA APIs. It is available in the environment variable:
-  - API Key: os.environ.get("API_OPENFDA")
-  Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
-
-  # Searchable Fields Reference:
-  ${fields_reference}
+provider: adhoc:specialist_agents
 resources:
   66215565-2562-455a-aedc-80cdb06f6c1a:
     filepath: faers_fields_reference.csv
-    integration: da3ecb53-dfc6-467d-a70d-43ab287e8254
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
     name: fields_reference
     resource_id: 66215565-2562-455a-aedc-80cdb06f6c1a
     resource_type: file
@@ -56,7 +48,7 @@ resources:
       top_med = df.iloc[0]
       print(f"\nMedication with highest number of adverse events:")
       print(f"{top_med['term']}: {top_med['count']} reports")
-    integration: da3ecb53-dfc6-467d-a70d-43ab287e8254
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
     notes: null
     query: Can you tell me which medication have the highest adverse effects reported
       from all of the available?
@@ -64,8 +56,21 @@ resources:
     resource_type: example
   f9afc1aa-371f-4318-9fb1-cd5030db39fe:
     filepath: faers_web.md
-    integration: da3ecb53-dfc6-467d-a70d-43ab287e8254
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
     name: web_documentation
     resource_id: f9afc1aa-371f-4318-9fb1-cd5030db39fe
     resource_type: file
-slug: da3ecb53-dfc6-467d-a70d-43ab287e8254
+slug: adhocspecificationintegration_fda_drug_adverse_event_faers_api
+source: |
+  ${web_documentation}
+
+  # Additional Instructions:
+
+  You will need an API Key to use any openFDA APIs. It is available in the environment variable:
+  - API Key: os.environ.get("API_OPENFDA")
+  Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
+
+  # Searchable Fields Reference:
+  ${fields_reference}
+url: null
+uuid: baf45232-38d9-401b-b1e5-8c5621917442

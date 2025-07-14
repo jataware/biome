@@ -1,11 +1,340 @@
+datatype: dataset
 description: |
   You have access to knowledge to all the Census Housing survey data, every 2 years from the
   year 1999 to 2023. You can use this API for answering questions on american housing, specifically their
   housing conditions (mold, water problems, etc), which can be used to correlate to health conditions,
   or other purposes.
-integration_type: dataset
+img_url: null
+last_updated: null
 name: Census American Housing Survey (AHS)
-prompt: |
+provider: adhoc:specialist_agents
+resources:
+  3a5b7607-80c5-44ae-a240-a9a388f78afd:
+    filepath: docs.md
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    name: more_instructions
+    resource_id: 3a5b7607-80c5-44ae-a240-a9a388f78afd
+    resource_type: file
+  5025a179-2b90-46ab-ab7e-deef3aa8b129:
+    code: |
+      import pandas as pd
+
+      def get_code_name(code):
+      # Read codebook to get metro area meanings
+      # ensure to set index_col=False, since the codebook has no index column
+      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
+
+      # Find the row for OMB13CBSA
+      ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
+
+      response_codes_text = ombs_row['Response Codes'].iloc[0]  # Get the string value from the Series
+      code_pairs = response_codes_text.split("||")
+
+      code_pairs_dict = {k.strip(): v.strip() for k, v in (code_pair.split(":") for code_pair in code_pairs)}
+
+      return code_pairs_dict.get(code)
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      Use the codebook to get the meaning of the codes for the OMB13CBSA variable, matching one code to the meaning by creating a dictionary of code:meaning pairs and returning the statistical metro area name for a given code
+    resource_id: 5025a179-2b90-46ab-ab7e-deef3aa8b129
+    resource_type: example
+  569a9b73-d61a-4b9a-8ee1-9c85c1637e1a:
+    code: "import pandas as pd\nimport numpy as np\n\n# Load the AHS dataset (2023)\
+      \ with asthma-related variables\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
+      \n# Define variables of interest\nasthma_vars = ['HHLDASTHMA']  # Household\
+      \ member ever diagnosed with asthma\nhousing_vars = [\n    'MOLDBASEM', 'MOLDBATH',\
+      \ 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM', 'MOLDOTHER',  # Mold\n    'LEAKI',\
+      \ 'LEAKO'                                                               # Water\
+      \ leaks\n]\nchild_vars = ['NUMOLDKIDS', 'NUMYNGKIDS']\ngeo_vars = ['OMB13CBSA']\n\
+      \n# Combine all variables of interest\ncols_of_interest = asthma_vars + housing_vars\
+      \ + child_vars + geo_vars\n\n# Load a sample of the data\nsample_size = 10000\
+      \  # Adjust based on memory constraints\nahs_sample = pd.read_csv(file_path,\
+      \ usecols=cols_of_interest, nrows=sample_size)\n\n# Clean the data by removing\
+      \ quotes from string values\nfor col in ahs_sample.columns:\n    if ahs_sample[col].dtype\
+      \ == 'object':\n        ahs_sample[col] = ahs_sample[col].str.replace(\"'\"\
+      , \"\")\n\n# Create a binary variable for presence of children\nahs_sample['has_children']\
+      \ = ((ahs_sample['NUMOLDKIDS'] > 0) | (ahs_sample['NUMYNGKIDS'] > 0)).astype(int)\n\
+      \n# Convert asthma variable to binary (Yes/No)\nahs_sample['asthma'] = ahs_sample['HHLDASTHMA'].apply(\n\
+      \    lambda x: 1 if x == '1' else (0 if x == '2' else np.nan)\n)\n\n# Convert\
+      \ housing condition variables to binary (Yes/No)\nfor col in housing_vars:\n\
+      \    ahs_sample[col + '_binary'] = ahs_sample[col].apply(\n        lambda x:\
+      \ 1 if x == '1' else (0 if x == '2' else np.nan)\n    )\n\n# Analyze relationship\
+      \ between housing conditions and asthma\nprint(\"Relationship between asthma\
+      \ and housing conditions:\")\nfor col in housing_vars:\n    binary_col = col\
+      \ + '_binary'\n    valid_data = ahs_sample.dropna(subset=['asthma', binary_col])\n\
+      \    \n    if len(valid_data) > 0:\n        with_asthma = valid_data[valid_data['asthma']\
+      \ == 1][binary_col].mean() * 100\n        without_asthma = valid_data[valid_data['asthma']\
+      \ == 0][binary_col].mean() * 100\n        \n        if not np.isnan(with_asthma)\
+      \ and not np.isnan(without_asthma):\n            print(f\"\\n{col}:\")\n   \
+      \         print(f\"  - Homes with asthma: {with_asthma:.1f}%\")\n          \
+      \  print(f\"  - Homes without asthma: {without_asthma:.1f}%\")\n           \
+      \ print(f\"  - Difference: {with_asthma - without_asthma:.1f} percentage points\"\
+      )\n\n# Calculate the prevalence of asthma in households with and without children\n\
+      asthma_by_children = ahs_sample.dropna(subset=['asthma', 'has_children']).groupby('has_children')['asthma'].mean()\
+      \ * 100\nprint(\"\\nAsthma Prevalence by Presence of Children:\")\nprint(f\"\
+      Households with children: {asthma_by_children.get(1, 'N/A'):.1f}%\")\nprint(f\"\
+      Households without children: {asthma_by_children.get(0, 'N/A'):.1f}%\")\nprint(f\"\
+      Difference: {asthma_by_children.get(1, 0) - asthma_by_children.get(0, 0):.1f}\
+      \ percentage points\")\n"
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      Analyzing the relationship between housing conditions, asthma, and the presence of children using the 2023 American Housing Survey data. This code calculates and compares the prevalence of various housing conditions (mold, water leaks) in homes with and without reported asthma cases, and also examines the prevalence of asthma in households with and without children.
+    resource_id: 569a9b73-d61a-4b9a-8ee1-9c85c1637e1a
+    resource_type: example
+  80f97f58-e289-4afe-9959-37212def3ce6:
+    code: "import pandas as pd\nimport numpy as np\n\n# Load the 2007 AHS dataset\
+      \ with Houston data\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2007.csv'\n\
+      \n# Define Houston SMSA code\nhouston_smsa = '3360'\n\n# Define housing condition\
+      \ variables based on our exploration\nhousing_vars = [\n    'LEAK', 'ILEAK',\
+      \                                        # Water leaks\n    'RATS', 'MICE' \
+      \                                         # Pests\n]\n\n# Define household size\
+      \ variable\nhousehold_var = 'PER'\n\n# Combine all columns of interest\ncols_of_interest\
+      \ = ['SMSA'] + housing_vars + [household_var]\n\n# Load the Houston data\nhouston_data\
+      \ = pd.read_csv(file_path, usecols=cols_of_interest)\n\n# Clean the data by\
+      \ removing quotes if needed\nfor col in houston_data.columns:\n    if houston_data[col].dtype\
+      \ == 'object':\n        houston_data[col] = houston_data[col].str.replace(\"\
+      '\", \"\")\n\n# Filter for Houston\nhouston_data = houston_data[houston_data['SMSA']\
+      \ == houston_smsa]\n\nprint(f\"Loaded {len(houston_data)} Houston records from\
+      \ 2007 survey\")\n\n# Create a binary variable for households likely to have\
+      \ children (3+ persons)\n# This is a proxy since we don't have direct child\
+      \ indicators\nhouston_data['likely_has_children'] = houston_data[household_var].apply(\n\
+      \    lambda x: 1 if x not in ['-6', '-9'] and int(x) >= 3 else 0\n)\n\nprint(f\"\
+      \\nHouseholds likely to have children (3+ persons): {houston_data['likely_has_children'].sum()}\
+      \ ({houston_data['likely_has_children'].mean()*100:.1f}% of Houston sample)\"\
+      )\n\n# Convert housing condition variables to binary (Yes/No)\nfor col in housing_vars:\n\
+      \    houston_data[col + '_binary'] = houston_data[col].apply(\n        lambda\
+      \ x: 1 if x == '1' else (0 if x == '2' else np.nan)\n    )\n\n# Analyze housing\
+      \ conditions\nprint(\"\\nPrevalence of housing conditions in Houston (2007):\"\
+      )\nfor col in housing_vars:\n    binary_col = col + '_binary'\n    valid_data\
+      \ = houston_data.dropna(subset=[binary_col])\n    if len(valid_data) > 0:\n\
+      \        yes_pct = valid_data[binary_col].mean() * 100\n        print(f\"{col}:\
+      \ {yes_pct:.1f}% reported 'Yes' (based on {len(valid_data)} valid responses)\"\
+      )\n\n# Analyze relationship between household size and housing conditions\n\
+      print(\"\\nRelationship between household size and housing conditions in Houston\
+      \ (2007):\")\nfor col in housing_vars:\n    binary_col = col + '_binary'\n \
+      \   valid_data = houston_data.dropna(subset=[binary_col, 'likely_has_children'])\n\
+      \    \n    if len(valid_data) > 0:\n        with_children = valid_data[valid_data['likely_has_children']\
+      \ == 1][binary_col].mean() * 100\n        without_children = valid_data[valid_data['likely_has_children']\
+      \ == 0][binary_col].mean() * 100\n        \n        if not np.isnan(with_children)\
+      \ and not np.isnan(without_children):\n            print(f\"\\n{col}:\")\n \
+      \           print(f\"  - Households with 3+ persons: {with_children:.1f}%\"\
+      )\n            print(f\"  - Households with 1-2 persons: {without_children:.1f}%\"\
+      )\n            print(f\"  - Difference: {with_children - without_children:.1f}\
+      \ percentage points\")\n"
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      Analyzing housing conditions in Houston, TX using the 2007 American Housing Survey data. This code identifies Houston records using the SMSA code, analyzes the prevalence of water leaks and pest problems, and compares these conditions between larger households (3+ persons, likely to have children) and smaller households (1-2 persons).
+    resource_id: 80f97f58-e289-4afe-9959-37212def3ce6
+    resource_type: example
+  ad42a806-0e81-4e63-97cf-2f7aad6a1a35:
+    code: |
+      import pandas as pd
+
+      # Read codebook to get metro area meanings
+      # ensure to set index_col=False, since the codebook has no index column
+      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
+
+      # Find the row for OMB13CBSA
+      ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
+
+      # Return the Response Codes column
+      ombs_row['Response Codes']
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: What is the meaning of the codes for the OMB13CBSA variable?
+    resource_id: ad42a806-0e81-4e63-97cf-2f7aad6a1a35
+    resource_type: example
+  badf3293-de67-4c9c-944e-6dbbb8b609d6:
+    code: "import pandas as pd\nimport numpy as np\n\n# Load the codebook to find\
+      \ information about variables\ncodebook_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv'\n\
+      codebook = pd.read_csv(codebook_path, dtype=str, index_col=False)\n\n# Define\
+      \ search terms related to asthma and respiratory health\nasthma_terms = [\n\
+      \    'asthma', 'allerg', 'respir', 'breath', 'lung', 'air', 'ventil', \n   \
+      \ 'humid', 'mold', 'mildew', 'dust', 'smoke', 'pest', 'roach', 'rodent', \n\
+      \    'insect', 'heat', 'cool', 'toxic', 'pollut', 'chemical', 'lead'\n]\n\n\
+      # Search for variables related to these terms\nasthma_vars = []\nfor term in\
+      \ asthma_terms:\n    term_vars = codebook[\n        (codebook['Description'].str.contains(term,\
+      \ case=False, na=False)) |\n        (codebook['Question Text'].str.contains(term,\
+      \ case=False, na=False)) |\n        (codebook['Variable'].str.contains(term,\
+      \ case=False, na=False))\n    ]\n    if not term_vars.empty:\n        for _,\
+      \ row in term_vars.iterrows():\n            var_info = {\n                'Variable':\
+      \ row['Variable'],\n                'Description': row['Description'] if 'Description'\
+      \ in row and not pd.isna(row['Description']) else 'No description',\n      \
+      \          'Question_Text': row['Question Text'] if 'Question Text' in row and\
+      \ not pd.isna(row['Question Text']) else 'No question text',\n             \
+      \   'Survey_Years': row['Survey Years'] if 'Survey Years' in row and not pd.isna(row['Survey\
+      \ Years']) else 'Unknown',\n                'Response_Codes': row['Response\
+      \ Codes'] if 'Response Codes' in row and not pd.isna(row['Response Codes'])\
+      \ else 'No codes'\n            }\n            # Check if this variable is already\
+      \ in our list\n            if not any(v['Variable'] == var_info['Variable']\
+      \ for v in asthma_vars):\n                asthma_vars.append(var_info)\n\n#\
+      \ Create a DataFrame for easier viewing\nasthma_vars_df = pd.DataFrame(asthma_vars)\n\
+      \n# Check if we have any variables specifically about asthma\nasthma_specific\
+      \ = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('asthma',\
+      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('asthma',\
+      \ case=False, na=False)\n]\n\nprint(f\"Found {len(asthma_vars_df)} variables\
+      \ potentially related to asthma and respiratory health\")\nprint(f\"Found {len(asthma_specific)}\
+      \ variables specifically mentioning asthma\")\n\n# Display the asthma-specific\
+      \ variables if any\nif not asthma_specific.empty:\n    print(\"\\nVariables\
+      \ specifically mentioning asthma:\")\n    for _, row in asthma_specific.head(5).iterrows():\
+      \  # Show first 5 for brevity\n        print(f\"\\nVariable: {row['Variable']}\"\
+      )\n        print(f\"Description: {row['Description']}\")\n        print(f\"\
+      Question Text: {row['Question_Text']}\")\n        print(f\"Survey Years: {row['Survey_Years']}\"\
+      )\n\n# Check for variables related to indoor air quality\nair_quality = asthma_vars_df[\n\
+      \    asthma_vars_df['Description'].str.contains('air quality|ventil|humid',\
+      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('air\
+      \ quality|ventil|humid', case=False, na=False)\n]\n\nprint(f\"\\nFound {len(air_quality)}\
+      \ variables related to indoor air quality\")\n\n# Check for variables related\
+      \ to pests\npest_vars = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('pest|roach|rodent|insect|rat|mice|mouse',\
+      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('pest|roach|rodent|insect|rat|mice|mouse',\
+      \ case=False, na=False)\n]\n\nprint(f\"\\nFound {len(pest_vars)} variables related\
+      \ to pests\")\n\n# Check for variables related to heating and cooling systems\n\
+      hvac_vars = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('heat|cool|air\
+      \ condition|hvac', case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('heat|cool|air\
+      \ condition|hvac', case=False, na=False)\n]\n\nprint(f\"\\nFound {len(hvac_vars)}\
+      \ variables related to heating and cooling systems\")"
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      Exploring the American Housing Survey codebook to identify variables related to asthma, respiratory health, and housing conditions. This code searches the codebook for terms related to asthma, air quality, pests, and HVAC systems, and provides a summary of available variables that could be relevant for analyzing the relationship between housing conditions and respiratory health.
+    resource_id: badf3293-de67-4c9c-944e-6dbbb8b609d6
+    resource_type: example
+  e72b358a-6a63-4d79-9ee5-e81b5d99af2b:
+    code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\
+      import seaborn as sns\nfrom matplotlib.ticker import PercentFormatter\n\n# Load\
+      \ a sample of the AHS dataset (2023)\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
+      \n# Define columns of interest based on our exploration\ngeo_cols = ['OMB13CBSA']\n\
+      mold_cols = ['MOLDBASEM', 'MOLDBATH', 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM',\
+      \ 'MOLDOTHER']\nleak_cols = ['LEAKI', 'LEAKO']\nchild_cols = ['NUMOLDKIDS',\
+      \ 'NUMYNGKIDS']\n\n# Combine all columns of interest\ncols_of_interest = geo_cols\
+      \ + mold_cols + leak_cols + child_cols\n\n# Load a sample of the data with only\
+      \ the columns we need\nsample_size = 10000  # Adjust based on memory constraints\n\
+      ahs_sample = pd.read_csv(file_path, usecols=cols_of_interest, nrows=sample_size)\n\
+      \n# Clean the data by removing quotes from string values\nfor col in ahs_sample.columns:\n\
+      \    if ahs_sample[col].dtype == 'object':\n        ahs_sample[col] = ahs_sample[col].str.replace(\"\
+      '\", \"\")\n\n# Create a binary variable for presence of children\nahs_sample['has_children']\
+      \ = ((ahs_sample['NUMOLDKIDS'] > 0) | (ahs_sample['NUMYNGKIDS'] > 0)).astype(int)\n\
+      \n# Convert categorical variables to numeric for analysis\nfor col in mold_cols\
+      \ + leak_cols:\n    # Convert '1' (Yes) to 1, '2' (No) to 0, and others to NaN\n\
+      \    ahs_sample[col] = ahs_sample[col].apply(\n        lambda x: 1 if x == '1'\
+      \ else (0 if x == '2' else np.nan)\n    )\n\n# Create a more descriptive mapping\
+      \ for the variables\nvariable_descriptions = {\n    'MOLDBASEM': 'Mold in Basement',\n\
+      \    'MOLDBATH': 'Mold in Bathroom',\n    'MOLDBEDRM': 'Mold in Bedroom',\n\
+      \    'MOLDKITCH': 'Mold in Kitchen',\n    'MOLDLROOM': 'Mold in Living Room',\n\
+      \    'MOLDOTHER': 'Mold in Other Areas',\n    'LEAKI': 'Inside Water Leaks',\n\
+      \    'LEAKO': 'Outside Water Leaks'\n}\n\n# Prepare data for visualization\n\
+      conditions = []\nwith_children_vals = []\nwithout_children_vals = []\nsample_sizes\
+      \ = []\n\nfor condition in mold_cols + leak_cols:\n    valid_data = ahs_sample.dropna(subset=[condition,\
+      \ 'has_children'])\n    \n    if len(valid_data) > 0:\n        with_children_val\
+      \ = valid_data[valid_data['has_children'] == 1][condition].mean() * 100\n  \
+      \      without_children_val = valid_data[valid_data['has_children'] == 0][condition].mean()\
+      \ * 100\n        \n        if not np.isnan(with_children_val) and not np.isnan(without_children_val):\n\
+      \            conditions.append(variable_descriptions.get(condition, condition))\n\
+      \            with_children_vals.append(with_children_val)\n            without_children_vals.append(without_children_val)\n\
+      \            sample_sizes.append(len(valid_data))\n\n# Create a DataFrame for\
+      \ plotting\nplot_data = pd.DataFrame({\n    'Condition': conditions,\n    'With\
+      \ Children (%)': with_children_vals,\n    'Without Children (%)': without_children_vals,\n\
+      \    'Sample Size': sample_sizes\n})\n\n# Sort by prevalence in homes with children\n\
+      plot_data = plot_data.sort_values(by='With Children (%)', ascending=False)\n\
+      \n# Create a horizontal bar chart\nplt.figure(figsize=(12, 10))\nsns.set_style(\"\
+      whitegrid\")\n\n# Create the horizontal bar chart\nax = sns.barplot(\n    x='With\
+      \ Children (%)', \n    y='Condition', \n    data=plot_data, \n    color='#3498db',\n\
+      \    label='Homes with Children'\n)\n\nsns.barplot(\n    x='Without Children\
+      \ (%)', \n    y='Condition', \n    data=plot_data, \n    color='#e74c3c',\n\
+      \    label='Homes without Children'\n)\n\n# Add percentage labels to the bars\n\
+      for i, (with_val, without_val) in enumerate(zip(plot_data['With Children (%)'],\
+      \ plot_data['Without Children (%)'])):\n    if with_val > without_val:\n   \
+      \     ax.text(with_val + 0.5, i, f'{with_val:.1f}%', va='center')\n        ax.text(without_val\
+      \ - 2.5, i, f'{without_val:.1f}%', va='center', color='white')\n    else:\n\
+      \        ax.text(with_val - 2.5, i, f'{with_val:.1f}%', va='center', color='white')\n\
+      \        ax.text(without_val + 0.5, i, f'{without_val:.1f}%', va='center')\n\
+      \n# Add sample size information to the y-axis labels\nlabels = [f\"{condition}\\\
+      n(n={size:,})\" for condition, size in zip(plot_data['Condition'], plot_data['Sample\
+      \ Size'])]\nax.set_yticklabels(labels)\n\n# Format the x-axis as percentages\n\
+      ax.xaxis.set_major_formatter(PercentFormatter())\n\n# Add a title and labels\n\
+      plt.title('Housing Conditions by Presence of Children\\nAmerican Housing Survey\
+      \ (2023)', fontsize=16, pad=20)\nplt.xlabel('Prevalence (%)', fontsize=12)\n\
+      plt.ylabel('Housing Condition', fontsize=12)\nplt.legend(title='Household Type',\
+      \ loc='lower right')\n\n# Add a note about the data\nplt.figtext(0.5, 0.01,\
+      \ \n            \"Note: Data from 2023 American Housing Survey. Sample sizes\
+      \ vary by condition.\\n\"\n            \"Percentages represent the proportion\
+      \ of households reporting each condition.\", \n            ha='center', fontsize=10,\
+      \ style='italic')\n\nplt.tight_layout(rect=[0, 0.03, 1, 0.97])\nplt.show()\n\
+      \n# Create a summary table of the results\nsummary_table = plot_data.copy()\n\
+      summary_table['Difference (percentage points)'] = summary_table['With Children\
+      \ (%)'] - summary_table['Without Children (%)']\nsummary_table = summary_table.sort_values(by='Difference\
+      \ (percentage points)', ascending=False)\n\nprint(\"Summary of Housing Conditions\
+      \ by Presence of Children:\")\nprint(summary_table[['Condition', 'With Children\
+      \ (%)', 'Without Children (%)', 'Difference (percentage points)', 'Sample Size']].to_string(index=False,\
+      \ float_format=lambda x: f\"{x:.1f}\"))\n"
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      Analyzing and visualizing the relationship between housing conditions (mold, water leaks) and the presence of children in households using the 2023 American Housing Survey data. This code creates a horizontal bar chart comparing the prevalence of various housing conditions in homes with and without children, and generates a summary table of the differences.
+    resource_id: e72b358a-6a63-4d79-9ee5-e81b5d99af2b
+    resource_type: example
+  ea7d2aec-2d76-4b95-ae85-177db08ff019:
+    code: "import pandas as pd\n\ndata_dir =  \"{{DATASET_FILES_BASE_PATH}}/census-ahs\"\
+      \n\ndef get_florida_mold_data():\n    # Store results\n    florida_mold_data\
+      \ = []\n    \n    # Years to analyze\n    years = range(2001, 2012, 2)\n   \
+      \ \n    for year in years:\n        try:\n            # Read data file for year\n\
+      \            file_path = os.path.join(data_dir, f'survey_{year}.csv')\n    \
+      \        \n            df = pd.read_csv(file_path, index_col=False)\n      \
+      \      \n            # Find mold-related columns\n            mold_cols = [col\
+      \ for col in df.columns if 'mold' in col.lower()]\n            \n          \
+      \  # Find geographic identifier columns\n            geo_cols = [col for col\
+      \ in df.columns if col in ['SMSA', 'METRO3', 'OMB13CBSA', 'DIVISION']]\n   \
+      \         \n            if len(mold_cols) == 0:\n                continue\n\
+      \                \n            if len(geo_cols) == 0:\n                continue\n\
+      \            \n            # Select relevant columns\n            cols_to_use\
+      \ = geo_cols + mold_cols\n            df_subset = df[cols_to_use]\n        \
+      \    \n            # Read codebook to identify Florida metro areas\n       \
+      \     codebook_path = os.path.join(data_dir, 'census_ahs_codebook.csv')\n  \
+      \          \n            # ensure to pass index_col=False, else sometimes data\
+      \ shifts\n            codebook = pd.read_csv(codebook_path, index_col=False)\n\
+      \            \n            # Get Florida metro codes for the geographic identifier\
+      \ being used\n            geo_col = geo_cols[len(geo_cols) - 1]\n          \
+      \  \n            geo_codes = codebook[codebook['Variable'] == geo_col]\n   \
+      \         if geo_codes.empty:\n                continue\n                \n\
+      \            florida_codes = [code.split(':')[0].strip() \n                \
+      \            for code in geo_codes['Response Codes'].iloc[0].split('||')\n \
+      \                           if 'FL' in code.upper()]\n            \n       \
+      \     # Filter for Florida metros using substring matching\n            df_fl\
+      \ = df_subset[df_subset[geo_col].apply(lambda x: any(code in str(x) for code\
+      \ in florida_codes))]\n            \n            # Add year column\n       \
+      \     df_fl.loc[:, 'YEAR'] = year\n            \n            florida_mold_data.append(df_fl)\n\
+      \            \n        except Exception as e:\n            import traceback\n\
+      \            print(f\"Traceback: {traceback.format_exc()}\")\n            continue\n\
+      \    \n    # Combine all years\n    if florida_mold_data:\n        combined_data\
+      \ = pd.concat(florida_mold_data, ignore_index=True)\n        \n        # Replace\
+      \ values in the 'MOLD' columns with number to string mappings\n        # where\
+      \ MOLD columns are columns that contain MOLD in the column name (substring match)\n\
+      \        mold_cols = [col for col in combined_data.columns if 'mold' in col.lower()]\n\
+      \        \n        for col in mold_cols:\n            def convert_value(x):\n\
+      \                # Remove any extra quotes that might be present\n         \
+      \       # many times codes are wrapped in quotes..\n                x_str =\
+      \ str(x).strip().strip(\"'\\\"\")\n                if x_str in ['Y', '1', '1.0']:\n\
+      \                    return \"Yes\"\n                elif x_str in ['N', '2',\
+      \ '2.0']:\n                    return \"No\"\n                elif x_str in\
+      \ ['-6', '-6.0', 'N/A', 'NA', '']:\n                    return \"N/A\"\n   \
+      \             else:\n                    return x\n            \n          \
+      \  # Remember that this example converts to \"Yes\" / \"No\" / \"N/A\"\n   \
+      \         # if you plot it, you'll want to \"count\" these text ocurrences\n\
+      \            # also remember that values soemtimes are wrapped in quotes, such\
+      \ as \"'6'\",\n            # that is why we strip them or sometimes compare\
+      \ to substrings\n            combined_data[col] = combined_data[col].apply(convert_value)\n\
+      \        \n        return combined_data\n    else:\n        return pd.DataFrame()\n"
+    integration: beb85142-d32f-42df-a438-b84829ddd4fd
+    notes: null
+    query: |-
+      I wonder if there are any trends for metro areas in Florida, US in which mold presence increased between years 2001 and 2011? Can you get the data for matching mold presence?
+    resource_id: ea7d2aec-2d76-4b95-ae85-177db08ff019
+    resource_type: example
+slug: adhocspecificationintegration_census_american_housing_survey__ahs_
+source: |
   You have access to a file-based Census American Housing Survey
   (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `${DATASET_FILES_BASE_PATH}/census-ahs` directory.
   The housing files are located and named per year as follows:
@@ -113,329 +442,5 @@ prompt: |
   codebook = pd.read_csv('${DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
   ```
   If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!
-resources:
-  3a5b7607-80c5-44ae-a240-a9a388f78afd:
-    filepath: docs.md
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    name: more_instructions
-    resource_id: 3a5b7607-80c5-44ae-a240-a9a388f78afd
-    resource_type: file
-  5025a179-2b90-46ab-ab7e-deef3aa8b129:
-    code: |
-      import pandas as pd
-
-      def get_code_name(code):
-      # Read codebook to get metro area meanings
-      # ensure to set index_col=False, since the codebook has no index column
-      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
-
-      # Find the row for OMB13CBSA
-      ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
-
-      response_codes_text = ombs_row['Response Codes'].iloc[0]  # Get the string value from the Series
-      code_pairs = response_codes_text.split("||")
-
-      code_pairs_dict = {k.strip(): v.strip() for k, v in (code_pair.split(":") for code_pair in code_pairs)}
-
-      return code_pairs_dict.get(code)
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      Use the codebook to get the meaning of the codes for the OMB13CBSA variable, matching one code to the meaning by creating a dictionary of code:meaning pairs and returning the statistical metro area name for a given code
-    resource_id: 5025a179-2b90-46ab-ab7e-deef3aa8b129
-    resource_type: example
-  569a9b73-d61a-4b9a-8ee1-9c85c1637e1a:
-    code: "import pandas as pd\nimport numpy as np\n\n# Load the AHS dataset (2023)\
-      \ with asthma-related variables\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
-      \n# Define variables of interest\nasthma_vars = ['HHLDASTHMA']  # Household\
-      \ member ever diagnosed with asthma\nhousing_vars = [\n    'MOLDBASEM', 'MOLDBATH',\
-      \ 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM', 'MOLDOTHER',  # Mold\n    'LEAKI',\
-      \ 'LEAKO'                                                               # Water\
-      \ leaks\n]\nchild_vars = ['NUMOLDKIDS', 'NUMYNGKIDS']\ngeo_vars = ['OMB13CBSA']\n\
-      \n# Combine all variables of interest\ncols_of_interest = asthma_vars + housing_vars\
-      \ + child_vars + geo_vars\n\n# Load a sample of the data\nsample_size = 10000\
-      \  # Adjust based on memory constraints\nahs_sample = pd.read_csv(file_path,\
-      \ usecols=cols_of_interest, nrows=sample_size)\n\n# Clean the data by removing\
-      \ quotes from string values\nfor col in ahs_sample.columns:\n    if ahs_sample[col].dtype\
-      \ == 'object':\n        ahs_sample[col] = ahs_sample[col].str.replace(\"'\"\
-      , \"\")\n\n# Create a binary variable for presence of children\nahs_sample['has_children']\
-      \ = ((ahs_sample['NUMOLDKIDS'] > 0) | (ahs_sample['NUMYNGKIDS'] > 0)).astype(int)\n\
-      \n# Convert asthma variable to binary (Yes/No)\nahs_sample['asthma'] = ahs_sample['HHLDASTHMA'].apply(\n\
-      \    lambda x: 1 if x == '1' else (0 if x == '2' else np.nan)\n)\n\n# Convert\
-      \ housing condition variables to binary (Yes/No)\nfor col in housing_vars:\n\
-      \    ahs_sample[col + '_binary'] = ahs_sample[col].apply(\n        lambda x:\
-      \ 1 if x == '1' else (0 if x == '2' else np.nan)\n    )\n\n# Analyze relationship\
-      \ between housing conditions and asthma\nprint(\"Relationship between asthma\
-      \ and housing conditions:\")\nfor col in housing_vars:\n    binary_col = col\
-      \ + '_binary'\n    valid_data = ahs_sample.dropna(subset=['asthma', binary_col])\n\
-      \    \n    if len(valid_data) > 0:\n        with_asthma = valid_data[valid_data['asthma']\
-      \ == 1][binary_col].mean() * 100\n        without_asthma = valid_data[valid_data['asthma']\
-      \ == 0][binary_col].mean() * 100\n        \n        if not np.isnan(with_asthma)\
-      \ and not np.isnan(without_asthma):\n            print(f\"\\n{col}:\")\n   \
-      \         print(f\"  - Homes with asthma: {with_asthma:.1f}%\")\n          \
-      \  print(f\"  - Homes without asthma: {without_asthma:.1f}%\")\n           \
-      \ print(f\"  - Difference: {with_asthma - without_asthma:.1f} percentage points\"\
-      )\n\n# Calculate the prevalence of asthma in households with and without children\n\
-      asthma_by_children = ahs_sample.dropna(subset=['asthma', 'has_children']).groupby('has_children')['asthma'].mean()\
-      \ * 100\nprint(\"\\nAsthma Prevalence by Presence of Children:\")\nprint(f\"\
-      Households with children: {asthma_by_children.get(1, 'N/A'):.1f}%\")\nprint(f\"\
-      Households without children: {asthma_by_children.get(0, 'N/A'):.1f}%\")\nprint(f\"\
-      Difference: {asthma_by_children.get(1, 0) - asthma_by_children.get(0, 0):.1f}\
-      \ percentage points\")\n"
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      Analyzing the relationship between housing conditions, asthma, and the presence of children using the 2023 American Housing Survey data. This code calculates and compares the prevalence of various housing conditions (mold, water leaks) in homes with and without reported asthma cases, and also examines the prevalence of asthma in households with and without children.
-    resource_id: 569a9b73-d61a-4b9a-8ee1-9c85c1637e1a
-    resource_type: example
-  80f97f58-e289-4afe-9959-37212def3ce6:
-    code: "import pandas as pd\nimport numpy as np\n\n# Load the 2007 AHS dataset\
-      \ with Houston data\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2007.csv'\n\
-      \n# Define Houston SMSA code\nhouston_smsa = '3360'\n\n# Define housing condition\
-      \ variables based on our exploration\nhousing_vars = [\n    'LEAK', 'ILEAK',\
-      \                                        # Water leaks\n    'RATS', 'MICE' \
-      \                                         # Pests\n]\n\n# Define household size\
-      \ variable\nhousehold_var = 'PER'\n\n# Combine all columns of interest\ncols_of_interest\
-      \ = ['SMSA'] + housing_vars + [household_var]\n\n# Load the Houston data\nhouston_data\
-      \ = pd.read_csv(file_path, usecols=cols_of_interest)\n\n# Clean the data by\
-      \ removing quotes if needed\nfor col in houston_data.columns:\n    if houston_data[col].dtype\
-      \ == 'object':\n        houston_data[col] = houston_data[col].str.replace(\"\
-      '\", \"\")\n\n# Filter for Houston\nhouston_data = houston_data[houston_data['SMSA']\
-      \ == houston_smsa]\n\nprint(f\"Loaded {len(houston_data)} Houston records from\
-      \ 2007 survey\")\n\n# Create a binary variable for households likely to have\
-      \ children (3+ persons)\n# This is a proxy since we don't have direct child\
-      \ indicators\nhouston_data['likely_has_children'] = houston_data[household_var].apply(\n\
-      \    lambda x: 1 if x not in ['-6', '-9'] and int(x) >= 3 else 0\n)\n\nprint(f\"\
-      \\nHouseholds likely to have children (3+ persons): {houston_data['likely_has_children'].sum()}\
-      \ ({houston_data['likely_has_children'].mean()*100:.1f}% of Houston sample)\"\
-      )\n\n# Convert housing condition variables to binary (Yes/No)\nfor col in housing_vars:\n\
-      \    houston_data[col + '_binary'] = houston_data[col].apply(\n        lambda\
-      \ x: 1 if x == '1' else (0 if x == '2' else np.nan)\n    )\n\n# Analyze housing\
-      \ conditions\nprint(\"\\nPrevalence of housing conditions in Houston (2007):\"\
-      )\nfor col in housing_vars:\n    binary_col = col + '_binary'\n    valid_data\
-      \ = houston_data.dropna(subset=[binary_col])\n    if len(valid_data) > 0:\n\
-      \        yes_pct = valid_data[binary_col].mean() * 100\n        print(f\"{col}:\
-      \ {yes_pct:.1f}% reported 'Yes' (based on {len(valid_data)} valid responses)\"\
-      )\n\n# Analyze relationship between household size and housing conditions\n\
-      print(\"\\nRelationship between household size and housing conditions in Houston\
-      \ (2007):\")\nfor col in housing_vars:\n    binary_col = col + '_binary'\n \
-      \   valid_data = houston_data.dropna(subset=[binary_col, 'likely_has_children'])\n\
-      \    \n    if len(valid_data) > 0:\n        with_children = valid_data[valid_data['likely_has_children']\
-      \ == 1][binary_col].mean() * 100\n        without_children = valid_data[valid_data['likely_has_children']\
-      \ == 0][binary_col].mean() * 100\n        \n        if not np.isnan(with_children)\
-      \ and not np.isnan(without_children):\n            print(f\"\\n{col}:\")\n \
-      \           print(f\"  - Households with 3+ persons: {with_children:.1f}%\"\
-      )\n            print(f\"  - Households with 1-2 persons: {without_children:.1f}%\"\
-      )\n            print(f\"  - Difference: {with_children - without_children:.1f}\
-      \ percentage points\")\n"
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      Analyzing housing conditions in Houston, TX using the 2007 American Housing Survey data. This code identifies Houston records using the SMSA code, analyzes the prevalence of water leaks and pest problems, and compares these conditions between larger households (3+ persons, likely to have children) and smaller households (1-2 persons).
-    resource_id: 80f97f58-e289-4afe-9959-37212def3ce6
-    resource_type: example
-  ad42a806-0e81-4e63-97cf-2f7aad6a1a35:
-    code: |
-      import pandas as pd
-
-      # Read codebook to get metro area meanings
-      # ensure to set index_col=False, since the codebook has no index column
-      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
-
-      # Find the row for OMB13CBSA
-      ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
-
-      # Return the Response Codes column
-      ombs_row['Response Codes']
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: What is the meaning of the codes for the OMB13CBSA variable?
-    resource_id: ad42a806-0e81-4e63-97cf-2f7aad6a1a35
-    resource_type: example
-  badf3293-de67-4c9c-944e-6dbbb8b609d6:
-    code: "import pandas as pd\nimport numpy as np\n\n# Load the codebook to find\
-      \ information about variables\ncodebook_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv'\n\
-      codebook = pd.read_csv(codebook_path, dtype=str, index_col=False)\n\n# Define\
-      \ search terms related to asthma and respiratory health\nasthma_terms = [\n\
-      \    'asthma', 'allerg', 'respir', 'breath', 'lung', 'air', 'ventil', \n   \
-      \ 'humid', 'mold', 'mildew', 'dust', 'smoke', 'pest', 'roach', 'rodent', \n\
-      \    'insect', 'heat', 'cool', 'toxic', 'pollut', 'chemical', 'lead'\n]\n\n\
-      # Search for variables related to these terms\nasthma_vars = []\nfor term in\
-      \ asthma_terms:\n    term_vars = codebook[\n        (codebook['Description'].str.contains(term,\
-      \ case=False, na=False)) |\n        (codebook['Question Text'].str.contains(term,\
-      \ case=False, na=False)) |\n        (codebook['Variable'].str.contains(term,\
-      \ case=False, na=False))\n    ]\n    if not term_vars.empty:\n        for _,\
-      \ row in term_vars.iterrows():\n            var_info = {\n                'Variable':\
-      \ row['Variable'],\n                'Description': row['Description'] if 'Description'\
-      \ in row and not pd.isna(row['Description']) else 'No description',\n      \
-      \          'Question_Text': row['Question Text'] if 'Question Text' in row and\
-      \ not pd.isna(row['Question Text']) else 'No question text',\n             \
-      \   'Survey_Years': row['Survey Years'] if 'Survey Years' in row and not pd.isna(row['Survey\
-      \ Years']) else 'Unknown',\n                'Response_Codes': row['Response\
-      \ Codes'] if 'Response Codes' in row and not pd.isna(row['Response Codes'])\
-      \ else 'No codes'\n            }\n            # Check if this variable is already\
-      \ in our list\n            if not any(v['Variable'] == var_info['Variable']\
-      \ for v in asthma_vars):\n                asthma_vars.append(var_info)\n\n#\
-      \ Create a DataFrame for easier viewing\nasthma_vars_df = pd.DataFrame(asthma_vars)\n\
-      \n# Check if we have any variables specifically about asthma\nasthma_specific\
-      \ = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('asthma',\
-      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('asthma',\
-      \ case=False, na=False)\n]\n\nprint(f\"Found {len(asthma_vars_df)} variables\
-      \ potentially related to asthma and respiratory health\")\nprint(f\"Found {len(asthma_specific)}\
-      \ variables specifically mentioning asthma\")\n\n# Display the asthma-specific\
-      \ variables if any\nif not asthma_specific.empty:\n    print(\"\\nVariables\
-      \ specifically mentioning asthma:\")\n    for _, row in asthma_specific.head(5).iterrows():\
-      \  # Show first 5 for brevity\n        print(f\"\\nVariable: {row['Variable']}\"\
-      )\n        print(f\"Description: {row['Description']}\")\n        print(f\"\
-      Question Text: {row['Question_Text']}\")\n        print(f\"Survey Years: {row['Survey_Years']}\"\
-      )\n\n# Check for variables related to indoor air quality\nair_quality = asthma_vars_df[\n\
-      \    asthma_vars_df['Description'].str.contains('air quality|ventil|humid',\
-      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('air\
-      \ quality|ventil|humid', case=False, na=False)\n]\n\nprint(f\"\\nFound {len(air_quality)}\
-      \ variables related to indoor air quality\")\n\n# Check for variables related\
-      \ to pests\npest_vars = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('pest|roach|rodent|insect|rat|mice|mouse',\
-      \ case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('pest|roach|rodent|insect|rat|mice|mouse',\
-      \ case=False, na=False)\n]\n\nprint(f\"\\nFound {len(pest_vars)} variables related\
-      \ to pests\")\n\n# Check for variables related to heating and cooling systems\n\
-      hvac_vars = asthma_vars_df[\n    asthma_vars_df['Description'].str.contains('heat|cool|air\
-      \ condition|hvac', case=False, na=False) |\n    asthma_vars_df['Question_Text'].str.contains('heat|cool|air\
-      \ condition|hvac', case=False, na=False)\n]\n\nprint(f\"\\nFound {len(hvac_vars)}\
-      \ variables related to heating and cooling systems\")"
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      Exploring the American Housing Survey codebook to identify variables related to asthma, respiratory health, and housing conditions. This code searches the codebook for terms related to asthma, air quality, pests, and HVAC systems, and provides a summary of available variables that could be relevant for analyzing the relationship between housing conditions and respiratory health.
-    resource_id: badf3293-de67-4c9c-944e-6dbbb8b609d6
-    resource_type: example
-  e72b358a-6a63-4d79-9ee5-e81b5d99af2b:
-    code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\
-      import seaborn as sns\nfrom matplotlib.ticker import PercentFormatter\n\n# Load\
-      \ a sample of the AHS dataset (2023)\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
-      \n# Define columns of interest based on our exploration\ngeo_cols = ['OMB13CBSA']\n\
-      mold_cols = ['MOLDBASEM', 'MOLDBATH', 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM',\
-      \ 'MOLDOTHER']\nleak_cols = ['LEAKI', 'LEAKO']\nchild_cols = ['NUMOLDKIDS',\
-      \ 'NUMYNGKIDS']\n\n# Combine all columns of interest\ncols_of_interest = geo_cols\
-      \ + mold_cols + leak_cols + child_cols\n\n# Load a sample of the data with only\
-      \ the columns we need\nsample_size = 10000  # Adjust based on memory constraints\n\
-      ahs_sample = pd.read_csv(file_path, usecols=cols_of_interest, nrows=sample_size)\n\
-      \n# Clean the data by removing quotes from string values\nfor col in ahs_sample.columns:\n\
-      \    if ahs_sample[col].dtype == 'object':\n        ahs_sample[col] = ahs_sample[col].str.replace(\"\
-      '\", \"\")\n\n# Create a binary variable for presence of children\nahs_sample['has_children']\
-      \ = ((ahs_sample['NUMOLDKIDS'] > 0) | (ahs_sample['NUMYNGKIDS'] > 0)).astype(int)\n\
-      \n# Convert categorical variables to numeric for analysis\nfor col in mold_cols\
-      \ + leak_cols:\n    # Convert '1' (Yes) to 1, '2' (No) to 0, and others to NaN\n\
-      \    ahs_sample[col] = ahs_sample[col].apply(\n        lambda x: 1 if x == '1'\
-      \ else (0 if x == '2' else np.nan)\n    )\n\n# Create a more descriptive mapping\
-      \ for the variables\nvariable_descriptions = {\n    'MOLDBASEM': 'Mold in Basement',\n\
-      \    'MOLDBATH': 'Mold in Bathroom',\n    'MOLDBEDRM': 'Mold in Bedroom',\n\
-      \    'MOLDKITCH': 'Mold in Kitchen',\n    'MOLDLROOM': 'Mold in Living Room',\n\
-      \    'MOLDOTHER': 'Mold in Other Areas',\n    'LEAKI': 'Inside Water Leaks',\n\
-      \    'LEAKO': 'Outside Water Leaks'\n}\n\n# Prepare data for visualization\n\
-      conditions = []\nwith_children_vals = []\nwithout_children_vals = []\nsample_sizes\
-      \ = []\n\nfor condition in mold_cols + leak_cols:\n    valid_data = ahs_sample.dropna(subset=[condition,\
-      \ 'has_children'])\n    \n    if len(valid_data) > 0:\n        with_children_val\
-      \ = valid_data[valid_data['has_children'] == 1][condition].mean() * 100\n  \
-      \      without_children_val = valid_data[valid_data['has_children'] == 0][condition].mean()\
-      \ * 100\n        \n        if not np.isnan(with_children_val) and not np.isnan(without_children_val):\n\
-      \            conditions.append(variable_descriptions.get(condition, condition))\n\
-      \            with_children_vals.append(with_children_val)\n            without_children_vals.append(without_children_val)\n\
-      \            sample_sizes.append(len(valid_data))\n\n# Create a DataFrame for\
-      \ plotting\nplot_data = pd.DataFrame({\n    'Condition': conditions,\n    'With\
-      \ Children (%)': with_children_vals,\n    'Without Children (%)': without_children_vals,\n\
-      \    'Sample Size': sample_sizes\n})\n\n# Sort by prevalence in homes with children\n\
-      plot_data = plot_data.sort_values(by='With Children (%)', ascending=False)\n\
-      \n# Create a horizontal bar chart\nplt.figure(figsize=(12, 10))\nsns.set_style(\"\
-      whitegrid\")\n\n# Create the horizontal bar chart\nax = sns.barplot(\n    x='With\
-      \ Children (%)', \n    y='Condition', \n    data=plot_data, \n    color='#3498db',\n\
-      \    label='Homes with Children'\n)\n\nsns.barplot(\n    x='Without Children\
-      \ (%)', \n    y='Condition', \n    data=plot_data, \n    color='#e74c3c',\n\
-      \    label='Homes without Children'\n)\n\n# Add percentage labels to the bars\n\
-      for i, (with_val, without_val) in enumerate(zip(plot_data['With Children (%)'],\
-      \ plot_data['Without Children (%)'])):\n    if with_val > without_val:\n   \
-      \     ax.text(with_val + 0.5, i, f'{with_val:.1f}%', va='center')\n        ax.text(without_val\
-      \ - 2.5, i, f'{without_val:.1f}%', va='center', color='white')\n    else:\n\
-      \        ax.text(with_val - 2.5, i, f'{with_val:.1f}%', va='center', color='white')\n\
-      \        ax.text(without_val + 0.5, i, f'{without_val:.1f}%', va='center')\n\
-      \n# Add sample size information to the y-axis labels\nlabels = [f\"{condition}\\\
-      n(n={size:,})\" for condition, size in zip(plot_data['Condition'], plot_data['Sample\
-      \ Size'])]\nax.set_yticklabels(labels)\n\n# Format the x-axis as percentages\n\
-      ax.xaxis.set_major_formatter(PercentFormatter())\n\n# Add a title and labels\n\
-      plt.title('Housing Conditions by Presence of Children\\nAmerican Housing Survey\
-      \ (2023)', fontsize=16, pad=20)\nplt.xlabel('Prevalence (%)', fontsize=12)\n\
-      plt.ylabel('Housing Condition', fontsize=12)\nplt.legend(title='Household Type',\
-      \ loc='lower right')\n\n# Add a note about the data\nplt.figtext(0.5, 0.01,\
-      \ \n            \"Note: Data from 2023 American Housing Survey. Sample sizes\
-      \ vary by condition.\\n\"\n            \"Percentages represent the proportion\
-      \ of households reporting each condition.\", \n            ha='center', fontsize=10,\
-      \ style='italic')\n\nplt.tight_layout(rect=[0, 0.03, 1, 0.97])\nplt.show()\n\
-      \n# Create a summary table of the results\nsummary_table = plot_data.copy()\n\
-      summary_table['Difference (percentage points)'] = summary_table['With Children\
-      \ (%)'] - summary_table['Without Children (%)']\nsummary_table = summary_table.sort_values(by='Difference\
-      \ (percentage points)', ascending=False)\n\nprint(\"Summary of Housing Conditions\
-      \ by Presence of Children:\")\nprint(summary_table[['Condition', 'With Children\
-      \ (%)', 'Without Children (%)', 'Difference (percentage points)', 'Sample Size']].to_string(index=False,\
-      \ float_format=lambda x: f\"{x:.1f}\"))\n"
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      Analyzing and visualizing the relationship between housing conditions (mold, water leaks) and the presence of children in households using the 2023 American Housing Survey data. This code creates a horizontal bar chart comparing the prevalence of various housing conditions in homes with and without children, and generates a summary table of the differences.
-    resource_id: e72b358a-6a63-4d79-9ee5-e81b5d99af2b
-    resource_type: example
-  ea7d2aec-2d76-4b95-ae85-177db08ff019:
-    code: "import pandas as pd\n\ndata_dir =  \"{{DATASET_FILES_BASE_PATH}}/census-ahs\"\
-      \n\ndef get_florida_mold_data():\n    # Store results\n    florida_mold_data\
-      \ = []\n    \n    # Years to analyze\n    years = range(2001, 2012, 2)\n   \
-      \ \n    for year in years:\n        try:\n            # Read data file for year\n\
-      \            file_path = os.path.join(data_dir, f'survey_{year}.csv')\n    \
-      \        \n            df = pd.read_csv(file_path, index_col=False)\n      \
-      \      \n            # Find mold-related columns\n            mold_cols = [col\
-      \ for col in df.columns if 'mold' in col.lower()]\n            \n          \
-      \  # Find geographic identifier columns\n            geo_cols = [col for col\
-      \ in df.columns if col in ['SMSA', 'METRO3', 'OMB13CBSA', 'DIVISION']]\n   \
-      \         \n            if len(mold_cols) == 0:\n                continue\n\
-      \                \n            if len(geo_cols) == 0:\n                continue\n\
-      \            \n            # Select relevant columns\n            cols_to_use\
-      \ = geo_cols + mold_cols\n            df_subset = df[cols_to_use]\n        \
-      \    \n            # Read codebook to identify Florida metro areas\n       \
-      \     codebook_path = os.path.join(data_dir, 'census_ahs_codebook.csv')\n  \
-      \          \n            # ensure to pass index_col=False, else sometimes data\
-      \ shifts\n            codebook = pd.read_csv(codebook_path, index_col=False)\n\
-      \            \n            # Get Florida metro codes for the geographic identifier\
-      \ being used\n            geo_col = geo_cols[len(geo_cols) - 1]\n          \
-      \  \n            geo_codes = codebook[codebook['Variable'] == geo_col]\n   \
-      \         if geo_codes.empty:\n                continue\n                \n\
-      \            florida_codes = [code.split(':')[0].strip() \n                \
-      \            for code in geo_codes['Response Codes'].iloc[0].split('||')\n \
-      \                           if 'FL' in code.upper()]\n            \n       \
-      \     # Filter for Florida metros using substring matching\n            df_fl\
-      \ = df_subset[df_subset[geo_col].apply(lambda x: any(code in str(x) for code\
-      \ in florida_codes))]\n            \n            # Add year column\n       \
-      \     df_fl.loc[:, 'YEAR'] = year\n            \n            florida_mold_data.append(df_fl)\n\
-      \            \n        except Exception as e:\n            import traceback\n\
-      \            print(f\"Traceback: {traceback.format_exc()}\")\n            continue\n\
-      \    \n    # Combine all years\n    if florida_mold_data:\n        combined_data\
-      \ = pd.concat(florida_mold_data, ignore_index=True)\n        \n        # Replace\
-      \ values in the 'MOLD' columns with number to string mappings\n        # where\
-      \ MOLD columns are columns that contain MOLD in the column name (substring match)\n\
-      \        mold_cols = [col for col in combined_data.columns if 'mold' in col.lower()]\n\
-      \        \n        for col in mold_cols:\n            def convert_value(x):\n\
-      \                # Remove any extra quotes that might be present\n         \
-      \       # many times codes are wrapped in quotes..\n                x_str =\
-      \ str(x).strip().strip(\"'\\\"\")\n                if x_str in ['Y', '1', '1.0']:\n\
-      \                    return \"Yes\"\n                elif x_str in ['N', '2',\
-      \ '2.0']:\n                    return \"No\"\n                elif x_str in\
-      \ ['-6', '-6.0', 'N/A', 'NA', '']:\n                    return \"N/A\"\n   \
-      \             else:\n                    return x\n            \n          \
-      \  # Remember that this example converts to \"Yes\" / \"No\" / \"N/A\"\n   \
-      \         # if you plot it, you'll want to \"count\" these text ocurrences\n\
-      \            # also remember that values soemtimes are wrapped in quotes, such\
-      \ as \"'6'\",\n            # that is why we strip them or sometimes compare\
-      \ to substrings\n            combined_data[col] = combined_data[col].apply(convert_value)\n\
-      \        \n        return combined_data\n    else:\n        return pd.DataFrame()\n"
-    integration: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
-    notes: null
-    query: |-
-      I wonder if there are any trends for metro areas in Florida, US in which mold presence increased between years 2001 and 2011? Can you get the data for matching mold presence?
-    resource_id: ea7d2aec-2d76-4b95-ae85-177db08ff019
-    resource_type: example
-slug: d73e06c5-e41b-4f7c-8a11-0fe1b4e6dfeb
+url: null
+uuid: beb85142-d32f-42df-a438-b84829ddd4fd

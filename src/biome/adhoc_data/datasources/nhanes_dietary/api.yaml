@@ -1,9 +1,20 @@
+datatype: dataset
 description: |
   API for accessing and analyzing NHANES dietary data, including food consumption patterns
   and processed food analysis across different survey cycles from 1999 to 2023, with demographic information.
-integration_type: dataset
+img_url: null
+last_updated: null
 name: NHANES Dietary Data
-prompt: |
+provider: adhoc:specialist_agents
+resources:
+  19e60e0b-82e2-4af2-b6f2-212287b43277:
+    filepath: docs.md
+    integration: 3b474df1-115a-4194-8395-509669f57be5
+    name: web_docs
+    resource_id: 19e60e0b-82e2-4af2-b6f2-212287b43277
+    resource_type: file
+slug: adhocspecificationintegration_nhanes_dietary_data
+source: |
   You have access to NHANES Dietary Data files from multiple survey cycles, including dietary intake and demographic information:
 
   # 1999-2000 NHANES Cycle
@@ -60,11 +71,5 @@ prompt: |
   dietary patterns by demographic characteristics such as age, gender, race/ethnicity, and socioeconomic status.
 
   ${web_docs}
-resources:
-  19e60e0b-82e2-4af2-b6f2-212287b43277:
-    filepath: docs.md
-    integration: a37bcc79-b195-4ade-bd08-2d44d558facd
-    name: web_docs
-    resource_id: 19e60e0b-82e2-4af2-b6f2-212287b43277
-    resource_type: file
-slug: a37bcc79-b195-4ade-bd08-2d44d558facd
+url: null
+uuid: 3b474df1-115a-4194-8395-509669f57be5

@@ -1,3 +1,4 @@
+datatype: api
 description: |
   INDRA CoGEx (Context Graph Extension) is an automatically assembled biomedical knowledge graph which integrates causal mechanisms from INDRA
   with non-causal contextual relations including properties, ontology, and data.
@@ -10,30 +11,10 @@ description: |
   data scientists, and healthcare professionals to explore and analyze rich biomedical data efficiently, supporting
   advancements in drug discovery, clinical decision-making, and research. With its robust architecture, the INDRA CoGEx
   Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
-integration_type: api
+img_url: null
+last_updated: null
 name: INDRA Context Graph Extension (CoGEx)
-prompt: |
-  ${raw_documentation}
-
-  # Additional Instructions:
-
-  You should make use of the python requests library to interact with the API.
-  Note that the base URL of the API is 'https://discovery.indra.bio/api/'
-
-  For example, here is an example request:
-
-  curl -X 'POST' \
-    'https://discovery.indra.bio/api/get_go_terms_for_gene' \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-      "gene": [
-        "HGNC",
-        "9896"
-      ],
-      "include_indirect": true
-    }'
-  ```
+provider: adhoc:specialist_agents
 resources:
   b7c4d45f-287b-47e2-aa9b-5ee5bae07353:
     code: |
@@ -75,7 +56,7 @@ resources:
 
       print("\nShared Pathways Response:")
       print(shared_pathways_response.json())
-    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
     notes: null
     query: |-
       Perform a gene pathway analysis for JAK2 to find associated pathways and shared pathways with other genes like STAT3, JAK3, and EGFR.
@@ -136,7 +117,7 @@ resources:
               for data in evidence_data.values():
                   all_pmids.update(data['pmids'])
               print(f"Total unique PMIDs: {len(all_pmids)}")
-    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
     notes: null
     query: Retrieve literature evidence related to AML using MeSH term queries, including
       child terms, and summarize the findings.
@@ -218,7 +199,7 @@ resources:
           print(f"Is kinase: {results['is_kinase']}")
           print(f"Is phosphatase: {results['is_phosphatase']}")
           print(f"Is transcription factor: {results['is_transcription_factor']}")
-    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
     notes: null
     query: |-
       This example demonstrates how to analyze the JAK2 gene using the INDRA CoGEx API to retrieve GO terms, pathway associations, and check if it is a kinase, phosphatase, or transcription factor.
@@ -226,8 +207,32 @@ resources:
     resource_type: example
   f49c8aa7-727e-444e-a3a2-314a5f0d6631:
     filepath: indra.json
-    integration: c3befe4c-07ef-445b-8bfc-32debea298bf
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
     name: raw_documentation
     resource_id: f49c8aa7-727e-444e-a3a2-314a5f0d6631
     resource_type: file
-slug: c3befe4c-07ef-445b-8bfc-32debea298bf
+slug: adhocspecificationintegration_indra_context_graph_extension__cogex_
+source: |
+  ${raw_documentation}
+
+  # Additional Instructions:
+
+  You should make use of the python requests library to interact with the API.
+  Note that the base URL of the API is 'https://discovery.indra.bio/api/'
+
+  For example, here is an example request:
+
+  curl -X 'POST' \
+    'https://discovery.indra.bio/api/get_go_terms_for_gene' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "gene": [
+        "HGNC",
+        "9896"
+      ],
+      "include_indirect": true
+    }'
+  ```
+url: null
+uuid: 417f20f1-4f56-4f6c-b11a-c40d84258557

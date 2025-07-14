@@ -1,9 +1,14 @@
+datatype: dataset
 description: |
   The USGS Pesticide National Synthesis Project contains annual agricultural pesticide use data by county,
   on a 2-5 year interval, from 2000 to 2019.
-integration_type: dataset
+img_url: null
+last_updated: null
 name: USGS Pesticide National Synthesis Project
-prompt: |
+provider: adhoc:specialist_agents
+resources: {}
+slug: adhocspecificationintegration_usgs_pesticide_national_synthesis_project
+source: |
   You have access to a file-based USGS Pesticide National Synthesis Project data, for annual agricultural pesticide use by county and pesticide compound.
   We've added files on a 2-5 year interval, from 2000 to 2019, under the `${DATASET_FILES_BASE_PATH}/usgs_pesticide` directory.
   The exact files are located in:
@@ -41,5 +46,5 @@ prompt: |
 
   You may use the python `us` library to convert FIPS codes to state and county names,
   and use pandas to read the tab-delimited text files.
-resources: {}
-slug: 19c8907f-cd98-4a3e-8d72-fe466b20087e
+url: null
+uuid: bc539ebb-0ce9-4f66-9522-e7f516e2c022

@@ -1,10 +1,43 @@
+datatype: api
 description: |
   The NF Synapse API is a RESTful API that allows you to interact with the Neurofibromatosis Data Portal.
   It additionally contains a Python client that can be used to interact with the API (on the package `synapseclient`, already installed in the environment).
   The code drafter has access both to the openapi spec, the web docs, and the python client documentation.
-integration_type: api
+img_url: null
+last_updated: null
 name: NF Synapse
-prompt: |
+provider: adhoc:specialist_agents
+resources:
+  45324841-c013-4942-8b5f-db85856d7e48:
+    filepath: web_docs.md
+    integration: 68a50df6-fa9c-4ef4-af32-0c2502c28b7b
+    name: web_docs
+    resource_id: 45324841-c013-4942-8b5f-db85856d7e48
+    resource_type: file
+  8d29393b-bc38-441f-aee1-88b60d1322b6:
+    filepath: SynapseOpenApiSpec.json
+    integration: 68a50df6-fa9c-4ef4-af32-0c2502c28b7b
+    name: raw_documentation
+    resource_id: 8d29393b-bc38-441f-aee1-88b60d1322b6
+    resource_type: file
+  920140d9-ce8a-4cef-ad8c-418146706556:
+    code: "```\nimport synapseclient, os\nfrom pathlib import Path\n\ndownloads_dir\
+      \ = Path(__file__).parent.parent / \"downloads\" / \"synapse\"\n\nsyn = synapseclient.Synapse(cache_root_dir=downloads_dir)\
+      \ \nsyn.login(authToken=os.environ.get(\"API_SYNAPSE\"))  # pass in the authToken\
+      \ on python client login!\n```"
+    integration: 68a50df6-fa9c-4ef4-af32-0c2502c28b7b
+    notes: null
+    query: Login to the Synapse API using the python client
+    resource_id: 920140d9-ce8a-4cef-ad8c-418146706556
+    resource_type: example
+  b9801ff2-37bb-44d0-9f47-9ce3d18804b5:
+    filepath: nf_programmatic_webdocs.md
+    integration: 68a50df6-fa9c-4ef4-af32-0c2502c28b7b
+    name: python_client
+    resource_id: b9801ff2-37bb-44d0-9f47-9ce3d18804b5
+    resource_type: file
+slug: adhocspecificationintegration_nf_synapse
+source: |
   # OpenAPI Spec JSON:
   ${raw_documentation}
 
@@ -77,33 +110,5 @@ prompt: |
   syn = synapseclient.Synapse(cache_root_dir=downloads_dir)
   syn.login(authToken=os.environ.get("API_SYNAPSE"))  # pass in the authToken on python client login!
   ```
-resources:
-  45324841-c013-4942-8b5f-db85856d7e48:
-    filepath: web_docs.md
-    integration: c6b31ee9-05d7-48fe-a9b3-6840df604e9c
-    name: web_docs
-    resource_id: 45324841-c013-4942-8b5f-db85856d7e48
-    resource_type: file
-  8d29393b-bc38-441f-aee1-88b60d1322b6:
-    filepath: SynapseOpenApiSpec.json
-    integration: c6b31ee9-05d7-48fe-a9b3-6840df604e9c
-    name: raw_documentation
-    resource_id: 8d29393b-bc38-441f-aee1-88b60d1322b6
-    resource_type: file
-  920140d9-ce8a-4cef-ad8c-418146706556:
-    code: "```\nimport synapseclient, os\nfrom pathlib import Path\n\ndownloads_dir\
-      \ = Path(__file__).parent.parent / \"downloads\" / \"synapse\"\n\nsyn = synapseclient.Synapse(cache_root_dir=downloads_dir)\
-      \ \nsyn.login(authToken=os.environ.get(\"API_SYNAPSE\"))  # pass in the authToken\
-      \ on python client login!\n```"
-    integration: c6b31ee9-05d7-48fe-a9b3-6840df604e9c
-    notes: null
-    query: Login to the Synapse API using the python client
-    resource_id: 920140d9-ce8a-4cef-ad8c-418146706556
-    resource_type: example
-  b9801ff2-37bb-44d0-9f47-9ce3d18804b5:
-    filepath: nf_programmatic_webdocs.md
-    integration: c6b31ee9-05d7-48fe-a9b3-6840df604e9c
-    name: python_client
-    resource_id: b9801ff2-37bb-44d0-9f47-9ce3d18804b5
-    resource_type: file
-slug: c6b31ee9-05d7-48fe-a9b3-6840df604e9c
+url: null
+uuid: 68a50df6-fa9c-4ef4-af32-0c2502c28b7b

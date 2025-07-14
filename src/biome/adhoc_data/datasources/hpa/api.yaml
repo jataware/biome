@@ -1,3 +1,4 @@
+datatype: api
 description: |
   The Human Protein Atlas is a Swedish-based program initiated in 2003 with the aim to map all
   the human proteins in cells, tissues, and organs using an integration of various omics
@@ -31,15 +32,14 @@ description: |
   In addition the Human Protein Atlas has been appointed Global Core Biodata Resource (GCBR)
   by the Global Biodata Coalition. The Human Protein Atlas consortium is mainly funded by the
   Knut and Alice Wallenberg Foundation.
-integration_type: api
+img_url: null
+last_updated: null
 name: Human Protein Atlas
-prompt: '${raw_documentation}
-
-  '
+provider: adhoc:specialist_agents
 resources:
   04c53147-cc0a-42f5-8e1d-6427a595948b:
     filepath: hpa_docs.md
-    integration: 6f995eeb-b836-4d32-8e4a-827e49d5ccf7
+    integration: 9653bf97-8668-4ce2-8c88-653f2d2b3749
     name: raw_documentation
     resource_id: 04c53147-cc0a-42f5-8e1d-6427a595948b
     resource_type: file
@@ -79,10 +79,15 @@ resources:
       print(f"Subcellular main location: {data.get('Subcellular main location', 'N/A')}")
       if 'Subcellular additional location' in data:
           print(f"Subcellular additional location: {data.get('Subcellular additional location', 'N/A')}")
-    integration: 6f995eeb-b836-4d32-8e4a-827e49d5ccf7
+    integration: 9653bf97-8668-4ce2-8c88-653f2d2b3749
     notes: null
     query: |-
       Query the Human Protein Atlas API for RNA and protein expression summary of a gene (JAK2) using its Ensembl ID. The example demonstrates how to retrieve and display tissue specificity, distribution, and subcellular localization information.
     resource_id: 92183e68-5e56-4487-a92f-8a1163b4e178
     resource_type: example
-slug: 6f995eeb-b836-4d32-8e4a-827e49d5ccf7
+slug: adhocspecificationintegration_human_protein_atlas
+source: '${raw_documentation}
+
+  '
+url: null
+uuid: 9653bf97-8668-4ce2-8c88-653f2d2b3749

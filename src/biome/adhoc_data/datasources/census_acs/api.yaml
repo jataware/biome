@@ -1,31 +1,16 @@
+datatype: api
 description: |
   The Census ACS (American Community Survey) and SF1 (Decennial Census) API returns data that has been collected from
   the Census Bureau, a database that contains information on the population of the United States.
   Use this to control for socioeconomic factors (or for other purposes).
-integration_type: api
+img_url: null
+last_updated: null
 name: Census ACS (American Community Survey) and SF1
-prompt: "The American Community Survey (ACS) is an ongoing survey that provides data\
-  \ every\nyear\u2014giving communities the current information they need to make\
-  \ important decisions.\nThe ACS covers a broad range of topics about social, economic,\
-  \ housing, and demographic\ncharacteristics of the U.S. population.\n\n${web_documentation}\n\
-  \nYou will need an API Key to use the Census ACS API.\nIt is available in the environment\
-  \ variable:\n- api_key: os.environ.get(\"API_CENSUS\")\n\nYou have an api key, so\
-  \ you have access to the census pypi package, and also direct access to the census\
-  \ web api.\nPrefer the pypi package if you can, it's easier to use.\n\nData ranges\
-  \ from 2005 to 2023.\n\n${sdk_documentation}\n\n## For 1-year datasets when loading\
-  \ as file (may or may not apply when using python libraries...)\n### Variable Changes\n\
-  Variables, and the values they represent, may change over time. Use the file in\
-  \ `${DATASET_FILES_BASE_PATH}/census-acs/2023-1yr-api-changes.csv` as a guide for\
-  \ which variables have changed from the prior year for 2023 ACS 1-Year Detailed\
-  \ Tables, Data Profiles and Subject Tables. See below for a description of each\
-  \ change type.\nNo Change - The variable has not changed from the prior year (most\
-  \ variables).\nUpdated - That variable has changed from the prior year and a matching\
-  \ variable for the current year has been found.\nNo Match - The variable has changed\
-  \ from the prior year and no matching or comparable variable has been found.\n"
+provider: adhoc:specialist_agents
 resources:
   76813161-e3dd-400e-b1db-c6534c3fb484:
     filepath: census_web.md
-    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
+    integration: d6d4d49c-b157-43cb-995a-d66fa3398a72
     name: web_documentation
     resource_id: 76813161-e3dd-400e-b1db-c6534c3fb484
     resource_type: file
@@ -39,7 +24,7 @@ resources:
       \ = ['Name', 'Median_Income', 'Poverty_Count', \n                        'Median_Rent',\
       \ 'Population', 'state', 'county', 'tract']\n\n# Calculate poverty rate\nharris_ses_df['Poverty_Rate']\
       \ = harris_ses_df['Poverty_Count'] / harris_ses_df['Population'] * 100\n"
-    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
+    integration: d6d4d49c-b157-43cb-995a-d66fa3398a72
     notes: null
     query: Calculate the poverty rate in Harris County, Texas- Descriptive analysis
     resource_id: 93d4da90-fe43-4121-8e1b-d9d677637143
@@ -58,15 +43,35 @@ resources:
       exposure_by_ses = pd.merge(environmental_data, harris_ses_df, on='tract')\n\n\
       # Calculate average exposures by income quartile\nquartile_summary = exposure_by_ses.groupby('Income_Quartile')['PM25_Annual',\
       \ 'Ozone_Days_Exceeded', 'TRI_Releases'].mean()"
-    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
+    integration: d6d4d49c-b157-43cb-995a-d66fa3398a72
     notes: null
     query: Calculate the poverty rate in Harris County, Texas- Stratified analysis
     resource_id: 9a1dd209-4e65-49af-a5cc-2f9d73cd8d4b
     resource_type: example
   cb8c091d-ff82-46d7-bdea-893aa5b0c6c5:
     filepath: census_sdk.md
-    integration: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
+    integration: d6d4d49c-b157-43cb-995a-d66fa3398a72
     name: sdk_documentation
     resource_id: cb8c091d-ff82-46d7-bdea-893aa5b0c6c5
     resource_type: file
-slug: 50e33776-2cc4-4b05-8135-4ff03d5d42b1
+slug: adhocspecificationintegration_census_acs__american_community_survey__and_sf1
+source: "The American Community Survey (ACS) is an ongoing survey that provides data\
+  \ every\nyear\u2014giving communities the current information they need to make\
+  \ important decisions.\nThe ACS covers a broad range of topics about social, economic,\
+  \ housing, and demographic\ncharacteristics of the U.S. population.\n\n${web_documentation}\n\
+  \nYou will need an API Key to use the Census ACS API.\nIt is available in the environment\
+  \ variable:\n- api_key: os.environ.get(\"API_CENSUS\")\n\nYou have an api key, so\
+  \ you have access to the census pypi package, and also direct access to the census\
+  \ web api.\nPrefer the pypi package if you can, it's easier to use.\n\nData ranges\
+  \ from 2005 to 2023.\n\n${sdk_documentation}\n\n## For 1-year datasets when loading\
+  \ as file (may or may not apply when using python libraries...)\n### Variable Changes\n\
+  Variables, and the values they represent, may change over time. Use the file in\
+  \ `${DATASET_FILES_BASE_PATH}/census-acs/2023-1yr-api-changes.csv` as a guide for\
+  \ which variables have changed from the prior year for 2023 ACS 1-Year Detailed\
+  \ Tables, Data Profiles and Subject Tables. See below for a description of each\
+  \ change type.\nNo Change - The variable has not changed from the prior year (most\
+  \ variables).\nUpdated - That variable has changed from the prior year and a matching\
+  \ variable for the current year has been found.\nNo Match - The variable has changed\
+  \ from the prior year and no matching or comparable variable has been found.\n"
+url: null
+uuid: d6d4d49c-b157-43cb-995a-d66fa3398a72
