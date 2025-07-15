@@ -84,7 +84,7 @@
           },
           {
                "name": "Evaluation Services",
-               "description": "<p>\n The Evaluation API is designed to support open-access data analysis and modeling challenges in\n Synapse. This framework provides tools for administrators to collect and analyze data models\n from Synapse users created for a specific goal or purpose.\n <\/p>\n  \n <p>\n The data model of the Evaluation API is built around around two primary objects:\n <ul>\n <li> <a href=\"${org.sagebionetworks.evaluation.model.Evaluation}\">Evaluation<\/a>: The primary\n object representing a Synapse Evaluation. Access to Evaluations is governed by an <a href=\"${org.sagebionetworks.repo.model.AccessControlList}\">Access Control\n List (ACL)<\/a>.\n <\/li> \n <li> <a href=\"${org.sagebionetworks.evaluation.model.Submission}\">Submission<\/a>: A user\n in a Synapse Evaluation can submit a Synapse Entity as Submission to that Evaluation. Submission\n data is owned by the parent Evaluation, and is immutable.\n <\/ul>\n <\/p>\n \n <p>\n The data model includes additional objects to support scoring of Submissions and convenient data \n access:\n <ul>\n <li> <a href=\"${org.sagebionetworks.evaluation.model.SubmissionStatus}\">SubmissionStatus<\/a>: An\n object used to track scoring information for a single Submission. This object is intended to be\n modified by the users (or test harnesses) managing the Evaluation.\n <\/li> \n <li> <a href=\"${org.sagebionetworks.evaluation.model.SubmissionBundle}\">SubmissionBundle<\/a>: \n A convenience object to transport a Submission and its accompanying SubmissionStatus in a single\n web service call.\n <\/li>\n <li> <a href=\"${org.sagebionetworks.repo.model.table.SubmissionView}\">SubmissionView<\/a>: \n A submission view can be created using the \n <a href=\"${org.sagebionetworks.repo.web.controller.EntityController}\">Entity Services<\/a> providing\n as scope a list of evaluation ids, in order to query the set of submissions through \n the <a href=\"${POST.entity.id.table.query.async.start}\">Table Query Services<\/a>.\n <a href=\"${org.sagebionetworks.repo.model.annotation.v2.Annotations}\">Annotations<\/a> set in \n the submissionAnnotations property of a <a href=\"${org.sagebionetworks.evaluation.model.SubmissionStatus}\">SubmissionStatus<\/a> \n can be exposed in the view.\n <\/li>\n <\/ul>\n <\/p>\n \n The Evaluation API supports data access mechanisms to monitor Evaluation activity for on-demand \n scoring and leaderboarding."
+               "description": "<p>\n The Evaluation API is designed to support open-access data analysis and modeling challenges in\n Synapse. This framework provides tools for administrators to collect and analyze data models\n from Synapse users created for a specific goal or purpose.\n <\/p>\n  \n <p>\n The data model of the Evaluation API is built around around two primary objects:\n <ul>\n <li> <a href=\"${org.sagebionetworks.evaluation.model.Evaluation}\">Evaluation<\/a>: The primary\n object representing a Synapse Evaluation. Access to Evaluations is governed by an <a href=\"${org.sagebionetworks.repo.model.AccessControlList}\">Access Control\n List (ACL)<\/a>.\n <\/li> \n <li> <a href=\"${org.sagebionetworks.evaluation.model.Submission}\">Submission<\/a>: A user\n in a Synapse Evaluation can submit a Synapse Entity as Submission to that Evaluation. Submission\n data is owned by the parent Evaluation, and is immutable.\n <\/ul>\n <\/p>\n \n <p>\n The data model includes additional objects to support scoring of Submissions and convenient data \n access:\n <ul>\n <li> <a href=\"${org.sagebionetworks.evaluation.model.SubmissionStatus}\">SubmissionStatus<\/a>: An\n object used to track scoring information for a single Submission. This object is intended to be\n modified by the users (or test harnesses) managing the Evaluation.\n <\/li> \n <li> <a href=\"${org.sagebionetworks.evaluation.model.SubmissionBundle}\">SubmissionBundle<\/a>: \n A convenience object to transport ,a Submission and its accompanying SubmissionStatus in a single\n web service call.\n <\/li>\n <li> <a href=\"${org.sagebionetworks.repo.model.table.SubmissionView}\">SubmissionView<\/a>: \n A submission view can be created using the \n <a href=\"${org.sagebionetworks.repo.web.controller.EntityController}\">Entity Services<\/a> providing\n as scope a list of evaluation ids, in order to query the set of submissions through \n the <a href=\"${POST.entity.id.table.query.async.start}\">Table Query Services<\/a>.\n <a href=\"${org.sagebionetworks.repo.model.annotation.v2.Annotations}\">Annotations<\/a> set in \n the submissionAnnotations property of a <a href=\"${org.sagebionetworks.evaluation.model.SubmissionStatus}\">SubmissionStatus<\/a> \n can be exposed in the view.\n <\/li>\n <\/ul>\n <\/p>\n \n The Evaluation API supports data access mechanisms to monitor Evaluation activity for on-demand \n scoring and leaderboarding."
           },
           {
                "name": "File Services",
@@ -801,7 +801,7 @@
           "/auth/v1/personalAccessToken/{id}": {
                "get": {
                     "tags": ["Authentication Services"],
-                    "operationId": "get-/auth/v1/personalAccessToken/{id}",
+                    "operationId": "get-/auth/v1/personalAccessToken/{,id}",
                     "parameters": [{
                          "name": "id",
                          "in": "path",
@@ -2052,7 +2052,7 @@
                }}
           }},
           "/repo/v1/download/list/remove": {"post": {
-               "tags": ["Download List Services"],
+  ,             "tags": ["Download List Services"],
                "operationId": "post-/repo/v1/download/list/remove",
                "parameters": [],
                "requestBody": {
@@ -3345,7 +3345,7 @@
                               "name": "wikiId",
                               "in": "path",
                               "required": true,
-                              "description": "The ID of the WikiPage to get.",
+,                              "description": "The ID of the WikiPage to get.",
                               "schema": {"type": "string"}
                          },
                          {
@@ -4605,7 +4605,7 @@
                "operationId": "post-/repo/v1/entity/header",
                "parameters": [],
                "requestBody": {
-                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/org.sagebionetworks.repo.model.request.ReferenceList"}}},
+                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/org.sagebionetworks.repo.model.r,equest.ReferenceList"}}},
                     "required": true
                },
                "security": [{"bearerAuth": []}],
@@ -5864,7 +5864,7 @@
           "/repo/v1/accessApproval/information": {"post": {
                "tags": ["Access Approval Services"],
                "operationId": "post-/repo/v1/accessApproval/information",
-               "parameters": [],
+               "parameters": [,],
                "requestBody": {
                     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest"}}},
                     "required": true
@@ -7123,7 +7123,7 @@
                "tags": ["Evaluation Services"],
                "operationId": "get-/repo/v1/evaluation/{evalId}/submission/bundle/all",
                "parameters": [
-                    {
+ ,                   {
                          "name": "evalId",
                          "in": "path",
                          "required": true,
@@ -8462,7 +8462,7 @@
                "tags": ["Table Services"],
                "operationId": "post-/repo/v1/entity/{id}/table/transaction/async/start",
                "parameters": [{
-                    "name": "id",
+  ,                  "name": "id",
                     "in": "path",
                     "required": true,
                     "description": "The ID of the TableEntity to update.",
@@ -9751,7 +9751,7 @@
                     },
                     {
                          "name": "limit",
-                         "in": "query",
+                         "in,": "query",
                          "required": true,
                          "description": "Limits the size of the page returned. For example, a page size\n            of 10 require limit = 10.",
                          "schema": {"type": "number"}
@@ -11032,7 +11032,7 @@
                               "type": "integer",
                               "format": "int32"
                          },
-                         "changeType": {"type": "string"},
+                         "changeType": {"ty,pe": "string"},
                          "transactionId": {
                               "type": "integer",
                               "format": "int32"
@@ -12220,7 +12220,7 @@
                               }
                          }
                     },
-                    "description": "Stores OIDC claims and details in accordance with <a href=\"https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter\">OIDC Core 1.0 Claims Request<\/a>. The keys used in these maps are <a href=\"${org.sagebionetworks.repo.model.oauth.OIDCClaimName}\">OIDCClaimName<\/a>s"
+                    "description": "Stores OIDC claims and details in accordance with <a href=\"https://openid.net/specs/openid-co,nnect-core-1_0.html#ClaimsParameter\">OIDC Core 1.0 Claims Request<\/a>. The keys used in these maps are <a href=\"${org.sagebionetworks.repo.model.oauth.OIDCClaimName}\">OIDCClaimName<\/a>s"
                },
                "org.sagebionetworks.evaluation.model.Evaluation": {
                     "type": "object",
@@ -13429,7 +13429,7 @@
                     "properties": {
                          "entityId": {"type": "string"},
                          "principalId": {"type": "string"},
-                         "createdOn": {"type": "string"}
+                         "createdOn": {"type": "stri,ng"}
                     },
                     "description": "JSON schema for a Favorite POJO"
                },
@@ -14572,7 +14572,7 @@
                               }
                          },
                          "nextPageToken": {"type": "string"}
-                    },
+                   , },
                     "description": "A request to search through the access approval history",
                     "required": ["accessorId"]
                },
@@ -15756,7 +15756,7 @@
                     "properties": {
                          "concreteType": {
                               "type": "string",
-                              "enum": ["org.sagebionetworks.repo.model.ErrorResponse"]
+                   ,           "enum": ["org.sagebionetworks.repo.model.ErrorResponse"]
                          },
                          "reason": {"type": "string"},
                          "errorCode": {"type": "string"}
@@ -16953,7 +16953,7 @@
                     },
                     "description": "Record for a Team that can be used to submit to a challenge, including whether said Team is already registered."
                },
-               "org.sagebionetworks.repo.model.auth.AuthenticationReceiptToken": {
+               "org.sagebionetworks.repo.model.auth.AuthenticationReceip,tToken": {
                     "type": "object",
                     "properties": {
                          "concreteType": {
@@ -18131,7 +18131,7 @@
                          "title": {"type": "string"},
                          "messageMarkdown": {"type": "string"}
                     },
-                    "description": "The model object represents a single Thread creation."
+                    "description": "The model object represents a single Thread c,reation."
                },
                "org.sagebionetworks.repo.model.file.AddPartResponse": {
                     "type": "object",
@@ -19332,7 +19332,7 @@
                     },
                     "description": "A single item for a user's download list."
                },
-               "org.sagebionetworks.repo.model.message.Comment": {
+               "org.sagebionetworks.rep,o.model.message.Comment": {
                     "type": "object",
                     "properties": {
                          "id": {"type": "string"},
@@ -20505,7 +20505,7 @@
                          "accessRequirementReviewerIds": {
                               "type": "array",
                               "items": {"type": "string"},
-                              "description": "The list of principal ids that are allowed to review the submission"
+                              "description": "The list of principal ids tha,t are allowed to review the submission"
                          },
                          "submitterId": {"type": "string"},
                          "accessorChanges": {
@@ -21663,7 +21663,7 @@
                          "objectId": {
                               "type": "integer",
                               "format": "int32"
-                         },
+,                         },
                          "objectType": {"type": "string"},
                          "createdOn": {"type": "string"},
                          "createdBy": {"type": "string"},
@@ -22849,7 +22849,7 @@
                               "description": "a list of Client Authentication methods supported by Synapse's Token Endpoint.  See <a href=\"https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication\">OpenID Connect Core 1.0 Client Authentication<\/a>"
                          }
                     },
-                    "description": "OpenID Provider Configuration, described by <a href=\"https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig\">OpenID Connect Core 1.0<\/a>. Fields are defined by the <a href=\"https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata\">OpenID Provider Metadata<\/a>."
+                    "description": "OpenID Pro,vider Configuration, described by <a href=\"https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig\">OpenID Connect Core 1.0<\/a>. Fields are defined by the <a href=\"https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata\">OpenID Provider Metadata<\/a>."
                },
                "org.sagebionetworks.repo.model.project.StorageLocationSetting": {
                     "type": "object",

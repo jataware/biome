@@ -1,0 +1,161 @@
+datatype: api
+description: |-
+  The NF Synapse API is a RESTful API that allows you to interact with the Neurofibromatosis Data Portal. The code drafter has access both to the openapi spec and the web docs.
+img_url: null
+last_updated: null
+name: NF Synapse
+provider: adhoc:specialist_agents
+resources:
+  19e09360-7ad6-4d53-9d27-e5bf68bab700:
+    filepath: SynapseWebDocs.md
+    integration: 365c5121-5819-4492-b653-6ed0e85703de
+    name: SynapseWebDocs
+    resource_id: 19e09360-7ad6-4d53-9d27-e5bf68bab700
+    resource_type: file
+  d92c04cb-0ece-4684-aebf-bce150e79d75:
+    filepath: SynapseOpenApiSpec.json
+    integration: 365c5121-5819-4492-b653-6ed0e85703de
+    name: SynapseOpenApiSpec
+    resource_id: d92c04cb-0ece-4684-aebf-bce150e79d75
+    resource_type: file
+  feca1051-3952-4a0f-bddf-09191aa17f15:
+    code: |-
+      import os
+      import requests
+      import pandas as pd
+
+      BASE_URL = "https://repo-prod.prod.sagebase.org"
+      AUTH_TOKEN = os.environ.get("API_SYNAPSE")
+      HEADERS = {"Authorization": f"Bearer {AUTH_TOKEN}"}
+
+      search_terms = [
+          "dementia",
+          "Alzheimer",
+          "cognitive decline",
+          "neurodegenerative",
+          "memory loss",
+          "Parkinson",
+          "Lewy body",
+          "frontotemporal",
+          "MCI",
+          "mild cognitive impairment"
+      ]
+
+      results = []
+      for term in search_terms:
+          payload = {
+              "queryTerm": [term],
+              "rangeQuery": [],
+              "facetOptions": [],
+              "returnFields": [],
+              "start": 0,
+              "size": 50
+          }
+          resp = requests.post(
+              f"{BASE_URL}/repo/v1/search",
+              headers=HEADERS,
+              json=payload
+          )
+          resp.raise_for_status()
+          data = resp.json()
+          for hit in data.get("hits", []):
+              results.append({
+                  "id": hit.get("id"),
+                  "name": hit.get("name"),
+                  "description": hit.get("description"),
+                  "type": hit.get("node_type"),
+                  "created_on": hit.get("created_on"),
+                  "modified_on": hit.get("modified_on"),
+                  "created_by": hit.get("created_by"),
+                  "modified_by": hit.get("modified_by"),
+              })
+
+      df = pd.DataFrame(results).drop_duplicates(subset=["id"])
+      # Filter for likely datasets, projects, or studies by type or name/description
+      mask = (
+          df["type"].str.lower().isin(["project", "dataset", "study", "folder", "entityview", "submissionview", "materializedview", "table"])
+          | df["name"].str.contains("study|dataset|project", case=False, na=False)
+          | df["description"].str.contains("study|dataset|project", case=False, na=False)
+      )
+      filtered = df[mask]
+
+      print(f"Found {len(filtered)} dementia-related studies/datasets in Synapse")
+      print("\nBreakdown by type:")
+      print(filtered['type'].value_counts())
+      print("\nTop 10 results:")
+      print(filtered.head(10)[['id', 'name', 'type']].to_string())
+    integration: 365c5121-5819-4492-b653-6ed0e85703de
+    notes: |-
+      This example demonstrates how to search Synapse for studies related to dementia
+      and neurodegenerative diseases. It uses multiple search terms to capture various
+      types of dementia research (Alzheimer's, Parkinson's, MCI, etc.) and filters results
+      to focus on actual studies, datasets, and projects rather than individual files.
+      The search found 229 relevant studies across different research areas including
+      biomarker discovery, genomics, proteomics, and clinical assessments. Key studies
+      include the Alzheimer's Disease Community Portal, multi-modal datasets for automatic
+      dementia detection, and various biomarker investigation projects.
+    query: Search for dementia studies in Synapse
+    resource_id: feca1051-3952-4a0f-bddf-09191aa17f15
+    resource_type: example
+slug: adhocspecificationintegration_nf_synapse
+source: |-
+  # Additional Instructions:
+
+  This API is through OpenAPI Spec. You have been provided the schema.
+  All requests go to the following URL: https://repo-prod.prod.sagebase.org
+  That is the base URL for all requests.
+
+  To use the Synapse API always retrieve the auth header token from the environment variable:
+  - bearer token: os.environ.get("API_SYNAPSE")
+  Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variables.
+
+  Ensure you know the fields that come back from the OpenAPI spec in order to process the Synapse data.
+
+  Never simulate this API- if it is not available ask the user how to proceed.
+
+  You will mostly have to use the /repo/v1 and /file/v1 paths.
+  For example you can start search with:
+  POST /repo/v1/search
+
+  and once you find a project or dataset you like, you can proceed to exploreother entities in
+  order to find a file / file handle and download it.
+
+  An example file handle we found: syn4988822 with it, you can issue a download request.
+  You'll need to find the file ID first depending on your needs and the user query.
+
+  You only have read/view/download assess/permissions- don't try to create or upload data- the openapi spec may have create/upload endpoints but do not use them.
+
+  # OpenAPI Spec JSON:
+  ${SynapseOpenApiSpec}
+
+  # More Web Docs:
+  ${SynapseWebDocs}
+
+  # Example issuing a POST to search for `High throughput analysis of pNF cell lines` (omitting auth bearer token header; eg Authorization: Bearer <token>)
+  ```
+  POST https://repo-prod.prod.sagebase.org/repo/v1/search
+  {
+    "queryTerm": [
+  "Blakeley"
+    ],
+    "rangeQuery": [],
+    "facetOptions": [],
+    "returnFields": [],
+    "start": 0,
+    "size": "10"
+  }
+  ```
+
+  # About the NF synapse subdomain
+
+  NF Data Portal
+  A home for Neurofibromatosis research resources
+
+  Files are data collected from from human samples, animal models, and cell lines from a variety of assays.
+  Datasets are curated collections of files organized to facilitate data sharing.
+  Initiatives are funder-organized programs, groups, consortia, cohorts, or awards, usually focused on a specific research area in neurofibromatosis.
+  Studies are hypothesis-driven projects with the goal of uncovering new knowledge about neurofibromatosis type 1, type 2, or schwannomatosis.
+  Papers are pre-prints and peer-reviewed articles produced by NF Data Portal studies
+  Tools include animal models, cell lines, genetic reagents, antibodies, and biobanks related to NF!
+url: null
+uuid: 365c5121-5819-4492-b653-6ed0e85703de

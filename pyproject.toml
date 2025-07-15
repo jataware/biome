@@ -25,7 +25,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "beaker-kernel @ file:///jupyter/beaker_kernel-1.11.2-py3-none-any.whl",
+  "beaker-kernel~=1.12.0",
   "adhoc-api~=2.4.0",
   "archytas~=1.5.0",
   "requests",
@@ -43,6 +43,8 @@ dependencies = [
   "xlrd~=2.0.1",
   "geopandas~=1.0.1",
   "scikit-learn~=1.6.1",
+  "paper-qa>=5",
+  "alphagenome~=0.0.2"
 ]
 
 [project.urls]

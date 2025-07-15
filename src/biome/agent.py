@@ -10,6 +10,10 @@ from beaker_kernel.lib.context import BaseContext
 
 from pathlib import Path
 
+from Bio import Entrez
+
+from biome.literature_review import LiteratureReviewAgent, PubmedSource
+
 logger = logging.getLogger(__name__)
 
 BIOME_URL = "http://biome_api:8082"
@@ -30,10 +34,9 @@ class MessageLogger():
         self.print_logger.debug(message)
 
 # Load docstrings at module level
-def load_docstring(filename):
+def load_docstring(filename: str):
     root_folder = Path(__file__).resolve().parent / 'adhoc_data'
-    with open(os.path.join(root_folder, 'prompts', filename), 'r') as f:
-        return f.read()
+    return (root_folder / 'prompts' / 'docstrings' / filename).read_text()
 
 def with_docstring(filename):
     """Decorator to set a function's docstring from a file"""
@@ -52,9 +55,31 @@ class BiomeAgent(BeakerAgent):
     An API should be considered a type of integration.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
+        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
+        try:
+            data_dir = Path(data_dir_raw).resolve(strict=True)
+            logger.info(f"Using data_dir: {data_dir}")
+        except OSError as e:
+            data_dir = Path('.')
+            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
+        self.data_dir = data_dir
+
+        self.initialize_literature_review()
+        self.initialize_entrez()
+
         logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
         self.logger = MessageLogger(self.log, logger)
         super().__init__(context, tools, **kwargs)
+
+    def initialize_literature_review(self):
+        self.litreview_agent = LiteratureReviewAgent(self.data_dir)
+        self.litreview_agent.add_source("pubmed", PubmedSource())
+
+    def initialize_entrez(self):
+        if (entrez_email := os.environ.get("ENTREZ_EMAIL", None)):
+            Entrez.email = entrez_email
+        if (entrez_key := os.environ.get("ENTREZ_API_KEY", None)):
+            Entrez.api_key = entrez_key
 
     @tool()
     async def drs_uri_info(self, uris: List[str]) -> List[dict]:
@@ -90,78 +115,6 @@ class BiomeAgent(BeakerAgent):
 
         return responses
 
-    # @tool()
-    # async def add_example(self, integration: str, code: str, query: str, notes: str = None) -> str:
-    #     """
-    #     Add a successful code example to the integration's examples.yaml documentation file.
-    #     This tool should be used after successfully completing a task with an integration to capture the working code for future reference.
-
-    #     The API names must match one of the names in the agent's integration list.
-
-    #     Args:
-    #         integration (str): The name of the integration the example is for
-    #         code (str): The working, successful code to add as an example
-    #         query (str): A brief description of what the example demonstrates
-    #         notes (str, optional): Additional notes about the example, such as implementation details
-
-    #     Returns:
-    #         str: Message indicating success or failure of adding the example
-    #     """
-    #     if integration not in self.integration_list:
-    #         raise ValueError(f"Error: the API name must match one of the names in the {self.integration_list}. The API name provided was {api}.")
-
-    #     self.context.beaker_kernel.send_response(
-    #         "iopub", "add_example", content={
-    #             "integration": integration,
-    #             "code": code,
-    #             "query": query,
-    #             "notes": notes
-    #         }
-    #     )
-    #     return "Successfully added example."
-
-    # @tool()
-    # async def add_integration(self,
-    #                          integration: str,
-    #                          description: str,
-    #                          base_url: str,
-    #                          schema_location: str) -> str:
-    #     """
-    #     Adds an integration to the list of supported integrations usable within Biome.
-    #     This will be added to the API and data source list.
-
-    #     Args:
-    #         integration (str): The name of the target data source or API that will be added.
-    #         description (str): A plain text description of what the data source is based on your knowledge of what the user is asking for, combined with their description if their description is relevant, or, if you do not know about the target data source. If the user does not provide any information, rely on what you know. Target a paragraph in length.
-    #         schema_location (str): A URL or local filepath to fetch an OpenAPI schema from. If the user does not provide one, ask them for the URL or local filepath to the schema.
-    #         base_url (str): The base URL for the integration that will be used for making OpenAPI calls. If the user does not provide one, ask them for the base URL of the API.
-    #     Returns:
-    #         str: Message indicating success or failure of adding the integration.
-    #     """
-
-    #     try:
-    #         if schema_location.startswith('http'):
-    #             response = requests.get(schema_location)
-    #             if response.status_code != 200:
-    #                 return f'Failed to get OpenAPI schema: {response.status_code}'
-    #             schema = response.content.decode("utf-8")
-    #         else:
-    #             with open(schema_location, 'r') as f:
-    #                 schema = f.read()
-    #     except Exception as e:
-    #         return f'Failed to get OpenAPI schema: {e}'
-
-    #     # calls save_integration in context.py as an action after finishing
-    #     self.context.beaker_kernel.send_response(
-    #         "iopub", "add_integration", content={
-    #             "integration": integration,
-    #             "description": description,
-    #             "base_url": base_url,
-    #             "schema": schema
-    #         }
-    #     )
-    #     return f"Added integration `{integration}`."
-
     @tool()
     async def extract_pdf(self, pdf_path: str, agent: AgentRef) -> str:
         """
@@ -178,3 +131,47 @@ class BiomeAgent(BeakerAgent):
         code = agent.context.get_code("extract_pdf", {'pdf_path': pdf_path})
         response = await agent.context.evaluate(code)
         return response["return"]
+
+
+    @tool()
+    async def pubmed_search(self, query: str):
+        """
+        Retrieves paper abstracts for a given PubMed query, as well as fetching the fulltexts for later.
+        Relevant papers will be listed as their ID and associated abstracts.
+
+        Try multiple formulations of the PubMed query to retrieve many papers.
+        If less than five papers are found, retry this tool to see if other formulations find more papers.
+
+        Args:
+            query (str): User query to search on PubMed.
+
+        Returns:
+            str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
+                 Additionally, search results will be available for paperQA.
+        """
+        return await self.litreview_agent.fetch_for_query("pubmed", query)
+
+
+    @tool()
+    async def paperQA(self, query: str, agent: AgentRef, loop: LoopControllerRef):
+        """
+        Given a corpus of fetched papers with `pubmed_search`, ask a question to analyze the
+        collected papers and decide what's relevant and sort through the information.
+
+        An example workflow would be grabbing all of the relevant papers with `pubmed_search` to find IDs,
+        then get the full texts with `pubmed_get_fulltext` to gather them all -- and then finally, use this
+        tool to get insights over all of the collected fulltext papers.
+
+        You should return this full response, without any summarization, to the user.
+        Important: do not summarize or shorten the response of this tool.
+
+        CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is.
+        CRITICAL: DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
+
+        Args:
+            query (str): The query to ask about all of the papers
+
+        Returns:
+            str: CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is. Include the DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
+        """
+        return await self.litreview_agent.paperQA(query)

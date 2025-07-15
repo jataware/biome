@@ -95,5 +95,6 @@ class BiomeContext(BeakerContext):
             "cdc_tracking_network_api_key": os.environ.get("API_CDC_TRACKING_NETWORK"),
             "synapse_api_key": os.environ.get("API_SYNAPSE"),
             "netrias_api_key": os.environ.get("NETRIAS_KEY"),
+            "alphagenome_key": os.environ.get("ALPHAGENOME_KEY"),
         })
         await self.execute(command)
