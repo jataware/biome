@@ -7,7 +7,7 @@ name = "biome"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [
@@ -25,9 +25,9 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "beaker-kernel~=1.11.0",
+  "beaker-kernel @ file:///jupyter/beaker_kernel-1.11.2-py3-none-any.whl",
   "adhoc-api~=2.4.0",
-  "archytas~=1.4.0",
+  "archytas~=1.5.0",
   "requests",
   "PyYAML",
   "idc-index",
@@ -43,7 +43,6 @@ dependencies = [
   "xlrd~=2.0.1",
   "geopandas~=1.0.1",
   "scikit-learn~=1.6.1",
-  "synapseclient"
 ]
 
 [project.urls]
