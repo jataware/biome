@@ -15,7 +15,7 @@
     }
 
     # Base URL for the API
-    base_url = "https://apieval.netriaslabs.cloud"
+    base_url = "https://apivm.netriasbdf.cloud"
 
     # The drug term to harmonize
     drug_term = "zorubicin_9012"
