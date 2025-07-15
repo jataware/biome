@@ -181,8 +181,8 @@ resources:
       url = 'https://pdc.cancer.gov/graphql'
 
       query = """
-      query ($gene_name: String!, $offset: Int, $limit: Int) {
-        getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: $offset, limit: $limit) {
+      query ($$gene_name: String!, $offset: Int, $limit: Int) {
+        getPaginatedUIGeneAliquotSpectralCount(gene_name: $$gene_name, offset: $offset, limit: $limit) {
           total
           uiGeneAliquotSpectralCounts {
             aliquot_id
@@ -253,9 +253,9 @@ resources:
 
       # Updated query with correct schema
       query = """
-      query ($gene_name: String!) {
+      query ($$gene_name: String!) {
         getPaginatedUIGeneAliquotSpectralCount(
-          gene_name: $gene_name,
+          gene_name: $$gene_name,
           offset: 0,
           limit: 100  # Increased limit to get more samples
         ) {
@@ -640,9 +640,9 @@ resources:
 
       # Corrected query structure
       query = """
-      query ($gene_name: String!) {
+      query ($$gene_name: String!) {
         getPaginatedUIGeneAliquotSpectralCount(
-          gene_name: $gene_name,
+          gene_name: $$gene_name,
           offset: 0,
           limit: 10
         ) {
@@ -753,8 +753,8 @@ resources:
 
       # Query for STAT5B protein expression data
       query = """
-      query ($gene_name: String!) {
-        getPaginatedUIGeneAliquotSpectralCount(gene_name: $gene_name, offset: 0, limit: 10) {
+      query ($$gene_name: String!) {
+        getPaginatedUIGeneAliquotSpectralCount(gene_name: $$gene_name, offset: 0, limit: 10) {
           total
           uiGeneAliquotSpectralCounts {
             aliquot_id
