@@ -41,7 +41,7 @@ class TestIntegrationProvider(BaseIntegrationProvider):
         ]
         super().__init__(display_name="Biome Second Test Integration")
     def list_integrations(self):
-        return [asdict(i) for i in self.integrations]
+        return self.integrations
     def get_integration(self, integration_id):
         pass
     def list_resources(self, integration_id, resource_type=None):
