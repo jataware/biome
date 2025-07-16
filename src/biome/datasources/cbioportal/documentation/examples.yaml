@@ -673,3 +673,311 @@
     features: 1) Gets both mutation and expression profiles from the same study, 2)
     Uses proper sample lists for each data type, 3) Formats data consistently for
     integration, 4) Provides summary statistics for validation.'
+- query: Find lung adenocarcinoma studies with both mutation and RNA expression data
+  code: "import requests\nimport pandas as pd\n\nBASE_URL = \"https://www.cbioportal.org/api\"\
+    \n\n# 1. Find lung adenocarcinoma studies with both mutation and expression data\n\
+    studies_url = f\"{BASE_URL}/studies\"\nstudies = requests.get(studies_url).json()\n\
+    \n# Filter for lung adenocarcinoma studies\nluad_studies = []\nfor study in studies:\n\
+    \    name = study.get('name', '').lower()\n    description = study.get('description',\
+    \ '').lower()\n    if ('lung' in name or 'lung' in description) and ('adenocarcinoma'\
+    \ in name or 'adenocarcinoma' in description):\n        luad_studies.append(study)\n\
+    \n# Check which studies have both mutation and expression data\nresults = []\n\
+    for study in luad_studies:\n    study_id = study['studyId']\n    profiles_url\
+    \ = f\"{BASE_URL}/studies/{study_id}/molecular-profiles\"\n    profiles = requests.get(profiles_url).json()\n\
+    \    data_types = set(p['molecularAlterationType'] for p in profiles)\n    \n\
+    \    has_mut = any(t in data_types for t in ['MUTATION_EXTENDED', 'MUTATION_UNCALLED'])\n\
+    \    has_expr = any(t in data_types for t in ['MRNA_EXPRESSION', 'RNA_EXPRESSION'])\n\
+    \    \n    if has_mut and has_expr:\n        results.append({\n            \"\
+    studyId\": study_id,\n            \"name\": study['name'],\n            \"sampleCount\"\
+    : study.get('allSampleCount', None),\n            \"dataTypes\": sorted(data_types)\n\
+    \        })\n\ndf = pd.DataFrame(results)\nprint(f\"Found {len(df)} lung adenocarcinoma\
+    \ studies with both mutation and expression data:\")\nprint(df.to_string(index=False))"
+  notes: This example demonstrates how to search for cancer studies by disease type
+    and filter for those containing both mutation and expression molecular profiles.
+    Essential for multi-omics cancer research workflows.
+- query: Calculate mutation frequencies for all genes in a cancer study
+  code: |-
+    import requests
+    import pandas as pd
+
+    BASE_URL = "https://www.cbioportal.org/api"
+    STUDY_ID = "luad_tcga_gdc"
+
+    # 1. Get mutation molecular profile ID
+    profiles_url = f"{BASE_URL}/studies/{STUDY_ID}/molecular-profiles?projection=SUMMARY"
+    profiles = requests.get(profiles_url).json()
+    mutation_profiles = [p for p in profiles if p['molecularAlterationType'] == 'MUTATION_EXTENDED']
+    mutation_profile_id = mutation_profiles[0]['molecularProfileId']
+
+    # 2. Get sample list for mutation data
+    sample_lists_url = f"{BASE_URL}/studies/{STUDY_ID}/sample-lists?projection=SUMMARY"
+    sample_lists = requests.get(sample_lists_url).json()
+    mutation_sample_list = next(sl['sampleListId'] for sl in sample_lists if sl['category'] == 'all_cases_with_mutation_data')
+
+    # 3. Fetch all mutations
+    mutations_url = f"{BASE_URL}/molecular-profiles/{mutation_profile_id}/mutations"
+    params = {"sampleListId": mutation_sample_list, "projection": "SUMMARY"}
+    mutations = requests.get(mutations_url, params=params).json()
+
+    # 4. Map entrez gene IDs to symbols
+    entrez_ids = list(set([m['entrezGeneId'] for m in mutations]))
+    entrez_to_symbol = {}
+    for i in range(0, len(entrez_ids), 500):
+        chunk = entrez_ids[i:i+500]
+        url = f"{BASE_URL}/genes/fetch?geneIdType=ENTREZ_GENE_ID&projection=SUMMARY"
+        resp = requests.post(url, json=[str(eid) for eid in chunk])
+        genes = resp.json()
+        for g in genes:
+            entrez_to_symbol[g['entrezGeneId']] = g['hugoGeneSymbol']
+
+    # 5. Calculate mutation frequencies
+    mutations_df = pd.DataFrame(mutations)
+    mutations_df['gene_symbol'] = mutations_df['entrezGeneId'].map(entrez_to_symbol)
+
+    # Count mutated samples per gene
+    sample_counts = mutations_df.groupby('gene_symbol')['sampleId'].nunique().reset_index()
+    sample_counts = sample_counts.rename(columns={'sampleId': 'mutated_samples'})
+
+    # Calculate frequencies
+    n_samples = mutations_df['sampleId'].nunique()
+    sample_counts['frequency_percent'] = (sample_counts['mutated_samples'] / n_samples * 100).round(2)
+
+    # Filter for >10% frequency and get top 20
+    top_mutated = sample_counts[sample_counts['frequency_percent'] > 10].sort_values('mutated_samples', ascending=False).head(20)
+    print("Top 20 most frequently mutated genes (>10% frequency):")
+    print(top_mutated.to_string(index=False))
+  notes: This example shows how to retrieve all mutations from a study, map gene IDs
+    to symbols, and calculate mutation frequencies across samples. Useful for identifying
+    driver genes and mutation burden analysis in cancer genomics.
+- query: Compare RNA expression levels between mutated and wild-type samples for specific
+    genes
+  code: "import requests\nimport pandas as pd\nfrom scipy import stats\n\nBASE_URL\
+    \ = \"https://www.cbioportal.org/api\"\nSTUDY_ID = \"luad_tcga_gdc\"\nGENE_SYMBOLS\
+    \ = [\"TP53\", \"KRAS\", \"RYR2\"]\n\n# 1. Get molecular profile IDs\nprofiles_url\
+    \ = f\"{BASE_URL}/studies/{STUDY_ID}/molecular-profiles?projection=SUMMARY\"\n\
+    profiles = requests.get(profiles_url).json()\nmutation_profile_id = next(p['molecularProfileId']\
+    \ for p in profiles if p['molecularAlterationType'] == 'MUTATION_EXTENDED')\n\
+    expr_profile_id = next(p['molecularProfileId'] for p in profiles if p['molecularAlterationType']\
+    \ == 'MRNA_EXPRESSION')\n\n# 2. Get gene information\ngenes_url = f\"{BASE_URL}/genes/fetch?geneIdType=HUGO_GENE_SYMBOL&projection=SUMMARY\"\
+    \ngenes = requests.post(genes_url, json=GENE_SYMBOLS).json()\nentrez_ids = [g['entrezGeneId']\
+    \ for g in genes]\nentrez_to_symbol = {g['entrezGeneId']: g['hugoGeneSymbol']\
+    \ for g in genes}\n\n# 3. Get sample lists\nsample_lists_url = f\"{BASE_URL}/studies/{STUDY_ID}/sample-lists?projection=SUMMARY\"\
+    \nsample_lists = requests.get(sample_lists_url).json()\nmutation_samples = next(sl['sampleListId']\
+    \ for sl in sample_lists if sl['category'] == 'all_cases_with_mutation_data')\n\
+    expr_samples = next(sl['sampleListId'] for sl in sample_lists if 'mrna' in sl['category'].lower())\n\
+    \n# 4. Get mutations for target genes\nmutations_url = f\"{BASE_URL}/molecular-profiles/{mutation_profile_id}/mutations\"\
+    \nparams = {\"sampleListId\": mutation_samples, \"projection\": \"SUMMARY\"}\n\
+    mutations = requests.get(mutations_url, params=params).json()\ntarget_mutations\
+    \ = [m for m in mutations if m['entrezGeneId'] in entrez_ids]\n\n# 5. Get expression\
+    \ data\nexpr_samples_url = f\"{BASE_URL}/sample-lists/{expr_samples}/sample-ids\"\
+    \nexpr_sample_ids = requests.get(expr_samples_url).json()\nexpr_url = f\"{BASE_URL}/molecular-profiles/{expr_profile_id}/molecular-data/fetch\"\
+    \nexpr_data = {\"sampleIds\": expr_sample_ids, \"entrezGeneIds\": entrez_ids}\n\
+    expression_data = requests.post(expr_url, json=expr_data).json()\n\n# 6. Create\
+    \ mutation status mapping\nmutations_df = pd.DataFrame([{\n    \"sample_id\":\
+    \ m['sampleId'],\n    \"gene_symbol\": entrez_to_symbol[m['entrezGeneId']]\n}\
+    \ for m in target_mutations])\n\n# 7. Create expression dataframe\nexpr_df = pd.DataFrame(expression_data)\n\
+    expr_df['gene_symbol'] = expr_df['entrezGeneId'].map(entrez_to_symbol)\nexpr_df\
+    \ = expr_df[['sampleId', 'gene_symbol', 'value']].rename(columns={'sampleId':\
+    \ 'sample_id', 'value': 'expression'})\n\n# 8. Analyze mutation-expression relationships\n\
+    results = []\nfor gene in GENE_SYMBOLS:\n    mutated_samples = set(mutations_df.loc[mutations_df['gene_symbol']\
+    \ == gene, 'sample_id'])\n    gene_expr = expr_df[expr_df['gene_symbol'] == gene].copy()\n\
+    \    gene_expr['mutation_status'] = gene_expr['sample_id'].apply(lambda x: 'Mutated'\
+    \ if x in mutated_samples else 'Wild-Type')\n    \n    # Statistical test\n  \
+    \  mutated = gene_expr[gene_expr['mutation_status'] == 'Mutated']['expression']\n\
+    \    wild_type = gene_expr[gene_expr['mutation_status'] == 'Wild-Type']['expression']\n\
+    \    \n    if len(mutated) > 0 and len(wild_type) > 0:\n        statistic, p_value\
+    \ = stats.mannwhitneyu(mutated, wild_type, alternative='two-sided')\n        fold_change\
+    \ = mutated.mean() / wild_type.mean() if wild_type.mean() != 0 else 0\n      \
+    \  \n        results.append({\n            'gene': gene,\n            'mutated_samples':\
+    \ len(mutated),\n            'wild_type_samples': len(wild_type),\n          \
+    \  'mutated_mean': mutated.mean(),\n            'wild_type_mean': wild_type.mean(),\n\
+    \            'fold_change': fold_change,\n            'p_value': p_value\n   \
+    \     })\n\nresults_df = pd.DataFrame(results)\nprint(\"Mutation-Expression Analysis\
+    \ Results:\")\nprint(results_df.to_string(index=False))"
+  notes: This example demonstrates how to integrate mutation and expression data to
+    perform statistical comparisons between mutated and wild-type samples. Essential
+    for understanding functional consequences of mutations in cancer genomics.
+- query: Analyze co-mutation patterns between genes using Fisher's exact test
+  code: "import requests\nimport pandas as pd\nfrom scipy.stats import fisher_exact\n\
+    \nBASE_URL = \"https://www.cbioportal.org/api\"\nSTUDY_ID = \"luad_tcga_gdc\"\n\
+    \n# Get mutation data (assuming mutations_df already exists from previous examples)\n\
+    # mutations_df should contain columns: 'sampleId', 'gene_symbol'\n\n# Create mutation\
+    \ matrix (samples x genes)\nmutation_matrix = mutations_df.pivot_table(\n    index='sampleId',\
+    \ \n    columns='gene_symbol', \n    values='entrezGeneId', \n    aggfunc='count',\
+    \ \n    fill_value=0\n)\nmutation_matrix = (mutation_matrix > 0).astype(int)\n\
+    \n# Focus on top mutated genes\ntop_genes = ['TP53', 'TTN', 'MUC16', 'CSMD3',\
+    \ 'RYR2', 'LRP1B', 'ZFHX4', 'USH2A', 'KRAS', 'XIRP2']\ntop_genes_matrix = mutation_matrix[top_genes]\n\
+    \n# Calculate co-mutation frequencies\nco_mutation_results = []\nfor i, gene1\
+    \ in enumerate(top_genes):\n    for j, gene2 in enumerate(top_genes):\n      \
+    \  if i < j:  # Avoid duplicates\n            # Count co-mutations\n         \
+    \   both_mutated = ((top_genes_matrix[gene1] == 1) & (top_genes_matrix[gene2]\
+    \ == 1)).sum()\n            gene1_only = ((top_genes_matrix[gene1] == 1) & (top_genes_matrix[gene2]\
+    \ == 0)).sum()\n            gene2_only = ((top_genes_matrix[gene1] == 0) & (top_genes_matrix[gene2]\
+    \ == 1)).sum()\n            neither = ((top_genes_matrix[gene1] == 0) & (top_genes_matrix[gene2]\
+    \ == 0)).sum()\n            \n            # Fisher's exact test for co-occurrence\n\
+    \            contingency_table = [[both_mutated, gene1_only], [gene2_only, neither]]\n\
+    \            odds_ratio, p_value = fisher_exact(contingency_table)\n         \
+    \   \n            total_samples = len(top_genes_matrix)\n            co_mutation_rate\
+    \ = (both_mutated / total_samples) * 100\n            \n            co_mutation_results.append({\n\
+    \                'gene1': gene1,\n                'gene2': gene2,\n          \
+    \      'co_mutations': both_mutated,\n                'co_mutation_rate': co_mutation_rate,\n\
+    \                'odds_ratio': odds_ratio,\n                'p_value': p_value\n\
+    \            })\n\n# Sort by co-mutation frequency and show significant pairs\n\
+    co_mutation_df = pd.DataFrame(co_mutation_results)\nsignificant_pairs = co_mutation_df[co_mutation_df['p_value']\
+    \ < 0.001].sort_values('co_mutations', ascending=False)\n\nprint(\"Significant\
+    \ co-mutation pairs (p < 0.001):\")\nfor _, row in significant_pairs.head(10).iterrows():\n\
+    \    significance = \"***\" if row['p_value'] < 0.001 else \"**\" if row['p_value']\
+    \ < 0.01 else \"*\"\n    print(f\"{row['gene1']} & {row['gene2']}: {row['co_mutations']}\
+    \ samples ({row['co_mutation_rate']:.1f}%) {significance}\")"
+  notes: This example shows how to identify genes that are frequently mutated together
+    in cancer samples using statistical testing. Useful for understanding mutational
+    processes and identifying potential synthetic lethal relationships.
+- query: Analyze specific mutations (e.g., KRAS G12C) in TCGA studies with expression
+    comparison
+  code: |-
+    import requests
+    import pandas as pd
+    from scipy import stats
+    import numpy as np
+
+    BASE_URL = "https://www.cbioportal.org/api"
+    STUDY_ID = "luad_tcga_gdc"
+    GENE_SYMBOLS = ["KRAS"]
+
+    # 1. Get molecular profile IDs
+    profiles_url = f"{BASE_URL}/studies/{STUDY_ID}/molecular-profiles?projection=SUMMARY"
+    profiles = requests.get(profiles_url).json()
+    mutation_profile_id = next(p['molecularProfileId'] for p in profiles if p['molecularAlterationType'] == 'MUTATION_EXTENDED')
+    expr_profile_id = next(p['molecularProfileId'] for p in profiles if p['molecularAlterationType'] == 'MRNA_EXPRESSION')
+
+    # 2. Get gene information
+    genes_url = f"{BASE_URL}/genes/fetch?geneIdType=HUGO_GENE_SYMBOL&projection=SUMMARY"
+    genes = requests.post(genes_url, json=GENE_SYMBOLS).json()
+    entrez_ids = [g['entrezGeneId'] for g in genes]
+
+    # 3. Get sample lists
+    sample_lists_url = f"{BASE_URL}/studies/{STUDY_ID}/sample-lists?projection=SUMMARY"
+    sample_lists = requests.get(sample_lists_url).json()
+    mutation_samples = next(sl['sampleListId'] for sl in sample_lists if sl['category'] == 'all_cases_with_mutation_data')
+    expr_samples = next(sl['sampleListId'] for sl in sample_lists if 'mrna' in sl['category'].lower())
+
+    # 4. Get detailed mutations for KRAS with protein changes
+    mutations_url = f"{BASE_URL}/molecular-profiles/{mutation_profile_id}/mutations"
+    params = {"sampleListId": mutation_samples, "projection": "DETAILED"}
+    mutations = requests.get(mutations_url, params=params).json()
+    kras_mutations = [m for m in mutations if m['entrezGeneId'] == entrez_ids[0]]
+
+    # Create mutation dataframe with protein changes
+    kras_df = pd.DataFrame([{
+        "sample_id": m['sampleId'],
+        "gene_symbol": m['gene']['hugoGeneSymbol'],
+        "protein_change": m.get('proteinChange', 'Unknown'),
+        "mutation_type": m.get('mutationType', 'Unknown'),
+        "hgvsp_short": m.get('hgvspShort', 'Unknown'),
+        "amino_acid_change": m.get('aminoAcidChange', 'Unknown')
+    } for m in kras_mutations])
+
+    # Filter for specific mutation (e.g., G12C)
+    g12c_samples = kras_df[kras_df['protein_change'] == 'G12C']['sample_id'].tolist()
+    print(f"G12C mutations found: {len(g12c_samples)}")
+
+    # 5. Get expression data
+    expr_samples_url = f"{BASE_URL}/sample-lists/{expr_samples}/sample-ids"
+    expr_sample_ids = requests.get(expr_samples_url).json()
+
+    expr_url = f"{BASE_URL}/molecular-profiles/{expr_profile_id}/molecular-data/fetch"
+    expr_data = {"sampleIds": expr_sample_ids, "entrezGeneIds": entrez_ids}
+    expression_data = requests.post(expr_url, json=expr_data).json()
+
+    # Create expression dataframe
+    expr_df = pd.DataFrame([{
+        "sample_id": e['sampleId'],
+        "expression": e['value']
+    } for e in expression_data])
+
+    # Map mutation status
+    all_kras_mutated_samples = set(kras_df['sample_id'].tolist())
+    mutation_status_map = {}
+    for sample in g12c_samples:
+        mutation_status_map[sample] = 'KRAS_G12C'
+    for sample in all_kras_mutated_samples:
+        if sample not in mutation_status_map:
+            mutation_status_map[sample] = 'KRAS_Other'
+
+    expr_df['mutation_status'] = expr_df['sample_id'].map(mutation_status_map).fillna('Wild_Type')
+
+    # Statistical analysis
+    g12c_expr = expr_df[expr_df['mutation_status'] == 'KRAS_G12C']['expression']
+    wt_expr = expr_df[expr_df['mutation_status'] == 'Wild_Type']['expression']
+
+    if len(g12c_expr) > 0 and len(wt_expr) > 0:
+        statistic, p_value = stats.mannwhitneyu(g12c_expr, wt_expr, alternative='two-sided')
+        fold_change = g12c_expr.mean() / wt_expr.mean()
+        print(f"G12C vs Wild-Type: {fold_change:.2f}x fold change, p = {p_value:.2e}")
+
+    print(f"Mutation distribution:\n{expr_df['mutation_status'].value_counts()}")
+  notes: 'This example demonstrates how to: 1) Fetch detailed mutation data with protein
+    changes from TCGA studies, 2) Filter for specific mutations like G12C, 3) Get
+    corresponding expression data, 4) Compare expression levels between mutation groups,
+    and 5) Perform statistical analysis. Key points: Use DETAILED projection for mutations
+    to get protein changes, map mutation status to expression data, and use appropriate
+    statistical tests for group comparisons.'
+- query: Analyze IDH1 R132H mutations in TCGA glioblastoma with expression comparison
+  code: "import requests\nimport pandas as pd\nfrom scipy import stats\nimport numpy\
+    \ as np\n\nBASE_URL = \"https://www.cbioportal.org/api\"\nSTUDY_ID = \"gbm_tcga_gdc\"\
+    \  # Glioblastoma study\nGENE_SYMBOLS = [\"IDH1\"]\n\n# 1. Get molecular profile\
+    \ IDs\nprofiles_url = f\"{BASE_URL}/studies/{STUDY_ID}/molecular-profiles?projection=SUMMARY\"\
+    \nprofiles = requests.get(profiles_url).json()\nmutation_profile_id = next(p['molecularProfileId']\
+    \ for p in profiles if p['molecularAlterationType'] == 'MUTATION_EXTENDED')\n\
+    expr_profile_id = next(p['molecularProfileId'] for p in profiles if p['molecularAlterationType']\
+    \ == 'MRNA_EXPRESSION')\n\n# 2. Get gene information\ngenes_url = f\"{BASE_URL}/genes/fetch?geneIdType=HUGO_GENE_SYMBOL&projection=SUMMARY\"\
+    \ngenes = requests.post(genes_url, json=GENE_SYMBOLS).json()\nentrez_ids = [g['entrezGeneId']\
+    \ for g in genes]\n\n# 3. Get sample lists\nsample_lists_url = f\"{BASE_URL}/studies/{STUDY_ID}/sample-lists?projection=SUMMARY\"\
+    \nsample_lists = requests.get(sample_lists_url).json()\nmutation_samples = next(sl['sampleListId']\
+    \ for sl in sample_lists if sl['category'] == 'all_cases_with_mutation_data')\n\
+    expr_samples = next(sl['sampleListId'] for sl in sample_lists if 'mrna' in sl['category'].lower())\n\
+    \n# 4. Get detailed mutations for IDH1 with protein changes\nmutations_url = f\"\
+    {BASE_URL}/molecular-profiles/{mutation_profile_id}/mutations\"\nparams = {\"\
+    sampleListId\": mutation_samples, \"projection\": \"DETAILED\"}\nmutations = requests.get(mutations_url,\
+    \ params=params).json()\nidh1_mutations = [m for m in mutations if m['entrezGeneId']\
+    \ == entrez_ids[0]]\n\n# Create mutation dataframe with protein changes\nidh1_df\
+    \ = pd.DataFrame([{\n    \"sample_id\": m['sampleId'],\n    \"gene_symbol\": m['gene']['hugoGeneSymbol'],\n\
+    \    \"protein_change\": m.get('proteinChange', 'Unknown'),\n    \"mutation_type\"\
+    : m.get('mutationType', 'Unknown'),\n    \"hgvsp_short\": m.get('hgvspShort',\
+    \ 'Unknown'),\n    \"amino_acid_change\": m.get('aminoAcidChange', 'Unknown')\n\
+    } for m in idh1_mutations])\n\n# Filter for R132H mutation specifically\nr132h_samples\
+    \ = idh1_df[idh1_df['protein_change'] == 'R132H']['sample_id'].tolist()\nprint(f\"\
+    IDH1 R132H mutations found: {len(r132h_samples)}\")\n\n# Show mutation distribution\n\
+    mutation_counts = idh1_df['protein_change'].value_counts()\nprint(f\"IDH1 mutation\
+    \ distribution:\\n{mutation_counts}\")\n\n# 5. Get expression data\nexpr_samples_url\
+    \ = f\"{BASE_URL}/sample-lists/{expr_samples}/sample-ids\"\nexpr_sample_ids =\
+    \ requests.get(expr_samples_url).json()\n\nexpr_url = f\"{BASE_URL}/molecular-profiles/{expr_profile_id}/molecular-data/fetch\"\
+    \nexpr_data = {\"sampleIds\": expr_sample_ids, \"entrezGeneIds\": entrez_ids}\n\
+    expression_data = requests.post(expr_url, json=expr_data).json()\n\n# Create expression\
+    \ dataframe\nexpr_df = pd.DataFrame([{\n    \"sample_id\": e['sampleId'],\n  \
+    \  \"expression\": e['value']\n} for e in expression_data])\n\n# Map mutation\
+    \ status\nall_idh1_mutated_samples = set(idh1_df['sample_id'].tolist())\nmutation_status_map\
+    \ = {}\nfor sample in r132h_samples:\n    mutation_status_map[sample] = 'IDH1_R132H'\n\
+    for sample in all_idh1_mutated_samples:\n    if sample not in mutation_status_map:\n\
+    \        mutation_status_map[sample] = 'IDH1_Other'\n\nexpr_df['mutation_status']\
+    \ = expr_df['sample_id'].map(mutation_status_map).fillna('Wild_Type')\n\n# Statistical\
+    \ analysis comparing R132H vs Wild-Type\nr132h_expr = expr_df[expr_df['mutation_status']\
+    \ == 'IDH1_R132H']['expression']\nwt_expr = expr_df[expr_df['mutation_status']\
+    \ == 'Wild_Type']['expression']\n\nif len(r132h_expr) > 0 and len(wt_expr) > 0:\n\
+    \    statistic, p_value = stats.mannwhitneyu(r132h_expr, wt_expr, alternative='two-sided')\n\
+    \    fold_change = r132h_expr.mean() / wt_expr.mean()\n    print(f\"\\nIDH1 R132H\
+    \ vs Wild-Type:\")\n    print(f\"\u2022 R132H samples: {len(r132h_expr)}\")\n\
+    \    print(f\"\u2022 Wild-type samples: {len(wt_expr)}\")\n    print(f\"\u2022\
+    \ Fold change: {fold_change:.2f}x\")\n    print(f\"\u2022 P-value: {p_value:.2e}\"\
+    )\n\n# Summary statistics\nsummary_stats = expr_df.groupby('mutation_status')['expression'].agg([\n\
+    \    'count', 'mean', 'median', 'std'\n]).round(2)\nprint(f\"\\nExpression summary\
+    \ by mutation status:\\n{summary_stats}\")\n\nprint(f\"\\nMutation status distribution:\\\
+    n{expr_df['mutation_status'].value_counts()}\")"
+  notes: 'This example demonstrates analyzing the IDH1 R132H mutation in glioblastoma,
+    which is a metabolic reprogramming mutation that creates neomorphic enzyme activity.
+    Key features: 1) Focuses on glioblastoma study where IDH1 mutations are most relevant,
+    2) Specifically filters for R132H mutation (the most common IDH1 mutation), 3)
+    Compares expression levels between R132H mutated and wild-type samples, 4) Provides
+    statistical analysis and summary statistics. This mutation is particularly interesting
+    because it changes enzyme function rather than just disrupting it, making it ideal
+    for functional prediction tools like AlphaGenome.'
