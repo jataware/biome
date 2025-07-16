@@ -71,3 +71,5 @@ documentation: !fill |
 
     # Tutorial Documentation:
     {tutorials}
+
+    IMPORTANT: you must only provide code that honestly uses the API. You MUST NEVER include fallbacks that print out key information that _should_ have been returned by the API.
