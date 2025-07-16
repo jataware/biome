@@ -1,0 +1,73 @@
+name: alphagenome
+slug: alphagenome
+cache_key: api_assistant_alphagenome
+description: |
+    AlphaGenome is a Google DeepMind AI model for analyzing DNA sequences, providing multimodal predictions of genomic features.
+    It can analyze DNA sequences up to 1 million base pairs and offers predictions at single base-pair resolution.
+    The model provides functional outputs including gene expression, splicing patterns, chromatin features, and contact maps.
+    It offers both a Python client library and API access for genomic analysis.
+overview: !load_txt documentation/alphagenome_overview.md
+tutorials: !load_txt documentation/alphagenome_tutorials.md
+examples: !load_yaml documentation/examples.yaml
+cache_body:
+    default: true
+documentation: !fill |
+    # Additional Instructions:
+
+    AlphaGenome is a Python package and API service for genomic analysis. It requires an API key from Google DeepMind.
+    This API key is available to you in the environment variable `ALPHAGENOME_KEY`.
+
+    When drafting code, use the following pattern to access the API key: `os.environ.get("ALPHAGENOME_KEY")`.
+    Do not use placeholder auth values, just use the environment variable.
+
+    ## Key Features
+    - Multimodal genomic predictions
+    - Single base-pair resolution analysis
+    - DNA sequences up to 1 million base pairs
+    - Variant effect prediction
+    - Gene expression analysis
+    - Splicing pattern analysis
+    - Chromatin feature analysis
+    - Contact map generation
+
+    ## Main Modules
+    - `alphagenome.data.genome`: Data structures for genomic intervals and variants
+    - `alphagenome.models.dna_client`: Main client for making predictions
+    - `alphagenome.visualization.plot_components`: Visualization tools
+    - `alphagenome.interpretation`: Sequence interpretation tools
+
+    ## Example Usage
+    ```python
+    from alphagenome.data import genome
+    from alphagenome.models import dna_client
+    
+    API_KEY = os.environ.get("ALPHAGENOME_KEY")
+    model = dna_client.create(API_KEY)
+    
+    interval = genome.Interval(chromosome='chr22', start=35677410, end=36725986)
+    variant = genome.Variant(
+        chromosome='chr22',
+        position=36201698,
+        reference_bases='A',
+        alternate_bases='C',
+    )
+    
+    outputs = model.predict_variant(
+        interval=interval,
+        variant=variant,
+        ontology_terms=['UBERON:0001157'],
+        requested_outputs=[dna_client.OutputType.RNA_SEQ],
+    )
+    ```
+
+    ## Supported Output Types
+    - RNA_SEQ: Gene expression predictions
+    - SPLICING: Splicing pattern predictions
+    - CHROMATIN: Chromatin feature predictions
+    - CONTACT_MAPS: 3D genomic contact predictions
+
+    # Overview Documentation:
+    {overview}
+
+    # Tutorial Documentation:
+    {tutorials}

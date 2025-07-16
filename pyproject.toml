@@ -43,7 +43,8 @@ dependencies = [
   "xlrd~=2.0.1",
   "geopandas~=1.0.1",
   "scikit-learn~=1.6.1",
-  "paper-qa>=5"
+  "paper-qa>=5",
+  "alphagenome~=0.0.2"
 ]
 
 [project.urls]
