@@ -44,6 +44,8 @@ class BiomeContext(BeakerContext):
             "synapse_api_key": os.environ.get("API_SYNAPSE"),
             "netrias_api_key": os.environ.get("NETRIAS_KEY"),
             "alphagenome_key": os.environ.get("ALPHAGENOME_KEY"),
+            "immport_username": os.environ.get("IMMPORT_USERNAME"),
+            "immport_password": os.environ.get("IMMPORT_PASSWORD"),
         })
         await self.execute(command)
 
