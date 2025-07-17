@@ -133,9 +133,8 @@ class BiomeAgent(BeakerAgent):
         self.integration_directories = {}
         for integration_dir in os.listdir(integration_root):
             if integration_dir == '.ipynb_checkpoints':
-                os.rmdir(os.path.join(integration_root, integration_dir))
                 try:
-                    os.rmdir(os.path.join(datasource_root, datasource_dir))
+                    os.rmdir(os.path.join(integration_root, integration_dir))
                 except IOError:
                     continue
 
