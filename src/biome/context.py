@@ -24,31 +24,6 @@ logger = logging.getLogger(__name__)
 ADHOC_DIR_PATH = (Path(__file__).parent / "adhoc_data")
 
 
-class TestIntegrationProvider(BaseIntegrationProvider):
-    integrations: list[Integration]
-    def __init__(self):
-        self.integrations = [
-            Integration(
-                name="Test Integration 1",
-                description="First Test Integration",
-                provider="test"
-            ),
-            Integration(
-                name="Test Integration 2",
-                description="Second Test Integration",
-                provider="test"
-            ),
-        ]
-        super().__init__(display_name="Biome Second Test Integration")
-    def list_integrations(self):
-        return self.integrations
-    def get_integration(self, integration_id):
-        pass
-    def list_resources(self, integration_id, resource_type=None):
-        pass
-    def get_resource(self, integration_id, resource_id):
-        pass
-
 class BiomeContext(BeakerContext):
     SLUG = "biome"
     agent_cls: "BaseAgent" = BiomeAgent
@@ -70,12 +45,11 @@ class BiomeContext(BeakerContext):
             logger=logger,
             display_name="Specialist Agents"
         )
-        test_integration = TestIntegrationProvider()
         super().__init__(
             beaker_kernel,
             self.agent_cls,
             config,
-            integrations=[adhoc_integration, test_integration]
+            integrations=[adhoc_integration]
         )
 
         if not isinstance(self.subkernel, PythonSubkernel):
