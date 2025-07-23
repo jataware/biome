@@ -52,6 +52,8 @@ class BiomeContext(BeakerContext):
             "alphagenome_key": os.environ.get("ALPHAGENOME_KEY"),
             "immport_username": os.environ.get("IMMPORT_USERNAME"),
             "immport_password": os.environ.get("IMMPORT_PASSWORD"),
+            "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),
+            "aqs_key": os.environ.get("API_EPA_AQS"),
         })
         await self.execute(command)
 
