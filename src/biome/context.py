@@ -7,11 +7,9 @@ from pathlib import Path
 
 from beaker_kernel.lib.context import BeakerContext
 from beaker_kernel.subkernels.python import PythonSubkernel
-from beaker_kernel.lib.types import Integration
-from beaker_kernel.lib.integrations.base import BaseIntegrationProvider
-from beaker_kernel.lib.integrations.adhoc import AdhocIntegrationProvider
 
 from .agent import BiomeAgent
+from .integrations import BiomeIntegrationProvider
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -19,9 +17,6 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
-
-# TODO: Change this for better autodiscovery, etc
-ADHOC_DIR_PATH = (Path(__file__).parent / "adhoc_data")
 
 
 class BiomeContext(BeakerContext):
@@ -37,8 +32,7 @@ class BiomeContext(BeakerContext):
         gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
 
         # Initialize adhoc integration
-        adhoc_integration = AdhocIntegrationProvider(
-            adhoc_path=ADHOC_DIR_PATH,
+        adhoc_integration = BiomeIntegrationProvider(
             drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
             curator_config=curator_config,
             contextualizer_config=gpt_41_config,
