@@ -33,18 +33,6 @@ class MessageLogger():
     def debug(self, message):
         self.print_logger.debug(message)
 
-# Load docstrings at module level
-def load_docstring(filename: str):
-    root_folder = Path(__file__).resolve().parent / 'adhoc_data'
-    return (root_folder / 'prompts' / 'docstrings' / filename).read_text()
-
-def with_docstring(filename):
-    """Decorator to set a function's docstring from a file"""
-    docstring = load_docstring(filename)
-    def decorator(func):
-        func.__doc__ = docstring
-        return func
-    return decorator
 
 class BiomeAgent(BeakerAgent):
     """

@@ -1,15 +1,17 @@
-from dataclasses import asdict
-from typing import TYPE_CHECKING, Any, Dict
 import os
+import re
 import logging
-
+import json
+from dataclasses import asdict
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict
 
 from beaker_kernel.lib.context import BeakerContext
 from beaker_kernel.subkernels.python import PythonSubkernel
 
 from .agent import BiomeAgent
 from .integrations import BiomeAdhocIntegrations
+
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -64,5 +66,9 @@ class BiomeContext(BeakerContext):
             "synapse_api_key": os.environ.get("API_SYNAPSE"),
             "netrias_api_key": os.environ.get("NETRIAS_KEY"),
             "alphagenome_key": os.environ.get("ALPHAGENOME_KEY"),
+            "immport_username": os.environ.get("IMMPORT_USERNAME"),
+            "immport_password": os.environ.get("IMMPORT_PASSWORD"),
+            "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),
+            "aqs_key": os.environ.get("API_EPA_AQS"),
         })
         await self.execute(command)
