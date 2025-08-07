@@ -9,7 +9,7 @@ from beaker_kernel.lib.context import BeakerContext
 from beaker_kernel.subkernels.python import PythonSubkernel
 
 from .agent import BiomeAgent
-from .integrations import BiomeIntegrationProvider
+from .integrations import BiomeAdhocIntegrations
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -32,7 +32,7 @@ class BiomeContext(BeakerContext):
         gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
 
         # Initialize adhoc integration
-        adhoc_integration = BiomeIntegrationProvider(
+        adhoc_integration = BiomeAdhocIntegrations(
             drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
             curator_config=curator_config,
             contextualizer_config=gpt_41_config,

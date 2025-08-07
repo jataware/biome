@@ -1,5 +1,5 @@
 from beaker_kernel.lib.integrations.adhoc import AdhocIntegrationProvider, AdhocSpecificationIntegration
 
-class BiomeIntegrationProvider(AdhocIntegrationProvider):
-    display_name="Specialist Agents"
+class BiomeAdhocIntegrations(AdhocIntegrationProvider):
+    display_name="Biome Specialist Agents"
     slug="biome"

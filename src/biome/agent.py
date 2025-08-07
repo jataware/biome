@@ -58,10 +58,10 @@ class BiomeAgent(BeakerAgent):
         data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
         try:
             data_dir = Path(data_dir_raw).resolve(strict=True)
-            logger.info(f"Using data_dir: {data_dir}")
+            logger.info(f"Using data_dir for lit review: {data_dir}")
         except OSError as e:
             data_dir = Path('.')
-            logger.error(f"Failed to set biome data dir: {data_dir_raw} does not exist: {e}")
+            logger.error(f"Failed to set biome data_dir for lit review: {data_dir_raw}\n\t{e}\n\tSetting to working directory.")
         self.data_dir = data_dir
 
         self.initialize_literature_review()

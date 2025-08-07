@@ -12,7 +12,7 @@ resources:
   125d85a4-0a2a-4306-b0d3-cc3c9451bb8e:
     code: "import pandas as pd\nimport matplotlib.pyplot as plt\nimport numpy as np\n\
       \n# Load and prepare data (assuming tri_data is already loaded and cleaned)\n\
-      file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'\n\
+      file_path = '{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}'\n\
       tri_data = pd.read_csv(file_path, low_memory=False)\n\n# Fix the numeric columns\
       \ that might be stored as strings with commas\nfor col in ['Releases (lb)',\
       \ 'Waste Managed (lb)', 'RSEI Hazard']:\n    if tri_data[col].dtype == 'object':\n\
@@ -47,7 +47,7 @@ resources:
       import pandas as pd
 
       # Always the TRI csv with index_col=False param, since pandas is inferring the wrong index column and shifting the data without it
-      df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', dtype=str, index_col=False)
+      df = pd.read_csv('{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}', dtype=str, index_col=False)
 
       # Filter for any entries containing 'Orange' in the County column
       # sample name without the county suffix, all uppercase and with correct spacing
@@ -69,7 +69,7 @@ resources:
       import pandas as pd
 
       # Load the TRI data
-      tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+      tri_data = pd.read_csv('{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}', index_col=False)
 
       # Define respiratory/asthma related chemicals
       # Updated to match the actual format in the dataset (with CAS numbers)
@@ -122,7 +122,7 @@ resources:
   494e3a73-da61-4132-a169-56880ce5ea60:
     code: "import pandas as pd\nimport matplotlib.pyplot as plt\nimport numpy as np\n\
       \n# Load and prepare data (assuming tri_data is already loaded and cleaned)\n\
-      file_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'\n\
+      file_path = '{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}'\n\
       tri_data = pd.read_csv(file_path, low_memory=False)\n\n# Fix the numeric columns\
       \ that might be stored as strings with commas\nfor col in ['Releases (lb)',\
       \ 'Waste Managed (lb)', 'RSEI Hazard']:\n    if tri_data[col].dtype == 'object':\n\
@@ -164,7 +164,7 @@ resources:
   7dcb643d-1565-415e-99c7-04c0c48e6366:
     code: "import pandas as pd\nimport folium\nfrom folium.plugins import MarkerCluster\n\
       import numpy as np\n\n# Load and prepare data (assuming tri_data is already\
-      \ loaded and cleaned)\nfile_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'\n\
+      \ loaded and cleaned)\nfile_path = '{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}'\n\
       tri_data = pd.read_csv(file_path, low_memory=False)\n\n# Fix the numeric columns\
       \ that might be stored as strings with commas\nfor col in ['Releases (lb)',\
       \ 'Waste Managed (lb)', 'RSEI Hazard']:\n    if tri_data[col].dtype == 'object':\n\
@@ -206,7 +206,7 @@ resources:
       import pandas as pd
 
       # Load the TRI data
-      tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+      tri_data = pd.read_csv('{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}', index_col=False)
 
       # List of respiratory-related chemicals
       respiratory_chemicals = [
@@ -250,7 +250,7 @@ resources:
   8de5ce51-3ff8-4ab3-a347-311b499acf7a:
     code: "import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as\
       \ sns\nimport numpy as np\nfrom scipy.stats import pearsonr\n\n# Load and prepare\
-      \ data (assuming tri_data is already loaded and cleaned)\nfile_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'\n\
+      \ data (assuming tri_data is already loaded and cleaned)\nfile_path = '{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}'\n\
       tri_data = pd.read_csv(file_path, low_memory=False)\n\n# Fix the numeric columns\
       \ that might be stored as strings with commas\nfor col in ['Releases (lb)',\
       \ 'Waste Managed (lb)', 'RSEI Hazard']:\n    if tri_data[col].dtype == 'object':\n\
@@ -285,7 +285,7 @@ resources:
     resource_id: 8de5ce51-3ff8-4ab3-a347-311b499acf7a
     resource_type: example
   9ec78574-65e7-4a7c-bb6b-7752a2cdf5a7:
-    code: "import pandas as pd\n\n# Load the data\nfile_path = '{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv'\n\
+    code: "import pandas as pd\n\n# Load the data\nfile_path = '{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}'\n\
       tri_data = pd.read_csv(file_path, low_memory=False)\n\n# Fix the numeric columns\
       \ that might be stored as strings with commas\nfor col in ['Releases (lb)',\
       \ 'Waste Managed (lb)', 'RSEI Hazard']:\n    if tri_data[col].dtype == 'object':\n\
@@ -317,7 +317,7 @@ resources:
       import pandas as pd
 
       # Load the data
-      tri_data = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+      tri_data = pd.read_csv('{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}', index_col=False)
 
       print("Sample of County values:")
       print(tri_data['County'].unique()[:10])  # Print first 10 unique county values
@@ -367,7 +367,7 @@ resources:
     resource_type: example
 slug: adhocspecificationintegration_epa_toxic_release_inventory__tri_
 source: |
-  You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `${DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv` file.
+  You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}` file.
   The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.
   It also contains geospatial information such as latitude, longitude, state/zip, and even EPA region.
 
@@ -410,7 +410,7 @@ source: |
   1. When loading the data, ensure you specify the index_col=False parameter, since pandas is inferring the wrong index column and shifting the data without it:
      ```python
      import pandas as pd
-     tri_data = pd.read_csv('${DATASET_FILES_BASE_PATH}/epa-tri/EPA_TRI_Toxics_2014_2023.csv', index_col=False)
+     tri_data = pd.read_csv('{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}', index_col=False)
      ```
 
   2. Common data analysis tasks:
