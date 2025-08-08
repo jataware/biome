@@ -312,7 +312,7 @@ resources:
       Multi-pollutant correlation analysis for air quality research. This example demonstrates how to retrieve data for multiple pollutants (Ozone, PM2.5, NO2, and SO2), process the data to get daily averages, merge the datasets, and analyze correlations between different pollutants. It includes a visualization of the correlation matrix using a heatmap.
     resource_id: e643cf2e-66f1-428e-8f2c-2626c4c59192
     resource_type: example
-slug: adhocspecificationintegration_epa_air_quality_system
+slug: epa_air_quality_system
 source: "# OpenAPI Spec JSON:\n${raw_documentation}\n\n# Additional Instructions:\n\
   \nThis API is through OpenAPI Spec (Swagger). You will be provided the schema.\n\
   All requests go to the following URL: https://aqs.epa.gov/data/api\nThat is the\

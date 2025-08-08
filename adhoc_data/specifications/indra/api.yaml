@@ -211,7 +211,7 @@ resources:
     name: raw_documentation
     resource_id: f49c8aa7-727e-444e-a3a2-314a5f0d6631
     resource_type: file
-slug: adhocspecificationintegration_indra_context_graph_extension__cogex_
+slug: indra_context_graph_extension__cogex_
 source: |
   ${raw_documentation}
 

@@ -869,7 +869,7 @@ resources:
       Get all clinical data (cases) from PDC and filter for those that have external references to GDC. Return the results as a pandas dataframe.
     resource_id: ed1fa5df-2d51-48ef-871b-b09abc5defc9
     resource_type: example
-slug: adhocspecificationintegration_proteomics_data_commons
+slug: proteomics_data_commons
 source: |
   ${raw_documentation}
 

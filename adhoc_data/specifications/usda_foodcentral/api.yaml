@@ -39,7 +39,7 @@ resources:
     query: Search for nutrients for raw acerola juice
     resource_id: 4164944f-a6d4-452c-a290-3ab7bd2e9d9e
     resource_type: example
-slug: adhocspecificationintegration_usda_fooddata_central_api
+slug: usda_fooddata_central_api
 source: |
   This API is the primary place to obtain data from the USDA's FoodData Central database.
 

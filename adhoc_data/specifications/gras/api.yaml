@@ -37,7 +37,7 @@ resources:
     query: Is there any FDA GRAS notice for Dioctyl sodium sulfosuccinate as an additive?
     resource_id: fd30b48e-e83b-41a2-a969-49ebc58da112
     resource_type: example
-slug: adhocspecificationintegration_fda_generally_recognized_as_safe__gras_
+slug: fda_generally_recognized_as_safe__gras_
 source: "You have access to the FDA Generally Recognized as Safe (GRAS), which is\
   \ a csv file data with notices filed from the FDA GRAS database from years 1998\
   \ to 2024.\nYou may use this to check for food additives introductions, and correlate\

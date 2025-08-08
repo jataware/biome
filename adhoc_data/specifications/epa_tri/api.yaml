@@ -365,7 +365,7 @@ resources:
       When not finding results for a combined query, try a more systematic approach by finding items and counting length by one by one, in order to discover if there is matching data, but the query is not returning any results. This is to discover amonia references for the county of 'HARRIS, TX'.
     resource_id: e2bd90f9-24a6-41e5-a3ba-1aca807d8990
     resource_type: example
-slug: adhocspecificationintegration_epa_toxic_release_inventory__tri_
+slug: epa_toxic_release_inventory__tri_
 source: |
   You have access to a file-based EPA Toxic Release Inventory (TRI) data, from 2014 to 2023, at the `{{'EPA_TRI_Toxics_2014_2023.csv'|file('data')}}` file.
   The report is just one file- there's a year column, and then a list of chemicals released, and the amount released.

@@ -85,7 +85,7 @@ resources:
       Query the Human Protein Atlas API for RNA and protein expression summary of a gene (JAK2) using its Ensembl ID. The example demonstrates how to retrieve and display tissue specificity, distribution, and subcellular localization information.
     resource_id: 92183e68-5e56-4487-a92f-8a1163b4e178
     resource_type: example
-slug: adhocspecificationintegration_human_protein_atlas
+slug: human_protein_atlas
 source: '${raw_documentation}
 
   '

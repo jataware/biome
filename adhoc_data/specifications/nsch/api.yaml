@@ -182,7 +182,7 @@ resources:
       Analyze trends in childhood asthma and environmental factors over time (2016-2023) using NSCH data. Load multiple years of data, harmonize variables across years, and analyze the relationship between asthma prevalence and environmental factors like smoke exposure, housing insecurity, and food insecurity. Include state-level comparisons and create a composite environmental risk score. Do so specifically for Texas.
     resource_id: e2681d9f-b1b5-441b-9deb-bd203d9de6f4
     resource_type: example
-slug: adhocspecificationintegration_national_survey_of_children_s_health__nsch_
+slug: national_survey_of_children_s_health__nsch_
 source: |
   You have access to file-based National Survey of Children's Health (NSCH) data
   from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.

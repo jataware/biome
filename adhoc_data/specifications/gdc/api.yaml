@@ -255,7 +255,7 @@ resources:
     name: mappings
     resource_id: a96216e1-8a2b-4fab-90e8-565d1db62fbe
     resource_type: file
-slug: adhocspecificationintegration_genomics_data_commons
+slug: genomics_data_commons
 source: |
   # GDC API Documentation
 

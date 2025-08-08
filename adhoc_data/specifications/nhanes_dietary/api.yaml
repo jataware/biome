@@ -13,7 +13,7 @@ resources:
     name: web_docs
     resource_id: 19e60e0b-82e2-4af2-b6f2-212287b43277
     resource_type: file
-slug: adhocspecificationintegration_nhanes_dietary_data
+slug: nhanes_dietary_data
 source: |
   You have access to NHANES Dietary Data files from multiple survey cycles, including dietary intake and demographic information:
 

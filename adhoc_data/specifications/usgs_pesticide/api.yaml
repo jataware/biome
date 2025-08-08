@@ -7,7 +7,7 @@ last_updated: null
 name: USGS Pesticide National Synthesis Project
 provider: adhoc:specialist_agents
 resources: {}
-slug: adhocspecificationintegration_usgs_pesticide_national_synthesis_project
+slug: usgs_pesticide_national_synthesis_project
 source: |
   You have access to a file-based USGS Pesticide National Synthesis Project data, for annual agricultural pesticide use by county and pesticide compound.
   We've added files on a 2-5 year interval, from 2000 to 2019, under the `${DATASET_FILES_BASE_PATH}/usgs_pesticide` directory.

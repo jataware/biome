@@ -27,7 +27,7 @@ resources:
     name: user_guide
     resource_id: 7c5e6353-7e1f-4639-91ee-9dc568887a69
     resource_type: file
-slug: adhocspecificationintegration_cdc_tracking_network
+slug: cdc_tracking_network
 source: |
   The Tracking Program collects, integrates, analyzes, and disseminates non-infectious disease,
   environmental, and socio-economic data from various sources.

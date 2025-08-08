@@ -25,7 +25,7 @@ resources:
       to understand the structure
     resource_id: ca7ff323-7bef-489d-9d2c-760628f40825
     resource_type: example
-slug: adhocspecificationintegration_chis_california_asthma
+slug: chis_california_asthma
 source: |
   You have access to a file-based California CHIS Data-Current Asthma Prevalence by County 2015-2022 file,
   located at `${DATASET_FILES_BASE_PATH}/chis_california_asthma/current-asthma-prevalence-by-county-2015_2022.csv`.

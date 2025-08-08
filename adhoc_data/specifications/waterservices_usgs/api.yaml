@@ -40,7 +40,7 @@ resources:
     name: site_types
     resource_id: ebee2534-6b90-4b45-8f05-03801d2e7a85
     resource_type: file
-slug: adhocspecificationintegration_usgs_water_services_api
+slug: usgs_water_services_api
 source: |
   You can use this service to retrieve daily statistical data about the hundreds of
   thousands of hydrologic sites served by the USGS. Various output formats available, prefer JSON.

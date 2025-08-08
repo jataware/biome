@@ -97,7 +97,7 @@ resources:
     query: Search for dementia studies in Synapse
     resource_id: feca1051-3952-4a0f-bddf-09191aa17f15
     resource_type: example
-slug: adhocspecificationintegration_nf_synapse
+slug: nf_synapse
 source: |-
   # Additional Instructions:
 

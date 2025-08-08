@@ -54,7 +54,7 @@ resources:
     name: sdk_documentation
     resource_id: cb8c091d-ff82-46d7-bdea-893aa5b0c6c5
     resource_type: file
-slug: adhocspecificationintegration_census_acs__american_community_survey__and_sf1
+slug: census_acs__american_community_survey__and_sf1
 source: "The American Community Survey (ACS) is an ongoing survey that provides data\
   \ every\nyear\u2014giving communities the current information they need to make\
   \ important decisions.\nThe ACS covers a broad range of topics about social, economic,\

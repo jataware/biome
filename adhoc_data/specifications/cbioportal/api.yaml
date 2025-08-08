@@ -632,7 +632,7 @@ resources:
       Query mutation data from cBioPortal for a specific study (Genentech colorectal cancer study) and analyze mutations in key cancer genes (APC, TP53, KRAS, PIK3CA)
     resource_id: d54d8188-81f5-4fff-a641-230480369fe4
     resource_type: example
-slug: adhocspecificationintegration_cbioportal
+slug: cbioportal
 source: |
   This API is through Open API Spec (Swagger). You will be provided the schema below.
   All requests go to the following URL: https://www.cbioportal.org/

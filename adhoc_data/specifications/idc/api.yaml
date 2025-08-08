@@ -337,7 +337,7 @@ resources:
     query: Get list of files in an S3 bucket for a specific collection on IDC
     resource_id: f5ffd878-c1c9-46e9-b83c-6fd54fe975a5
     resource_type: example
-slug: adhocspecificationintegration_imaging_data_commons
+slug: imaging_data_commons
 source: |
   ${raw_documentation}
 

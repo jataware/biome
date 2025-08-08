@@ -104,7 +104,7 @@ resources:
     name: raw_documentation
     resource_id: 5361ce45-01fb-4c16-aa22-31d5397a0bd1
     resource_type: file
-slug: adhocspecificationintegration_cancer_data_aggregator
+slug: cancer_data_aggregator
 source: |
   ${raw_documentation}
 

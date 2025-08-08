@@ -60,7 +60,7 @@ resources:
     name: web_documentation
     resource_id: f9afc1aa-371f-4318-9fb1-cd5030db39fe
     resource_type: file
-slug: adhocspecificationintegration_fda_drug_adverse_event_faers_api
+slug: fda_drug_adverse_event_faers_api
 source: |
   ${web_documentation}
 

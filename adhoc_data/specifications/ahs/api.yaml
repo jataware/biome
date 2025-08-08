@@ -333,7 +333,7 @@ resources:
       I wonder if there are any trends for metro areas in Florida, US in which mold presence increased between years 2001 and 2011? Can you get the data for matching mold presence?
     resource_id: ea7d2aec-2d76-4b95-ae85-177db08ff019
     resource_type: example
-slug: adhocspecificationintegration_census_american_housing_survey__ahs_
+slug: census_american_housing_survey__ahs_
 source: |
   You have access to a file-based Census American Housing Survey
   (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `${DATASET_FILES_BASE_PATH}/census-ahs` directory.
