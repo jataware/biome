@@ -22,7 +22,7 @@ resources:
       def get_code_name(code):
       # Read codebook to get metro area meanings
       # ensure to set index_col=False, since the codebook has no index column
-      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
+      codebook = pd.read_csv('{% file census-ahs/census_ahs_codebook.csv %}', index_col=False)
 
       # Find the row for OMB13CBSA
       ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -41,7 +41,7 @@ resources:
     resource_type: example
   569a9b73-d61a-4b9a-8ee1-9c85c1637e1a:
     code: "import pandas as pd\nimport numpy as np\n\n# Load the AHS dataset (2023)\
-      \ with asthma-related variables\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
+      \ with asthma-related variables\nfile_path = '{% file census-ahs/survey_2023.csv %}'\n\
       \n# Define variables of interest\nasthma_vars = ['HHLDASTHMA']  # Household\
       \ member ever diagnosed with asthma\nhousing_vars = [\n    'MOLDBASEM', 'MOLDBATH',\
       \ 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM', 'MOLDOTHER',  # Mold\n    'LEAKI',\
@@ -85,7 +85,7 @@ resources:
     resource_type: example
   80f97f58-e289-4afe-9959-37212def3ce6:
     code: "import pandas as pd\nimport numpy as np\n\n# Load the 2007 AHS dataset\
-      \ with Houston data\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2007.csv'\n\
+      \ with Houston data\nfile_path = '{% file census-ahs/survey_2007.csv %}'\n\
       \n# Define Houston SMSA code\nhouston_smsa = '3360'\n\n# Define housing condition\
       \ variables based on our exploration\nhousing_vars = [\n    'LEAK', 'ILEAK',\
       \                                        # Water leaks\n    'RATS', 'MICE' \
@@ -135,7 +135,7 @@ resources:
 
       # Read codebook to get metro area meanings
       # ensure to set index_col=False, since the codebook has no index column
-      codebook = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv', index_col=False)
+      codebook = pd.read_csv('{% file census-ahs/census_ahs_codebook.csv %}', index_col=False)
 
       # Find the row for OMB13CBSA
       ombs_row = codebook[codebook['Variable'] == 'OMB13CBSA']
@@ -149,7 +149,7 @@ resources:
     resource_type: example
   badf3293-de67-4c9c-944e-6dbbb8b609d6:
     code: "import pandas as pd\nimport numpy as np\n\n# Load the codebook to find\
-      \ information about variables\ncodebook_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/census_ahs_codebook.csv'\n\
+      \ information about variables\ncodebook_path = '{% file census-ahs/census_ahs_codebook.csv %}'\n\
       codebook = pd.read_csv(codebook_path, dtype=str, index_col=False)\n\n# Define\
       \ search terms related to asthma and respiratory health\nasthma_terms = [\n\
       \    'asthma', 'allerg', 'respir', 'breath', 'lung', 'air', 'ventil', \n   \
@@ -205,7 +205,7 @@ resources:
   e72b358a-6a63-4d79-9ee5-e81b5d99af2b:
     code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\
       import seaborn as sns\nfrom matplotlib.ticker import PercentFormatter\n\n# Load\
-      \ a sample of the AHS dataset (2023)\nfile_path = '{{DATASET_FILES_BASE_PATH}}/census-ahs/survey_2023.csv'\n\
+      \ a sample of the AHS dataset (2023)\nfile_path = '{% file census-ahs/survey_2023.csv %}'\n\
       \n# Define columns of interest based on our exploration\ngeo_cols = ['OMB13CBSA']\n\
       mold_cols = ['MOLDBASEM', 'MOLDBATH', 'MOLDBEDRM', 'MOLDKITCH', 'MOLDLROOM',\
       \ 'MOLDOTHER']\nleak_cols = ['LEAKI', 'LEAKO']\nchild_cols = ['NUMOLDKIDS',\
@@ -277,7 +277,7 @@ resources:
     resource_id: e72b358a-6a63-4d79-9ee5-e81b5d99af2b
     resource_type: example
   ea7d2aec-2d76-4b95-ae85-177db08ff019:
-    code: "import pandas as pd\n\ndata_dir =  \"{{DATASET_FILES_BASE_PATH}}/census-ahs\"\
+    code: "import pandas as pd\n\ndata_dir =  \"{% file census-ahs %}\"\
       \n\ndef get_florida_mold_data():\n    # Store results\n    florida_mold_data\
       \ = []\n    \n    # Years to analyze\n    years = range(2001, 2012, 2)\n   \
       \ \n    for year in years:\n        try:\n            # Read data file for year\n\
@@ -336,12 +336,12 @@ resources:
 slug: census_american_housing_survey__ahs_
 source: |
   You have access to a file-based Census American Housing Survey
-  (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `${DATASET_FILES_BASE_PATH}/census-ahs` directory.
+  (National Public Use Files CSV) from every 2 years from 1999 to 2023, under the `{% file census-ahs %}` directory.
   The housing files are located and named per year as follows:
-  - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_2023.csv
-  - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_2021.csv
+  - {% file census-ahs/survey_2023.csv %}
+  - {% file census-ahs/survey_2021.csv %}
   - ...
-  - ${DATASET_FILES_BASE_PATH}/census-ahs/survey_1999.csv
+  - {% file census-ahs/survey_1999.csv %}
   the more recent onces are at the metropolitan area level, while older ones
   are only avaiable at the national level. Use whichever year files you need, depending
   on the user question.
@@ -361,7 +361,7 @@ source: |
 
   Once you identify columns of interest available, you can use this csv codebook dictionary that explains what each column code means:
 
-  - ${DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv
+  - {% file census-ahs/census_ahs_codebook.csv %}
 
   from the codebook,you can use the "Variable" column to  match the variable you have access to (say "OMB13CBSA") and use the column "Response Codes" to get
   the meaning of the codes or the numeric code range values, for other types of variables.
@@ -439,7 +439,7 @@ source: |
 
   Read the CSV fiels with index_col=False, like so:
   ```
-  codebook = pd.read_csv('${DATASET_FILES_BASE_PATH}/census-ahs/census_ahs_codebook.csv', dtype=str, index_col=False)
+  codebook = pd.read_csv('{% file census-ahs/census_ahs_codebook.csv %}', dtype=str, index_col=False)
   ```
   If you don't add the index_col=False, the first column values will disappear and the whole dataframe will be shifted!
 url: null

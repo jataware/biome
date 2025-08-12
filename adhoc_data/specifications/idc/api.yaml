@@ -339,7 +339,7 @@ resources:
     resource_type: example
 slug: imaging_data_commons
 source: |
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 

@@ -637,6 +637,6 @@ source: |
   This API is through Open API Spec (Swagger). You will be provided the schema below.
   All requests go to the following URL: https://www.cbioportal.org/
 
-  ${cbioportal}
+  {{cbioportal}}
 url: null
 uuid: 33e3119f-5504-4615-981e-55000c066e80

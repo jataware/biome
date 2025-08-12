@@ -14,7 +14,7 @@ resources:
       import pandas as pd
 
       # Load GRAS notices data
-      df = pd.read_csv('{{DATASET_FILES_BASE_PATH}}/fda-gras/GRASNotices.csv', dtype=str, index_col=False)
+      df = pd.read_csv('{% file fda-gras/GRASNotices.csv %}', dtype=str, index_col=False)
 
       # print head
       print(f"First 5 rows of GRAS notices:")
@@ -45,7 +45,7 @@ source: "You have access to the FDA Generally Recognized as Safe (GRAS), which i
   \ Generally Recognized As Safe.\nUnder sections 201(s) and 409 of the Federal Food,\
   \ Drug, and Cosmetic Act,\nany substance that is intentionally added to food is\
   \ a food additive.\n\n# Additional Instructions:\nUse the raw csv notices file to\
-  \ answer questions about GRAS substances. Load the file from:\n\n${DATASET_FILES_BASE_PATH}/fda-gras/GRASNotices.csv\n\
+  \ answer questions about GRAS substances. Load the file from:\n\n{% file fda-gras/GRASNotices.csv %}\n\
   \nThese are the columns available (separated by semicolons, some newlines/spaces):\n\
   GRAS Notice (GRN) No.\t; Substance; Intended Use; Basis; Notifier;\tNotifier Address;\n\
   Date of filing;\tGRN Part 1;\tGRN Part 2;\tGRN Part 3;\tGRN Part 4;\tGRN Part 5;\t\

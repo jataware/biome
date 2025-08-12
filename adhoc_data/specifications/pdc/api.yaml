@@ -871,7 +871,7 @@ resources:
     resource_type: example
 slug: proteomics_data_commons
 source: |
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 

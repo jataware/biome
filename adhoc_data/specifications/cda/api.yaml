@@ -106,7 +106,7 @@ resources:
     resource_type: file
 slug: cancer_data_aggregator
 source: |
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 

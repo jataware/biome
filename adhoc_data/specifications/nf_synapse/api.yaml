@@ -126,10 +126,10 @@ source: |-
   You only have read/view/download assess/permissions- don't try to create or upload data- the openapi spec may have create/upload endpoints but do not use them.
 
   # OpenAPI Spec JSON:
-  ${SynapseOpenApiSpec}
+  {{SynapseOpenApiSpec}}
 
   # More Web Docs:
-  ${SynapseWebDocs}
+  {{SynapseWebDocs}}
 
   # Example issuing a POST to search for `High throughput analysis of pNF cell lines` (omitting auth bearer token header; eg Authorization: Bearer <token>)
   ```

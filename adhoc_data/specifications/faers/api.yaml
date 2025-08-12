@@ -62,7 +62,7 @@ resources:
     resource_type: file
 slug: fda_drug_adverse_event_faers_api
 source: |
-  ${web_documentation}
+  {{web_documentation}}
 
   # Additional Instructions:
 
@@ -71,6 +71,6 @@ source: |
   Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
 
   # Searchable Fields Reference:
-  ${fields_reference}
+  {{fields_reference}}
 url: null
 uuid: baf45232-38d9-401b-b1e5-8c5621917442

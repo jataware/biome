@@ -992,11 +992,11 @@ resources:
 cache_body:
     default: true
 source: |
-    ${auth_examples}
+    {{auth_examples}}
 
     Here is the API documentation:
 
-    ${raw_documentation}
+    {{raw_documentation}}
 
     IMPORTANT: you must only provide code that honestly uses the API. You MUST NEVER include fallbacks that print out key information that _should_ have been returned by the API.
 url: null

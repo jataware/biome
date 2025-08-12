@@ -15,6 +15,7 @@ from Bio import Entrez
 from biome.literature_review import LiteratureReviewAgent, PubmedSource
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 BIOME_URL = "http://biome_api:8082"
 
@@ -55,7 +56,6 @@ class BiomeAgent(BeakerAgent):
         self.initialize_literature_review()
         self.initialize_entrez()
 
-        logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
         self.logger = MessageLogger(self.log, logger)
         super().__init__(context, tools, **kwargs)
 

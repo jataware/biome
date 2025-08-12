@@ -213,7 +213,7 @@ resources:
     resource_type: file
 slug: indra_context_graph_extension__cogex_
 source: |
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 

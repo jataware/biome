@@ -58,15 +58,15 @@ slug: census_acs__american_community_survey__and_sf1
 source: "The American Community Survey (ACS) is an ongoing survey that provides data\
   \ every\nyear\u2014giving communities the current information they need to make\
   \ important decisions.\nThe ACS covers a broad range of topics about social, economic,\
-  \ housing, and demographic\ncharacteristics of the U.S. population.\n\n${web_documentation}\n\
+  \ housing, and demographic\ncharacteristics of the U.S. population.\n\n{{web_documentation}}\n\
   \nYou will need an API Key to use the Census ACS API.\nIt is available in the environment\
   \ variable:\n- api_key: os.environ.get(\"API_CENSUS\")\n\nYou have an api key, so\
   \ you have access to the census pypi package, and also direct access to the census\
   \ web api.\nPrefer the pypi package if you can, it's easier to use.\n\nData ranges\
-  \ from 2005 to 2023.\n\n${sdk_documentation}\n\n## For 1-year datasets when loading\
+  \ from 2005 to 2023.\n\n{{sdk_documentation}}\n\n## For 1-year datasets when loading\
   \ as file (may or may not apply when using python libraries...)\n### Variable Changes\n\
   Variables, and the values they represent, may change over time. Use the file in\
-  \ `${DATASET_FILES_BASE_PATH}/census-acs/2023-1yr-api-changes.csv` as a guide for\
+  \ `{% file census-acs/2023-1yr-api-changes.csv %}` as a guide for\
   \ which variables have changed from the prior year for 2023 ACS 1-Year Detailed\
   \ Tables, Data Profiles and Subject Tables. See below for a description of each\
   \ change type.\nNo Change - The variable has not changed from the prior year (most\

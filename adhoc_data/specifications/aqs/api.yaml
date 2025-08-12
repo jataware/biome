@@ -313,7 +313,7 @@ resources:
     resource_id: e643cf2e-66f1-428e-8f2c-2626c4c59192
     resource_type: example
 slug: epa_air_quality_system
-source: "# OpenAPI Spec JSON:\n${raw_documentation}\n\n# Additional Instructions:\n\
+source: "# OpenAPI Spec JSON:\n{{raw_documentation}}\n\n# Additional Instructions:\n\
   \nThis API is through OpenAPI Spec (Swagger). You will be provided the schema.\n\
   All requests go to the following URL: https://aqs.epa.gov/data/api\nThat is the\
   \ base URL for all requests.\n\nTo use the AQS API always retrieve the email/key\

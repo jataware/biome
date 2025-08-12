@@ -45,9 +45,9 @@ source: |
   You can use this service to retrieve daily statistical data about the hundreds of
   thousands of hydrologic sites served by the USGS. Various output formats available, prefer JSON.
 
-  ${web_documentation}
+  {{web_documentation}}
 
   ### Site Types (siteType) minor filter codes
-  ${site_types}
+  {{site_types}}
 url: null
 uuid: b0b57684-6f63-4436-9489-853c493da6ec

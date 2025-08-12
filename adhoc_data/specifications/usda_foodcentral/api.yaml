@@ -45,7 +45,7 @@ source: |
 
   # OpenAPI Spec JSON:
 
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 

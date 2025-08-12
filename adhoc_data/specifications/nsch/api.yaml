@@ -10,8 +10,8 @@ provider: adhoc:specialist_agents
 resources:
   118cc8be-f400-40e0-bac7-b10745d888fb:
     code: "import pandas as pd\nimport numpy as np\n\n# Read the codebook\ncodebook\
-      \ = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
-      , index_col=False)\n\n# Read 2023 data \ndf = pd.read_sas(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat\"\
+      \ = pd.read_csv(\"{% file census-nsch/nsch_dictionary_codebook.csv %}\"\
+      , index_col=False)\n\n# Read 2023 data \ndf = pd.read_sas(\"{% file census-nsch/2023e_topical.sas7bdat %}\"\
       , format=\"sas7bdat\")\n\n# Find condition-related variables from codebook\n\
       conditions = codebook[\n    (codebook['Variable'].str.contains('adhd|autism|asth',\
       \ case=False, na=False)) &\n    (codebook['Source'] == 'Topical')\n][['Variable',\
@@ -35,7 +35,7 @@ resources:
   4cdaa736-1ca8-4158-8d3f-60de680da7f3:
     code: "import pandas as pd\n\n# Read codebook with explicit parameters\n\n# Ensure\
       \ index_col=FALSE, if not first column values disappear and the whole dataframe\
-      \ is shifted!\ncodebook = pd.read_csv(\"{{DATASET_FILES_BASE_PATH}}/census-nsch/nsch_dictionary_codebook.csv\"\
+      \ is shifted!\ncodebook = pd.read_csv(\"{% file census-nsch/nsch_dictionary_codebook.csv %}\"\
       , index_col=False)  \n# Display the first few rows\nprint(codebook.head())\n\
       \n# and columns if needed\nprint(codebook.columns.tolist())\n"
     integration: 92d74583-521c-45e1-b65f-535b1501996d
@@ -47,7 +47,7 @@ resources:
     code: |
       import pandas as pd
 
-      df_2023 = pd.read_sas("{{DATASET_FILES_BASE_PATH}}/census-nsch/2023e_topical.sas7bdat", format="sas7bdat")
+      df_2023 = pd.read_sas("{% file census-nsch/2023e_topical.sas7bdat %}", format="sas7bdat")
 
       existing_cols = df_2023.columns.tolist()
       print(existing_cols)
@@ -60,7 +60,7 @@ resources:
   e2681d9f-b1b5-441b-9deb-bd203d9de6f4:
     code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\
       import seaborn as sns\nimport os\nfrom matplotlib.ticker import PercentFormatter\n\
-      \n# Set the path to the NSCH data directory\nnsch_dir = \"{{DATASET_FILES_BASE_PATH}}/census-nsch/\"\
+      \n# Set the path to the NSCH data directory\nnsch_dir = \"{% file census-nsch/ %}\"\
       \n\n# Function to load and prepare NSCH data for a specific year\ndef load_nsch_data(year):\n\
       \    # Load the dataset\n    file_path = os.path.join(nsch_dir, f\"{year}e_topical.sas7bdat\"\
       )\n    df = pd.read_sas(file_path)\n    \n    # Add year column\n    df['year']\
@@ -185,18 +185,18 @@ resources:
 slug: national_survey_of_children_s_health__nsch_
 source: |
   You have access to file-based National Survey of Children's Health (NSCH) data
-  from 2016 to 2023, located under the `${DATASET_FILES_BASE_PATH}/census-nsch` directory.
+  from 2016 to 2023, located under the `{% file census-nsch %}` directory.
 
   The NSCH files are located and named per year as follows:
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2022e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2021e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2020e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2019e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2018e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2017e_topical.sas7bdat
-  - ${DATASET_FILES_BASE_PATH}/census-nsch/2016e_topical.sas7bdat
-  - Codebook: ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+  - {% file census-nsch/2023e_topical.sas7bdat %}
+  - {% file census-nsch/2022e_topical.sas7bdat %}
+  - {% file census-nsch/2021e_topical.sas7bdat %}
+  - {% file census-nsch/2020e_topical.sas7bdat %}
+  - {% file census-nsch/2019e_topical.sas7bdat %}
+  - {% file census-nsch/2018e_topical.sas7bdat %}
+  - {% file census-nsch/2017e_topical.sas7bdat %}
+  - {% file census-nsch/2016e_topical.sas7bdat %}
+  - Codebook: {% file census-nsch/nsch_dictionary_codebook.csv %}
 
   The NSCH is a national survey that collects information on the health and well-being of children ages 0-17 years
   in the United States and the factors that may relate to their well-being. The survey includes data on physical and
@@ -215,7 +215,7 @@ source: |
   To read these SAS7BDAT files with pandas, use:
   ```python
   import pandas as pd
-  filename = "${DATASET_FILES_BASE_PATH}/census-nsch/2023e_topical.sas7bdat"
+  filename = "{% file census-nsch/2023e_topical.sas7bdat %}"
   df = pd.read_sas(filename, format="sas7bdat")
   ```
 
@@ -227,7 +227,7 @@ source: |
   1. Variable names may change slightly between survey years
   2. Many variables use coded responses (e.g. subset for examples: 1=Yes||2=No, 1 = Never served in the military||2 = Only on active duty for training in the Reserves
     You'll need to use the nsch codebook to decode these variable response codes-
-    The codebook is available at ${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv
+    The codebook is available at {% file census-nsch/nsch_dictionary_codebook.csv %}
     You may open it with pandas and find the "Variable" name, the "Question", "Description", and its "Response Code"s, etc.
     The Response Code options/alternatives per column are separated by a double pipe (||),such as "1=Yes||2=No"
     In the codebook, the Question itself is under the "Question" column
@@ -251,7 +251,7 @@ source: |
 
   Open it with pandas like so:
   ```
-  codebook = pd.read_csv("${DATASET_FILES_BASE_PATH}/census-nsch/nsch_dictionary_codebook.csv", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
+  codebook = pd.read_csv("{% file census-nsch/nsch_dictionary_codebook.csv %}", index_col=False) # ensure index_col=False, otherwise the dataframe will be shifted!
   ```
 
   The NSCH is not an API but a collection of dataset files from 2016 to 2023 in SAS7BDAT format. These datasets provide rich information on:

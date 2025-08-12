@@ -265,7 +265,7 @@ source: |
 
   When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
 
-  ${raw_documentation}
+  {{raw_documentation}}
 
   # Additional Instructions:
 
@@ -280,7 +280,7 @@ source: |
   This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
 
   ```
-  ${mappings}
+  {{mappings}}
   ```
 
   These are the fields that are available for filtering and also the fields that can be returned. You can use
@@ -289,7 +289,7 @@ source: |
   A list of fields and their respective choices/facets are as follows:
 
   ```
-  ${facets}
+  {{facets}}
   ```
 
   Note this list of facets may be incomplete as it changes over time. Remember to consult it

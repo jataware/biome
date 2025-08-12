@@ -86,7 +86,7 @@ resources:
     resource_id: 92183e68-5e56-4487-a92f-8a1163b4e178
     resource_type: example
 slug: human_protein_atlas
-source: '${raw_documentation}
+source: '{{raw_documentation}}
 
   '
 url: null

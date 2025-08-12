@@ -41,11 +41,11 @@ source: |
   you must run code against the API to see what features are available at
   what level of geography.
 
-  ${user_guide}
+  {{user_guide}}
 
   Never simulate this API- if it is not available ask the user how to proceed.
 
   The list of content areas is available at:
-  ${api_examples}
+  {{api_examples}}
 url: null
 uuid: 62306be3-9b4b-4988-aac9-19d50b64b336
