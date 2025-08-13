@@ -408,10 +408,10 @@ source: |
   - CONTACT_MAPS: 3D genomic contact predictions
 
   # Overview Documentation:
-  {overview}
+  {{overview}}
 
   # Tutorial Documentation:
-  {tutorials}
+  {{tutorials}}
 
   IMPORTANT: you must only provide code that honestly uses the API. You MUST NEVER include fallbacks that print out key information that _should_ have been returned by the API.
 url: null

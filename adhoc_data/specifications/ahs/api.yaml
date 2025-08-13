@@ -346,7 +346,7 @@ source: |
   are only avaiable at the national level. Use whichever year files you need, depending
   on the user question.
 
-  {more_instructions}
+  {{more_instructions}}
 
   In particular, we have the household data file, which means we
   have the OMB13CBSA as a constantly availablecolumn to identify geographic area of survey(
