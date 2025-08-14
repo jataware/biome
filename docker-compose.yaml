@@ -23,6 +23,7 @@ services:
       - .env
     volumes:
       - ./src/biome:/jupyter/src/biome
+      - ./adhoc_data:/jupyter/adhoc_data
     networks:
       - beaker
   rest_api:
@@ -30,8 +31,7 @@ services:
       context: .
       dockerfile: ./rest_api/Dockerfile
     volumes:
-      - ./src/biome/datasources:/integrations
-      - ./data:/data
+      - ./adhoc_data:/jupyter/integrations
     env_file:
       - .env
     ports:

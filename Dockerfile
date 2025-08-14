@@ -6,7 +6,7 @@ EXPOSE 8888
 RUN apt update && apt install -y lsof
 
 # Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv
+RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv poetry
 
 COPY --chown=1000:1000 . /jupyter
 
@@ -17,8 +17,6 @@ RUN rm -f /jupyter/.beaker.conf
 RUN rm -f /jupyter/.env
 
 RUN uv pip install --system /jupyter
-
-RUN chown jupyter:jupyter -R /usr/local/lib/python3.11/site-packages/biome/adhoc_data/
 
 RUN mkdir -m 777 /var/run/beaker
 
