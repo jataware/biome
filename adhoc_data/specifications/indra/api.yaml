@@ -1,0 +1,238 @@
+datatype: api
+description: |
+  INDRA CoGEx (Context Graph Extension) is an automatically assembled biomedical knowledge graph which integrates causal mechanisms from INDRA
+  with non-causal contextual relations including properties, ontology, and data.
+
+  The INDRA CoGEx Query API is a RESTful service designed to streamline complex queries within the biomedical domain,
+  powered by the Contextual Graph Explorer (CoGEx) framework. It provides an interface to retrieve detailed insights
+  by integrating and analyzing data from diverse biomedical sources. Users can execute queries to uncover relationships
+  such as diseases associated with specific clinical trials, drugs linked to particular side effects, or other intricate
+  connections in biomedical knowledge. By leveraging its contextual graph-based approach, the API enables researchers,
+  data scientists, and healthcare professionals to explore and analyze rich biomedical data efficiently, supporting
+  advancements in drug discovery, clinical decision-making, and research. With its robust architecture, the INDRA CoGEx
+  Query API facilitates the discovery of meaningful patterns and supports informed decision-making in complex biomedical scenarios.
+img_url: null
+last_updated: null
+name: INDRA Context Graph Extension (CoGEx)
+provider: adhoc:specialist_agents
+resources:
+  b7c4d45f-287b-47e2-aa9b-5ee5bae07353:
+    code: |
+      import requests
+
+      base_url = "https://discovery.indra.bio/api/"
+
+      # Get pathways for JAK2
+      jak2_payload = {
+          "gene": ["HGNC", "6192"]  # JAK2 HGNC ID
+      }
+
+      # Get JAK2 pathways
+      jak2_pathways_response = requests.post(
+          base_url + "get_pathways_for_gene",
+          json=jak2_payload
+      )
+
+      print("JAK2 Pathways Response:")
+      print(jak2_pathways_response.json())
+
+      # Get shared pathways with common partner genes
+      partner_genes = [
+          ["HGNC", "6192"],  # JAK2
+          ["HGNC", "3603"],  # STAT3
+          ["HGNC", "6193"],  # JAK3
+          ["HGNC", "3236"]   # EGFR
+      ]
+
+      shared_payload = {
+          "genes": partner_genes
+      }
+
+      # Get shared pathways
+      shared_pathways_response = requests.post(
+          base_url + "get_shared_pathways_for_genes",
+          json=shared_payload
+      )
+
+      print("\nShared Pathways Response:")
+      print(shared_pathways_response.json())
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: null
+    query: |-
+      Perform a gene pathway analysis for JAK2 to find associated pathways and shared pathways with other genes like STAT3, JAK3, and EGFR.
+    resource_id: b7c4d45f-287b-47e2-aa9b-5ee5bae07353
+    resource_type: example
+  c8f8db77-c0bb-4ee2-9525-925707496b5a:
+    code: |
+      import requests
+      import json
+
+      def get_mesh_literature():
+          # API base URL
+          base_url = "https://discovery.indra.bio/api/"
+
+          # Get papers with evidence for AML MeSH term
+          payload = {
+              "mesh_term": ["MESH", "D015470"],
+              "include_child_terms": True
+          }
+
+          # Make request to get evidences
+          response = requests.post(
+              base_url + "get_evidences_for_mesh",
+              json=payload,
+              headers={"Content-Type": "application/json"}
+          )
+
+          if response.status_code == 200:
+              # Process and return results
+              results = response.json()
+
+              # Convert results to a more readable format
+              evidence_by_statement = {}
+              for stmt_hash, evidences in results.items():
+                  evidence_by_statement[stmt_hash] = {
+                      'pmids': list(set([ev['text_refs'].get('PMID') for ev in evidences if ev.get('text_refs', {}).get('PMID')])),
+                      'evidence_count': len(evidences)
+                  }
+
+              return evidence_by_statement
+          else:
+              print(f"Error: {response.status_code}")
+              return None
+
+      if __name__ == "__main__":
+          evidence_data = get_mesh_literature()
+
+          if evidence_data:
+              # Print summary of findings
+              print(f"Found {len(evidence_data)} statements with evidence")
+
+              # Get total evidence count
+              total_evidence = sum(data['evidence_count'] for data in evidence_data.values())
+              print(f"Total evidence count: {total_evidence}")
+
+              # Get unique PMIDs
+              all_pmids = set()
+              for data in evidence_data.values():
+                  all_pmids.update(data['pmids'])
+              print(f"Total unique PMIDs: {len(all_pmids)}")
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: null
+    query: Retrieve literature evidence related to AML using MeSH term queries, including
+      child terms, and summarize the findings.
+    resource_id: c8f8db77-c0bb-4ee2-9525-925707496b5a
+    resource_type: example
+  e57fbdf9-732a-407a-8469-921076b69054:
+    code: |
+      import requests
+
+      def analyze_jak2():
+          # API base URL
+          base_url = "https://discovery.indra.bio/api/"
+
+          # JAK2 HGNC ID
+          jak2_node = ["HGNC", "6192"]
+
+          # Get GO terms
+          go_terms_payload = {
+              "gene": jak2_node,
+              "include_indirect": True
+          }
+          go_response = requests.post(
+              base_url + "get_go_terms_for_gene",
+              json=go_terms_payload
+          )
+
+          # Get pathways
+          pathways_payload = {
+              "gene": jak2_node
+          }
+          pathways_response = requests.post(
+              base_url + "get_pathways_for_gene",
+              json=pathways_payload
+          )
+
+          # Check if kinase
+          kinase_payload = {
+              "genes": ["JAK2"]
+          }
+          kinase_response = requests.post(
+              base_url + "is_kinase",
+              json=kinase_payload
+          )
+
+          # Check if phosphatase
+          phosphatase_payload = {
+              "genes": ["JAK2"]
+          }
+          phosphatase_response = requests.post(
+              base_url + "is_phosphatase",
+              json=phosphatase_payload
+          )
+
+          # Check if transcription factor
+          tf_payload = {
+              "genes": ["JAK2"]
+          }
+          tf_response = requests.post(
+              base_url + "is_transcription_factor",
+              json=tf_payload
+          )
+
+          # Compile and return results
+          results = {
+              "go_terms": go_response.json(),
+              "pathways": pathways_response.json(),
+              "is_kinase": kinase_response.json().get("JAK2", False),
+              "is_phosphatase": phosphatase_response.json().get("JAK2", False),
+              "is_transcription_factor": tf_response.json().get("JAK2", False)
+          }
+
+          return results
+
+      if __name__ == "__main__":
+          results = analyze_jak2()
+          print(f"Analysis Results for JAK2:")
+          print(f"Number of GO terms: {len(results['go_terms'])}")
+          print(f"Number of pathways: {len(results['pathways'])}")
+          print(f"Is kinase: {results['is_kinase']}")
+          print(f"Is phosphatase: {results['is_phosphatase']}")
+          print(f"Is transcription factor: {results['is_transcription_factor']}")
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: null
+    query: |-
+      This example demonstrates how to analyze the JAK2 gene using the INDRA CoGEx API to retrieve GO terms, pathway associations, and check if it is a kinase, phosphatase, or transcription factor.
+    resource_id: e57fbdf9-732a-407a-8469-921076b69054
+    resource_type: example
+  f49c8aa7-727e-444e-a3a2-314a5f0d6631:
+    filepath: indra.json
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    name: raw_documentation
+    resource_id: f49c8aa7-727e-444e-a3a2-314a5f0d6631
+    resource_type: file
+slug: indra_context_graph_extension__cogex_
+source: |
+  {{raw_documentation}}
+
+  # Additional Instructions:
+
+  You should make use of the python requests library to interact with the API.
+  Note that the base URL of the API is 'https://discovery.indra.bio/api/'
+
+  For example, here is an example request:
+
+  curl -X 'POST' \
+    'https://discovery.indra.bio/api/get_go_terms_for_gene' \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "gene": [
+        "HGNC",
+        "9896"
+      ],
+      "include_indirect": true
+    }'
+  ```
+url: null
+uuid: 417f20f1-4f56-4f6c-b11a-c40d84258557

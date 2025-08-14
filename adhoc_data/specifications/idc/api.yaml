@@ -1,0 +1,352 @@
+datatype: api
+description: |
+  NCI Imaging Data Commons (IDC) is a cloud-based environment containing publicly available cancer imaging data co-located with the analysis and exploration tools and resources.
+
+  Features:
+  - >65 TB: IDC contains radiology, brightfield (H&E) and fluorescence slide microscopy images, along with image-derived data (annotations, segmentations, quantitative measurements) and accompanying clinical data
+  - Free: All of the data in IDC is publicly available: no registration, no access requests
+  - Commercial-friendly: >95% of the data in IDC is covered by the permissive CC-BY license, which allows commercial reuse (small subset of data is covered by the CC-NC license); each file in IDC is tagged with the license to make it easier for you to understand and follow the rules
+  - Cloud-based: All of the data in IDC is available from both Google and AWS public buckets: fast and free to download, no out-of-cloud egress fees
+  - Harmonized: All of the images and image-derived data in IDC is harmonized into standard DICOM representation
+img_url: null
+last_updated: null
+name: Imaging Data Commons
+provider: adhoc:specialist_agents
+resources:
+  090cdd92-54e0-4a30-82ab-a2e9c67b50c7:
+    code: "# Query to list all studies in the 'cmb_aml' collection\nquery_all_studies\
+      \ = \"\"\"\nSELECT DISTINCT StudyDescription\nFROM \n    index\nWHERE \n   \
+      \ collection_id = 'cmb_aml'\n\"\"\"\n\ntry:\n    df_all_studies = client.sql_query(query_all_studies)\n\
+      \    print(\"All studies in the 'cmb_aml' collection:\")\n    print(df_all_studies)\n\
+      except Exception as e:\n    print(f\"An error occurred: {str(e)}\")\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: List all studies for a given collection
+    resource_id: 090cdd92-54e0-4a30-82ab-a2e9c67b50c7
+    resource_type: example
+  1be1fe03-4bb2-4240-a95e-96efb9c1d4d8:
+    code: |
+      from idc_index import index
+      import pandas as pd
+
+      client = index.IDCClient()
+
+      # Query for slide microscopy data
+      query = """
+      SELECT DISTINCT
+          collection_id,
+          PatientID,
+          SeriesDescription,
+          StudyDescription,
+          BodyPartExamined,
+          SeriesDate
+      FROM
+          index
+      WHERE
+          Modality = 'SM'
+      """
+
+      try:
+          df = client.sql_query(query)
+          print("Slide Microscopy Data Available:")
+          print("\nCollections with slide microscopy data:")
+          print(df['collection_id'].unique())
+          print("\nSample of the data:")
+          print(df.head())
+          print("\nTotal number of records:", len(df))
+      except Exception as e:
+          print(f"An error occurred: {str(e)}")
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Get slide microscopy data
+    resource_id: 1be1fe03-4bb2-4240-a95e-96efb9c1d4d8
+    resource_type: example
+  25d73a5f-adb2-495c-9588-8237bb39883d:
+    code: "from idc_index import index\nimport pandas as pd\n\nclient = index.IDCClient()\n\
+      \n# Query for all available fields for AML slides\nquery = \"\"\"\nSELECT *\n\
+      FROM\n    index\nWHERE\n    Modality = 'SM'\n    AND collection_id IN ('cptac_aml',\
+      \ 'cmb_aml')\n    AND SeriesDescription LIKE '%bone marrow%'\nORDER BY\n   \
+      \ PatientID, SeriesDate\n\"\"\"\n\ntry:\n    df = client.sql_query(query)\n\
+      \    print(\"AML Bone Marrow Slide Data:\")\n    print(\"\\nTotal number of\
+      \ bone marrow slides:\", len(df))\n\n    print(\"\\nAvailable columns (metadata\
+      \ fields):\")\n    print(df.columns.tolist())\n\n    # Look for any columns\
+      \ that might contain annotations or clinical data\n    clinical_cols = [col\
+      \ for col in df.columns if any(term in col.lower() \n                      \
+      \                              for term in ['annotation', 'clinical', 'blast',\
+      \ 'cell', \n                                                               'pathology',\
+      \ 'diagnosis', 'grade', 'stage'])]\n    print(\"\\nPotentially relevant clinical/annotation\
+      \ columns:\")\n    print(clinical_cols)\n\n    # Get the source DOIs which might\
+      \ lead to additional clinical data\n    print(\"\\nUnique source DOIs (for finding\
+      \ additional clinical data):\")\n    print(df['source_DOI'].unique())\n\nexcept\
+      \ Exception as e:\n    print(f\"An error occurred: {str(e)}\")\n\n# Let's also\
+      \ check if there are any study-level annotations\nquery_study = \"\"\"\nSELECT\
+      \ DISTINCT\n    StudyDescription,\n    collection_id,\n    source_DOI,\n   \
+      \ license_short_name\nFROM\n    index\nWHERE\n    collection_id IN ('cptac_aml',\
+      \ 'cmb_aml')\n\"\"\"\n\ntry:\n    df_study = client.sql_query(query_study)\n\
+      \    print(\"\\nStudy-level information:\")\n    print(df_study)\nexcept Exception\
+      \ as e:\n    print(f\"An error occurred querying study data: {str(e)}\")\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Get additional information for microscopy data for a specific collection
+    resource_id: 25d73a5f-adb2-495c-9588-8237bb39883d
+    resource_type: example
+  3078cb17-9102-4e54-a381-d0b546032cef:
+    code: "from idc_index import index\nimport pandas as pd\n\nclient = index.IDCClient()\n\
+      \n# Query to find collection names containing 'aml'\nquery = \"\"\"\nSELECT\
+      \ DISTINCT collection_id\nFROM \n    index\nWHERE \n    LOWER(collection_id)\
+      \ LIKE '%aml%'\n\"\"\"\n\ntry:\n    df_collections = client.sql_query(query)\n\
+      \    print(\"Collections with 'aml' in their name:\")\n    print(df_collections)\n\
+      except Exception as e:\n    print(f\"An error occurred: {str(e)}\")\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Find collections in the Imaging Data Commons with 'aml' in their name,
+      likely related to Acute Myeloid Leukemia.
+    resource_id: 3078cb17-9102-4e54-a381-d0b546032cef
+    resource_type: example
+  49f63b7d-8e99-4e88-ac9d-86db0d831a8f:
+    code: |
+      from idc_index import index
+      import pandas as pd
+
+      client = index.IDCClient()
+
+      # First, let's see what columns are available
+      query_columns = """
+      SELECT * FROM index LIMIT 1
+      """
+
+      try:
+          df = client.sql_query(query_columns)
+          print("Available columns in the index:")
+          print(df.columns.tolist())
+      except Exception as e:
+          print(f"An error occurred: {str(e)}")
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Get columns available in IDC index
+    resource_id: 49f63b7d-8e99-4e88-ac9d-86db0d831a8f
+    resource_type: example
+  4adff70f-bc39-4728-a215-b8f7908ff5d0:
+    code: |
+      import pandas as pd
+      from idc_index import index
+
+      client = index.IDCClient()
+
+      # Query for the desired images
+      query = """
+      SELECT series_aws_url
+      FROM index
+      WHERE collection_id = 'cmb_aml'
+      AND StudyDescription = 'XR_Biopsy_BoneMarrow'
+      """
+      df = client.sql_query(query)
+
+      # Create a download manifest using the current directory
+      with open('download_manifest.txt', 'w') as f:
+          for url in df['series_aws_url']:
+              f.write(f'cp {url} ./\n')
+
+      # Execute the download
+      s5cmd_binary = client.s5cmdPath
+      !{s5cmd_binary} --no-sign-request --endpoint-url https://s3.amazonaws.com run download_manifest.txt
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Download bone marrow biopsy images from the 'cmb_aml' collection for a
+      specific study using IDC's public S3 bucket.
+    resource_id: 4adff70f-bc39-4728-a215-b8f7908ff5d0
+    resource_type: example
+  51d2dd36-412e-492e-b52f-37b60219dd8c:
+    code: "from idc_index import index\nimport pandas as pd\n\n# Initialize the IDC\
+      \ client\nclient = index.IDCClient()\n\n# Query to find studies within the 'cptac_aml'\
+      \ collection\nquery = \"\"\"\nSELECT DISTINCT StudyDescription\nFROM \n    index\n\
+      WHERE \n    collection_id = 'cptac_aml'\n\"\"\"\n\ntry:\n    # Execute the query\n\
+      \    df_studies = client.sql_query(query)\n    print(\"Studies in 'cptac_aml':\"\
+      )\n    print(df_studies)\nexcept Exception as e:\n    print(f\"An error occurred:\
+      \ {str(e)}\")\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Fetch studies for a given collection in the Imaging Data Commons (IDC),
+      specifically for the 'cptac_aml' collection.
+    resource_id: 51d2dd36-412e-492e-b52f-37b60219dd8c
+    resource_type: example
+  590305c8-9e62-49a5-a28f-8cc74df03667:
+    code: |
+      import pandas as pd
+      from idc_index import index
+
+      client = index.IDCClient()
+
+      query = """
+      SELECT series_aws_url
+      FROM index
+      WHERE collection_id = 'cmb_aml'
+      AND StudyDescription = 'XR_Biopsy_BoneMarrow'
+      """
+      df = client.sql_query(query)
+      print(df.head())
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Retrieve imagery URLs for the 'XR_Biopsy_BoneMarrow' study in the 'cmb_aml'
+      collection from IDC.
+    resource_id: 590305c8-9e62-49a5-a28f-8cc74df03667
+    resource_type: example
+  a155ea7d-f42f-4546-8d4c-b1135994ea47:
+    filepath: idc.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: raw_documentation
+    resource_id: a155ea7d-f42f-4546-8d4c-b1135994ea47
+    resource_type: file
+  bbfbce09-abfe-4565-a50b-6afc299df2d3:
+    code: |
+      import pydicom
+      import matplotlib.pyplot as plt
+
+      # Load the DICOM file
+      filename = '73f18e49-8699-4c1f-90ad-5db94b6b5602.dcm'
+      ds = pydicom.dcmread(filename)
+
+      # Display the image
+      plt.imshow(ds.pixel_array, cmap=plt.cm.gray)
+      plt.title('Bone Marrow Biopsy Image')
+      plt.axis('off')
+      plt.show()
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Basic plot of dicom image from file
+    resource_id: bbfbce09-abfe-4565-a50b-6afc299df2d3
+    resource_type: example
+  c19b78ab-29cb-4be3-8069-1ef22302dfb2:
+    code: "import sys\nimport subprocess\n\n# Install required package\nsubprocess.check_call([sys.executable,\
+      \ \"-m\", \"pip\", \"install\", \"pydicom\"])\n\nimport boto3\nfrom botocore\
+      \ import UNSIGNED\nfrom botocore.config import Config\nimport os\nimport tempfile\n\
+      import pydicom\nfrom PIL import Image\nimport numpy as np\nimport matplotlib.pyplot\
+      \ as plt\n\n# Create S3 client\ns3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))\n\
+      \n# Create temporary directory\ntemp_dir = tempfile.mkdtemp()\n\n# Let's try\
+      \ the smallest DICOM file first\nfile_key = \"d53e7fc3-8ef9-4de5-8059-47b21a67eb4f/40006642-6ee5-44ca-bc5f-e1cc2bd7ee70.dcm\"\
+      \nlocal_file = os.path.join(temp_dir, \"slide.dcm\")\n\ntry:\n    print(f\"\
+      Downloading file: {file_key}\")\n    s3.download_file('idc-open-data', file_key,\
+      \ local_file)\n    print(\"Download successful!\")\n\n    # Try to read the\
+      \ DICOM file\n    print(\"\\nReading DICOM file...\")\n    ds = pydicom.dcmread(local_file)\n\
+      \n    print(\"\\nDICOM metadata:\")\n    print(f\"Patient ID: {ds.PatientID}\"\
+      )\n    print(f\"Modality: {ds.Modality}\")\n    print(f\"Image Type: {ds.ImageType}\"\
+      )\n\n    # Convert to image and display\n    if hasattr(ds, 'pixel_array'):\n\
+      \        print(\"\\nConverting to image...\")\n        pixel_array = ds.pixel_array\n\
+      \n        # Normalize the pixel values\n        if pixel_array.dtype != np.uint8:\n\
+      \            pixel_array = ((pixel_array - pixel_array.min()) * 255.0 / \n \
+      \                        (pixel_array.max() - pixel_array.min())).astype(np.uint8)\n\
+      \n        # Create image\n        img = Image.fromarray(pixel_array)\n\n   \
+      \     # Display\n        plt.figure(figsize=(15, 10))\n        plt.imshow(img,\
+      \ cmap='gray')\n        plt.axis('off')\n        plt.title(f\"DICOM Image -\
+      \ Patient: {ds.PatientID}\")\n        plt.show()\n    else:\n        print(\"\
+      No pixel data found in the DICOM file\")\n\nexcept Exception as e:\n    print(f\"\
+      An error occurred: {str(e)}\")\nfinally:\n    # Clean up\n    if os.path.exists(local_file):\n\
+      \        os.remove(local_file)\n    os.rmdir(temp_dir)\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Download and visualize a slide microscopy image with pydicom and matplotlib
+    resource_id: c19b78ab-29cb-4be3-8069-1ef22302dfb2
+    resource_type: example
+  dc0ce97c-46a2-406b-a582-a51be49367c9:
+    code: "from idc_index import index\nimport pandas as pd\n\nclient = index.IDCClient()\n\
+      \n# Query to get download URLs for bone marrow slides\nquery = \"\"\"\nSELECT\n\
+      \    PatientID,\n    SeriesDescription,\n    series_aws_url,\n    series_size_MB\n\
+      FROM\n    index\nWHERE\n    Modality = 'SM'\n    AND collection_id IN ('cptac_aml',\
+      \ 'cmb_aml')\n    AND SeriesDescription LIKE '%bone marrow%'\nLIMIT 1\n\"\"\"\
+      \n\ntry:\n    df = client.sql_query(query)\n    print(\"Sample slide information:\"\
+      )\n    print(df)\n    \n    if not df.empty:\n        url = df['series_aws_url'].iloc[0]\n\
+      \        size_mb = df['series_size_MB'].iloc[0]\n        print(f\"\\nFile size:\
+      \ {size_mb:.2f} MB\")\n        print(f\"Download URL: {url}\")\nexcept Exception\
+      \ as e:\n    print(f\"An error occurred: {str(e)}\")\n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Query to get download URLs for bone marrow slides
+    resource_id: dc0ce97c-46a2-406b-a582-a51be49367c9
+    resource_type: example
+  e0279959-d257-438e-8513-fb40391082c1:
+    code: "from idc_index import index\nimport pandas as pd\n\nclient = index.IDCClient()\n\
+      \n# Query for AML-specific slide microscopy data\nquery = \"\"\"\nSELECT DISTINCT\n\
+      \    collection_id,\n    PatientID,\n    SeriesDescription,\n    StudyDescription,\n\
+      \    BodyPartExamined,\n    SeriesDate,\n    Manufacturer,\n    ManufacturerModelName,\n\
+      \    SeriesNumber,\n    instanceCount\nFROM\n    index\nWHERE\n    Modality\
+      \ = 'SM'\n    AND collection_id IN ('cptac_aml', 'cmb_aml')\nORDER BY\n    PatientID,\
+      \ SeriesDate\n\"\"\"\n\ntry:\n    df = client.sql_query(query)\n    print(\"\
+      AML Slide Microscopy Data:\")\n    print(\"\\nTotal number of records:\", len(df))\n\
+      \n    print(\"\\nUnique patients:\", len(df['PatientID'].unique()))\n\n    print(\"\
+      \\nTypes of series descriptions (slide types):\")\n    print(df['SeriesDescription'].unique())\n\
+      \n    print(\"\\nSample of the data:\")\n    print(df.head(10))\n\n    # Save\
+      \ to a CSV file for further analysis\n    df.to_csv('aml_pathology_data.csv',\
+      \ index=False)\n    print(\"\\nData has been saved to 'aml_pathology_data.csv'\"\
+      )\n\nexcept Exception as e:\n    print(f\"An error occurred: {str(e)}\")   \n"
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Get slide microscopy data for a specific collection
+    resource_id: e0279959-d257-438e-8513-fb40391082c1
+    resource_type: example
+  f5ffd878-c1c9-46e9-b83c-6fd54fe975a5:
+    code: |
+      import boto3
+      from botocore import UNSIGNED
+      from botocore.config import Config
+      import os
+      import tempfile
+
+      # Function to list contents of an S3 path
+      def list_s3_contents(bucket, prefix):
+          s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+          try:
+              result = s3.list_objects_v2(Bucket=bucket, Prefix=prefix)
+              if 'Contents' in result:
+                  return result['Contents']
+              return []
+          except Exception as e:
+              print(f"Error listing S3 contents: {str(e)}")
+              return []
+
+      # Parse S3 URL and list contents
+      s3_url = "s3://idc-open-data/d53e7fc3-8ef9-4de5-8059-47b21a67eb4f"
+      bucket = s3_url.split('/')[2]
+      prefix = '/'.join(s3_url.split('/')[3:])
+
+      print(f"Checking contents of bucket: {bucket}")
+      print(f"With prefix: {prefix}")
+
+      contents = list_s3_contents(bucket, prefix)
+      print("\nFound files:")
+      for item in contents:
+          print(f"- {item['Key']} ({item['Size']/1024/1024:.2f} MB)")
+
+      # Let's also check if we can get any pre-signed URLs or public access URLs
+      s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+      try:
+          # Try to get the bucket location
+          location = s3.get_bucket_location(Bucket=bucket)
+          print(f"\nBucket location: {location}")
+
+          # Try to get bucket policy
+          try:
+              policy = s3.get_bucket_policy(Bucket=bucket)
+              print("\nBucket policy:", policy)
+          except Exception as e:
+              print("\nCouldn't get bucket policy:", str(e))
+
+      except Exception as e:
+          print(f"\nError getting bucket information: {str(e)}")
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    notes: null
+    query: Get list of files in an S3 bucket for a specific collection on IDC
+    resource_id: f5ffd878-c1c9-46e9-b83c-6fd54fe975a5
+    resource_type: example
+slug: imaging_data_commons
+source: |
+  {{raw_documentation}}
+
+  # Additional Instructions:
+
+  Be sure to import and instantiate the client for the Imaging Data Commons API:
+  ```python
+  from idc_index import index
+  client = index.IDCClient()
+  ```
+url: null
+uuid: b9f7983b-97b3-43c6-9b12-13b810e91ac0
