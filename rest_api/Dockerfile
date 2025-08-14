@@ -5,7 +5,6 @@ FROM python:3.11.5
 EXPOSE 8001
 
 COPY ./rest_api /rest_api
-COPY ./data /data
 WORKDIR /rest_api
 
 RUN pip install --upgrade --no-cache-dir pip

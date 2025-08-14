@@ -6,7 +6,7 @@ EXPOSE 8888
 RUN apt update && apt install -y lsof
 
 # Install debugpy for remote debugging
-RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv
+RUN pip install --upgrade --no-cache-dir hatch pip editables debugpy uv poetry
 
 COPY --chown=1000:1000 . /jupyter
 
@@ -16,7 +16,7 @@ COPY --chown=1000:1000 . /jupyter
 RUN rm -f /jupyter/.beaker.conf
 RUN rm -f /jupyter/.env
 
-RUN uv pip install --system -v -e /jupyter
+RUN uv pip install --system /jupyter
 
 RUN mkdir -m 777 /var/run/beaker
 
@@ -27,13 +27,6 @@ ENV BEAKER_AGENT_USER=jupyter
 ENV BEAKER_SUBKERNEL_USER=user
 ENV BEAKER_RUN_PATH=/var/run/beaker
 ENV BEAKER_APP=biome.app.BiomeApp
-
-# subkernel access / file pane
-RUN ln -s /jupyter/src/biome/datasources /home/jupyter/datasources
-RUN ln -s /jupyter/data /home/jupyter/data
-
-RUN ln -s /jupyter/src/biome/datasources /home/user/datasources
-RUN ln -s /jupyter/data /home/user/data
 
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
