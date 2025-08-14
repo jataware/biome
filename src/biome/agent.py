@@ -44,14 +44,14 @@ class BiomeAgent(BeakerAgent):
     An API should be considered a type of integration.
     """
     def __init__(self, context: BaseContext = None, tools: list = None, **kwargs):
-        data_dir_raw = os.environ.get("BIOME_DATA_DIR", "./data")
+        lit_review_dir_raw = os.environ.get("BIOME_LIT_REVIEW_DIR", "./_literature_review")
         try:
-            data_dir = Path(data_dir_raw).resolve(strict=True)
-            logger.info(f"Using data_dir for lit review: {data_dir}")
+            lit_review_dir = Path(lit_review_dir_raw).resolve(strict=True)
         except OSError as e:
-            data_dir = Path('.')
-            logger.error(f"Failed to set biome data_dir for lit review: {data_dir_raw}\n\t{e}\n\tSetting to working directory.")
-        self.data_dir = data_dir
+            lit_review_dir = Path('.') / lit_review_dir_raw
+            lit_review_dir.mkdir(exist_ok=True, parents=True)
+        logger.info(f"Using lit review directory: {lit_review_dir}")
+        self.lit_review_dir = lit_review_dir
 
         self.initialize_literature_review()
         self.initialize_entrez()
@@ -60,7 +60,7 @@ class BiomeAgent(BeakerAgent):
         super().__init__(context, tools, **kwargs)
 
     def initialize_literature_review(self):
-        self.litreview_agent = LiteratureReviewAgent(self.data_dir)
+        self.litreview_agent = LiteratureReviewAgent(self.lit_review_dir)
         self.litreview_agent.add_source("pubmed", PubmedSource())
 
     def initialize_entrez(self):

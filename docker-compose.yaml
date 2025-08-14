@@ -18,8 +18,7 @@ services:
       - TOOL_ENABLED_ASK_USER=true
       - TOOL_ENABLED_RUN_CODE=true
       - PYTHONBREAKPOINT=debugpy.breakpoint
-      - BIOME_INTEGRATIONS_DIR=/datasources
-      - BIOME_DATA_DIR=./data
+      - BIOME_LIT_REVIEW_DIR=/jupyter/_literature_review
     env_file:
       - .env
     volumes:
