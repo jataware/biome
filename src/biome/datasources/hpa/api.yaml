@@ -1,0 +1,39 @@
+name: "Human Protein Atlas"
+description: |
+    The Human Protein Atlas is a Swedish-based program initiated in 2003 with the aim to map all 
+    the human proteins in cells, tissues, and organs using an integration of various omics 
+    technologies, including antibody-based imaging, mass spectrometry-based proteomics, 
+    transcriptomics, and systems biology. All the data in the knowledge resource is open access 
+    to allow scientists both in academia and industry to freely access the data for exploration 
+    of the human proteome.
+
+    The Human Protein Atlas consists of eight separate resources, each focusing on a particular 
+    aspect of the genome-wide analysis of the human proteins:
+
+    - The Tissue resource, showing the distribution of the proteins across all major tissues and 
+      organs in the human body
+    - The Brain resource, exploring the distribution of proteins in various regions of the 
+      mammalian brain 
+    - The Single Cell resource, showing expression of protein-coding genes in immune cells and 
+      human single cell types based on bulk and single cell RNA-seq
+    - The Subcellular resource, showing the subcellular localization of proteins in single cells
+    - The Cancer resource, showing the impact of protein levels for the survival of patients 
+      with cancer
+    - The Blood resource, describing proteins detected in blood and showing protein levels in 
+      blood in patients with different diseases
+    - The Cell line resource, showing expression of protein-coding genes in human cancer cell 
+      lines
+    - The Structure & Interaction resource, showing predicted 3D structures and exploring 
+      protein-coding genes in the context of protein-protein and metabolic interaction networks.
+    
+    The Human Protein Atlas program has already contributed to several thousands of publications 
+    in the field of human biology and disease and is selected by the organization ELIXIR as a 
+    European core resource due to its fundamental importance for a wider life science community. 
+    In addition the Human Protein Atlas has been appointed Global Core Biodata Resource (GCBR) 
+    by the Global Biodata Coalition. The Human Protein Atlas consortium is mainly funded by the 
+    Knut and Alice Wallenberg Foundation.
+raw_documentation: !load_txt documentation/hpa_docs.md
+examples: !load_yaml documentation/examples.yaml
+cache_key: "api_assistant_pdc_graphql"
+documentation: !fill |
+    {raw_documentation}

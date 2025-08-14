@@ -1,0 +1,56 @@
+name: Genomics Data Commons
+description: |
+    The NCI's Genomic Data Commons (GDC) provides the cancer research community with a repository and computational 
+    platform for cancer researchers who need to understand cancer, its clinical progression, and response to therapy.
+    The GDC supports several cancer genome programs at the NCI Center for Cancer Genomics (CCG), 
+    including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Treatments (TARGET).
+raw_documentation: !load_txt documentation/gdc.md
+facets: !load_txt documentation/facets.txt
+mappings: !load_txt documentation/gdc_mappings.json
+examples: !load_yaml documentation/examples.yaml
+cache_key: api_assistant_gdc_faceted
+documentation: !fill |
+
+    # GDC API Documentation
+
+    Below you will find the GDC API documentation. Note that 
+    there are several endpoints available--some are discussed in the `Search and Retrieval`
+    section, and others are discussed in the `Data Analysis` section.
+
+    When a user is searching for cases related to gene mutations you should use the `/ssm_occurrences` endpoint.
+
+    {raw_documentation}
+
+    # Additional Instructions:
+    
+    You will be given python code to query the GDC API. 
+
+    When querying GDC, change the `format` from "TSV" to "JSON"
+
+    If you download a file by file-id, the output will be TSV.
+    Save the file with the proper extension.
+
+    When filtering you should rely on the fields provided for a given endpoint in the following mapping.
+    This mapping is a dictionary where the keys are the endpoints and the values are the fields that are available for that endpoint.
+
+    ```
+    {mappings}
+    ```
+
+    These are the fields that are available for filtering and also the fields that can be returned. You can use
+    the facets to filter the fields that are available for a given endpoint.
+
+    A list of fields and their respective choices/facets are as follows:
+
+    ```
+    {facets}
+    ```
+
+    Note this list of facets may be incomplete as it changes over time. Remember to consult it
+    when you are filtering. If you are unsure about options available for a given field, you should consider
+    just using the wildcard operator. For example, if you are looking for cases for "paragangliomas and glomus tumors"
+    and getting no results, you should consider just using `*paragangliomas*`. Be sure to let the user know that you are using
+    the wildcard operator so it might not be as specific as they would like.
+
+    If a user asks you to filter based on the type of cancer, it is often productive to filter on 
+    disease type, primary diagnosis, or primary site.

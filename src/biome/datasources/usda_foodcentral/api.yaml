@@ -1,0 +1,77 @@
+name: "USDA FoodData Central API"
+cache_key: api_assistant_usda_foodcentral_json
+description: |
+    This openapi is the primary place to obtain data from the USDA's FoodData Central (nutrition) database.
+    It is intended to assist in incorporating nutrient data into any analysis we need.
+raw_documentation: !load_txt documentation/foodcentral_openapi.json
+examples: !load_yaml documentation/examples.yaml
+cache_body: 
+    default: true 
+documentation: !fill |
+    This API is the primary place to obtain data from the USDA's FoodData Central database.
+
+    # OpenAPI Spec JSON:
+
+    {raw_documentation}
+
+    # Additional Instructions:
+    
+    This API is through OpenAPI Spec (Swagger). You will be provided the schema. 
+    All requests go to the following URL: https://api.nal.usda.gov/fdc/v1/
+    That is the base URL for all requests. 
+
+    To use the USDA FoodData Central API always retrieve the `api_key` query parameter from environment variables:
+    - api_key: os.environ.get("API_USDA_FDC")
+    Do not use placeholder auth values from the OpenAPI spec nor other values from the documentation, only use the key from the environment variable!
+    anywhere you see YOUR_API_KEY or DEMO_KEY, replace with os.environ.get("API_USDA_FDC")
+
+    The FoodData Central API provides REST access to FoodData Central (FDC). It is intended primarily to assist application developers wishing to incorporate nutrient data into their applications or websites.
+
+    What's Available
+    The API provides two endpoints: the Food Search endpoint, which returns foods that match desired search criteria, and the Food Details endpoint, which returns details on a particular food.
+
+    To take full advantage of the API, developers should familiarize themselves with the database by reading the database documentation available via links on Data Type Documentation. This documentation provides the detailed definitions and descriptions needed to understand the data elements referenced in the API documentation.
+    Note: The API that was available on the USDA Food Composition Databases Web site is no longer being updated and will be discontinued March 31, 2020. Users are encouraged to begin working with the new FoodData Central API system described on this page. This new API allows users to obtain Standard Reference (SR) Legacy data, provides the most current data from the USDA Global Branded Foods Database, and give users the ability to search for specific foods in Foundation Foods and the Food and Nutrient Database for Dietary Studies (FNDDS) 2019-2020.
+
+    ## Sample Calls
+
+    Note: These calls use DEMO_KEY for the API key, which can be used for initially exploring the API prior to signing up, but has much lower rate limits. See here for more info on uses and limitations of DEMO_KEY.
+
+    GET REQUEST:
+    ```
+    curl https://api.nal.usda.gov/fdc/v1/food/######?api_key=DEMO_KEY
+    ```
+    The number (######) in the above sample must be a valid FoodData Central ID.
+
+    ```
+    curl https://api.nal.usda.gov/fdc/v1/foods/list?api_key=DEMO_KEY
+    curl https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&query=Cheddar%20Cheese
+    ```
+
+    POST REQUEST:
+    ```
+    curl -XPOST -H "Content-Type:application/json" -d '{{"pageSize":25}}' https://api.nal.usda.gov/fdc/v1/foods/list?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d '{{"query":"Cheddar cheese"}}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    curl -XPOST -H "Content-Type:application/json" -d "{{\"query\":\"Cheddar cheese\"}}" https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    ```
+
+    ```
+    curl -XPOST -H "Content-Type:application/json" -d '{{"query": "Cheddar cheese", "dataType": ["Branded"], "sortBy": "fdcId", "sortOrder": "desc"}}' https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY
+    ```
+    Note: The "dataType" parameter values need to be specified as an array.
+
+    ## Data Type Comparison
+    ### Foundation Foods	
+    Data and metadata on individual samples of commodity/commodity-derived minimally processed foods with insights into variability
+
+    ### Experimental Foods	
+    Data on food published in peer-reviewed journals supported by or in collaboration with USDA
+
+    ### Food and Nutrient Database for Dietary Studies (FNDDS)
+    Data on nutrients and portion weights for foods and beverages reported in What We Eat in America, NHANES
+
+    ### Branded Foods
+    Data from labels of national and international branded foods collected by a public-private partnership
+
+    ### SR Legacy
+    Historic data on food components including nutrients derived from analyses, calculations, and published literature

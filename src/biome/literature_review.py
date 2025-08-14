@@ -35,15 +35,12 @@ class LiteratureReviewAgent:
         self.source_root = source_root
         self.source_dirs = []
         self.sources = {}
-
     def add_source(self, name: str, source: DocumentSource):
         self.source_dirs.append(source.data_dir)
         source.qualified_path = self.source_root / source.data_dir
         self.sources[name] = source
-
     async def fetch_for_query(self, source_name: str, query: str):
         return await self.sources[source_name].fetch_for_query(query)
-
     async def paperQA(self, query: str) -> str:
         """
         run paperQA over the downloaded corpus and returns the response
@@ -225,3 +222,4 @@ class PubmedSource(DocumentSource):
                 self.get_pubmed_fulltext(pmc_id)
 
         return details
+
