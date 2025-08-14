@@ -1,0 +1,17 @@
+- query: "Open the california chis asthma dataset and display columns/first 2 rows to understand the structure"
+  code: |
+    import pandas as pd
+    import os
+
+    # Define the file path using the correct filename
+    file_path = os.path.join('{{DATASET_FILES_BASE_PATH}}', 'chis_california_asthma', 'current-asthma-prevalence-by-county-2015_2022.csv')
+
+    df = pd.read_csv(file_path, encoding='latin1') # latin1 encoding has worked before, not specifying it hasn't
+    
+    # Check the column names to make sure we're using the right ones
+    print("Column names:", df.columns.tolist())
+    
+    # Display a sample of the data to understand its structure
+    print("\nSample data:")
+    print(df.head(2))
+        

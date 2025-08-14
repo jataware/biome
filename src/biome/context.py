@@ -1,17 +1,21 @@
+from typing import TYPE_CHECKING, Any, Dict
 import os
 import re
 import logging
 import json
-from dataclasses import asdict
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict
 
-from beaker_kernel.lib.context import BeakerContext
+from jupyter_server.services.contents.filemanager import (
+    FileContentsManager,
+)
+
+from pathlib import Path
+
+from beaker_kernel.lib.context import BeakerContext, action
 from beaker_kernel.subkernels.python import PythonSubkernel
+from beaker_kernel.lib.types import Integration, IntegrationAttachment
 
 from .agent import BiomeAgent
-from .integrations import BiomeAdhocIntegrations
-
+from .integration import create_folder_structure_for_integration, get_integration_folder, write_integration
 
 if TYPE_CHECKING:
     from beaker_kernel.kernel import LLMKernel
@@ -22,32 +26,12 @@ logger = logging.getLogger(__name__)
 
 
 class BiomeContext(BeakerContext):
+
     SLUG = "biome"
     agent_cls: "BaseAgent" = BiomeAgent
 
     def __init__(self, beaker_kernel: "LLMKernel", config: Dict[str, Any]):
-        from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
-        ttl_seconds = 1800
-        drafter_config_gemini = {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
-        curator_config = {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
-
-        # Initialize adhoc integration
-        adhoc_integration = BiomeAdhocIntegrations(
-            drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
-            curator_config=curator_config,
-            contextualizer_config=gpt_41_config,
-            logger=logger,
-            display_name="Specialist Agents"
-        )
-        super().__init__(
-            beaker_kernel,
-            self.agent_cls,
-            config,
-            integrations=[adhoc_integration]
-        )
-
+        super().__init__(beaker_kernel, self.agent_cls, config)
         if not isinstance(self.subkernel, PythonSubkernel):
             raise ValueError("This context is only valid for Python.")
 
@@ -72,3 +56,94 @@ class BiomeContext(BeakerContext):
             "aqs_key": os.environ.get("API_EPA_AQS"),
         })
         await self.execute(command)
+
+    async def get_integrations(self) -> list[Integration]:
+        """
+        fetch all of the adhoc-api integrations to pass to beaker.
+        """
+
+        # get list of keys not inherent to a integrations for the user-files category
+        attached_files = {}
+        for (_, spec) in self.agent.raw_specs:
+            attached_files[spec["name"]] = []
+            for attachment_key in [
+                key for key in spec.keys() if key not in [
+                    "name",
+                    "slug",
+                    "description",
+                    "cache_key",
+                    "documentation",
+                    "examples",
+                    "cache_body",
+                    "loaded_examples"
+                ]
+            ]:
+                if not isinstance(spec[attachment_key], str):
+                    logger.warning(f"warning: key {attachment_key} on spec {spec['name']} is of type {type(spec[attachment_key])} and not str. ignoring and continuing")
+                    continue
+
+                # trim yaml tags since they will be readded at save time
+                # TODO: handle not-eliding documentation/
+                filepath_raw = re.sub(
+                        r"!load_[a-zA-Z]+",
+                        "",
+                        spec[attachment_key].strip()
+                    ).strip().replace("documentation/", "")
+
+                attached_files[spec["name"]].append(IntegrationAttachment(
+                    name=attachment_key,
+                    filepath=filepath_raw,
+                    content=None,
+                    is_empty_file=False
+                ))
+
+        # manually load examples
+
+        return [
+            Integration(
+                slug=spec["slug"],
+                url=str(yaml_location),
+                name=spec["name"],
+                description=spec.get("description"),
+                source=spec.get("documentation").replace("!fill", ""),
+                attached_files=attached_files[spec["name"]],
+                examples=spec.get("loaded_examples", [])
+            )
+            for (yaml_location, spec) in self.agent.raw_specs
+        ]
+
+    # frontend can request where to upload files to given a specific integration
+    async def get_integration_root(self, message):
+        content = message.content
+        return str(
+            Path(os.environ.get("BIOME_INTEGRATIONS_DIR", "/"))
+            / get_integration_folder(content.get("integration"))
+        )
+
+    # handles a case of uploading a new file to a temporary, unsaved integration
+    # that way the frontend can upload directly rather than sending it in an action message
+    async def create_integration_folders_for_upload(self, message):
+        manager = FileContentsManager()
+        content = message.content
+        create_folder_structure_for_integration(manager, content.get("integration"))
+        return True
+
+
+    async def save_integration(self, message):
+        logger.warning('called save_integration')
+        manager = FileContentsManager()
+        content = message.content
+        write_integration(manager, content)
+        self.agent.fetch_specs()
+        self.agent.initialize_adhoc()
+        self.agent.add_context(f"A new integration has been added: `{content.get('slug')}`. You may now use this with `draft_integration_code`.")
+
+    async def add_example(self, message):
+        logger.warning('called add_example')
+        manager = FileContentsManager()
+        content = message.content
+        logger.warning(content)
+        write_integration(manager, content)
+        self.agent.fetch_specs()
+        self.agent.initialize_adhoc()
+        self.agent.add_context(f"A new example has been added to `{content.get('slug')}.`")
