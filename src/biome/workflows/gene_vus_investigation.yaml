@@ -11,10 +11,10 @@ hidden: false
 is_context_default: false
 
 stages:
-  - name: Stage 1
+  - name: Gather Gene Information
     steps:
       - prompt: Find the gene symbol, full gene name, and cytogenic band from ClinVar. Make sure to find the correct gene information using the coding change and protein change in your search, NOT just the name.
-  - name: Stage 2
+  - name: Get Transcript Information
     steps:
       - prompt: |
           Find the transcript of the given variant and get the transcript statistics. Find a transcript via the Ensembl rest API through a RefSeq ID. Once you get the Ensembl transcript, find the detailed transcript statistics.
@@ -23,28 +23,30 @@ stages:
           * Transcript Length
           * Translation Length
       - prompt: Find the location of the variant (exon X of Y)
-  - name: Stage 3
+      - prompt: After finding this information, unset the relevant variables to keep the context lean.
+  - name: Find Relevant Domains
     steps:
       - prompt: |
           Find the domains of the variant, focusing on Smart and Pfam regions. Find this via Ensemble's rest API. List the domains and sources.
 
           IMPORTANT: do not print a large amount of text here. Check the size of what you're printing out - this might be a lot of data. Please interpret it without printing all of it.
-  - name: Stage 4
+      - prompt: After finding this information, unset the relevant variables to keep the context lean.
+  - name: Find Relevant Organs
     steps:
     - prompt: Find the organs with RNA expression from Human Protein Atlas for the given gene variant.
     - prompt: Find the organs with high protein expression from Human Protein Atlas for the given gene variant.
-  - name: Stage 5
+  - name: Find ClinVar Information
     steps:
       - prompt: |
           Record the Clinvar details of the variant:
             * Classification
             * Condition
             * All comments and more information
-  - name: Stage 6
+  - name: Format Results
     steps:
       - prompt: |
           Show a table of all of the information gathered to the user with the following rows:
-          `
+          ```
           Gene Symbol
           Full Gene Name
           Cytogenic Band
@@ -65,5 +67,5 @@ stages:
           Classification
           Condition
           ClinVar comments and more information.
-          `
+          ```
           Important: Format this last step as a markdown table rather than a to-do list and show everything recorded up to this point.

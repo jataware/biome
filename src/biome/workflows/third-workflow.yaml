@@ -1,0 +1,25 @@
+title: Third Test Workflow
+human_description: |
+  Additional workflow for the purpose of testing. Extra description text to make the card bigger.
+agent_description: |
+  Additional workflow for the purpose of testing. Shows an example of a to-do list and the workflow capabilities.
+category: climate
+example_prompt: Run Gene VUS workflow for EGFR variant NM_005228.3:c.2648T>C (p.Leu883Ser)
+hidden: false
+is_context_default: false
+metadata:
+  additional_tags: Nothing to add here, just for testing.
+stages:
+  - name: Stage 1
+    steps:
+      - prompt: This is the first task. Tell the user you completed the first task.
+  - name: Stage 2
+    steps:
+      - prompt: |
+          Tell a joke.
+      - prompt: Explain the joke to the user.
+        metadata:
+          additional_information: This step is tagged with additional metadata.
+    # stage-level metadata
+    metadata:
+      additional_information: This stage is tagged with extra metadata.
