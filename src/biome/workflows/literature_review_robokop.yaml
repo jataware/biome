@@ -1,0 +1,23 @@
+title: Literature Review and KG Lookup
+human_description: |
+  Run an example of looking at a drug repurposing literature review and then searching Robokop to ground that information.
+agent_description: |
+  Run an example of looking at a drug repurposing literature review and then searching Robokop to ground that information.
+  This workflow needs a disorder and a symptom.
+category: biomedical
+example_prompt: Run the workflow
+hidden: false
+is_context_default: false
+stages:
+  - name: Literature Review
+    steps:
+      - prompt: Do a literature review over drug repurposing candidates for the user's given disorder. ONLY search for papers once or twice. ONLY use paperqa once.
+    description:
+      - Do a literature review over drug repurposing candidates for the given condition.
+  - name: Knowledge Graph Lookup
+    steps:
+      - prompt: |
+          Find a gene that is related to both the top drug candidate you found earlier (chemical) and the user's symptom (phenotype)
+          by querying for genes that have edges to both nodes in the Robokop knowledge graph.
+    description:
+      - Use Robokop to match how that drug may have an impact on that symptom.
