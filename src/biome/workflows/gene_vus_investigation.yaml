@@ -14,6 +14,8 @@ stages:
   - name: Gather Gene Information
     steps:
       - prompt: Find the gene symbol, full gene name, and cytogenic band from ClinVar. Make sure to find the correct gene information using the coding change and protein change in your search, NOT just the name.
+    description:
+      - Find the cytogenic band and full gene name.
   - name: Get Transcript Information
     steps:
       - prompt: |
@@ -24,6 +26,8 @@ stages:
           * Translation Length
       - prompt: Find the location of the variant (exon X of Y)
       - prompt: After finding this information, unset the relevant variables to keep the context lean.
+    description:
+      - Find the transcript information of the given variant, and gather detailed transcript statistics such as exon details and length.
   - name: Find Relevant Domains
     steps:
       - prompt: |
@@ -31,10 +35,14 @@ stages:
 
           IMPORTANT: do not print a large amount of text here. Check the size of what you're printing out - this might be a lot of data. Please interpret it without printing all of it.
       - prompt: After finding this information, unset the relevant variables to keep the context lean.
+    description:
+      - Investigate information about the protein domains of the variant, including the most specific domain.
   - name: Find Relevant Organs
     steps:
-    - prompt: Find the organs with RNA expression from Human Protein Atlas for the given gene variant.
-    - prompt: Find the organs with high protein expression from Human Protein Atlas for the given gene variant.
+      - prompt: Find the organs with RNA expression from Human Protein Atlas for the given gene variant.
+      - prompt: Find the organs with high protein expression from Human Protein Atlas for the given gene variant.
+    description:
+      - Find organs that have high RNA and protein expression for the variant.
   - name: Find ClinVar Information
     steps:
       - prompt: |
@@ -42,6 +50,8 @@ stages:
             * Classification
             * Condition
             * All comments and more information
+    description:
+      - Find details from ClinVar about the classification and condition, as well as comments.
   - name: Format Results
     steps:
       - prompt: |
@@ -69,3 +79,38 @@ stages:
           ClinVar comments and more information.
           ```
           Important: Format this last step as a markdown table rather than a to-do list and show everything recorded up to this point.
+    description:
+      - Format and present the information in a table highlighting the most relevant information.
+
+output_prompt: |
+  You will be provided the results of a process that gathers information about gene variants.
+  Not all of the information will be provided. For anything not provided, list it as "pending future work."
+  Show a table of all of the information gathered to the user with the following rows:
+
+  IMPORTANT: Format this as a markdown table.
+  CRITICAL: Return the entire response and information as markdown.
+
+  ```
+  Gene Symbol
+  Full Gene Name
+  Cytogenic Band
+
+  Organs with high RNA expression
+  Organs with high protein expression
+
+  Transcript statistics:
+  Exons
+  Coding exons
+  Transcript length
+  Translation length
+
+  Domains
+
+  Location of variant
+
+  Classification
+  Condition
+  ClinVar comments and more information.
+  ```
+
+  The results will be provided below:
