@@ -1,12 +1,14 @@
-title: Literature Review and KG Lookup
+title: |
+  Drug Repurposing: Literature Review and KG Lookup
 human_description: |
-  Run an example of looking at a drug repurposing literature review and then searching Robokop to ground that information.
+  Find drug repurposing candidates for a disorder, and then find how that drug candidate influences a specific symptom of that disorder.
 agent_description: |
   Run an example of looking at a drug repurposing literature review and then searching Robokop to ground that information.
-  This workflow needs a disorder and a symptom.
+  This workflow needs a disorder and a symptom provided.
+  This workflow finds drug repurposing for a disorder and then explaining the pathway for how that occurs.
 category: biomedical
-example_prompt: Run the workflow
-hidden: false
+example_prompt: Find drug repurposing candidates for myesthenia gravis and explain the pathway for how that drug impacts ptosis
+hidden: true
 is_context_default: false
 stages:
   - name: Literature Review
@@ -21,3 +23,21 @@ stages:
           by querying for genes that have edges to both nodes in the Robokop knowledge graph.
     description:
       - Use Robokop to match how that drug may have an impact on that symptom.
+
+output_prompt: |
+  You will be provided the results of a process that gathers information about drug repurposing.
+  Return a markdown document with the following format:
+
+  ```
+  ### Drug Repurposing Candidates
+
+  ### Top Candidate: <drug name>
+
+  ### Impact Pathway
+  ```
+
+  - Drug Repurposing Candidates is a list of what was found and brief summaries.
+  - Top Candidate section contains more details about the selected drug candidate.
+  - Impact Pathway should summarize the results of the knowledge graph lookup.
+
+  IMPORTANT: If you do not yet have the information, fill out the section as "pending next workflow stage."
