@@ -1,0 +1,52 @@
+datatype: api
+description: |
+  ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
+img_url: null
+last_updated: null
+name: Robokop
+provider: adhoc:biome
+resources:
+  aa7c235c-3c54-4581-9426-de90cc75d4e5:
+    filepath: db_relationship_types.txt
+    integration: 00000ebb-0ce9-4f66-9522-e7f516e2c020
+    name: db_relationship_types
+    resource_id: aa7c235c-3c54-4581-9426-de90cc75d4e5
+    resource_type: file
+  e632efe8-2bbc-472c-aa55-98a409554bf3:
+    filepath: db_labels.txt
+    integration: 00000ebb-0ce9-4f66-9522-e7f516e2c020
+    name: db_labels
+    resource_id: e632efe8-2bbc-472c-aa55-98a409554bf3
+    resource_type: file
+slug: robokop
+source: |-
+  ROBOKOP is an open-source, modular, biomedical knowledge graph-based system that includes the ROBOKOP biomedical knowledge graph, a user interface, and a variety of supporting resources, including tools and services to support deep exploration of the ROBOKOP KG and each of its underlying primary knowledge sources.
+
+  You have access to an online Neo4J instance. You can start a session with the following:
+
+  '''
+  import neo4j
+  from neo4j import GraphDatabase
+
+  url = "neo4j://robokopkg.renci.org:7687"
+  session = GraphDatabase.driver(url, auth=('neo4j', 'neo4j')).session()
+  '''
+
+  Here is a list of all of the knowledge graph node labels:
+
+  IMPORTANT: When referencing node labels, make sure to quote them in backticks. For example,
+  biolink:BiologicalProcess should be `biolink:BiologicalProcess` as to be proper Cypher syntax.
+
+  ```
+  ${db_labels}
+  ```
+
+  Here is a list of all of the knowledge graph relationship types:
+
+  ```
+  ${db_relationship_types}
+  ```
+
+  IMPORTANT: Reference these when making your queries and think carefully about only using types that exist.
+url: null
+uuid: 00000ebb-0ce9-4f66-9522-e7f516e2c020
