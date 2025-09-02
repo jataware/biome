@@ -19,7 +19,7 @@ class DocumentSource(ABC):
     data_dir: str
     # set when added to LiteratureReviewAgent or manually
     qualified_path: Path | None
-    async def fetch_for_query(self, query: str):
+    async def fetch_for_query(self, query: str, slug: str = ""):
         """
         Fetch papers for a given query and write them to qualified_path.
         Returns details relevant for an agent to read, in an unspecified format.
@@ -41,10 +41,10 @@ class LiteratureReviewAgent:
         source.qualified_path = self.source_root / source.data_dir
         self.sources[name] = source
 
-    async def fetch_for_query(self, source_name: str, query: str):
-        return await self.sources[source_name].fetch_for_query(query)
+    async def fetch_for_query(self, source_name: str, query: str, slug: str):
+        return await self.sources[source_name].fetch_for_query(query, slug)
 
-    async def paperQA(self, query: str) -> str:
+    async def paperQA(self, query: str, slug: str) -> str:
         """
         run paperQA over the downloaded corpus and returns the response
         """
@@ -55,7 +55,7 @@ class LiteratureReviewAgent:
             callbacks=["langsmith"]
         )
         for path in self.source_dirs:
-            output_dir = self.source_root / path
+            output_dir = self.source_root / path / slug
             for paper in output_dir.glob('*.html'):
                 await docs.aadd(paper)
             for paper in output_dir.glob('*.pdf'):
@@ -69,8 +69,8 @@ class PubmedSource(DocumentSource):
         self.data_dir = "pubmed"
         self.qualified_path = qualified_path
 
-    async def fetch_for_query(self, query: str):
-        return await self.pubmed_search(query)
+    async def fetch_for_query(self, query: str, slug: str):
+        return await self.pubmed_search(query, slug)
 
     def _assert_qualified_path(self) -> Path:
         if self.qualified_path is None:
@@ -89,7 +89,7 @@ class PubmedSource(DocumentSource):
             return id_list
         return ["No IDs returned for the given query."]
 
-    def get_pubmed_fulltext(self, pmc_id: str):
+    def get_pubmed_fulltext(self, pmc_id: str, slug: str):
         """
         download the fulltext of a paper given a PMC id and save it to
         the agent's data dir for dataset storage.
@@ -110,7 +110,7 @@ class PubmedSource(DocumentSource):
                 else:
                     break
             contents = "".join(text)
-            output_dir = self._assert_qualified_path()
+            output_dir = self._assert_qualified_path() / slug
             fulltext_file = output_dir / f"{pmc_id}.fulltext.html"
             os.makedirs(str(output_dir), exist_ok=True)
             with open(fulltext_file, 'w') as f:
@@ -131,7 +131,7 @@ class PubmedSource(DocumentSource):
         except Exception:
             raise ValueError("No PDF link found.")
 
-    async def pubmed_search(self, query: str):
+    async def pubmed_search(self, query: str, slug: str):
         """
         search pubmed for papers given a query and download the respective papers.
 
@@ -141,7 +141,7 @@ class PubmedSource(DocumentSource):
         paper_ids = self.pubmed_search_ids(query)
         details = {}
         for paper_id in paper_ids:
-            output_dir = self._assert_qualified_path()
+            output_dir = self._assert_qualified_path() / slug
             os.makedirs(str(output_dir), exist_ok=True)
             metadata_file = output_dir / f"{paper_id}.metadata.json"
             if metadata_file.exists():
@@ -222,6 +222,6 @@ class PubmedSource(DocumentSource):
 
         for paper_id in details:
             if (pmc_id := details[paper_id].get('pmc_full_text_id')) is not None:
-                self.get_pubmed_fulltext(pmc_id)
+                self.get_pubmed_fulltext(pmc_id, slug)
 
         return details
