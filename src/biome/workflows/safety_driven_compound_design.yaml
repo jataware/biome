@@ -1,0 +1,151 @@
+title: Safety-Driven Compound Design
+human_description: |
+  Analyze adverse event patterns from FDA FAERS database and correlate them with
+  chemical structures and target profiles to identify safety liabilities and guide
+  safer compound design strategies for drug development.
+agent_description: |
+  This workflow identifies safety-driven design principles through pharmacovigilance analysis.
+  The user should provide a drug class, therapeutic area, or specific safety concern of interest.
+  The workflow will analyze adverse event patterns and correlate them with chemical properties.
+category: biomedical
+example_prompt: Analyze cardiovascular safety signals in kinase inhibitors and identify structural features associated with cardiotoxicity
+hidden: false
+is_context_default: false
+
+stages:
+  - name: Pharmacovigilance Signal Detection
+    steps:
+      - prompt: |
+          Query the FDA FAERS database to analyze adverse event patterns for the specified drug class or therapeutic area:
+          * Identify the most frequently reported adverse events
+          * Analyze event severity and outcomes (hospitalization, death, etc.)
+          * Examine time-to-onset patterns for different adverse events
+          * Compare AE profiles across different compounds in the class
+          
+          Focus on identifying 3-5 key safety signals that appear consistently across multiple drugs.
+      - prompt: |
+          Perform demographic and co-medication analysis of the adverse events:
+          * Patient age, gender, and comorbidity patterns
+          * Concomitant medications that might contribute to events
+          * Dose-response relationships where available
+          * Geographic or temporal trends in reporting
+          
+          Identify patient populations or conditions that appear at higher risk.
+    description:
+      - Extract comprehensive adverse event patterns and identify key safety signals of concern.
+      
+  - name: Chemical Structure-Safety Analysis
+    steps:
+      - prompt: |
+          Query the ChEMBL SQLite database at chembl_35/chembl_35_sqlite/chembl_35.db for compounds
+          associated with the identified safety signals:
+          * Retrieve chemical structures and molecular descriptors
+          * Gather target activity profiles and selectivity data
+          * Extract pharmacokinetic and ADMET properties
+          * Identify common structural scaffolds or functional groups
+          
+          Focus on compounds that show the adverse events identified in the FAERS analysis.
+      - prompt: |
+          Perform structure-activity relationship analysis:
+          * Identify common structural motifs in compounds with safety issues
+          * Analyze molecular properties (MW, logP, polar surface area, etc.)
+          * Compare target binding profiles of safe vs problematic compounds
+          * Look for off-target activities that correlate with adverse events
+          
+          Generate hypotheses about structural features that contribute to toxicity.
+    description:
+      - Correlate chemical structures and target profiles with adverse event patterns.
+      
+  - name: Safety Liability Assessment
+    steps:
+      - prompt: |
+          Create a comprehensive safety liability profile including:
+          * Structural alerts and problematic chemical features
+          * Target-based safety concerns (on-target and off-target)
+          * Patient population risk factors
+          * Dose and exposure considerations
+          * Mechanism-based predictions for toxicity
+          
+          Rank safety concerns by severity, frequency, and predictability.
+      - prompt: |
+          Cross-reference findings with known safety pharmacology data:
+          * hERG, CYP450, and other safety target interactions
+          * Genotoxicity and carcinogenicity structure alerts
+          * Hepatotoxicity and nephrotoxicity patterns
+          * Central nervous system and cardiovascular risks
+          
+          Validate the identified safety signals against established safety knowledge.
+    description:
+      - Develop comprehensive safety liability profiles with mechanistic understanding.
+      
+  - name: Design Strategy Recommendations
+    steps:
+      - prompt: |
+          Develop specific compound design recommendations to mitigate identified safety risks:
+          * Structural modifications to avoid problematic features
+          * Target selectivity profiles to minimize off-target effects
+          * Physicochemical property ranges for safer compounds
+          * Patient stratification strategies to avoid high-risk populations
+          
+          Provide actionable guidance for medicinal chemistry teams.
+      - prompt: |
+          Create a safety-by-design framework including:
+          * Early screening cascades for identified liability targets
+          * Structural guidelines and forbidden substructures
+          * Patient selection criteria for clinical studies
+          * Risk mitigation strategies for unavoidable safety concerns
+          * Biomarker strategies for safety monitoring
+          
+          Prioritize recommendations by feasibility and impact on safety profile.
+    description:
+      - Synthesize analysis into actionable safety-by-design principles and compound optimization strategies.
+
+output_prompt: |
+  You will be provided the results of a safety-driven compound design analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a drug safety and medicinal chemistry guidance document.
+
+  ```
+  ## Executive Summary
+  - Drug class/therapeutic area analyzed
+  - Key safety signals identified
+  - Primary structural recommendations
+
+  ## Pharmacovigilance Analysis
+  - FAERS adverse event patterns
+  - Most concerning safety signals (frequency, severity)
+  - High-risk patient populations
+  - Dose-response relationships
+
+  ## Structure-Safety Relationships
+  - Problematic structural features identified
+  - Target activity correlations with adverse events
+  - Molecular property ranges associated with toxicity
+  - Off-target interactions of concern
+
+  ## Safety Liability Profile
+
+  ### High Priority Concerns
+  - [Safety Signal 1]: Structural basis and mitigation strategies
+  - [Safety Signal 2]: Structural basis and mitigation strategies
+
+  ### Moderate Priority Concerns
+  [Same format as above]
+
+  ## Compound Design Recommendations
+  - Structural modifications to improve safety
+  - Target selectivity requirements
+  - Physicochemical property optimization
+  - Patient stratification strategies
+
+  ## Safety-by-Design Framework
+  - Early screening protocols
+  - Structural guidelines and alerts
+  - Clinical development considerations
+  - Risk monitoring strategies
+  ```
+
+  If any analysis section is incomplete, mark it as "pending additional data analysis" and proceed with available information.
+
+  The results will be provided below:

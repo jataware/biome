@@ -1,0 +1,137 @@
+title: Precision Medicine Biomarker Discovery
+human_description: |
+  Identify and validate genomic biomarkers for patient stratification by analyzing
+  clinical outcomes data, predicting functional effects of genetic variants, and
+  validating tissue-specific expression patterns for precision medicine applications.
+agent_description: |
+  This workflow discovers precision medicine biomarkers through clinical genomics analysis.
+  The user should provide a cancer type or therapeutic area of interest. The workflow will
+  analyze patient outcome data, predict variant functional effects, and validate biomarkers.
+category: biomedical
+example_prompt: Identify precision medicine biomarkers for immunotherapy response in lung cancer patients
+hidden: false
+is_context_default: false
+
+stages:
+  - name: Clinical Data Mining
+    steps:
+      - prompt: |
+          Query cBioPortal for the specified cancer type/indication to identify:
+          * Studies with sufficient sample sizes and clinical annotation
+          * Mutation landscapes and frequencies across patient cohorts
+          * Survival data and treatment response information where available
+          * Key genes with recurrent mutations or copy number alterations
+          
+          Focus on finding 3-5 genes that show variable mutation patterns across patients.
+      - prompt: |
+          Use the GDC API to supplement the cBioPortal data with:
+          * Additional patient demographic and clinical characteristics
+          * Mutation burden and signature analysis
+          * Expression data tied to clinical outcomes
+          
+          Identify patient subgroups with distinct mutation profiles or outcomes.
+    description:
+      - Extract comprehensive clinical genomics data to identify candidate biomarker genes and patient stratifications.
+      
+  - name: Functional Variant Prediction
+    steps:
+      - prompt: |
+          For the top 3-5 candidate biomarker genes identified, use AlphaGenome to predict
+          the functional consequences of the most common variants:
+          * Impact on gene expression levels (RNA-seq predictions)
+          * Effects on chromatin accessibility and regulatory elements
+          * Changes in splicing patterns and transcript isoforms
+          * Alterations in transcription factor binding sites
+          
+          Focus on variants that show clear functional predictions and could explain clinical differences.
+      - prompt: |
+          Analyze the predicted functional effects in the context of:
+          * Disease-relevant pathways (immune response, DNA repair, cell cycle, etc.)
+          * Drug mechanism of action for relevant therapies
+          * Known resistance or sensitivity mechanisms
+          
+          Identify variants with functional predictions that align with clinical observations.
+    description:
+      - Use AlphaGenome to predict molecular mechanisms underlying clinical variant associations.
+      
+  - name: Tissue Context Validation
+    steps:
+      - prompt: |
+          Query the Human Protein Atlas for the candidate biomarker genes to validate:
+          * Tissue-specific expression patterns in relevant organs/tissues
+          * Protein levels and subcellular localization
+          * Expression correlation with disease progression markers
+          * Variability across normal vs disease tissue samples
+      - prompt: |
+          Cross-reference the HPA tissue expression data with clinical data to assess:
+          * Whether expression patterns support biomarker utility
+          * Tissue accessibility for clinical testing (blood, biopsy sites, etc.)
+          * Potential confounding factors from tissue heterogeneity
+    description:
+      - Validate biomarker candidates using tissue-specific expression and protein data.
+      
+  - name: Biomarker Classification Strategy
+    steps:
+      - prompt: |
+          Develop a clinical biomarker strategy for the validated candidates including:
+          * Biomarker classification (predictive, prognostic, pharmacodynamic)
+          * Patient stratification algorithm based on variant combinations
+          * Clinical testing methodology recommendations (sequencing, IHC, etc.)
+          * Integration with existing clinical workflows
+          
+          Create decision trees or algorithms for using these biomarkers in practice.
+      - prompt: |
+          Assess the clinical utility and feasibility:
+          * Prevalence of biomarker-positive patients in the target population
+          * Potential impact on treatment selection or clinical outcomes
+          * Regulatory pathway considerations for companion diagnostics
+          * Comparison to existing biomarkers in the field
+          
+          Prioritize biomarkers by clinical actionability and commercial potential.
+    description:
+      - Synthesize findings into actionable clinical biomarker strategies with implementation guidance.
+
+output_prompt: |
+  You will be provided the results of a precision medicine biomarker discovery analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a clinical development document suitable for precision medicine teams.
+
+  ```
+  ## Executive Summary
+  - Cancer type/indication analyzed
+  - Number of candidate biomarkers evaluated
+  - Top biomarker recommendation with clinical utility
+
+  ## Clinical Genomics Analysis
+  - Patient cohorts analyzed (sample sizes, demographics)
+  - Key mutation patterns and frequencies
+  - Clinical outcome associations identified
+
+  ## Biomarker Candidates
+
+  ### Biomarker 1: [Gene/Variant]
+  - Clinical association (response, survival, etc.)
+  - AlphaGenome functional predictions
+  - Tissue expression validation
+  - Proposed clinical use case
+  - Patient stratification potential
+
+  ### Biomarker 2: [Gene/Variant]
+  [Same structure as above]
+
+  ## Clinical Implementation Strategy
+  - Recommended biomarker classification
+  - Patient selection algorithm
+  - Clinical testing approach
+  - Integration with treatment protocols
+
+  ## Regulatory and Commercial Considerations
+  - Companion diagnostic pathway
+  - Market size and patient prevalence
+  - Competitive landscape assessment
+  ```
+
+  If any analysis section is incomplete, mark it as "pending validation studies" and proceed with available data.
+
+  The results will be provided below:

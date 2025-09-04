@@ -1,0 +1,136 @@
+title: Drug Repurposing Discovery Pipeline
+human_description: |
+  Discover novel drug repurposing opportunities by combining literature analysis,
+  knowledge graph exploration, and genomic validation to identify existing compounds
+  that could be repositioned for new therapeutic indications.
+agent_description: |
+  This workflow identifies drug repurposing opportunities through systematic analysis.
+  The user should provide a disease or indication of interest. The workflow will find
+  literature gaps, explore knowledge graph connections, and validate mechanisms genomically.
+category: biomedical
+example_prompt: Find drug repurposing candidates for Alzheimer's disease using literature analysis and knowledge graph exploration
+hidden: false
+is_context_default: false
+
+stages:
+  - name: Current Therapeutic Landscape Analysis
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to analyze the current drug landscape for the specified disease/indication:
+          * Query get_drugs_for_indication to find all currently approved/investigated drugs
+          * Use get_indications_for_drug for each drug to understand their full therapeutic scope
+          * Identify gaps in the therapeutic landscape (patient populations, disease subtypes, resistance patterns)
+          
+          Focus on finding underserved therapeutic areas within the indication.
+      - prompt: |
+          Supplement INDRA findings with focused literature review using PubMed search and PaperQA:
+          * Current limitations of existing therapies
+          * Emerging resistance mechanisms
+          * Unmet medical needs in specific patient subpopulations
+          
+          IMPORTANT: Only search for papers 1-2 times maximum to fill specific knowledge gaps from INDRA analysis.
+    description:
+      - Comprehensively map current therapeutic landscape and identify repurposing opportunities.
+      
+  - name: Drug-Target-Disease Network Analysis
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to systematically explore drug repurposing candidates:
+          * Query get_pathways_for_gene for key disease-associated genes to identify relevant pathways
+          * Use get_drugs_for_target to find drugs targeting proteins in those pathways
+          * Cross-reference with get_targets_for_drug to understand each candidate's full target profile
+          * Use get_side_effects_for_drug to assess safety profiles
+          
+          Focus on drugs with mechanistic relevance but different current indications.
+      - prompt: |
+          Enhance INDRA findings with ChEMBL SQLite database queries at chembl_35/chembl_35_sqlite/chembl_35.db:
+          * Binding affinities and selectivity profiles for promising candidates
+          * Pharmacokinetic and ADMET properties
+          * Chemical scaffolds and structure-activity relationships
+          * Clinical trial history and development status
+    description:
+      - Systematically identify and characterize drug repurposing candidates using integrated knowledge networks.
+      
+  - name: Clinical Feasibility Assessment
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to assess clinical development feasibility for the top drug repurposing candidates:
+          * Query get_trials_for_drug to understand current clinical trial landscape
+          * Use get_sensitive_cell_lines_for_drug to predict potential efficacy in disease-relevant models
+          * Cross-reference clinical trial data with disease subtypes and patient populations
+          
+          Assess regulatory pathway and clinical development timeline considerations.
+      - prompt: |
+          For the most promising candidates, use AlphaGenome to predict functional genomic effects
+          of key disease-associated variants in the target pathways:
+          * Gene expression changes in disease-relevant tissues
+          * Chromatin accessibility effects that could affect drug response
+          * Transcriptional regulation modifications
+          
+          Validate whether genomic predictions support the repurposing hypothesis.
+    description:
+      - Evaluate clinical development feasibility and validate mechanistic rationale through genomic analysis.
+      
+  - name: Strategic Repurposing Recommendations
+    steps:
+      - prompt: |
+          Create a comprehensive assessment table for the top repurposing candidates including:
+          * Drug name and current indications (from INDRA analysis)
+          * Target profile and mechanism of action (INDRA + ChEMBL data)
+          * Repurposing rationale based on pathway overlap and unmet medical needs
+          * Safety profile and potential contraindications (INDRA side effects data)
+          * Clinical trial landscape and development feasibility (INDRA trials data)
+          * Genomic validation results supporting the hypothesis (AlphaGenome)
+          * Competitive advantage and market opportunity assessment
+          
+          Rank candidates by development risk, timeline, and commercial potential.
+      - prompt: |
+          For the top recommendation, create a detailed repurposing strategy including:
+          * Specific patient population and indication positioning
+          * Recommended clinical development pathway (505(b)(2) FDA pathway, etc.)
+          * Key biomarkers for patient selection based on genomic analysis
+          * Risk mitigation strategies for identified safety concerns
+          * Partnership opportunities and competitive differentiation
+          
+          Provide actionable next steps for business development and clinical teams.
+    description:
+      - Deliver strategic repurposing recommendations with comprehensive risk-benefit analysis and implementation roadmap.
+
+output_prompt: |
+  You will be provided the results of a drug repurposing discovery analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a professional markdown document suitable for pharmaceutical R&D review.
+
+  ```
+  ## Executive Summary
+  - Disease/indication analyzed
+  - Number of repurposing candidates identified
+  - Top recommendation with key rationale
+
+  ## Literature Analysis Summary
+  - Current therapeutic gaps identified
+  - Key understudied pathways or mechanisms
+
+  ## Drug Repurposing Candidates
+
+  ### Candidate 1: [Drug Name]
+  - Current indication(s)
+  - Mechanistic rationale
+  - Knowledge graph evidence
+  - Genomic validation results
+  - Clinical feasibility assessment
+  - Overall score/ranking
+
+  ### Candidate 2: [Drug Name]
+  [Same structure as above]
+
+  ## Recommended Next Steps
+  - Priority candidate for further evaluation
+  - Suggested validation experiments
+  - Clinical development considerations
+  ```
+
+  If any analysis section is incomplete, mark it as "pending further analysis" and proceed with available data.
+
+  The results will be provided below:
