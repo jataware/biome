@@ -22,6 +22,12 @@ stages:
           * Examine time-to-onset patterns for different adverse events
           * Compare AE profiles across different compounds in the class
           
+          CRITICAL: For every finding, document:
+          * Exact FAERS query parameters used
+          * Date range of data analyzed
+          * Total number of reports analyzed
+          * Statistical significance and confidence intervals where applicable
+          
           Focus on identifying 3-5 key safety signals that appear consistently across multiple drugs.
       - prompt: |
           Perform demographic and co-medication analysis of the adverse events:
@@ -44,6 +50,12 @@ stages:
           * Extract pharmacokinetic and ADMET properties
           * Identify common structural scaffolds or functional groups
           > Note: if the ChEMBL database is not available, you can can download it from https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_sqlite.tar.gz
+          
+          CRITICAL: For every compound analyzed, document:
+          * ChEMBL compound ID and version
+          * Exact SQL queries used
+          * Data completeness (% of compounds with activity data, ADMET data, etc.)
+          * Source publications for activity data (PubMed IDs where available)
           
           Focus on compounds that show the adverse events identified in the FAERS analysis.
       - prompt: |
@@ -113,38 +125,54 @@ output_prompt: |
   - Key safety signals identified
   - Primary structural recommendations
 
+  ## Data Sources and Methods
+  - **FAERS Database**: Version, date range analyzed, query parameters, total reports (N=X)
+  - **ChEMBL Database**: Version 35, compounds analyzed (N=X), data completeness metrics
+  - **Statistical Methods**: Tests used, confidence intervals, significance thresholds
+  - **Analysis Limitations**: Missing data, potential biases, caveats
+
   ## Pharmacovigilance Analysis
-  - FAERS adverse event patterns
-  - Most concerning safety signals (frequency, severity)
-  - High-risk patient populations
-  - Dose-response relationships
+  - **FAERS adverse event patterns**: Specific query results with report counts
+  - **Most concerning safety signals**: Frequency (N reports), severity scores, statistical significance
+  - **High-risk patient populations**: Demographics from N=X reports
+  - **Dose-response relationships**: Based on N=X reports with dose information
 
   ## Structure-Safety Relationships
-  - Problematic structural features identified
-  - Target activity correlations with adverse events
-  - Molecular property ranges associated with toxicity
-  - Off-target interactions of concern
+  - **Problematic structural features**: Identified from N=X ChEMBL compounds (list ChEMBL IDs)
+  - **Target activity correlations**: Based on N=X binding assays from ChEMBL
+  - **Molecular property ranges**: Derived from N=X compounds with complete data
+  - **Off-target interactions**: Evidence from N=X selectivity assays
 
   ## Safety Liability Profile
 
   ### High Priority Concerns
-  - [Safety Signal 1]: Structural basis and mitigation strategies
-  - [Safety Signal 2]: Structural basis and mitigation strategies
+  - **[Safety Signal 1]**: 
+    - FAERS evidence: N=X reports, 95% CI: X-X, p-value
+    - ChEMBL compounds: N=X analyzed (ChEMBL IDs: list)
+    - Source publications: PMIDs where available
+    - Structural basis and mitigation strategies
+  - **[Safety Signal 2]**: [Same detailed format with complete provenance]
 
   ### Moderate Priority Concerns
-  [Same format as above]
+  [Same detailed format with specific data sources and statistics]
 
   ## Compound Design Recommendations
-  - Structural modifications to improve safety
-  - Target selectivity requirements
-  - Physicochemical property optimization
-  - Patient stratification strategies
+  - **Structural modifications**: Based on analysis of N compounds from ChEMBL v35
+  - **Target selectivity requirements**: Evidence from X binding datasets
+  - **Physicochemical property optimization**: Statistical analysis of N=X compounds
+  - **Patient stratification strategies**: Based on N=X FAERS demographic reports
 
   ## Safety-by-Design Framework
-  - Early screening protocols
-  - Structural guidelines and alerts
-  - Clinical development considerations
-  - Risk monitoring strategies
+  - **Early screening protocols**: Validated against N compounds with known outcomes
+  - **Structural guidelines**: Based on analysis of X adverse events from FAERS
+  - **Clinical development considerations**: Evidence from N clinical trial reports
+  - **Risk monitoring strategies**: Supported by X post-market surveillance reports
+
+  ## Appendix: Data Quality and Limitations
+  - FAERS reporting biases and underreporting estimates
+  - ChEMBL data completeness by assay type
+  - Statistical power calculations and confidence intervals
+  - Excluded data and rationale
   ```
 
   If any analysis section is incomplete, mark it as "pending additional data analysis" and proceed with available information.

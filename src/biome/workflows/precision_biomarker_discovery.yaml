@@ -22,12 +22,25 @@ stages:
           * Survival data and treatment response information where available
           * Key genes with recurrent mutations or copy number alterations
           
+          CRITICAL: Document all data provenance:
+          * cBioPortal study IDs analyzed
+          * Sample sizes for each cohort (N=X patients)
+          * Data types available (mutations, CNV, expression, clinical)
+          * Query timestamps and API version used
+          * Statistical significance tests and p-values for associations
+          
           Focus on finding 3-5 genes that show variable mutation patterns across patients.
       - prompt: |
           Use the GDC API to supplement the cBioPortal data with:
           * Additional patient demographic and clinical characteristics
           * Mutation burden and signature analysis
           * Expression data tied to clinical outcomes
+          
+          CRITICAL: Document GDC data provenance:
+          * GDC case IDs and file IDs accessed
+          * API query filters and parameters used
+          * Data completeness metrics (% patients with each data type)
+          * Version of GDC data release accessed
           
           Identify patient subgroups with distinct mutation profiles or outcomes.
     description:

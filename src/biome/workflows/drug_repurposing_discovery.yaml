@@ -21,6 +21,12 @@ stages:
           * Use get_indications_for_drug for each drug to understand their full therapeutic scope
           * Identify gaps in the therapeutic landscape (patient populations, disease subtypes, resistance patterns)
           
+          CRITICAL: Document all data provenance:
+          * INDRA database version and query timestamp
+          * Exact API endpoints and parameters used
+          * Number of drugs/indications returned for each query
+          * Data completeness and coverage limitations
+          
           Focus on finding underserved therapeutic areas within the indication.
       - prompt: |
           Supplement INDRA findings with focused literature review using PubMed search and PaperQA:
@@ -29,6 +35,12 @@ stages:
           * Unmet medical needs in specific patient subpopulations
           
           IMPORTANT: Only search for papers 1-2 times maximum to fill specific knowledge gaps from INDRA analysis.
+          
+          CRITICAL: Document literature provenance:
+          * PubMed search terms and filters used
+          * Number of papers retrieved and analyzed
+          * Date range of publications
+          * PaperQA model version and settings used
     description:
       - Use INDRA CoGEx API to map current therapeutic landscape and supplement with PubMed/PaperQA literature analysis to identify repurposing opportunities.
       
@@ -109,27 +121,42 @@ output_prompt: |
   - Number of repurposing candidates identified
   - Top recommendation with key rationale
 
-  ## Literature Analysis Summary
-  - Current therapeutic gaps identified
-  - Key understudied pathways or mechanisms
+  ## Data Sources and Methods
+  - **INDRA CoGEx**: Database version, query timestamps, API endpoints used
+  - **ChEMBL**: Version 35, compounds analyzed (N=X), SQL queries executed
+  - **PubMed/PaperQA**: Search terms, papers analyzed (N=X), date ranges
+  - **AlphaGenome**: Model version, genomic intervals analyzed, prediction confidence
+  - **Analysis Limitations**: Data gaps, potential biases, confidence levels
+
+  ## Current Therapeutic Landscape
+  - **Existing drugs**: N=X drugs identified via INDRA get_drugs_for_indication
+  - **Therapeutic gaps**: Evidence from N literature sources and X clinical datasets
+  - **Unmet needs**: Patient populations and disease subtypes identified
 
   ## Drug Repurposing Candidates
 
   ### Candidate 1: [Drug Name]
-  - Current indication(s)
-  - Mechanistic rationale
-  - Knowledge graph evidence
-  - Genomic validation results
-  - Clinical feasibility assessment
-  - Overall score/ranking
+  - **Current indication(s)**: From INDRA get_indications_for_drug
+  - **INDRA evidence**: Pathway connections (specific API queries used)
+  - **ChEMBL data**: Compound ID, target activities (N=X assays)
+  - **Clinical trials**: N=X trials from INDRA get_trials_for_drug
+  - **Genomic validation**: AlphaGenome predictions (confidence scores)
+  - **Safety profile**: N=X adverse events from INDRA get_side_effects_for_drug
+  - **Overall assessment**: Risk/benefit score with data sources
 
   ### Candidate 2: [Drug Name]
-  [Same structure as above]
+  [Same detailed structure with complete provenance]
 
   ## Recommended Next Steps
-  - Priority candidate for further evaluation
-  - Suggested validation experiments
-  - Clinical development considerations
+  - **Priority candidate**: Based on analysis of N data points
+  - **Validation experiments**: Specific assays with power calculations
+  - **Clinical development strategy**: Evidence from N=X similar programs
+  
+  ## Appendix: Data Quality Assessment
+  - INDRA data coverage for indication (% completeness)
+  - ChEMBL target activity data availability
+  - Literature search limitations and biases
+  - Statistical confidence intervals for all quantitative findings
   ```
 
   If any analysis section is incomplete, mark it as "pending further analysis" and proceed with available data.
