@@ -19,8 +19,9 @@ services:
       - TOOL_ENABLED_RUN_CODE=true
       - PYTHONBREAKPOINT=debugpy.breakpoint
       - BIOME_LIT_REVIEW_DIR=/jupyter/_literature_review
+      - INTEGRATION_PATH=/jupyter/adhoc_data  
     env_file:
-      - .env
+      - .env        
     volumes:
       - ./src/biome:/jupyter/src/biome
       - ./adhoc_data:/jupyter/adhoc_data
