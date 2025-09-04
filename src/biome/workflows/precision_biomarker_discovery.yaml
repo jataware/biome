@@ -31,7 +31,7 @@ stages:
           
           Identify patient subgroups with distinct mutation profiles or outcomes.
     description:
-      - Extract comprehensive clinical genomics data to identify candidate biomarker genes and patient stratifications.
+      - Use cBioPortal API and GDC API to extract comprehensive clinical genomics data and identify candidate biomarker genes and patient stratifications.
       
   - name: Functional Variant Prediction
     steps:
@@ -52,7 +52,7 @@ stages:
           
           Identify variants with functional predictions that align with clinical observations.
     description:
-      - Use AlphaGenome to predict molecular mechanisms underlying clinical variant associations.
+      - Use AlphaGenome API to predict functional genomic effects of variants and correlate molecular mechanisms with clinical associations.
       
   - name: Tissue Context Validation
     steps:
@@ -68,7 +68,7 @@ stages:
           * Tissue accessibility for clinical testing (blood, biopsy sites, etc.)
           * Potential confounding factors from tissue heterogeneity
     description:
-      - Validate biomarker candidates using tissue-specific expression and protein data.
+      - Use Human Protein Atlas API to validate biomarker candidates through tissue-specific expression and protein localization data.
       
   - name: Biomarker Classification Strategy
     steps:
@@ -89,7 +89,7 @@ stages:
           
           Prioritize biomarkers by clinical actionability and commercial potential.
     description:
-      - Synthesize findings into actionable clinical biomarker strategies with implementation guidance.
+      - Integrate data from cBioPortal, GDC, AlphaGenome, and Human Protein Atlas to develop actionable clinical biomarker strategies with implementation guidance.
 
 output_prompt: |
   You will be provided the results of a precision medicine biomarker discovery analysis.

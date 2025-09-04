@@ -30,7 +30,7 @@ stages:
           
           IMPORTANT: Only search for papers 1-2 times maximum to fill specific knowledge gaps from INDRA analysis.
     description:
-      - Comprehensively map current therapeutic landscape and identify repurposing opportunities.
+      - Use INDRA CoGEx API to map current therapeutic landscape and supplement with PubMed/PaperQA literature analysis to identify repurposing opportunities.
       
   - name: Drug-Target-Disease Network Analysis
     steps:
@@ -48,8 +48,9 @@ stages:
           * Pharmacokinetic and ADMET properties
           * Chemical scaffolds and structure-activity relationships
           * Clinical trial history and development status
+          > Note: if the ChEMBL database is not available, you can can download it from https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_sqlite.tar.gz
     description:
-      - Systematically identify and characterize drug repurposing candidates using integrated knowledge networks.
+      - Use INDRA CoGEx API for drug-target-pathway network analysis and ChEMBL SQLite database for chemical and pharmacological characterization of repurposing candidates.
       
   - name: Clinical Feasibility Assessment
     steps:
@@ -69,7 +70,7 @@ stages:
           
           Validate whether genomic predictions support the repurposing hypothesis.
     description:
-      - Evaluate clinical development feasibility and validate mechanistic rationale through genomic analysis.
+      - Use INDRA CoGEx API for clinical trials data and cell line sensitivity analysis, combined with AlphaGenome predictions for genomic mechanism validation.
       
   - name: Strategic Repurposing Recommendations
     steps:
@@ -94,7 +95,7 @@ stages:
           
           Provide actionable next steps for business development and clinical teams.
     description:
-      - Deliver strategic repurposing recommendations with comprehensive risk-benefit analysis and implementation roadmap.
+      - Integrate findings from INDRA CoGEx, ChEMBL, and AlphaGenome analyses to deliver strategic repurposing recommendations with comprehensive risk-benefit analysis and implementation roadmap.
 
 output_prompt: |
   You will be provided the results of a drug repurposing discovery analysis.

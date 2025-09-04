@@ -5,7 +5,12 @@ networks:
 
 services:
   jupyter:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BEAKER_KERNEL_REF=dev  # or whatever branch/tag you want (e.g. main, etc)
+        - DOWNLOAD_CHEMBL_DATABASE=true # set to true if you want to download the ChEMBL database (it is several GB and is used in various workflows)
     ports:
       - "8888:8888"
     environment:
@@ -25,6 +30,7 @@ services:
     volumes:
       - ./src/biome:/jupyter/src/biome
       - ./adhoc_data:/jupyter/adhoc_data
+      - ./literature_review:/jupyter/_literature_review
     networks:
       - beaker
   rest_api:

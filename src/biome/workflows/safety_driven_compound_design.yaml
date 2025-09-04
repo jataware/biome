@@ -32,7 +32,7 @@ stages:
           
           Identify patient populations or conditions that appear at higher risk.
     description:
-      - Extract comprehensive adverse event patterns and identify key safety signals of concern.
+      - Use FDA FAERS database to extract comprehensive adverse event patterns and identify key safety signals of concern.
       
   - name: Chemical Structure-Safety Analysis
     steps:
@@ -43,6 +43,7 @@ stages:
           * Gather target activity profiles and selectivity data
           * Extract pharmacokinetic and ADMET properties
           * Identify common structural scaffolds or functional groups
+          > Note: if the ChEMBL database is not available, you can can download it from https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_sqlite.tar.gz
           
           Focus on compounds that show the adverse events identified in the FAERS analysis.
       - prompt: |
@@ -54,7 +55,7 @@ stages:
           
           Generate hypotheses about structural features that contribute to toxicity.
     description:
-      - Correlate chemical structures and target profiles with adverse event patterns.
+      - Use ChEMBL SQLite database to correlate chemical structures and target profiles with adverse event patterns from FAERS analysis.
       
   - name: Safety Liability Assessment
     steps:
@@ -76,7 +77,7 @@ stages:
           
           Validate the identified safety signals against established safety knowledge.
     description:
-      - Develop comprehensive safety liability profiles with mechanistic understanding.
+      - Integrate FAERS adverse event data with ChEMBL structure-activity relationships to develop comprehensive safety liability profiles with mechanistic understanding.
       
   - name: Design Strategy Recommendations
     steps:
@@ -98,7 +99,7 @@ stages:
           
           Prioritize recommendations by feasibility and impact on safety profile.
     description:
-      - Synthesize analysis into actionable safety-by-design principles and compound optimization strategies.
+      - Synthesize FAERS and ChEMBL analyses into actionable safety-by-design principles and compound optimization strategies for medicinal chemistry teams.
 
 output_prompt: |
   You will be provided the results of a safety-driven compound design analysis.
