@@ -9,7 +9,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - BEAKER_KERNEL_REF=dev  # or whatever branch/tag you want (e.g. main, etc)
+        - ARCHYTAS_REF=main             # archytas branch/tag
+        - BEAKER_KERNEL_REF=dev         # beaker-kernel branch/tag
         - DOWNLOAD_CHEMBL_DATABASE=true # set to true if you want to download the ChEMBL database (it is several GB and is used in various workflows)
     ports:
       - "8888:8888"

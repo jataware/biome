@@ -26,6 +26,14 @@ RUN if [ "$DOWNLOAD_CHEMBL_DATABASE" = "true" ]; then \
         echo "ChEMBL database ready at /jupyter/chembl_35/"; \
     fi
 
+# Install archytas from GitHub source (changes when you update REF)
+ARG ARCHYTAS_REF=main
+ADD https://codeload.github.com/jataware/archytas/tar.gz/$ARCHYTAS_REF /tmp/archytas.tar.gz
+RUN mkdir -p /tmp/archytas && \
+    tar -xzf /tmp/archytas.tar.gz -C /tmp/archytas --strip-components=1
+WORKDIR /tmp/archytas
+RUN uv pip install --system .
+
 # Install beaker-kernel from GitHub source (changes when you update REF)
 ARG BEAKER_KERNEL_REF=dev
 ADD https://codeload.github.com/jataware/beaker-kernel/tar.gz/$BEAKER_KERNEL_REF /tmp/beaker-kernel.tar.gz
