@@ -127,13 +127,13 @@ class BiomeAgent(BeakerAgent):
 
 
     @tool()
-    async def pubmed_search(self, query: str, slug: str):
+    async def pubmed_search(self, query: str, slug: str, max_papers: int = 10):
         """
-        Retrieves paper abstracts for a given PubMed query, as well as fetching the fulltexts for later.
-        Relevant papers will be listed as their ID and associated abstracts.
+        Retrieves paper abstracts for a given PubMed query as well as the full text of the papers for further analysis.
 
-        Try multiple formulations of the PubMed query to retrieve many papers.
-        If less than five papers are found, retry this tool to see if other formulations find more papers.
+        If less than five papers are found, you may retry this tool to see if other formulations of the query to find more papers.
+
+        After fetching, provide a brief, high-level summary of the result set (e.g., common themes, date range, notable gaps)—do not include step-by-step internal reasoning.
 
         Args:
             query (str): User query to search on PubMed.
@@ -143,12 +143,13 @@ class BiomeAgent(BeakerAgent):
                         It should be specified in snake_case.
                         Multiple successive pubmed_search calls with different queries and the same
                         slug will aggregate the papers in one place for a future paperQA call.
+            max_papers (int): Maximum number of papers to retrieve. Defaults to 10. Only change this if the user requests it.
 
         Returns:
             str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
                  Additionally, search results will be available for paperQA.
         """
-        return await self.litreview_agent.fetch_for_query("pubmed", query, slug)
+        return await self.litreview_agent.fetch_for_query("pubmed", query, slug, max_papers)
 
 
     @tool()

@@ -13,13 +13,14 @@ hidden: false
 is_context_default: false
 
 stages:
-  - name: Current Therapeutic Landscape Analysis
+  - name: INDRA Therapeutic Landscape Mapping
     steps:
       - prompt: |
-          Use INDRA CoGEx to analyze the current drug landscape for the specified disease/indication:
+          Use INDRA CoGEx to systematically map the current drug landscape for the specified disease/indication:
           * Query get_drugs_for_indication to find all currently approved/investigated drugs
           * Use get_indications_for_drug for each drug to understand their full therapeutic scope
-          * Identify gaps in the therapeutic landscape (patient populations, disease subtypes, resistance patterns)
+          * Analyze drug-indication network to identify therapeutic clusters and gaps
+          * Quantify the therapeutic landscape (number of drugs, indication overlap, market coverage)
           
           CRITICAL: Document all data provenance:
           * INDRA database version and query timestamp
@@ -27,22 +28,30 @@ stages:
           * Number of drugs/indications returned for each query
           * Data completeness and coverage limitations
           
-          Focus on finding underserved therapeutic areas within the indication.
+          Identify specific knowledge gaps where literature validation is needed.
+    description:
+      - Use INDRA CoGEx API to systematically map and quantify the current therapeutic landscape for the target indication.
+      
+  - name: Literature Gap Analysis
+    steps:
       - prompt: |
-          Supplement INDRA findings with focused literature review using PubMed search and PaperQA:
-          * Current limitations of existing therapies
-          * Emerging resistance mechanisms
+          Based on the INDRA landscape analysis, conduct targeted literature review using PubMed search and PaperQA:
+          * Focus on specific therapeutic gaps identified by INDRA analysis
+          * Current limitations of existing therapies (particularly underrepresented in INDRA)
+          * Emerging resistance mechanisms not captured in structured databases
           * Unmet medical needs in specific patient subpopulations
+          * Recent clinical developments and pipeline updates
           
-          IMPORTANT: Only search for papers 1-2 times maximum to fill specific knowledge gaps from INDRA analysis.
+          IMPORTANT: Only search for papers 1-2 times maximum. Target literature search based on specific INDRA-identified gaps.
           
           CRITICAL: Document literature provenance:
-          * PubMed search terms and filters used
+          * PubMed search terms and filters used (linked to specific INDRA gaps)
           * Number of papers retrieved and analyzed
           * Date range of publications
           * PaperQA model version and settings used
+          * How literature findings complement or contradict INDRA data
     description:
-      - Use INDRA CoGEx API to map current therapeutic landscape and supplement with PubMed/PaperQA literature analysis to identify repurposing opportunities.
+      - Use targeted PubMed/PaperQA literature analysis to fill specific knowledge gaps identified in the INDRA therapeutic landscape mapping.
       
   - name: Drug-Target-Disease Network Analysis
     steps:
@@ -72,7 +81,29 @@ stages:
           * Use get_sensitive_cell_lines_for_drug to predict potential efficacy in disease-relevant models
           * Cross-reference clinical trial data with disease subtypes and patient populations
           
+          CRITICAL: Document INDRA clinical trials data:
+          * Number of trials found for each drug
+          * Trial phases, status, and sponsor information
+          * Overlap with target indication or related diseases
+          * Data completeness and potential gaps
+          
           Assess regulatory pathway and clinical development timeline considerations.
+      - prompt: |
+          Supplement INDRA findings with comprehensive ClinicalTrials.gov analysis:
+          * Search for trials by drug name and chemical synonyms to ensure complete coverage
+          * Analyze ongoing and completed trials in the target indication and related diseases
+          * Extract dosing regimens, patient populations, and safety monitoring approaches
+          * Identify regulatory precedents and FDA guidance adherence patterns
+          * Compare trial designs and endpoints across similar repurposing programs
+          
+          CRITICAL: Document ClinicalTrials.gov data provenance:
+          * Search terms and filters used
+          * Total trials retrieved and analyzed (N=X)
+          * Date range of trials included
+          * Exclusion criteria and rationale
+          * Data extraction methodology and completeness
+          
+          Focus on trials that inform repurposing feasibility, safety, and regulatory strategy.
       - prompt: |
           For the most promising candidates, use AlphaGenome to predict functional genomic effects
           of key disease-associated variants in the target pathways:
@@ -82,7 +113,7 @@ stages:
           
           Validate whether genomic predictions support the repurposing hypothesis.
     description:
-      - Use INDRA CoGEx API for clinical trials data and cell line sensitivity analysis, combined with AlphaGenome predictions for genomic mechanism validation.
+      - Use INDRA CoGEx API and ClinicalTrials.gov database for comprehensive clinical feasibility assessment, combined with AlphaGenome predictions for genomic mechanism validation.
       
   - name: Strategic Repurposing Recommendations
     steps:
@@ -124,14 +155,22 @@ output_prompt: |
   ## Data Sources and Methods
   - **INDRA CoGEx**: Database version, query timestamps, API endpoints used
   - **ChEMBL**: Version 35, compounds analyzed (N=X), SQL queries executed
+  - **ClinicalTrials.gov**: Search date, trials analyzed (N=X), filters applied
   - **PubMed/PaperQA**: Search terms, papers analyzed (N=X), date ranges
   - **AlphaGenome**: Model version, genomic intervals analyzed, prediction confidence
   - **Analysis Limitations**: Data gaps, potential biases, confidence levels
 
-  ## Current Therapeutic Landscape
+  ## INDRA Therapeutic Landscape
   - **Existing drugs**: N=X drugs identified via INDRA get_drugs_for_indication
-  - **Therapeutic gaps**: Evidence from N literature sources and X clinical datasets
-  - **Unmet needs**: Patient populations and disease subtypes identified
+  - **Drug-indication network**: X therapeutic clusters, Y indication overlaps
+  - **Quantitative metrics**: Market coverage and therapeutic density analysis
+  - **Knowledge gaps identified**: Specific areas requiring literature validation
+
+  ## Literature Gap Analysis
+  - **Targeted literature search**: Based on N=X specific INDRA gaps
+  - **Papers analyzed**: N=Y publications (date range: YYYY-YYYY)
+  - **Key findings**: Therapeutic limitations and unmet needs not captured in INDRA
+  - **INDRA validation**: Areas where literature confirms/contradicts structured data
 
   ## Drug Repurposing Candidates
 
@@ -139,7 +178,7 @@ output_prompt: |
   - **Current indication(s)**: From INDRA get_indications_for_drug
   - **INDRA evidence**: Pathway connections (specific API queries used)
   - **ChEMBL data**: Compound ID, target activities (N=X assays)
-  - **Clinical trials**: N=X trials from INDRA get_trials_for_drug
+  - **Clinical trials**: N=X trials from INDRA get_trials_for_drug, N=Y trials from ClinicalTrials.gov
   - **Genomic validation**: AlphaGenome predictions (confidence scores)
   - **Safety profile**: N=X adverse events from INDRA get_side_effects_for_drug
   - **Overall assessment**: Risk/benefit score with data sources

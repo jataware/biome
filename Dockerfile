@@ -60,6 +60,10 @@ RUN mkdir -m 777 /var/run/beaker
 # which is not sync'd to the /jupyter directory (which is shown in the UI as the home directory)
 RUN usermod -d /jupyter jupyter
 
+# Create common cache/config directories that tools need with proper permissions
+RUN mkdir -p /jupyter/.local /jupyter/.pqa /jupyter/.config/biopython/Bio/Entrez/DTDs && \
+    chown -R 1000:1000 /jupyter/.local /jupyter/.pqa /jupyter/.config
+
 # Set default server env variables
 ENV BEAKER_AGENT_USER=jupyter \
     BEAKER_SUBKERNEL_USER=jupyter \

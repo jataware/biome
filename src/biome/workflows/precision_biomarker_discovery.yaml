@@ -56,16 +56,34 @@ stages:
           * Changes in splicing patterns and transcript isoforms
           * Alterations in transcription factor binding sites
           
+          CRITICAL: Document AlphaGenome analysis:
+          * Model version and prediction confidence scores
+          * Genomic coordinates and variant details analyzed
+          * Prediction methodology and parameters used
+          * Quality metrics and reliability assessments
+          
           Focus on variants that show clear functional predictions and could explain clinical differences.
+    description:
+      - Use AlphaGenome API to predict functional genomic effects of candidate biomarker variants.
+      
+  - name: Clinical Relevance Analysis
+    steps:
       - prompt: |
-          Analyze the predicted functional effects in the context of:
+          Analyze the AlphaGenome functional predictions in the context of clinical associations:
           * Disease-relevant pathways (immune response, DNA repair, cell cycle, etc.)
           * Drug mechanism of action for relevant therapies
           * Known resistance or sensitivity mechanisms
+          * Correlation with patient outcomes and treatment responses
           
-          Identify variants with functional predictions that align with clinical observations.
+          CRITICAL: Document clinical correlation analysis:
+          * Specific pathways and mechanisms analyzed
+          * Drug-target interaction databases consulted
+          * Literature sources for resistance/sensitivity mechanisms
+          * Statistical correlations between functional predictions and clinical data
+          
+          Identify variants with functional predictions that align with clinical observations and could serve as actionable biomarkers.
     description:
-      - Use AlphaGenome API to predict functional genomic effects of variants and correlate molecular mechanisms with clinical associations.
+      - Correlate AlphaGenome functional predictions with clinical associations, drug mechanisms, and treatment outcomes to identify actionable biomarkers.
       
   - name: Tissue Context Validation
     steps:
@@ -117,21 +135,35 @@ output_prompt: |
   - Top biomarker recommendation with clinical utility
 
   ## Clinical Genomics Analysis
-  - Patient cohorts analyzed (sample sizes, demographics)
-  - Key mutation patterns and frequencies
-  - Clinical outcome associations identified
+  - **Patient cohorts**: N=X patients analyzed from Y cBioPortal studies
+  - **GDC supplementation**: N=Z additional cases with demographic/clinical data
+  - **Key mutation patterns**: Frequencies and associations (p-values, confidence intervals)
+  - **Clinical outcome associations**: Survival, response, resistance patterns identified
+
+  ## Functional Variant Predictions
+  - **AlphaGenome analysis**: N=X variants analyzed (model version, confidence scores)
+  - **Genomic effects predicted**: Expression, chromatin, splicing, TF binding changes
+  - **Quality metrics**: Prediction confidence and reliability assessments
+  - **Functional impact assessment**: High/medium/low confidence predictions
+
+  ## Clinical Relevance Analysis
+  - **Pathway correlations**: Disease-relevant pathways validated (N=X pathways)
+  - **Drug mechanism alignment**: Correlation with N=Y therapeutic mechanisms
+  - **Resistance mechanisms**: Evidence from Z literature sources
+  - **Clinical-functional concordance**: Statistical correlations between predictions and outcomes
 
   ## Biomarker Candidates
 
   ### Biomarker 1: [Gene/Variant]
-  - Clinical association (response, survival, etc.)
-  - AlphaGenome functional predictions
-  - Tissue expression validation
-  - Proposed clinical use case
-  - Patient stratification potential
+  - **Clinical association**: From N=X patients, statistical significance (p-value, HR)
+  - **AlphaGenome predictions**: Specific functional effects (confidence scores)
+  - **Clinical relevance**: Pathway/drug mechanism correlations
+  - **Tissue validation**: HPA expression data supporting biomarker utility
+  - **Patient stratification**: N=Y patients potentially eligible, prevalence estimates
+  - **Actionability score**: Based on functional + clinical + tissue evidence
 
   ### Biomarker 2: [Gene/Variant]
-  [Same structure as above]
+  [Same detailed structure with complete provenance]
 
   ## Clinical Implementation Strategy
   - Recommended biomarker classification

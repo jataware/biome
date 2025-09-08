@@ -19,7 +19,7 @@ class DocumentSource(ABC):
     data_dir: str
     # set when added to LiteratureReviewAgent or manually
     qualified_path: Path | None
-    async def fetch_for_query(self, query: str, slug: str = ""):
+    async def fetch_for_query(self, query: str, slug: str = "", max_papers: int = 10):
         """
         Fetch papers for a given query and write them to qualified_path.
         Returns details relevant for an agent to read, in an unspecified format.
@@ -41,8 +41,8 @@ class LiteratureReviewAgent:
         source.qualified_path = self.source_root / source.data_dir
         self.sources[name] = source
 
-    async def fetch_for_query(self, source_name: str, query: str, slug: str):
-        return await self.sources[source_name].fetch_for_query(query, slug)
+    async def fetch_for_query(self, source_name: str, query: str, slug: str, max_papers: int = 10):
+        return await self.sources[source_name].fetch_for_query(query, slug, max_papers)
 
     async def paperQA(self, query: str, slug: str) -> str:
         """
@@ -69,8 +69,8 @@ class PubmedSource(DocumentSource):
         self.data_dir = "pubmed"
         self.qualified_path = qualified_path
 
-    async def fetch_for_query(self, query: str, slug: str):
-        return await self.pubmed_search(query, slug)
+    async def fetch_for_query(self, query: str, slug: str, max_papers: int = 10):
+        return await self.pubmed_search(query, slug, max_papers)
 
     def _assert_qualified_path(self) -> Path:
         if self.qualified_path is None:
@@ -83,8 +83,8 @@ class PubmedSource(DocumentSource):
         handle.close()
         return results # type: ignore
 
-    def pubmed_search_ids(self, query: str) -> list[str]:
-        results = self.entrez_read(Entrez.esearch(db="pubmed", term=query, retmax=25))
+    def pubmed_search_ids(self, query: str, retmax: int = 10) -> list[str]:
+        results = self.entrez_read(Entrez.esearch(db="pubmed", term=query, retmax=retmax))
         if (id_list := results.get("IdList", None)):
             return id_list
         return ["No IDs returned for the given query."]
@@ -131,14 +131,14 @@ class PubmedSource(DocumentSource):
         except Exception:
             raise ValueError("No PDF link found.")
 
-    async def pubmed_search(self, query: str, slug: str):
+    async def pubmed_search(self, query: str, slug: str, max_papers: int = 10):
         """
         search pubmed for papers given a query and download the respective papers.
 
         this tool includes downloading them, as fallbacks might catch papers not existing
         on PMC.
         """
-        paper_ids = self.pubmed_search_ids(query)
+        paper_ids = self.pubmed_search_ids(query, retmax=max_papers)
         details = {}
         for paper_id in paper_ids:
             output_dir = self._assert_qualified_path() / slug
