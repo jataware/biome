@@ -50,7 +50,7 @@ WORKDIR /jupyter
 
 # Clean up sensitive files and install local package
 RUN rm -f /jupyter/.beaker.conf /jupyter/.env && \
-    uv pip install --system /jupyter
+    uv pip install --system -e /jupyter
 
 # Create runtime directories
 RUN mkdir -m 777 /var/run/beaker
