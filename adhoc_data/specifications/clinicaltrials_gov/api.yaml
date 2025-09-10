@@ -1,251 +1,190 @@
 datatype: api
-description: |
-  The ClinicalTrials.gov REST API provides access to clinical trial data from the world's largest clinical trial registry. 
-  This API allows researchers to search and retrieve information about clinical studies, including study design, 
-  eligibility criteria, outcomes, and locations. The database contains over 400,000 studies from around the globe,
-  making it an essential resource for clinical research and evidence-based medicine.
+description: "The ClinicalTrials.gov REST API provides access to clinical trial data\
+  \ from the world's largest clinical trial registry. \nThis API allows researchers\
+  \ to search and retrieve information about clinical studies, including study design,\
+  \ \neligibility criteria, outcomes, and locations. The database contains over 400,000\
+  \ studies from around the globe,\nmaking it an essential resource for clinical research\
+  \ and evidence-based medicine.\n"
 img_url: null
 last_updated: null
 name: ClinicalTrials.gov
-provider: adhoc:specialist_agents
-slug: clinicaltrials_gov
-source: |
-  This API is through Open API Spec (Swagger). You will be provided the schema below.
-  All requests go to the following URL: https://clinicaltrials.gov/api/v2
-
-  {{openapi_specification}}
-url: https://clinicaltrials.gov/api/v2
-uuid: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
+provider: adhoc:biome
 resources:
   a1b2c3d4-e5f6-7890-abcd-ef1234567890:
-    code: |
-      import requests
-      import pandas as pd
-
-      def search_cancer_studies():
-          """Search for recruiting lung cancer studies"""
-          base_url = "https://clinicaltrials.gov/api/v2"
-          
-          params = {
-              'query.cond': 'lung cancer',
-              'filter.overallStatus': 'RECRUITING',
-              'pageSize': 20,
-              'format': 'json'
-          }
-          
-          response = requests.get(f"{base_url}/studies", params=params)
-          
-          if response.status_code != 200:
-              raise Exception(f"API request failed with status code {response.status_code}")
-          
-          data = response.json()
-          studies = data.get('studies', [])
-          
-          # Extract key information from each study
-          study_list = []
-          for study in studies:
-              protocol = study.get('protocolSection', {})
-              ident_mod = protocol.get('identificationModule', {})
-              status_mod = protocol.get('statusModule', {})
-              design_mod = protocol.get('designModule', {})
-              
-              study_info = {
-                  'nct_id': ident_mod.get('nctId', 'N/A'),
-                  'brief_title': ident_mod.get('briefTitle', 'N/A'),
-                  'overall_status': status_mod.get('overallStatus', 'N/A'),
-                  'study_type': design_mod.get('studyType', 'N/A'),
-                  'phase': design_mod.get('phases', ['N/A'])[0] if design_mod.get('phases') else 'N/A',
-                  'last_update': status_mod.get('lastUpdatePostDateStruct', {}).get('date', 'N/A')
-              }
-              study_list.append(study_info)
-          
-          # Convert to DataFrame
-          df = pd.DataFrame(study_list)
-          print(f"Found {len(df)} recruiting lung cancer studies")
-          return df
-
-      # Execute the search
-      cancer_studies = search_cancer_studies()
-      print(cancer_studies.head())
+    code: "import requests\nimport pandas as pd\n\ndef search_cancer_studies():\n\
+      \    \"\"\"Search for recruiting lung cancer studies\"\"\"\n    base_url = \"\
+      https://clinicaltrials.gov/api/v2\"\n    \n    params = {\n        'query.cond':\
+      \ 'lung cancer',\n        'filter.overallStatus': 'RECRUITING',\n        'pageSize':\
+      \ 20,\n        'format': 'json'\n    }\n    \n    response = requests.get(f\"\
+      {base_url}/studies\", params=params)\n    \n    if response.status_code != 200:\n\
+      \        raise Exception(f\"API request failed with status code {response.status_code}\"\
+      )\n    \n    data = response.json()\n    studies = data.get('studies', [])\n\
+      \    \n    # Extract key information from each study\n    study_list = []\n\
+      \    for study in studies:\n        protocol = study.get('protocolSection',\
+      \ {})\n        ident_mod = protocol.get('identificationModule', {})\n      \
+      \  status_mod = protocol.get('statusModule', {})\n        design_mod = protocol.get('designModule',\
+      \ {})\n        \n        study_info = {\n            'nct_id': ident_mod.get('nctId',\
+      \ 'N/A'),\n            'brief_title': ident_mod.get('briefTitle', 'N/A'),\n\
+      \            'overall_status': status_mod.get('overallStatus', 'N/A'),\n   \
+      \         'study_type': design_mod.get('studyType', 'N/A'),\n            'phase':\
+      \ design_mod.get('phases', ['N/A'])[0] if design_mod.get('phases') else 'N/A',\n\
+      \            'last_update': status_mod.get('lastUpdatePostDateStruct', {}).get('date',\
+      \ 'N/A')\n        }\n        study_list.append(study_info)\n    \n    # Convert\
+      \ to DataFrame\n    df = pd.DataFrame(study_list)\n    print(f\"Found {len(df)}\
+      \ recruiting lung cancer studies\")\n    return df\n\n# Execute the search\n\
+      cancer_studies = search_cancer_studies()\nprint(cancer_studies.head())\n"
     integration: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
     notes: null
     query: Search for recruiting lung cancer studies using condition-based filtering
     resource_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
     resource_type: example
+  b1183f1d-4cb7-4dd9-bc76-4c206f2ba901:
+    code: "import requests\nimport pandas as pd\n\ndef search_disease_trials(condition,\
+      \ max_trials=50):\n    \"\"\"Search for clinical trials for a specific condition\
+      \ to assess therapeutic landscape\"\"\"\n    base_url = \"https://clinicaltrials.gov/api/v2/studies\"\
+      \n    params = {\n        'query.cond': condition,\n        'pageSize': max_trials,\n\
+      \        'format': 'json'\n    }\n    \n    print(f\"Searching ClinicalTrials.gov\
+      \ for {condition} trials...\")\n    response = requests.get(base_url, params=params)\n\
+      \    \n    if response.ok:\n        data = response.json()\n        studies\
+      \ = data.get('studies', [])\n        print(f\"Found {len(studies)} {condition}\
+      \ trials\")\n        \n        # Extract basic information for feasibility assessment\n\
+      \        trial_info = []\n        phases = []\n        statuses = []\n     \
+      \   \n        for study in studies:\n            protocol = study.get('protocolSection',\
+      \ {})\n            ident = protocol.get('identificationModule', {})\n      \
+      \      status = protocol.get('statusModule', {})\n            design = protocol.get('designModule',\
+      \ {})\n            \n            # Collect trial information\n            trial_info.append({\n\
+      \                'nct_id': ident.get('nctId', 'N/A'),\n                'title':\
+      \ ident.get('briefTitle', 'N/A')[:80] + '...' if len(ident.get('briefTitle',\
+      \ '')) > 80 else ident.get('briefTitle', 'N/A'),\n                'status':\
+      \ status.get('overallStatus', 'N/A')\n            })\n            \n       \
+      \     # Collect phases and statuses for analysis\n            phase_list = design.get('phases',\
+      \ [])\n            if phase_list:\n                phases.extend(phase_list)\n\
+      \            \n            status_val = status.get('overallStatus', '')\n  \
+      \          if status_val:\n                statuses.append(status_val)\n   \
+      \     \n        # Display sample trials\n        if trial_info:\n          \
+      \  df = pd.DataFrame(trial_info[:10])  # Show first 10\n            print(f\"\
+      \\nSample {condition} trials:\")\n            print(df.to_string(index=False))\n\
+      \        \n        # Analyze trial landscape for repurposing feasibility\n \
+      \       if phases:\n            phase_df = pd.DataFrame({'phase': phases})\n\
+      \            print(f\"\\n{condition} trial phases (regulatory landscape):\"\
+      )\n            print(phase_df['phase'].value_counts())\n        \n        if\
+      \ statuses:\n            status_df = pd.DataFrame({'status': statuses})\n  \
+      \          print(f\"\\n{condition} trial statuses (development activity):\"\
+      )\n            print(status_df['status'].value_counts())\n            \n   \
+      \     return {\n            'trials': trial_info,\n            'phases': phases,\n\
+      \            'statuses': statuses,\n            'total_count': len(studies)\n\
+      \        }\n    else:\n        print(f\"API request failed with status: {response.status_code}\"\
+      )\n        return None\n\n# Example usage for Alzheimer's disease\nalzheimer_data\
+      \ = search_disease_trials('alzheimer', max_trials=30)\n\nif alzheimer_data:\n\
+      \    print(f\"\\nClinical Feasibility Assessment:\")\n    print(f\"- Total active\
+      \ trials: {alzheimer_data['total_count']}\")\n    print(f\"- Regulatory activity\
+      \ level: {'High' if alzheimer_data['total_count'] > 20 else 'Medium' if alzheimer_data['total_count']\
+      \ > 10 else 'Low'}\")\n    print(f\"- Development stage diversity: {len(set(alzheimer_data['phases']))}\
+      \ different phases\")\n    print(f\"- Market validation: {'Strong' if 'RECRUITING'\
+      \ in alzheimer_data['statuses'] else 'Moderate'}\")"
+    integration: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
+    notes: |-
+      This example shows how to use the ClinicalTrials.gov API to assess the clinical development landscape for drug repurposing. It analyzes trial phases, statuses, and activity levels to determine regulatory feasibility and market validation. This information is crucial for understanding the competitive landscape, regulatory precedents, and development timelines for repurposing candidates. The analysis helps prioritize candidates based on clinical development feasibility.
+    query: Search for clinical trials to assess drug repurposing feasibility and regulatory
+      landscape
+    resource_id: b1183f1d-4cb7-4dd9-bc76-4c206f2ba901
+    resource_type: example
   b2c3d4e5-f6g7-8901-bcde-f23456789012:
-    code: |
-      import requests
-      import pandas as pd
-
-      def search_studies_by_location():
-          """Search for studies near NIH/Bethesda area"""
-          base_url = "https://clinicaltrials.gov/api/v2"
-          
-          params = {
-              'filter.geo': 'distance(39.0035707,-77.1013313,50mi)',  # NIH coordinates, 50 mile radius
-              'filter.overallStatus': 'RECRUITING|NOT_YET_RECRUITING',
-              'pageSize': 15,
-              'format': 'json'
-          }
-          
-          response = requests.get(f"{base_url}/studies", params=params)
-          
-          if response.status_code != 200:
-              raise Exception(f"API request failed with status code {response.status_code}")
-          
-          data = response.json()
-          studies = data.get('studies', [])
-          
-          # Extract location and study information
-          study_list = []
-          for study in studies:
-              protocol = study.get('protocolSection', {})
-              ident_mod = protocol.get('identificationModule', {})
-              contacts_mod = protocol.get('contactsLocationsModule', {})
-              
-              # Get first location if available
-              locations = contacts_mod.get('locations', [])
-              location_info = locations[0] if locations else {}
-              
-              study_info = {
-                  'nct_id': ident_mod.get('nctId', 'N/A'),
-                  'brief_title': ident_mod.get('briefTitle', 'N/A')[:80] + '...',
-                  'facility': location_info.get('facility', 'N/A'),
-                  'city': location_info.get('city', 'N/A'),
-                  'state': location_info.get('state', 'N/A'),
-                  'country': location_info.get('country', 'N/A')
-              }
-              study_list.append(study_info)
-          
-          # Convert to DataFrame
-          df = pd.DataFrame(study_list)
-          print(f"Found {len(df)} studies within 50 miles of NIH/Bethesda")
-          return df
-
-      # Execute the geographic search
-      local_studies = search_studies_by_location()
-      print(local_studies.head())
+    code: "import requests\nimport pandas as pd\n\ndef search_studies_by_location():\n\
+      \    \"\"\"Search for studies near NIH/Bethesda area\"\"\"\n    base_url = \"\
+      https://clinicaltrials.gov/api/v2\"\n    \n    params = {\n        'filter.geo':\
+      \ 'distance(39.0035707,-77.1013313,50mi)',  # NIH coordinates, 50 mile radius\n\
+      \        'filter.overallStatus': 'RECRUITING|NOT_YET_RECRUITING',\n        'pageSize':\
+      \ 15,\n        'format': 'json'\n    }\n    \n    response = requests.get(f\"\
+      {base_url}/studies\", params=params)\n    \n    if response.status_code != 200:\n\
+      \        raise Exception(f\"API request failed with status code {response.status_code}\"\
+      )\n    \n    data = response.json()\n    studies = data.get('studies', [])\n\
+      \    \n    # Extract location and study information\n    study_list = []\n \
+      \   for study in studies:\n        protocol = study.get('protocolSection', {})\n\
+      \        ident_mod = protocol.get('identificationModule', {})\n        contacts_mod\
+      \ = protocol.get('contactsLocationsModule', {})\n        \n        # Get first\
+      \ location if available\n        locations = contacts_mod.get('locations', [])\n\
+      \        location_info = locations[0] if locations else {}\n        \n     \
+      \   study_info = {\n            'nct_id': ident_mod.get('nctId', 'N/A'),\n \
+      \           'brief_title': ident_mod.get('briefTitle', 'N/A')[:80] + '...',\n\
+      \            'facility': location_info.get('facility', 'N/A'),\n           \
+      \ 'city': location_info.get('city', 'N/A'),\n            'state': location_info.get('state',\
+      \ 'N/A'),\n            'country': location_info.get('country', 'N/A')\n    \
+      \    }\n        study_list.append(study_info)\n    \n    # Convert to DataFrame\n\
+      \    df = pd.DataFrame(study_list)\n    print(f\"Found {len(df)} studies within\
+      \ 50 miles of NIH/Bethesda\")\n    return df\n\n# Execute the geographic search\n\
+      local_studies = search_studies_by_location()\nprint(local_studies.head())\n"
     integration: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
     notes: null
     query: Search for studies within 50 miles of NIH/Bethesda using geographic filtering
     resource_id: b2c3d4e5-f6g7-8901-bcde-f23456789012
     resource_type: example
   c3d4e5f6-g7h8-9012-cdef-345678901234:
-    code: |
-      import requests
-      import json
-
-      def get_study_details(nct_id):
-          """Get detailed information for a specific study by NCT ID"""
-          base_url = "https://clinicaltrials.gov/api/v2"
-          
-          response = requests.get(f"{base_url}/studies/{nct_id}")
-          
-          if response.status_code != 200:
-              raise Exception(f"API request failed with status code {response.status_code}")
-          
-          data = response.json()
-          protocol = data.get('protocolSection', {})
-          
-          # Extract detailed study information
-          ident_mod = protocol.get('identificationModule', {})
-          status_mod = protocol.get('statusModule', {})
-          design_mod = protocol.get('designModule', {})
-          desc_mod = protocol.get('descriptionModule', {})
-          eligibility_mod = protocol.get('eligibilityModule', {})
-          
-          study_details = {
-              'nct_id': ident_mod.get('nctId', 'N/A'),
-              'brief_title': ident_mod.get('briefTitle', 'N/A'),
-              'official_title': ident_mod.get('officialTitle', 'N/A'),
-              'overall_status': status_mod.get('overallStatus', 'N/A'),
-              'study_type': design_mod.get('studyType', 'N/A'),
-              'phases': design_mod.get('phases', []),
-              'enrollment': design_mod.get('enrollmentInfo', {}).get('count', 'N/A'),
-              'brief_summary': desc_mod.get('briefSummary', 'N/A'),
-              'detailed_description': desc_mod.get('detailedDescription', 'N/A')[:200] + '...' if desc_mod.get('detailedDescription') else 'N/A',
-              'eligibility_criteria': eligibility_mod.get('eligibilityCriteria', 'N/A')[:200] + '...' if eligibility_mod.get('eligibilityCriteria') else 'N/A',
-              'minimum_age': eligibility_mod.get('minimumAge', 'N/A'),
-              'maximum_age': eligibility_mod.get('maximumAge', 'N/A'),
-              'gender': eligibility_mod.get('sex', 'N/A')
-          }
-          
-          return study_details
-
-      # Get details for a specific study
-      nct_id = "NCT05227326"  # Example NCT ID
-      study_info = get_study_details(nct_id)
-
-      print(f"Study Details for {nct_id}:")
-      for key, value in study_info.items():
-          print(f"{key.replace('_', ' ').title()}: {value}")
+    code: "import requests\nimport json\n\ndef get_study_details(nct_id):\n    \"\"\
+      \"Get detailed information for a specific study by NCT ID\"\"\"\n    base_url\
+      \ = \"https://clinicaltrials.gov/api/v2\"\n    \n    response = requests.get(f\"\
+      {base_url}/studies/{nct_id}\")\n    \n    if response.status_code != 200:\n\
+      \        raise Exception(f\"API request failed with status code {response.status_code}\"\
+      )\n    \n    data = response.json()\n    protocol = data.get('protocolSection',\
+      \ {})\n    \n    # Extract detailed study information\n    ident_mod = protocol.get('identificationModule',\
+      \ {})\n    status_mod = protocol.get('statusModule', {})\n    design_mod = protocol.get('designModule',\
+      \ {})\n    desc_mod = protocol.get('descriptionModule', {})\n    eligibility_mod\
+      \ = protocol.get('eligibilityModule', {})\n    \n    study_details = {\n   \
+      \     'nct_id': ident_mod.get('nctId', 'N/A'),\n        'brief_title': ident_mod.get('briefTitle',\
+      \ 'N/A'),\n        'official_title': ident_mod.get('officialTitle', 'N/A'),\n\
+      \        'overall_status': status_mod.get('overallStatus', 'N/A'),\n       \
+      \ 'study_type': design_mod.get('studyType', 'N/A'),\n        'phases': design_mod.get('phases',\
+      \ []),\n        'enrollment': design_mod.get('enrollmentInfo', {}).get('count',\
+      \ 'N/A'),\n        'brief_summary': desc_mod.get('briefSummary', 'N/A'),\n \
+      \       'detailed_description': desc_mod.get('detailedDescription', 'N/A')[:200]\
+      \ + '...' if desc_mod.get('detailedDescription') else 'N/A',\n        'eligibility_criteria':\
+      \ eligibility_mod.get('eligibilityCriteria', 'N/A')[:200] + '...' if eligibility_mod.get('eligibilityCriteria')\
+      \ else 'N/A',\n        'minimum_age': eligibility_mod.get('minimumAge', 'N/A'),\n\
+      \        'maximum_age': eligibility_mod.get('maximumAge', 'N/A'),\n        'gender':\
+      \ eligibility_mod.get('sex', 'N/A')\n    }\n    \n    return study_details\n\
+      \n# Get details for a specific study\nnct_id = \"NCT05227326\"  # Example NCT\
+      \ ID\nstudy_info = get_study_details(nct_id)\n\nprint(f\"Study Details for {nct_id}:\"\
+      )\nfor key, value in study_info.items():\n    print(f\"{key.replace('_', ' ').title()}:\
+      \ {value}\")\n"
     integration: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
     notes: null
     query: Get detailed information for a specific clinical trial using its NCT ID
     resource_id: c3d4e5f6-g7h8-9012-cdef-345678901234
     resource_type: example
   d4e5f6g7-h8i9-0123-defg-456789012345:
-    code: |
-      import requests
-      import pandas as pd
-      from datetime import datetime, timedelta
-
-      def get_recently_updated_studies():
-          """Get studies updated in the last 30 days"""
-          base_url = "https://clinicaltrials.gov/api/v2"
-          
-          # Calculate date 30 days ago
-          thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-          
-          params = {
-              'query.term': f'AREA[LastUpdatePostDate]RANGE[{thirty_days_ago},MAX]',
-              'pageSize': 25,
-              'format': 'json',
-              'sort': 'LastUpdatePostDate:desc'  # Sort by most recently updated first
-          }
-          
-          response = requests.get(f"{base_url}/studies", params=params)
-          
-          if response.status_code != 200:
-              raise Exception(f"API request failed with status code {response.status_code}")
-          
-          data = response.json()
-          studies = data.get('studies', [])
-          
-          # Extract study information with update details
-          study_list = []
-          for study in studies:
-              protocol = study.get('protocolSection', {})
-              ident_mod = protocol.get('identificationModule', {})
-              status_mod = protocol.get('statusModule', {})
-              design_mod = protocol.get('designModule', {})
-              
-              study_info = {
-                  'nct_id': ident_mod.get('nctId', 'N/A'),
-                  'brief_title': ident_mod.get('briefTitle', 'N/A')[:60] + '...',
-                  'overall_status': status_mod.get('overallStatus', 'N/A'),
-                  'study_type': design_mod.get('studyType', 'N/A'),
-                  'last_update_date': status_mod.get('lastUpdatePostDateStruct', {}).get('date', 'N/A'),
-                  'status_verified_date': status_mod.get('statusVerifiedDateStruct', {}).get('date', 'N/A'),
-                  'start_date': status_mod.get('startDateStruct', {}).get('date', 'N/A')
-              }
-              study_list.append(study_info)
-          
-          # Convert to DataFrame and sort by update date
-          df = pd.DataFrame(study_list)
-          df['last_update_date'] = pd.to_datetime(df['last_update_date'], errors='coerce')
-          df = df.sort_values('last_update_date', ascending=False)
-          
-          print(f"Found {len(df)} studies updated in the last 30 days")
-          return df
-
-      # Get recently updated studies
-      recent_studies = get_recently_updated_studies()
-      print("Most recently updated studies:")
-      print(recent_studies.head(10))
+    code: "import requests\nimport pandas as pd\nfrom datetime import datetime, timedelta\n\
+      \ndef get_recently_updated_studies():\n    \"\"\"Get studies updated in the\
+      \ last 30 days\"\"\"\n    base_url = \"https://clinicaltrials.gov/api/v2\"\n\
+      \    \n    # Calculate date 30 days ago\n    thirty_days_ago = (datetime.now()\
+      \ - timedelta(days=30)).strftime('%Y-%m-%d')\n    \n    params = {\n       \
+      \ 'query.term': f'AREA[LastUpdatePostDate]RANGE[{thirty_days_ago},MAX]',\n \
+      \       'pageSize': 25,\n        'format': 'json',\n        'sort': 'LastUpdatePostDate:desc'\
+      \  # Sort by most recently updated first\n    }\n    \n    response = requests.get(f\"\
+      {base_url}/studies\", params=params)\n    \n    if response.status_code != 200:\n\
+      \        raise Exception(f\"API request failed with status code {response.status_code}\"\
+      )\n    \n    data = response.json()\n    studies = data.get('studies', [])\n\
+      \    \n    # Extract study information with update details\n    study_list =\
+      \ []\n    for study in studies:\n        protocol = study.get('protocolSection',\
+      \ {})\n        ident_mod = protocol.get('identificationModule', {})\n      \
+      \  status_mod = protocol.get('statusModule', {})\n        design_mod = protocol.get('designModule',\
+      \ {})\n        \n        study_info = {\n            'nct_id': ident_mod.get('nctId',\
+      \ 'N/A'),\n            'brief_title': ident_mod.get('briefTitle', 'N/A')[:60]\
+      \ + '...',\n            'overall_status': status_mod.get('overallStatus', 'N/A'),\n\
+      \            'study_type': design_mod.get('studyType', 'N/A'),\n           \
+      \ 'last_update_date': status_mod.get('lastUpdatePostDateStruct', {}).get('date',\
+      \ 'N/A'),\n            'status_verified_date': status_mod.get('statusVerifiedDateStruct',\
+      \ {}).get('date', 'N/A'),\n            'start_date': status_mod.get('startDateStruct',\
+      \ {}).get('date', 'N/A')\n        }\n        study_list.append(study_info)\n\
+      \    \n    # Convert to DataFrame and sort by update date\n    df = pd.DataFrame(study_list)\n\
+      \    df['last_update_date'] = pd.to_datetime(df['last_update_date'], errors='coerce')\n\
+      \    df = df.sort_values('last_update_date', ascending=False)\n    \n    print(f\"\
+      Found {len(df)} studies updated in the last 30 days\")\n    return df\n\n# Get\
+      \ recently updated studies\nrecent_studies = get_recently_updated_studies()\n\
+      print(\"Most recently updated studies:\")\nprint(recent_studies.head(10))\n"
     integration: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f
     notes: null
-    query: Find clinical trials that have been updated in the last 30 days using date range filtering
+    query: Find clinical trials that have been updated in the last 30 days using date
+      range filtering
     resource_id: d4e5f6g7-h8i9-0123-defg-456789012345
     resource_type: example
   e5f6g7h8-i9j0-1234-efgh-567890123456:
@@ -254,3 +193,11 @@ resources:
     name: openapi_specification
     resource_id: e5f6g7h8-i9j0-1234-efgh-567890123456
     resource_type: file
+slug: clinicaltrials_gov
+source: |
+  This API is through Open API Spec (Swagger). You will be provided the schema below.
+  All requests go to the following URL: https://clinicaltrials.gov/api/v2
+
+  {{openapi_specification}}
+url: null
+uuid: 7f8a9b2c-4d3e-4f5a-8b9c-1a2b3c4d5e6f

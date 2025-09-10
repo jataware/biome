@@ -98,8 +98,21 @@ stages:
           * Whether expression patterns support biomarker utility
           * Tissue accessibility for clinical testing (blood, biopsy sites, etc.)
           * Potential confounding factors from tissue heterogeneity
+      - prompt: |
+          Create comprehensive visualizations to demonstrate biomarker discovery and validation:
+          * Kaplan-Meier survival curves comparing patients with/without biomarker variants
+          * Genomic browser tracks showing AlphaGenome predictions (expression, chromatin, splicing)
+          * Correlation heatmap between functional predictions and clinical outcomes
+          * Tissue expression heatmap from Human Protein Atlas across relevant organs
+          * Patient stratification flowchart showing biomarker-based decision trees
+          
+          > Note: Write files to your current working directory, but reference them with the /files/ prefix when displaying in markdown (e.g., save as 'survival_curves.png' but display as '/files/survival_curves.png').
+          > Note: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+          >   ```
+          >   <img src="/files/survival_curves.png" alt="Survival Analysis" style="width:85%; display:block; margin:auto;" />
+          >   ```
     description:
-      - Use Human Protein Atlas API to validate biomarker candidates through tissue-specific expression and protein localization data.
+      - Use Human Protein Atlas API to validate biomarker candidates through tissue-specific expression data and create comprehensive visualizations demonstrating biomarker utility.
       
   - name: Biomarker Classification Strategy
     steps:
@@ -176,6 +189,11 @@ output_prompt: |
   - Market size and patient prevalence
   - Competitive landscape assessment
   ```
+
+  - **Visualization Requirements**: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+    ```
+    <img src="/files/survival_curves.png" alt="Biomarker Survival Analysis" style="width:85%; display:block; margin:auto;" />
+    ```
 
   If any analysis section is incomplete, mark it as "pending validation studies" and proceed with available data.
 

@@ -46,6 +46,7 @@ RUN make build && \
 
 # Copy source code and install
 COPY --chown=1000:1000 . /jupyter
+RUN chown -R 1000:1000 /jupyter
 WORKDIR /jupyter
 
 # Clean up sensitive files and install local package

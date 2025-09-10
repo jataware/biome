@@ -14,8 +14,60 @@ description: |
 img_url: null
 last_updated: null
 name: INDRA Context Graph Extension (CoGEx)
-provider: adhoc:specialist_agents
+provider: adhoc:biome
 resources:
+  a086290e-031b-44cd-9acc-4a482a9c2500:
+    code: |-
+      import requests
+      import pandas as pd
+
+      url = "https://discovery.indra.bio/api/get_drugs_for_indication"
+      payload = {
+          "indication": ["mesh", "D000544"]  # Alzheimer's Disease (MeSH)
+      }
+      headers = {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+      }
+
+      print("Querying INDRA CoGEx for drugs associated with Alzheimer's disease...")
+      response = requests.post(url, json=payload, headers=headers)
+      response.raise_for_status()
+      data = response.json()
+
+      print(f"Found {len(data)} drug entries")
+
+      # Parse the correct response structure
+      drugs = []
+      for node in data:
+          if 'data' in node:
+              drug_data = node['data']
+              drugs.append({
+                  "id": drug_data.get("db_id"),
+                  "name": drug_data.get("name"),
+                  "namespace": drug_data.get("db_ns"),
+                  "labels": node.get("labels", [])
+              })
+
+      df = pd.DataFrame(drugs)
+      print(f"\nFirst 15 drugs for Alzheimer's disease:")
+      print(df.head(15)[['name', 'id', 'namespace']].to_string(index=False))
+
+      # Store for later analysis
+      alzheimer_drugs = df.copy()
+      print(f"\nTotal drugs found for Alzheimer's disease: {len(alzheimer_drugs)}")
+
+      # Get unique drug names
+      unique_drugs = df['name'].value_counts()
+      print(f"\nTop 10 most frequently mentioned drugs:")
+      print(unique_drugs.head(10))
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: |-
+      This example demonstrates how to query INDRA CoGEx for drugs associated with a specific disease indication using MeSH terms. The response structure includes nested 'data' objects that need to be parsed correctly. This is essential for therapeutic landscape mapping in drug repurposing workflows. The code handles the API response format and creates a structured DataFrame for further analysis.
+    query: Find all drugs associated with Alzheimer's disease for drug repurposing
+      analysis
+    resource_id: a086290e-031b-44cd-9acc-4a482a9c2500
+    resource_type: example
   b7c4d45f-287b-47e2-aa9b-5ee5bae07353:
     code: |
       import requests
@@ -61,6 +113,47 @@ resources:
     query: |-
       Perform a gene pathway analysis for JAK2 to find associated pathways and shared pathways with other genes like STAT3, JAK3, and EGFR.
     resource_id: b7c4d45f-287b-47e2-aa9b-5ee5bae07353
+    resource_type: example
+  bde145b5-0c08-4b29-9799-52e25ce1ad96:
+    code: "import requests\nimport pandas as pd\n\n# HGNC IDs for key target proteins\n\
+      genes = {\n    \"APP\": \"620\",\n    \"PSEN1\": \"9508\",\n    \"PSEN2\": \"\
+      9509\", \n    \"APOE\": \"613\",\n    \"MAPT\": \"6893\",\n    \"BACE1\": \"\
+      933\"\n}\n\nprint(\"Querying INDRA CoGEx for drugs targeting key proteins...\"\
+      )\nprint(\"=\" * 70)\n\nresults = []\nfor gene_name, hgnc_id in genes.items():\n\
+      \    try:\n        payload = {\"target\": [\"HGNC\", hgnc_id]}\n        response\
+      \ = requests.post(\n            \"https://discovery.indra.bio/api/get_drugs_for_target\"\
+      ,\n            json=payload,\n            headers={\"accept\": \"application/json\"\
+      , \"Content-Type\": \"application/json\"}\n        )\n        \n        if response.ok:\n\
+      \            drugs_data = response.json()\n            print(f\"{gene_name}\
+      \ (HGNC:{hgnc_id}): Found {len(drugs_data)} targeting drugs\")\n           \
+      \ \n            for node in drugs_data:\n                if 'data' in node:\n\
+      \                    drug_data = node['data']\n                    results.append({\n\
+      \                        \"target_gene\": gene_name,\n                     \
+      \   \"target_hgnc_id\": hgnc_id,\n                        \"drug_name\": drug_data.get(\"\
+      name\"),\n                        \"drug_id\": drug_data.get(\"db_id\"),\n \
+      \                       \"namespace\": drug_data.get(\"db_ns\"),\n         \
+      \               \"labels\": node.get(\"labels\", [])\n                    })\n\
+      \        else:\n            print(f\"Error for {gene_name}: {response.status_code}\"\
+      )\n            \n    except Exception as e:\n        print(f\"Exception for\
+      \ {gene_name}: {e}\")\n\nif results:\n    df = pd.DataFrame(results)\n    print(f\"\
+      \\nFound {len(results)} drug-target associations\")\n    \n    # Find drugs\
+      \ targeting multiple proteins (multi-target candidates)\n    drug_target_counts\
+      \ = df.groupby('drug_name')['target_gene'].nunique().sort_values(ascending=False)\n\
+      \    multi_target_drugs = drug_target_counts[drug_target_counts > 1]\n    \n\
+      \    if len(multi_target_drugs) > 0:\n        print(f\"\\nMulti-target drugs\
+      \ (promising repurposing candidates):\")\n        for drug, target_count in\
+      \ multi_target_drugs.head(10).items():\n            targets = df[df['drug_name']\
+      \ == drug]['target_gene'].unique()\n            print(f\"- {drug}: targets {target_count}\
+      \ proteins ({', '.join(targets)})\")\n    else:\n        print(f\"\\nNo multi-target\
+      \ drugs found in current dataset\")\n        \n    # Analyze drug distribution\
+      \ by target\n    print(f\"\\nDrug distribution by target:\")\n    target_counts\
+      \ = df.groupby('target_gene').size().sort_values(ascending=False)\n    print(target_counts)"
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: |-
+      This example demonstrates how to identify drugs that target specific proteins and find multi-target candidates for drug repurposing. Multi-target drugs are particularly valuable for repurposing because they can address pathway convergence and potentially offer superior efficacy. The code systematically queries multiple targets and identifies drugs with polypharmacology profiles, which are often the most promising repurposing candidates.
+    query: Find drugs targeting specific proteins to identify multi-target repurposing
+      candidates
+    resource_id: bde145b5-0c08-4b29-9799-52e25ce1ad96
     resource_type: example
   c8f8db77-c0bb-4ee2-9525-925707496b5a:
     code: |
@@ -122,6 +215,45 @@ resources:
     query: Retrieve literature evidence related to AML using MeSH term queries, including
       child terms, and summarize the findings.
     resource_id: c8f8db77-c0bb-4ee2-9525-925707496b5a
+    resource_type: example
+  d1ce809b-ba0e-4220-9375-1f8d2e141f3e:
+    code: "import requests\nimport pandas as pd\n\n# HGNC IDs for key Alzheimer's\
+      \ disease-associated genes\ngenes = {\n    \"APP\": \"620\",\n    \"PSEN1\"\
+      : \"9508\", \n    \"PSEN2\": \"9509\",\n    \"APOE\": \"613\",\n    \"MAPT\"\
+      : \"6893\",\n    \"BACE1\": \"933\"\n}\n\nbase_url = \"https://discovery.indra.bio/api/get_pathways_for_gene\"\
+      \nresults = []\n\nprint(\"Querying INDRA CoGEx for pathways associated with\
+      \ key disease genes...\")\nprint(\"=\" * 70)\n\nfor gene_name, hgnc_id in genes.items():\n\
+      \    try:\n        payload = {\"gene\": [\"HGNC\", hgnc_id]}\n        response\
+      \ = requests.post(base_url, json=payload)\n        \n        if response.ok:\n\
+      \            pathways_data = response.json()\n            print(f\"{gene_name}\
+      \ (HGNC:{hgnc_id}): Found {len(pathways_data)} pathways\")\n            \n \
+      \           for node in pathways_data:\n                if 'data' in node:\n\
+      \                    pathway_data = node['data']\n                    results.append({\n\
+      \                        \"gene\": gene_name,\n                        \"gene_hgnc_id\"\
+      : hgnc_id,\n                        \"pathway_name\": pathway_data.get(\"name\"\
+      ),\n                        \"pathway_id\": pathway_data.get(\"db_id\"),\n \
+      \                       \"namespace\": pathway_data.get(\"db_ns\"),\n      \
+      \                  \"labels\": node.get(\"labels\", [])\n                  \
+      \  })\n        else:\n            print(f\"Error for {gene_name}: {response.status_code}\"\
+      )\n            \n    except Exception as e:\n        print(f\"Exception for\
+      \ {gene_name}: {e}\")\n\nif results:\n    df = pd.DataFrame(results)\n    print(f\"\
+      \\nFound {len(results)} gene-pathway associations\")\n    \n    # Identify pathways\
+      \ that appear in multiple genes (potential drug targets)\n    pathway_gene_counts\
+      \ = df.groupby('pathway_name')['gene'].nunique().sort_values(ascending=False)\n\
+      \    multi_gene_pathways = pathway_gene_counts[pathway_gene_counts > 1]\n  \
+      \  \n    print(f\"\\nPathways involving multiple genes (top repurposing targets):\"\
+      )\n    for pathway, gene_count in multi_gene_pathways.head(10).items():\n  \
+      \      genes_in_pathway = df[df['pathway_name'] == pathway]['gene'].unique()\n\
+      \        print(f\"- {pathway}: {gene_count} genes ({', '.join(genes_in_pathway)})\"\
+      )\n        \n    # Store key pathways for drug target analysis\n    key_pathway_genes\
+      \ = df[df['pathway_name'].isin(multi_gene_pathways.head(5).index)]\n    print(f\"\
+      \\nSelected {len(key_pathway_genes)} pathway-gene associations for drug target\
+      \ analysis\")"
+    integration: 417f20f1-4f56-4f6c-b11a-c40d84258557
+    notes: |-
+      This example shows how to systematically explore pathways for multiple disease-associated genes using HGNC identifiers. It identifies multi-gene pathways that represent convergent therapeutic targets for drug repurposing. The analysis prioritizes pathways involving multiple disease genes, which often represent the most promising targets for intervention. This approach is crucial for network-based drug repurposing strategies.
+    query: Find pathways associated with key disease genes for drug target identification
+    resource_id: d1ce809b-ba0e-4220-9375-1f8d2e141f3e
     resource_type: example
   e57fbdf9-732a-407a-8469-921076b69054:
     code: |

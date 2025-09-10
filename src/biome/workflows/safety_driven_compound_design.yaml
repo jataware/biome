@@ -110,8 +110,21 @@ stages:
           * Biomarker strategies for safety monitoring
           
           Prioritize recommendations by feasibility and impact on safety profile.
+      - prompt: |
+          Create comprehensive data visualizations to illustrate safety insights and design recommendations:
+          * Adverse event frequency plots showing severity and demographics across drug classes
+          * Chemical structure SAR visualizations highlighting problematic motifs vs safer alternatives
+          * Molecular property scatter plots (MW vs logP) with safety risk zones
+          * Target selectivity radar charts comparing problematic vs optimized compounds
+          * Risk assessment matrices ranking safety concerns by severity and frequency
+          
+          > Note: Write files to your current working directory, but reference them with the /files/ prefix when displaying in markdown (e.g., save as 'safety_sar.png' but display as '/files/safety_sar.png').
+          > Note: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+          >   ```
+          >   <img src="/files/safety_sar.png" alt="Safety SAR Analysis" style="width:85%; display:block; margin:auto;" />
+          >   ```
     description:
-      - Synthesize FAERS and ChEMBL analyses into actionable safety-by-design principles and compound optimization strategies for medicinal chemistry teams.
+      - Synthesize FAERS and ChEMBL analyses into actionable safety-by-design principles, create comprehensive visualizations, and deliver compound optimization strategies for medicinal chemistry teams.
 
 output_prompt: |
   You will be provided the results of a safety-driven compound design analysis.
@@ -174,6 +187,11 @@ output_prompt: |
   - Statistical power calculations and confidence intervals
   - Excluded data and rationale
   ```
+
+  - **Visualization Requirements**: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+    ```
+    <img src="/files/safety_sar.png" alt="Safety Structure-Activity Analysis" style="width:85%; display:block; margin:auto;" />
+    ```
 
   If any analysis section is incomplete, mark it as "pending additional data analysis" and proceed with available information.
 
