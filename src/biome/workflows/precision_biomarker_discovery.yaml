@@ -1,0 +1,200 @@
+title: Precision Medicine Biomarker Discovery
+human_description: |
+  Identify and validate genomic biomarkers for patient stratification by analyzing
+  clinical outcomes data, predicting functional effects of genetic variants, and
+  validating tissue-specific expression patterns for precision medicine applications.
+agent_description: |
+  This workflow discovers precision medicine biomarkers through clinical genomics analysis.
+  The user should provide a cancer type or therapeutic area of interest. The workflow will
+  analyze patient outcome data, predict variant functional effects, and validate biomarkers.
+category: biomedical
+example_prompt: Identify precision medicine biomarkers for immunotherapy response in lung cancer patients
+hidden: false
+is_context_default: false
+
+stages:
+  - name: Clinical Data Mining
+    steps:
+      - prompt: |
+          Query cBioPortal for the specified cancer type/indication to identify:
+          * Studies with sufficient sample sizes and clinical annotation
+          * Mutation landscapes and frequencies across patient cohorts
+          * Survival data and treatment response information where available
+          * Key genes with recurrent mutations or copy number alterations
+          
+          CRITICAL: Document all data provenance:
+          * cBioPortal study IDs analyzed
+          * Sample sizes for each cohort (N=X patients)
+          * Data types available (mutations, CNV, expression, clinical)
+          * Query timestamps and API version used
+          * Statistical significance tests and p-values for associations
+          
+          Focus on finding 3-5 genes that show variable mutation patterns across patients.
+      - prompt: |
+          Use the GDC API to supplement the cBioPortal data with:
+          * Additional patient demographic and clinical characteristics
+          * Mutation burden and signature analysis
+          * Expression data tied to clinical outcomes
+          
+          CRITICAL: Document GDC data provenance:
+          * GDC case IDs and file IDs accessed
+          * API query filters and parameters used
+          * Data completeness metrics (% patients with each data type)
+          * Version of GDC data release accessed
+          
+          Identify patient subgroups with distinct mutation profiles or outcomes.
+    description:
+      - Use cBioPortal API and GDC API to extract comprehensive clinical genomics data and identify candidate biomarker genes and patient stratifications.
+      
+  - name: Functional Variant Prediction
+    steps:
+      - prompt: |
+          For the top 3-5 candidate biomarker genes identified, use AlphaGenome to predict
+          the functional consequences of the most common variants:
+          * Impact on gene expression levels (RNA-seq predictions)
+          * Effects on chromatin accessibility and regulatory elements
+          * Changes in splicing patterns and transcript isoforms
+          * Alterations in transcription factor binding sites
+          
+          CRITICAL: Document AlphaGenome analysis:
+          * Model version and prediction confidence scores
+          * Genomic coordinates and variant details analyzed
+          * Prediction methodology and parameters used
+          * Quality metrics and reliability assessments
+          
+          Focus on variants that show clear functional predictions and could explain clinical differences.
+    description:
+      - Use AlphaGenome API to predict functional genomic effects of candidate biomarker variants.
+      
+  - name: Clinical Relevance Analysis
+    steps:
+      - prompt: |
+          Analyze the AlphaGenome functional predictions in the context of clinical associations:
+          * Disease-relevant pathways (immune response, DNA repair, cell cycle, etc.)
+          * Drug mechanism of action for relevant therapies
+          * Known resistance or sensitivity mechanisms
+          * Correlation with patient outcomes and treatment responses
+          
+          CRITICAL: Document clinical correlation analysis:
+          * Specific pathways and mechanisms analyzed
+          * Drug-target interaction databases consulted
+          * Literature sources for resistance/sensitivity mechanisms
+          * Statistical correlations between functional predictions and clinical data
+          
+          Identify variants with functional predictions that align with clinical observations and could serve as actionable biomarkers.
+    description:
+      - Correlate AlphaGenome functional predictions with clinical associations, drug mechanisms, and treatment outcomes to identify actionable biomarkers.
+      
+  - name: Tissue Context Validation
+    steps:
+      - prompt: |
+          Query the Human Protein Atlas for the candidate biomarker genes to validate:
+          * Tissue-specific expression patterns in relevant organs/tissues
+          * Protein levels and subcellular localization
+          * Expression correlation with disease progression markers
+          * Variability across normal vs disease tissue samples
+      - prompt: |
+          Cross-reference the HPA tissue expression data with clinical data to assess:
+          * Whether expression patterns support biomarker utility
+          * Tissue accessibility for clinical testing (blood, biopsy sites, etc.)
+          * Potential confounding factors from tissue heterogeneity
+      - prompt: |
+          Create comprehensive visualizations to demonstrate biomarker discovery and validation:
+          * Kaplan-Meier survival curves comparing patients with/without biomarker variants
+          * Genomic browser tracks showing AlphaGenome predictions (expression, chromatin, splicing)
+          * Correlation heatmap between functional predictions and clinical outcomes
+          * Tissue expression heatmap from Human Protein Atlas across relevant organs
+          * Patient stratification flowchart showing biomarker-based decision trees
+          
+          > Note: Write files to your current working directory, but reference them with the /files/ prefix when displaying in markdown (e.g., save as 'survival_curves.png' but display as '/files/survival_curves.png').
+          > Note: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+          >   ```
+          >   <img src="/files/survival_curves.png" alt="Survival Analysis" style="width:85%; display:block; margin:auto;" />
+          >   ```
+    description:
+      - Use Human Protein Atlas API to validate biomarker candidates through tissue-specific expression data and create comprehensive visualizations demonstrating biomarker utility.
+      
+  - name: Biomarker Classification Strategy
+    steps:
+      - prompt: |
+          Develop a clinical biomarker strategy for the validated candidates including:
+          * Biomarker classification (predictive, prognostic, pharmacodynamic)
+          * Patient stratification algorithm based on variant combinations
+          * Clinical testing methodology recommendations (sequencing, IHC, etc.)
+          * Integration with existing clinical workflows
+          
+          Create decision trees or algorithms for using these biomarkers in practice.
+      - prompt: |
+          Assess the clinical utility and feasibility:
+          * Prevalence of biomarker-positive patients in the target population
+          * Potential impact on treatment selection or clinical outcomes
+          * Regulatory pathway considerations for companion diagnostics
+          * Comparison to existing biomarkers in the field
+          
+          Prioritize biomarkers by clinical actionability and commercial potential.
+    description:
+      - Integrate data from cBioPortal, GDC, AlphaGenome, and Human Protein Atlas to develop actionable clinical biomarker strategies with implementation guidance.
+
+output_prompt: |
+  You will be provided the results of a precision medicine biomarker discovery analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a clinical development document suitable for precision medicine teams.
+
+  ```
+  ## Executive Summary
+  - Cancer type/indication analyzed
+  - Number of candidate biomarkers evaluated
+  - Top biomarker recommendation with clinical utility
+
+  ## Clinical Genomics Analysis
+  - **Patient cohorts**: N=X patients analyzed from Y cBioPortal studies
+  - **GDC supplementation**: N=Z additional cases with demographic/clinical data
+  - **Key mutation patterns**: Frequencies and associations (p-values, confidence intervals)
+  - **Clinical outcome associations**: Survival, response, resistance patterns identified
+
+  ## Functional Variant Predictions
+  - **AlphaGenome analysis**: N=X variants analyzed (model version, confidence scores)
+  - **Genomic effects predicted**: Expression, chromatin, splicing, TF binding changes
+  - **Quality metrics**: Prediction confidence and reliability assessments
+  - **Functional impact assessment**: High/medium/low confidence predictions
+
+  ## Clinical Relevance Analysis
+  - **Pathway correlations**: Disease-relevant pathways validated (N=X pathways)
+  - **Drug mechanism alignment**: Correlation with N=Y therapeutic mechanisms
+  - **Resistance mechanisms**: Evidence from Z literature sources
+  - **Clinical-functional concordance**: Statistical correlations between predictions and outcomes
+
+  ## Biomarker Candidates
+
+  ### Biomarker 1: [Gene/Variant]
+  - **Clinical association**: From N=X patients, statistical significance (p-value, HR)
+  - **AlphaGenome predictions**: Specific functional effects (confidence scores)
+  - **Clinical relevance**: Pathway/drug mechanism correlations
+  - **Tissue validation**: HPA expression data supporting biomarker utility
+  - **Patient stratification**: N=Y patients potentially eligible, prevalence estimates
+  - **Actionability score**: Based on functional + clinical + tissue evidence
+
+  ### Biomarker 2: [Gene/Variant]
+  [Same detailed structure with complete provenance]
+
+  ## Clinical Implementation Strategy
+  - Recommended biomarker classification
+  - Patient selection algorithm
+  - Clinical testing approach
+  - Integration with treatment protocols
+
+  ## Regulatory and Commercial Considerations
+  - Companion diagnostic pathway
+  - Market size and patient prevalence
+  - Competitive landscape assessment
+  ```
+
+  - **Visualization Requirements**: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+    ```
+    <img src="/files/survival_curves.png" alt="Biomarker Survival Analysis" style="width:85%; display:block; margin:auto;" />
+    ```
+
+  If any analysis section is incomplete, mark it as "pending validation studies" and proceed with available data.
+
+  The results will be provided below:

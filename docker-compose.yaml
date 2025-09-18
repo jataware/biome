@@ -5,7 +5,13 @@ networks:
 
 services:
   jupyter:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - ARCHYTAS_REF=main             # archytas branch/tag
+        - BEAKER_KERNEL_REF=workflow-browser         # beaker-kernel branch/tag
+        - DOWNLOAD_CHEMBL_DATABASE=true # set to true if you want to download the ChEMBL database (it is several GB and is used in various workflows)
     ports:
       - "8888:8888"
     environment:
@@ -19,11 +25,13 @@ services:
       - TOOL_ENABLED_RUN_CODE=true
       - PYTHONBREAKPOINT=debugpy.breakpoint
       - BIOME_LIT_REVIEW_DIR=/jupyter/_literature_review
+      - INTEGRATION_PATH=/jupyter/adhoc_data  
     env_file:
-      - .env
+      - .env        
     volumes:
       - ./src/biome:/jupyter/src/biome
       - ./adhoc_data:/jupyter/adhoc_data
+      - ./literature_review:/jupyter/_literature_review
     networks:
       - beaker
   rest_api:

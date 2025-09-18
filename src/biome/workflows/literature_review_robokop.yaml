@@ -1,5 +1,5 @@
 title: |
-  Drug Repurposing: Literature Review and KG Lookup
+  Knowledge Graph Based Drug Repurposing
 human_description: |
   Find drug repurposing candidates for a disorder, and then find how that drug candidate influences a specific symptom of that disorder.
 agent_description: |
