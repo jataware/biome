@@ -49,7 +49,12 @@ class BiomeAgent(BeakerAgent):
             lit_review_dir = Path(lit_review_dir_raw).resolve(strict=True)
         except OSError as e:
             lit_review_dir = Path('.') / lit_review_dir_raw
+
+        lit_review_dir = lit_review_dir / f"{context.beaker_kernel.session_id}"
+        try:
             lit_review_dir.mkdir(exist_ok=True, parents=True)
+        except OSError as e:
+            logger.error(f"Failed to create literature review directory: {e}")
         logger.info(f"Using lit review directory: {lit_review_dir}")
         self.lit_review_dir = lit_review_dir
 
@@ -122,26 +127,33 @@ class BiomeAgent(BeakerAgent):
 
 
     @tool()
-    async def pubmed_search(self, query: str):
+    async def pubmed_search(self, query: str, slug: str, max_papers: int = 10):
         """
-        Retrieves paper abstracts for a given PubMed query, as well as fetching the fulltexts for later.
-        Relevant papers will be listed as their ID and associated abstracts.
+        Retrieves paper abstracts for a given PubMed query as well as the full text of the papers for further analysis.
 
-        Try multiple formulations of the PubMed query to retrieve many papers.
-        If less than five papers are found, retry this tool to see if other formulations find more papers.
+        If less than five papers are found, you may retry this tool to see if other formulations of the query to find more papers.
+
+        After fetching, provide a brief, high-level summary of the result set (e.g., common themes, date range, notable gaps)—do not include step-by-step internal reasoning.
 
         Args:
             query (str): User query to search on PubMed.
+            slug (str): Summarized version of the query to reference collected results by.
+                        This should be three to six words written in snake case to identify at a glance
+                        the user query, chosen to not overlap for unrelated topics.
+                        It should be specified in snake_case.
+                        Multiple successive pubmed_search calls with different queries and the same
+                        slug will aggregate the papers in one place for a future paperQA call.
+            max_papers (int): Maximum number of papers to retrieve. Defaults to 10. Only change this if the user requests it.
 
         Returns:
             str: Dictionary mapping the paper ID to the title and abstract and date, and full text PMC ID.
                  Additionally, search results will be available for paperQA.
         """
-        return await self.litreview_agent.fetch_for_query("pubmed", query)
+        return await self.litreview_agent.fetch_for_query("pubmed", query, slug, max_papers)
 
 
     @tool()
-    async def paperQA(self, query: str, agent: AgentRef, loop: LoopControllerRef):
+    async def paperQA(self, query: str, slug: str, agent: AgentRef, loop: LoopControllerRef):
         """
         Given a corpus of fetched papers with `pubmed_search`, ask a question to analyze the
         collected papers and decide what's relevant and sort through the information.
@@ -157,9 +169,14 @@ class BiomeAgent(BeakerAgent):
         CRITICAL: DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
 
         Args:
-            query (str): The query to ask about all of the papers
+            query (str): The query to ask about all of the papers.
+            slug (str): Summarized version of the query to reference collected results by.
+                        This should be three to six words written in snake case to identify at a glance
+                        the user query, chosen to not overlap for unrelated topics.
+                        It should be specified in snake_case.
+                        CRITICAL: this slug must have been created by a `pubmed_search` or other paper-gathering call beforehand.
 
         Returns:
             str: CRITICAL: do not summarize or shorten the scientific explanation and output. Return it as-is. Include the DOI in every single citation. Cite where things were from in the PaperQA answer. Ensure the full title and doi are visible. Do not elide citations.
         """
-        return await self.litreview_agent.paperQA(query)
+        return await self.litreview_agent.paperQA(query, slug)

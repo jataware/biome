@@ -1,0 +1,148 @@
+datatype: api
+description: |
+  Drug Adverse Event Overview
+  The openFDA drug adverse event API returns data that has been collected from
+  the FDA Adverse Event Reporting System (FAERS), a database that contains
+  information on adverse event and medication error reports submitted to FDA.
+img_url: null
+last_updated: null
+name: FDA drug adverse event FAERS API
+provider: adhoc:biome
+resources:
+  66215565-2562-455a-aedc-80cdb06f6c1a:
+    filepath: faers_fields_reference.csv
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
+    name: fields_reference
+    resource_id: 66215565-2562-455a-aedc-80cdb06f6c1a
+    resource_type: file
+  906b3712-07be-46a7-868e-a60678a90b0c:
+    code: "# Comprehensive cardiovascular adverse events analysis for kinase inhibitors\n\
+      # Using FAERS API to search by drug, then filter by cardiovascular terms\n\n\
+      import requests\nimport pandas as pd\nimport os\n\nAPI_KEY = os.environ.get(\"\
+      API_OPENFDA\")\nBASE_URL = \"https://api.fda.gov/drug/event.json\"\n\n# Define\
+      \ cardiovascular terms found in FAERS database\ncardiovascular_terms = [\n \
+      \   \"hypertension\", \"cardiac failure\", \"heart failure\", \"arrhythmia\"\
+      , \n    \"atrial fibrillation\", \"myocardial infarction\", \"cardiomyopathy\"\
+      ,\n    \"left ventricular dysfunction\", \"electrocardiogram qt prolonged\"\
+      ,\n    \"pulmonary arterial hypertension\", \"cardiac arrest\", \"bradycardia\"\
+      ,\n    \"tachycardia\", \"pericardial effusion\", \"ventricular dysfunction\"\
+      \n]\n\n# List of kinase inhibitors to analyze\nkinase_inhibitors = [\n    \"\
+      imatinib\", \"dasatinib\", \"nilotinib\", \"sunitinib\", \"sorafenib\",\n  \
+      \  \"erlotinib\", \"gefitinib\", \"lapatinib\", \"ponatinib\", \"bosutinib\"\
+      ,\n    \"axitinib\", \"cabozantinib\", \"regorafenib\", \"vandetanib\", \"crizotinib\"\
+      \n]\n\nall_cardio_cases = []\ndrug_totals = {}\n\n# Search each kinase inhibitor\
+      \ for cardiovascular adverse events\nfor drug in kinase_inhibitors:\n    print(f\"\
+      Analyzing {drug}...\")\n    \n    # Get all adverse events for this drug\n \
+      \   params = {\n        \"api_key\": API_KEY,\n        \"search\": f'patient.drug.medicinalproduct:\"\
+      {drug}\"',\n        \"limit\": 1000  # Adjust based on needs\n    }\n    \n\
+      \    try:\n        response = requests.get(BASE_URL, params=params)\n      \
+      \  if response.status_code == 200:\n            data = response.json()\n   \
+      \         total_reports = data.get(\"meta\", {}).get(\"results\", {}).get(\"\
+      total\", 0)\n            drug_totals[drug] = total_reports\n            \n \
+      \           # Filter for cardiovascular events\n            for report in data.get(\"\
+      results\", []):\n                patient = report.get(\"patient\", {})\n   \
+      \             reactions = [r.get(\"reactionmeddrapt\", \"\").lower() for r in\
+      \ patient.get(\"reaction\", [])]\n                \n                # Check\
+      \ if any reaction is cardiovascular\n                cardio_reactions = [r for\
+      \ r in reactions if any(cv_term.lower() in r for cv_term in cardiovascular_terms)]\n\
+      \                \n                if cardio_reactions:\n                  \
+      \  case = {\n                        \"drug\": drug,\n                     \
+      \   \"safetyreportid\": report.get(\"safetyreportid\"),\n                  \
+      \      \"receivedate\": report.get(\"receivedate\"),\n                     \
+      \   \"patient_age\": patient.get(\"patientonsetage\"),\n                   \
+      \     \"patient_sex\": patient.get(\"patientsex\"),\n                      \
+      \  \"cardiovascular_events\": cardio_reactions,\n                        \"\
+      all_reactions\": reactions,\n                        \"serious\": report.get(\"\
+      serious\"),\n                        \"death\": report.get(\"seriousnessdeath\"\
+      ),\n                        \"hospitalization\": report.get(\"seriousnesshospitalization\"\
+      ),\n                        \"country\": report.get(\"occurcountry\")\n    \
+      \                }\n                    all_cardio_cases.append(case)\n    \
+      \                \n    except Exception as e:\n        print(f\"Error processing\
+      \ {drug}: {e}\")\n\n# Create summary analysis\ndf = pd.DataFrame(all_cardio_cases)\n\
+      \nif not df.empty:\n    print(f\"\\n=== CARDIOVASCULAR ADVERSE EVENTS ANALYSIS\
+      \ ===\")\n    print(f\"Total cardiovascular cases found: {len(df)}\")\n    print(f\"\
+      Total reports analyzed: {sum(drug_totals.values())}\")\n    \n    # Drug-specific\
+      \ analysis\n    drug_summary = df.groupby('drug').agg({\n        'safetyreportid':\
+      \ 'count',\n        'serious': lambda x: (x == 1).sum(),\n        'death': lambda\
+      \ x: (x == 1).sum(),\n        'hospitalization': lambda x: (x == 1).sum()\n\
+      \    }).rename(columns={'safetyreportid': 'cardio_cases'})\n    \n    # Add\
+      \ total reports and calculate percentages\n    drug_summary['total_reports']\
+      \ = drug_summary.index.map(drug_totals)\n    drug_summary['cardio_percentage']\
+      \ = (drug_summary['cardio_cases'] / drug_summary['total_reports'] * 100).round(1)\n\
+      \    \n    print(\"\\n=== RISK BY DRUG (sorted by cardiovascular event percentage)\
+      \ ===\")\n    print(drug_summary.sort_values('cardio_percentage', ascending=False))\n\
+      \    \n    # Most common cardiovascular events\n    all_cv_events = []\n   \
+      \ for events_list in df['cardiovascular_events']:\n        all_cv_events.extend(events_list)\n\
+      \    \n    cv_counts = pd.Series(all_cv_events).value_counts()\n    print(f\"\
+      \\n=== MOST COMMON CARDIOVASCULAR EVENTS ===\")\n    print(cv_counts.head(10))\n\
+      \    \n    # Severity analysis\n    serious_pct = (df['serious'] == 1).mean()\
+      \ * 100\n    death_pct = (df['death'] == 1).mean() * 100\n    hosp_pct = (df['hospitalization']\
+      \ == 1).mean() * 100\n    \n    print(f\"\\n=== SEVERITY ANALYSIS ===\")\n \
+      \   print(f\"Serious cases: {serious_pct:.1f}%\")\n    print(f\"Deaths: {death_pct:.1f}%\"\
+      )\n    print(f\"Hospitalizations: {hosp_pct:.1f}%\")\n\nelse:\n    print(\"\
+      No cardiovascular adverse events found.\")"
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
+    notes: |-
+      This example demonstrates how to query FAERS for cardiovascular adverse events associated with kinase inhibitors. Key technical points: 1) The FAERS API requires searching by drug first, then filtering reactions client-side rather than using complex AND queries, 2) Cardiovascular terms must match exact MedDRA terminology used in the database (e.g., "electrocardiogram qt prolonged" not "qt prolongation"), 3) The analysis includes both absolute numbers and percentages to identify highest-risk drugs, 4) Results show vandetanib and bosutinib have highest cardiovascular risk percentages, while hypertension is the most common cardiovascular adverse event across all kinase inhibitors. The code handles API rate limits and provides comprehensive safety analysis including severity metrics.
+    query: Query cardiovascular adverse events for kinase inhibitors from FAERS
+    resource_id: 906b3712-07be-46a7-868e-a60678a90b0c
+    resource_type: example
+  a02272d5-d7da-4070-942e-750f5f5f9088:
+    code: |-
+      import requests
+      import os
+      import pandas as pd
+
+      # Base URL for the API
+      base_url = "https://api.fda.gov/drug/event.json?api_key=" + os.environ.get('API_OPENFDA')
+
+      # Query parameters
+      params = {
+          'count': 'patient.drug.medicinalproduct.exact',
+          'limit': 100  # Get top 100 medications by report count
+      }
+
+      # Make API request
+      response = requests.get(base_url, params=params)
+
+      # Convert to DataFrame
+      results = response.json()['results']
+      df = pd.DataFrame(results, columns=['term', 'count'])
+
+      # Sort by count in descending order
+      df = df.sort_values('count', ascending=False)
+
+      # Display top medications with highest adverse event counts
+      print("Top medications by adverse event count:")
+      print(df.head(10))
+
+      # Get medication with highest count
+      top_med = df.iloc[0]
+      print(f"\nMedication with highest number of adverse events:")
+      print(f"{top_med['term']}: {top_med['count']} reports")
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
+    notes: null
+    query: Can you tell me which medication have the highest adverse effects reported
+      from all of the available?
+    resource_id: a02272d5-d7da-4070-942e-750f5f5f9088
+    resource_type: example
+  f9afc1aa-371f-4318-9fb1-cd5030db39fe:
+    filepath: faers_web.md
+    integration: baf45232-38d9-401b-b1e5-8c5621917442
+    name: web_documentation
+    resource_id: f9afc1aa-371f-4318-9fb1-cd5030db39fe
+    resource_type: file
+slug: fda_drug_adverse_event_faers_api
+source: |
+  {{web_documentation}}
+
+  # Additional Instructions:
+
+  You will need an API Key to use any openFDA APIs. It is available in the environment variable:
+  - API Key: os.environ.get("API_OPENFDA")
+  Do not use placeholder auth values from the OpenAPI spec nor prompt the user for these values, just use the environment variable.
+
+  # Searchable Fields Reference:
+  {{fields_reference}}
+url: null
+uuid: baf45232-38d9-401b-b1e5-8c5621917442

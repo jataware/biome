@@ -1,0 +1,198 @@
+title: Safety-Driven Compound Design
+human_description: |
+  Analyze adverse event patterns from FDA FAERS database and correlate them with
+  chemical structures and target profiles to identify safety liabilities and guide
+  safer compound design strategies for drug development.
+agent_description: |
+  This workflow identifies safety-driven design principles through pharmacovigilance analysis.
+  The user should provide a drug class, therapeutic area, or specific safety concern of interest.
+  The workflow will analyze adverse event patterns and correlate them with chemical properties.
+category: biomedical
+example_prompt: Analyze cardiovascular safety signals in kinase inhibitors and identify structural features associated with cardiotoxicity
+hidden: false
+is_context_default: false
+
+stages:
+  - name: Pharmacovigilance Signal Detection
+    steps:
+      - prompt: |
+          Query the FDA FAERS database to analyze adverse event patterns for the specified drug class or therapeutic area:
+          * Identify the most frequently reported adverse events
+          * Analyze event severity and outcomes (hospitalization, death, etc.)
+          * Examine time-to-onset patterns for different adverse events
+          * Compare AE profiles across different compounds in the class
+          
+          CRITICAL: For every finding, document:
+          * Exact FAERS query parameters used
+          * Date range of data analyzed
+          * Total number of reports analyzed
+          * Statistical significance and confidence intervals where applicable
+          
+          Focus on identifying 3-5 key safety signals that appear consistently across multiple drugs.
+      - prompt: |
+          Perform demographic and co-medication analysis of the adverse events:
+          * Patient age, gender, and comorbidity patterns
+          * Concomitant medications that might contribute to events
+          * Dose-response relationships where available
+          * Geographic or temporal trends in reporting
+          
+          Identify patient populations or conditions that appear at higher risk.
+    description:
+      - Use FDA FAERS database to extract comprehensive adverse event patterns and identify key safety signals of concern.
+      
+  - name: Chemical Structure-Safety Analysis
+    steps:
+      - prompt: |
+          Query the ChEMBL SQLite database at chembl_35/chembl_35_sqlite/chembl_35.db for compounds
+          associated with the identified safety signals:
+          * Retrieve chemical structures and molecular descriptors
+          * Gather target activity profiles and selectivity data
+          * Extract pharmacokinetic and ADMET properties
+          * Identify common structural scaffolds or functional groups
+          > Note: if the ChEMBL database is not available, you can can download it from https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_sqlite.tar.gz
+          
+          CRITICAL: For every compound analyzed, document:
+          * ChEMBL compound ID and version
+          * Exact SQL queries used
+          * Data completeness (% of compounds with activity data, ADMET data, etc.)
+          * Source publications for activity data (PubMed IDs where available)
+          
+          Focus on compounds that show the adverse events identified in the FAERS analysis.
+      - prompt: |
+          Perform structure-activity relationship analysis:
+          * Identify common structural motifs in compounds with safety issues
+          * Analyze molecular properties (MW, logP, polar surface area, etc.)
+          * Compare target binding profiles of safe vs problematic compounds
+          * Look for off-target activities that correlate with adverse events
+          
+          Generate hypotheses about structural features that contribute to toxicity.
+    description:
+      - Use ChEMBL SQLite database to correlate chemical structures and target profiles with adverse event patterns from FAERS analysis.
+      
+  - name: Safety Liability Assessment
+    steps:
+      - prompt: |
+          Create a comprehensive safety liability profile including:
+          * Structural alerts and problematic chemical features
+          * Target-based safety concerns (on-target and off-target)
+          * Patient population risk factors
+          * Dose and exposure considerations
+          * Mechanism-based predictions for toxicity
+          
+          Rank safety concerns by severity, frequency, and predictability.
+      - prompt: |
+          Cross-reference findings with known safety pharmacology data:
+          * hERG, CYP450, and other safety target interactions
+          * Genotoxicity and carcinogenicity structure alerts
+          * Hepatotoxicity and nephrotoxicity patterns
+          * Central nervous system and cardiovascular risks
+          
+          Validate the identified safety signals against established safety knowledge.
+    description:
+      - Integrate FAERS adverse event data with ChEMBL structure-activity relationships to develop comprehensive safety liability profiles with mechanistic understanding.
+      
+  - name: Design Strategy Recommendations
+    steps:
+      - prompt: |
+          Develop specific compound design recommendations to mitigate identified safety risks:
+          * Structural modifications to avoid problematic features
+          * Target selectivity profiles to minimize off-target effects
+          * Physicochemical property ranges for safer compounds
+          * Patient stratification strategies to avoid high-risk populations
+          
+          Provide actionable guidance for medicinal chemistry teams.
+      - prompt: |
+          Create a safety-by-design framework including:
+          * Early screening cascades for identified liability targets
+          * Structural guidelines and forbidden substructures
+          * Patient selection criteria for clinical studies
+          * Risk mitigation strategies for unavoidable safety concerns
+          * Biomarker strategies for safety monitoring
+          
+          Prioritize recommendations by feasibility and impact on safety profile.
+      - prompt: |
+          Create comprehensive data visualizations to illustrate safety insights and design recommendations:
+          * Adverse event frequency plots showing severity and demographics across drug classes
+          * Chemical structure SAR visualizations highlighting problematic motifs vs safer alternatives
+          * Molecular property scatter plots (MW vs logP) with safety risk zones
+          * Target selectivity radar charts comparing problematic vs optimized compounds
+          * Risk assessment matrices ranking safety concerns by severity and frequency
+          
+          > Note: Write files to your current working directory, but reference them with the /files/ prefix when displaying in markdown (e.g., save as 'safety_sar.png' but display as '/files/safety_sar.png').
+          > Note: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+          >   ```
+          >   <img src="/files/safety_sar.png" alt="Safety SAR Analysis" style="width:85%; display:block; margin:auto;" />
+          >   ```
+    description:
+      - Synthesize FAERS and ChEMBL analyses into actionable safety-by-design principles, create comprehensive visualizations, and deliver compound optimization strategies for medicinal chemistry teams.
+
+output_prompt: |
+  You will be provided the results of a safety-driven compound design analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a drug safety and medicinal chemistry guidance document.
+
+  ```
+  ## Executive Summary
+  - Drug class/therapeutic area analyzed
+  - Key safety signals identified
+  - Primary structural recommendations
+
+  ## Data Sources and Methods
+  - **FAERS Database**: Version, date range analyzed, query parameters, total reports (N=X)
+  - **ChEMBL Database**: Version 35, compounds analyzed (N=X), data completeness metrics
+  - **Statistical Methods**: Tests used, confidence intervals, significance thresholds
+  - **Analysis Limitations**: Missing data, potential biases, caveats
+
+  ## Pharmacovigilance Analysis
+  - **FAERS adverse event patterns**: Specific query results with report counts
+  - **Most concerning safety signals**: Frequency (N reports), severity scores, statistical significance
+  - **High-risk patient populations**: Demographics from N=X reports
+  - **Dose-response relationships**: Based on N=X reports with dose information
+
+  ## Structure-Safety Relationships
+  - **Problematic structural features**: Identified from N=X ChEMBL compounds (list ChEMBL IDs)
+  - **Target activity correlations**: Based on N=X binding assays from ChEMBL
+  - **Molecular property ranges**: Derived from N=X compounds with complete data
+  - **Off-target interactions**: Evidence from N=X selectivity assays
+
+  ## Safety Liability Profile
+
+  ### High Priority Concerns
+  - **[Safety Signal 1]**: 
+    - FAERS evidence: N=X reports, 95% CI: X-X, p-value
+    - ChEMBL compounds: N=X analyzed (ChEMBL IDs: list)
+    - Source publications: PMIDs where available
+    - Structural basis and mitigation strategies
+  - **[Safety Signal 2]**: [Same detailed format with complete provenance]
+
+  ### Moderate Priority Concerns
+  [Same detailed format with specific data sources and statistics]
+
+  ## Compound Design Recommendations
+  - **Structural modifications**: Based on analysis of N compounds from ChEMBL v35
+  - **Target selectivity requirements**: Evidence from X binding datasets
+  - **Physicochemical property optimization**: Statistical analysis of N=X compounds
+  - **Patient stratification strategies**: Based on N=X FAERS demographic reports
+
+  ## Safety-by-Design Framework
+  - **Early screening protocols**: Validated against N compounds with known outcomes
+  - **Structural guidelines**: Based on analysis of X adverse events from FAERS
+  - **Clinical development considerations**: Evidence from N clinical trial reports
+  - **Risk monitoring strategies**: Supported by X post-market surveillance reports
+
+  ## Appendix: Data Quality and Limitations
+  - FAERS reporting biases and underreporting estimates
+  - ChEMBL data completeness by assay type
+  - Statistical power calculations and confidence intervals
+  - Excluded data and rationale
+  ```
+
+  - **Visualization Requirements**: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+    ```
+    <img src="/files/safety_sar.png" alt="Safety Structure-Activity Analysis" style="width:85%; display:block; margin:auto;" />
+    ```
+
+  If any analysis section is incomplete, mark it as "pending additional data analysis" and proceed with available information.
+
+  The results will be provided below:

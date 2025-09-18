@@ -1,0 +1,220 @@
+title: Drug Repurposing Discovery Pipeline
+human_description: |
+  Discover novel drug repurposing opportunities by combining literature analysis,
+  knowledge graph exploration, and genomic validation to identify existing compounds
+  that could be repositioned for new therapeutic indications.
+agent_description: |
+  This workflow identifies drug repurposing opportunities through systematic analysis.
+  The user should provide a disease or indication of interest. The workflow will find
+  literature gaps, explore knowledge graph connections, and validate mechanisms genomically.
+category: biomedical
+example_prompt: Find drug repurposing candidates for Alzheimer's disease using literature analysis and knowledge graph exploration
+hidden: false
+is_context_default: false
+
+stages:
+  - name: INDRA Therapeutic Landscape Mapping
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to systematically map the current drug landscape for the specified disease/indication:
+          * Query get_drugs_for_indication to find all currently approved/investigated drugs
+          * Use get_indications_for_drug for each drug to understand their full therapeutic scope
+          * Analyze drug-indication network to identify therapeutic clusters and gaps
+          * Quantify the therapeutic landscape (number of drugs, indication overlap, market coverage)
+          
+          CRITICAL: Document all data provenance:
+          * INDRA database version and query timestamp
+          * Exact API endpoints and parameters used
+          * Number of drugs/indications returned for each query
+          * Data completeness and coverage limitations
+          
+          Identify specific knowledge gaps where literature validation is needed.
+    description:
+      - Use INDRA CoGEx API to systematically map and quantify the current therapeutic landscape for the target indication.
+      
+  - name: Literature Gap Analysis
+    steps:
+      - prompt: |
+          Based on the INDRA landscape analysis, conduct targeted literature review using PubMed search and PaperQA:
+          * Focus on specific therapeutic gaps identified by INDRA analysis
+          * Current limitations of existing therapies (particularly underrepresented in INDRA)
+          * Emerging resistance mechanisms not captured in structured databases
+          * Unmet medical needs in specific patient subpopulations
+          * Recent clinical developments and pipeline updates
+          
+          IMPORTANT: Only search for papers 1-2 times maximum. Target literature search based on specific INDRA-identified gaps.
+          
+          CRITICAL: Document literature provenance:
+          * PubMed search terms and filters used (linked to specific INDRA gaps)
+          * Number of papers retrieved and analyzed
+          * Date range of publications
+          * PaperQA model version and settings used
+          * How literature findings complement or contradict INDRA data
+    description:
+      - Use targeted PubMed/PaperQA literature analysis to fill specific knowledge gaps identified in the INDRA therapeutic landscape mapping.
+      
+  - name: Drug-Target-Disease Network Analysis
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to systematically explore drug repurposing candidates:
+          * Query get_pathways_for_gene for key disease-associated genes to identify relevant pathways
+          * Use get_drugs_for_target to find drugs targeting proteins in those pathways
+          * Cross-reference with get_targets_for_drug to understand each candidate's full target profile
+          * Use get_side_effects_for_drug to assess safety profiles
+          
+          Focus on drugs with mechanistic relevance but different current indications.
+      - prompt: |
+          Enhance INDRA findings with ChEMBL SQLite database queries at chembl_35/chembl_35_sqlite/chembl_35.db:
+          * Binding affinities and selectivity profiles for promising candidates
+          * Pharmacokinetic and ADMET properties
+          * Chemical scaffolds and structure-activity relationships
+          * Clinical trial history and development status
+          > Note: if the ChEMBL database is not available, you can can download it from https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_sqlite.tar.gz
+      - prompt: |
+          Create comprehensive data visualizations to illustrate drug repurposing opportunities:
+          * Network graph showing drug-target-disease connections with nodes colored by therapeutic area
+          * Interactive bubble chart of repurposing candidates (x=safety score, y=efficacy potential, size=clinical feasibility)
+          * Heatmap of target selectivity profiles across candidate drugs
+          * Bar chart comparing current vs proposed indications for top candidates
+          
+          > Note: Write files to your current working directory, but reference them with the /files/ prefix when displaying in markdown (e.g., save as 'drug_network.png' but display as '/files/drug_network.png').
+          > Note: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+          >   ```
+          >   <img src="/files/drug_network.png" alt="Drug Network" style="width:85%; display:block; margin:auto;" />
+          >   ```
+    description:
+      - Use INDRA CoGEx API for drug-target-pathway network analysis, ChEMBL SQLite database for chemical characterization, and create comprehensive visualizations of repurposing opportunities.
+      
+  - name: Clinical Feasibility Assessment
+    steps:
+      - prompt: |
+          Use INDRA CoGEx to assess clinical development feasibility for the top drug repurposing candidates:
+          * Query get_trials_for_drug to understand current clinical trial landscape
+          * Use get_sensitive_cell_lines_for_drug to predict potential efficacy in disease-relevant models
+          * Cross-reference clinical trial data with disease subtypes and patient populations
+          
+          CRITICAL: Document INDRA clinical trials data:
+          * Number of trials found for each drug
+          * Trial phases, status, and sponsor information
+          * Overlap with target indication or related diseases
+          * Data completeness and potential gaps
+          
+          Assess regulatory pathway and clinical development timeline considerations.
+      - prompt: |
+          Supplement INDRA findings with comprehensive ClinicalTrials.gov analysis:
+          * Search for trials by drug name and chemical synonyms to ensure complete coverage
+          * Analyze ongoing and completed trials in the target indication and related diseases
+          * Extract dosing regimens, patient populations, and safety monitoring approaches
+          * Identify regulatory precedents and FDA guidance adherence patterns
+          * Compare trial designs and endpoints across similar repurposing programs
+          
+          CRITICAL: Document ClinicalTrials.gov data provenance:
+          * Search terms and filters used
+          * Total trials retrieved and analyzed (N=X)
+          * Date range of trials included
+          * Exclusion criteria and rationale
+          * Data extraction methodology and completeness
+          
+          Focus on trials that inform repurposing feasibility, safety, and regulatory strategy.
+      - prompt: |
+          CRITICAL: For the most promising candidates, use AlphaGenome to predict functional genomic effects
+          of key disease-associated variants in the target pathways:
+          * Gene expression changes in disease-relevant tissues
+          * Chromatin accessibility effects that could affect drug response
+          * Transcriptional regulation modifications
+          
+          You must validate whether genomic predictions support the repurposing hypothesis and cite AlphaGenome for your findings.
+    description:
+      - Use INDRA CoGEx API and ClinicalTrials.gov database for comprehensive clinical feasibility assessment, combined with AlphaGenome predictions for genomic mechanism validation.
+      
+  - name: Strategic Repurposing Recommendations
+    steps:
+      - prompt: |
+          Create a comprehensive assessment table for the top repurposing candidates including:
+          * Drug name and current indications (from INDRA analysis)
+          * Target profile and mechanism of action (INDRA + ChEMBL data)
+          * Repurposing rationale based on pathway overlap and unmet medical needs
+          * Safety profile and potential contraindications (INDRA side effects data)
+          * Clinical trial landscape and development feasibility (INDRA trials data)
+          * Genomic validation results supporting the hypothesis (AlphaGenome)
+          * Competitive advantage and market opportunity assessment
+          
+          Rank candidates by development risk, timeline, and commercial potential.
+      - prompt: |
+          For the top recommendation, create a detailed repurposing strategy including:
+          * Specific patient population and indication positioning
+          * Recommended clinical development pathway (505(b)(2) FDA pathway, etc.)
+          * Key biomarkers for patient selection based on genomic analysis
+          * Risk mitigation strategies for identified safety concerns
+          * Partnership opportunities and competitive differentiation
+          
+          Provide actionable next steps for business development and clinical teams.
+    description:
+      - Integrate findings from INDRA CoGEx, ChEMBL, and AlphaGenome analyses to deliver strategic repurposing recommendations with comprehensive risk-benefit analysis and implementation roadmap.
+
+output_prompt: |
+  You will be provided the results of a drug repurposing discovery analysis.
+  Create a comprehensive markdown report with the following sections:
+
+  IMPORTANT: Format this as a professional markdown document suitable for pharmaceutical R&D review.
+
+  ```
+  ## Executive Summary
+  - Disease/indication analyzed
+  - Number of repurposing candidates identified
+  - Top recommendation with key rationale
+
+  ## Data Sources and Methods
+  - **INDRA CoGEx**: Database version, query timestamps, API endpoints used
+  - **ChEMBL**: Version 35, compounds analyzed (N=X), SQL queries executed
+  - **ClinicalTrials.gov**: Search date, trials analyzed (N=X), filters applied
+  - **PubMed/PaperQA**: Search terms, papers analyzed (N=X), date ranges
+  - **AlphaGenome**: Model version, genomic intervals analyzed, prediction confidence
+  - **Analysis Limitations**: Data gaps, potential biases, confidence levels
+
+  ## INDRA Therapeutic Landscape
+  - **Existing drugs**: N=X drugs identified via INDRA get_drugs_for_indication
+  - **Drug-indication network**: X therapeutic clusters, Y indication overlaps
+  - **Quantitative metrics**: Market coverage and therapeutic density analysis
+  - **Knowledge gaps identified**: Specific areas requiring literature validation
+
+  ## Literature Gap Analysis
+  - **Targeted literature search**: Based on N=X specific INDRA gaps
+  - **Papers analyzed**: N=Y publications (date range: YYYY-YYYY)
+  - **Key findings**: Therapeutic limitations and unmet needs not captured in INDRA
+  - **INDRA validation**: Areas where literature confirms/contradicts structured data
+
+  ## Drug Repurposing Candidates
+
+  ### Candidate 1: [Drug Name]
+  - **Current indication(s)**: From INDRA get_indications_for_drug
+  - **INDRA evidence**: Pathway connections (specific API queries used)
+  - **ChEMBL data**: Compound ID, target activities (N=X assays)
+  - **Clinical trials**: N=X trials from INDRA get_trials_for_drug, N=Y trials from ClinicalTrials.gov
+  - **Genomic validation**: AlphaGenome predictions (confidence scores)
+  - **Safety profile**: N=X adverse events from INDRA get_side_effects_for_drug
+  - **Overall assessment**: Risk/benefit score with data sources
+
+  ### Candidate 2: [Drug Name]
+  [Same detailed structure with complete provenance]
+
+  ## Recommended Next Steps
+  - **Priority candidate**: Based on analysis of N data points
+  - **Validation experiments**: Specific assays with power calculations
+  - **Clinical development strategy**: Evidence from N=X similar programs
+  
+  ## Appendix: Data Quality Assessment
+  - INDRA data coverage for indication (% completeness)
+  - ChEMBL target activity data availability
+  - Literature search limitations and biases
+  - Statistical confidence intervals for all quantitative findings
+  ```
+
+  - **Visualization Requirements**: Ensure that display visualizations are rendered inline as html images with the following css: width: 85%; display: block; margin: auto;. For example:
+    ```
+    <img src="/files/drug_network.png" alt="Drug Network Analysis" style="width:85%; display:block; margin:auto;" />
+    ```
+
+  If any analysis section is incomplete, mark it as "pending further analysis" and proceed with available data.
+
+  The results will be provided below:
