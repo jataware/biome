@@ -41,7 +41,8 @@ dependencies = [
   "geopandas>=1.0.1",
   "scikit-learn>=1.6.1",
   "paper-qa>=5",
-  "alphagenome>=0.0.2"
+  "alphagenome>=0.0.2",
+  "cdapython"
 ]
 
 [project.urls]

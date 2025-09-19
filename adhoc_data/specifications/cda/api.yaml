@@ -96,28 +96,109 @@ description: "The Cancer Data Aggregator (CDA) is a service of the National Canc
 img_url: null
 last_updated: null
 name: Cancer Data Aggregator
-provider: adhoc:specialist_agents
+provider: adhoc:biome
 resources:
-  5361ce45-01fb-4c16-aa22-31d5397a0bd1:
-    filepath: cda.yaml
+  172e3313-4a85-4c01-9c7e-6712bbd47b4e:
+    code: "import cdapython as cda\n\n# Search for subjects with kidney-related cancer\
+      \ that have CT imaging data\nct_subjects = cda.get_subject_data(\n    match_all=['primary_site\
+      \ = *kidney*', 'file_type = CT*'],\n    add_columns=['file.*']\n)\n\nprint(f\"\
+      Found {len(ct_subjects)} subjects with kidney cancer and CT imaging data\")\n\
+      \n# Search for subjects with kidney-related cancer that have annotated somatic\
+      \ mutation data\nmutation_subjects = cda.get_subject_data(\n    match_all=['primary_site\
+      \ = *kidney*', 'file_type = Annotated Somatic Mutation'],\n    add_columns=['file.*']\n\
+      )\n\nprint(f\"Found {len(mutation_subjects)} subjects with kidney cancer and\
+      \ annotated somatic mutation data\")\n\n# Find subjects that appear in both\
+      \ datasets (have both CT and mutation data)\nct_subject_ids = set(ct_subjects['subject_id'])\n\
+      mutation_subject_ids = set(mutation_subjects['subject_id'])\n\n# Find intersection\n\
+      subjects_with_both = ct_subject_ids.intersection(mutation_subject_ids)\n\nprint(f\"\
+      Subjects with CT imaging data: {len(ct_subject_ids)}\")\nprint(f\"Subjects with\
+      \ mutation data: {len(mutation_subject_ids)}\")\nprint(f\"Subjects with BOTH\
+      \ CT and mutation data: {len(subjects_with_both)}\")\n\n# Get detailed information\
+      \ for subjects with both data types\nif len(subjects_with_both) > 0:\n    both_ct\
+      \ = ct_subjects[ct_subjects['subject_id'].isin(subjects_with_both)]\n    both_mutation\
+      \ = mutation_subjects[mutation_subjects['subject_id'].isin(subjects_with_both)]\n\
+      \    \n    print(f\"\\nData source distribution:\")\n    print(\"CT data sources:\"\
+      , both_ct['data_source'].explode().value_counts().to_dict())\n    print(\"Mutation\
+      \ data sources:\", both_mutation['data_source'].explode().value_counts().to_dict())\n\
+      \    \n    print(f\"\\nAccess levels:\")\n    print(\"CT data access:\", both_ct['access'].explode().value_counts().to_dict())\n\
+      \    print(\"Mutation data access:\", both_mutation['access'].explode().value_counts().to_dict())"
     integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
-    name: raw_documentation
-    resource_id: 5361ce45-01fb-4c16-aa22-31d5397a0bd1
+    notes: |-
+      This example demonstrates how to find subjects with kidney cancer that have both CT imaging and sequencing data from CDA. Key points: 1) Use wildcard search (*kidney*) for primary_site to catch all kidney-related cancers, 2) Perform separate searches with specific file_type filters ('CT*' and 'Annotated Somatic Mutation'), 3) Use add_columns=['file.*'] to get file metadata, 4) Find intersection of subject IDs to identify subjects with both data types, 5) Analyze data sources and access levels. The example found 263 subjects with both CT (open access DICOM) and mutation data (controlled access MAF/VCF files) from multiple data commons (GDC, IDC, PDC, CDS).
+    query: |-
+      Find subjects that have kidney cancer with both CT and sequencing data using wildcard search for kidney and separate searches for CT images and annotated somatic mutation data
+    resource_id: 172e3313-4a85-4c01-9c7e-6712bbd47b4e
+    resource_type: example
+  61bdf3b5-9a6a-478d-aeb0-bad6e54578cc:
+    code: |-
+      import cdapython as cda
+
+      # Get breast cancer subjects from GDC
+      gdc_subjects = cda.get_subject_data(
+          data_source='GDC',
+          match_all=['primary_site = Breast']
+      )
+
+      # Get breast cancer subjects from IDC
+      idc_subjects = cda.get_subject_data(
+          data_source='IDC',
+          match_all=['primary_site = Breast']
+      )
+
+      # Find subjects present in both GDC and IDC
+      common_subjects = cda.intersect_subject_results(gdc_subjects, idc_subjects)
+
+      # Print the number of subjects
+      print(len(common_subjects))
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    notes: |-
+      This example demonstrates how to retrieve and intersect subject data from the Genomic Data Commons (GDC) and the Imaging Data Commons (IDC) specifically for breast cancer subjects.
+    query: Find subjects in both GDC and IDC dealing with breast cancer.
+    resource_id: 61bdf3b5-9a6a-478d-aeb0-bad6e54578cc
+    resource_type: example
+  b255a3f1-bede-43d6-b7da-0c69d77654d7:
+    code: |-
+      import cdapython as cda
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      # Retrieve subjects data
+      subjects = cda.get_subject_data(
+          match_all=['diagnosis = *adenocarcinoma*', 'age_at_observation != NULL'],
+          add_columns=['age_at_observation']
+      )
+
+      # Extracting ages from the subjects DataFrame
+      ages = subjects['age_at_observation'].explode().astype(int)
+
+      # Plotting the histogram
+      plt.figure(figsize=(10, 6))
+      plt.hist(ages, bins=20, color='blue', alpha=0.7)
+      plt.title('Histogram of Ages of Adenocarcinoma Subjects')
+      plt.xlabel('Age at Observation')
+      plt.ylabel('Frequency')
+      plt.grid(axis='y', alpha=0.75)
+      plt.show()
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    notes: |-
+      This example demonstrates how to retrieve age data for adenocarcinoma subjects and plot a histogram of their ages, filtering for human subjects and excluding NULL values.
+    query: Plot a histogram of the ages of adenocarcinoma subjects, filtering for
+      humans.
+    resource_id: b255a3f1-bede-43d6-b7da-0c69d77654d7
+    resource_type: example
+  dc34d556-1d5d-4713-b0fa-59dc200f9acc:
+    filepath: DOCUMENTATION.md
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    name: DOCUMENTATION
+    resource_id: dc34d556-1d5d-4713-b0fa-59dc200f9acc
+    resource_type: file
+  fb40e4ff-f56f-4fb9-9e63-c2b219c7aee2:
+    filepath: DOCUMENTATION.md
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    name: DOCUMENTATION
+    resource_id: fb40e4ff-f56f-4fb9-9e63-c2b219c7aee2
     resource_type: file
 slug: cancer_data_aggregator
-source: |
-  {{raw_documentation}}
-
-  # Additional Instructions:
-
-  Typically metadata retrieved from CDA will locate the raw data files via Data Repository Service (DRS) URIs.
-  DRS URIs are not to the data itself, but will return metadata about the location of the data.
-  The location metadata (which should include the actual data download URL) can be retrieved by using the drs_uri_info tool if it is available,
-  or by querying "https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/<object_id>" directly.
-
-  All data in CDA should be publicly accessible without any special permissions or credentials.
-
-  You should make use of the python requests library to interact with the API.
-  Note that the base URL of the API is 'https://cda.datacommons.cancer.gov/'
+source: '{{DOCUMENTATION}}'
 url: null
 uuid: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
