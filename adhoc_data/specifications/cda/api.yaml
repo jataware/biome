@@ -192,12 +192,6 @@ resources:
     name: DOCUMENTATION
     resource_id: dc34d556-1d5d-4713-b0fa-59dc200f9acc
     resource_type: file
-  fb40e4ff-f56f-4fb9-9e63-c2b219c7aee2:
-    filepath: DOCUMENTATION.md
-    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
-    name: DOCUMENTATION
-    resource_id: fb40e4ff-f56f-4fb9-9e63-c2b219c7aee2
-    resource_type: file
 slug: cancer_data_aggregator
 source: '{{DOCUMENTATION}}'
 url: null
