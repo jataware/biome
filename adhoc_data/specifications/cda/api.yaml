@@ -125,9 +125,85 @@ resources:
     integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
     notes: |-
       This example demonstrates how to find subjects with kidney cancer that have both CT imaging and sequencing data from CDA. Key points: 1) Use wildcard search (*kidney*) for primary_site to catch all kidney-related cancers, 2) Perform separate searches with specific file_type filters ('CT*' and 'Annotated Somatic Mutation'), 3) Use add_columns=['file.*'] to get file metadata, 4) Find intersection of subject IDs to identify subjects with both data types, 5) Analyze data sources and access levels. The example found 263 subjects with both CT (open access DICOM) and mutation data (controlled access MAF/VCF files) from multiple data commons (GDC, IDC, PDC, CDS).
-    query: |-
-      Find subjects that have kidney cancer with both CT and sequencing data using wildcard search for kidney and separate searches for CT images and annotated somatic mutation data
+    query: Find subjects that have kidney cancer with both CT and sequencing data
     resource_id: 172e3313-4a85-4c01-9c7e-6712bbd47b4e
+    resource_type: example
+  4d6b5148-5f1f-4942-83f0-36bad920de8d:
+    code: |-
+      import cdapython as cda
+      import pandas as pd
+
+      # subject (str): Subject ID (e.g., "TCGA.TCGA-BP-5168")
+      patientId = ""
+      files = cda.get_file_data(
+          match_all=[f'subject_id = {subject}', 'access = open'],
+          # CRITICAL: do not change the below line.
+          add_columns=['file_name', 'file_type', 'access']
+      )
+
+      files
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    notes: Fetches the DRS URIs and dataframe of all of the files for a given subject
+      ID
+    query: List all open access files for a given subject ID
+    resource_id: 4d6b5148-5f1f-4942-83f0-36bad920de8d
+    resource_type: example
+  52a61321-e035-4c58-91f5-42d61d939c13:
+    code: "import cdapython as cda\nimport pandas as pd\nimport requests\nimport os\n\
+      import time\n\n# Step 1: Query CDA for all open access files for a specific\
+      \ subject\nsubject = \"TCGA.TCGA-BP-5168\"  # Replace with your subject ID\n\
+      files = cda.get_file_data(\n    match_all=[f'subject_id = {subject}', 'access\
+      \ = open'],\n    # IMPORTANT: Do not modify the below line.\n    add_columns=['file_name', 'file_type', 'access']\n)\n\nprint(f\"\
+      Found {len(files)} open access files for patient {subject}\")\n\n# Step 2: Create\
+      \ download directory\ndownload_path = f\"{subject.replace('.', '_')}_files\"\
+      \nos.makedirs(download_path, exist_ok=True)\n\n# Step 3: Download function using\
+      \ DRS URIs\ndef download_file_from_drs(drs_uri, download_path, filename=None):\n\
+      \    \"\"\"Download a file using its DRS URI\"\"\"\n    try:\n        if not\
+      \ drs_uri.startswith(\"drs://\"):\n            print(f\"Invalid DRS URI: {drs_uri}\"\
+      )\n            return False\n            \n        object_id = drs_uri.split(\"\
+      :\")[-1]\n        url = f\"https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/{object_id}\"\
+      \n        \n        response = requests.get(url)\n        response.raise_for_status()\n\
+      \        file_info = response.json()\n        \n        if not filename:\n \
+      \           filename = file_info.get('name', f'file_{object_id}')\n        \n\
+      \        # Find HTTPS download URL\n        https_url = None\n        for access_method\
+      \ in file_info.get('access_methods', []):\n            if access_method.get('type')\
+      \ == 'https':\n                https_url = access_method['access_url']['url']\n\
+      \                break\n        \n        if https_url:\n            file_size\
+      \ = file_info.get('size', 'unknown size')\n            print(f\"Downloading:\
+      \ {filename} ({file_size} bytes)\")\n            file_response = requests.get(https_url,\
+      \ stream=True)\n            file_response.raise_for_status()\n            file_path\
+      \ = os.path.join(download_path, filename)\n            with open(file_path,\
+      \ 'wb') as f:\n                for chunk in file_response.iter_content(chunk_size=8192):\n\
+      \                    f.write(chunk)\n            return True\n        else:\n\
+      \            print(f\"Failed to find HTTPS download link: {file_info}\")\n \
+      \           return False\n            \n    except Exception as e:\n       \
+      \ print(f\"Error downloading {filename}: {str(e)}\")\n        return False\n\
+      \n# Step 4: Download all files\nsuccessful_downloads = 0\nfailed_downloads =\
+      \ 0\n\nfor idx, row in files.iterrows():\n    drs_uri = row['drs_uri']\n   \
+      \ filename = row['file_name']\n    \n    if pd.isna(filename) or filename ==\
+      \ '':\n        print(f\"Skipping file {idx+1}: No filename available\")\n  \
+      \      failed_downloads += 1\n        continue\n    \n    print(f\"\\nDownloading\
+      \ file {idx+1}/{len(files)}: {filename}\")\n    success = download_file_from_drs(drs_uri,\
+      \ download_path, filename)\n    \n    if success:\n        successful_downloads\
+      \ += 1\n    else:\n        failed_downloads += 1\n    \n    # Small delay to\
+      \ be respectful to the server\n    time.sleep(0.1)\n\n# Step 5: Summary\nprint(f\"\
+      \\nDownload Summary:\")\nprint(f\"\u2713 Successful: {successful_downloads}\"\
+      )\nprint(f\"\u2717 Failed: {failed_downloads}\")\nprint(f\"Files saved to: {os.path.abspath(download_path)}\"\
+      )\n\n# Step 6: Analyze downloaded files by type\ndownloaded_files = os.listdir(download_path)\n\
+      file_types = {}\ntotal_size = 0\n\nfor filename in downloaded_files:\n    file_path\
+      \ = os.path.join(download_path, filename)\n    file_size = os.path.getsize(file_path)\n\
+      \    total_size += file_size\n    \n    if '.' in filename:\n        ext = filename.split('.')[-1].lower()\n\
+      \        if ext not in file_types:\n            file_types[ext] = []\n     \
+      \   file_types[ext].append([filename, file_size])\n\nprint(f\"\\nFile types\
+      \ downloaded:\")\nfor ext, file_list in file_types.items():\n    print(f\"{ext.upper()}:\
+      \ {len(file_list)} files\")\n\nprint(f\"\\nTotal size: {total_size:,} bytes\
+      \ ({total_size/1024/1024/1024:.2f} GB)\")"
+    integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
+    notes: |-
+      This example demonstrates a complete workflow for finding and downloading all open access files for a specific patient/subject from the Cancer Data Aggregator (CDA). The workflow includes: 1) Querying CDA for open access files using subject_id filter, 2) Creating organized download directory, 3) Using DRS URIs to download files with proper error handling, 4) Providing download progress and summary statistics, and 5) Analyzing the downloaded files by type and size. This is particularly useful for researchers who want to obtain comprehensive molecular and clinical data for specific cancer patients from TCGA and other programs. The example successfully downloaded 45 files totaling 1.3GB including genomics, transcriptomics, proteomics, imaging, and clinical data.
+    query: List and download all open access files for a specific subject ID from
+      CDA
+    resource_id: 52a61321-e035-4c58-91f5-42d61d939c13
     resource_type: example
   61bdf3b5-9a6a-478d-aeb0-bad6e54578cc:
     code: |-
@@ -153,7 +229,7 @@ resources:
     integration: 3a97a492-4947-4cb1-9b40-4dcfbdeee3f3
     notes: |-
       This example demonstrates how to retrieve and intersect subject data from the Genomic Data Commons (GDC) and the Imaging Data Commons (IDC) specifically for breast cancer subjects.
-    query: Find subjects in both GDC and IDC dealing with breast cancer.
+    query: Find subjects in GDC and IDC dealing with breast cancer.
     resource_id: 61bdf3b5-9a6a-478d-aeb0-bad6e54578cc
     resource_type: example
   b255a3f1-bede-43d6-b7da-0c69d77654d7:
@@ -183,7 +259,7 @@ resources:
     notes: |-
       This example demonstrates how to retrieve age data for adenocarcinoma subjects and plot a histogram of their ages, filtering for human subjects and excluding NULL values.
     query: Plot a histogram of the ages of adenocarcinoma subjects, filtering for
-      humans.
+      humans and age_at_observation not NULL.
     resource_id: b255a3f1-bede-43d6-b7da-0c69d77654d7
     resource_type: example
   dc34d556-1d5d-4713-b0fa-59dc200f9acc:
