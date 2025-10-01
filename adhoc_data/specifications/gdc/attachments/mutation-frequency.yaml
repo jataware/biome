@@ -1,0 +1,822 @@
+---
+openapi: 3.1.0
+info:
+  title: Mutation Frequency API
+  version: v0
+  description: |
+    Mutation Frequency API allows for downloading top mutated genes and top ssms data.
+servers:
+  - url: https://api.gdc.cancer.gov
+tags:
+  - name: Top Mutated Genes
+    description: |
+      Analaysis endpoint which allows users to download mutated genes data,
+      which is sorted (descending) by number of cases in the cohort with at least one
+      single somatic mutation in given gene.
+  - name: Top Ssms
+    description: |
+      Analaysis endpoint which allows users to download single somatic mutation (SSM)
+      data, which is sorted (descending) by number of cases in cohort with given SSM.
+  - name: Top Ssms By Gene
+    description: |
+      Analysis endpoint which allows users to download single somatic mutation (SSM)
+      data, which is sorted (descending) by number of cases in cohort with given SSM.
+      A gene_id is required as input, which is used to filter the ssms returned,
+      as well as to filter the number of cases with some variant with given gene.
+  - name: Top Ssms By Case
+    description: |
+      Analaysis endpoint which allows users to download single somatic mutation (SSM)
+      data, which is sorted (descending) by number of cases in the project with given
+      SSM. A case_id is required as input, which is used to filter the ssms returned,
+      and the case's project_id is used to calculate the number of cases in the project
+      that were tested for ssms.
+paths:
+  /analysis/top_mutated_genes:
+    post:
+      summary: Download tsv file with top mutated genes data.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/TopMutatedGenesRequestBody'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopMutatedGenesTsvResponse'
+              examples:
+                Top Mutated Genes Tsv Response:
+                  $ref: '#/components/examples/TopMutatedGenesTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid Cohort Id Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+      tags:
+        - Top Mutated Genes
+    get:
+      summary: Download tsv file with top mutated genes data.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/case_filters'
+        - $ref: '#/components/parameters/cohort_id'
+        - $ref: '#/components/parameters/attachment'
+        - $ref: '#/components/parameters/mutated_genes_filename'
+        - $ref: '#/components/parameters/downloadCookieKey'
+        - $ref: '#/components/parameters/downloadCookiePath'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopMutatedGenesTsvResponse'
+              examples:
+                Top Mutated Genes Tsv Response:
+                  $ref: '#/components/examples/TopMutatedGenesTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid CohortId Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+      tags:
+        - Top Mutated Genes
+  /analysis/top_ssms:
+    post:
+      summary: Download tsv file with top ssms data.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/TopSsmsRequestBody'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid CohortId Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+      tags:
+        - Top Ssms
+    get:
+      summary: Download tsv file with top ssms data.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/case_filters'
+        - $ref: '#/components/parameters/cohort_id'
+        - $ref: '#/components/parameters/attachment'
+        - $ref: '#/components/parameters/ssms_filename'
+        - $ref: '#/components/parameters/downloadCookieKey'
+        - $ref: '#/components/parameters/downloadCookiePath'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid CohortId Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+      tags:
+        - Top Ssms
+  /analysis/top_ssms_by_gene:
+    post:
+      summary: Download tsv file with top ssms data for given gene context.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/TopSsmsByGeneRequestBody'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsByGeneTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsByGeneTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid CohortId Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+                Invalid Gene Id Value:
+                  $ref: '#/components/examples/400InvalidGeneId'
+                Missing Gene Id:
+                  $ref: '#/components/examples/400MissingGeneId'
+                Gene Id Not Found:
+                  $ref: '#/components/examples/400GeneIdNotFound'
+      tags:
+        - Top Ssms By Gene
+    get:
+      summary: Download tsv file with top ssms data for given gene context.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/case_filters'
+        - $ref: '#/components/parameters/cohort_id'
+        - $ref: '#/components/parameters/attachment'
+        - $ref: '#/components/parameters/ssms_filename'
+        - $ref: '#/components/parameters/gene_id'
+        - $ref: '#/components/parameters/downloadCookieKey'
+        - $ref: '#/components/parameters/downloadCookiePath'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsByGeneTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsByGeneTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Invalid CohortId Value:
+                  $ref: '#/components/examples/400InvalidCohortId'
+                Invalid Filters Value:
+                  $ref: '#/components/examples/400InvalidFilters'
+                Invalid Case Filters Value:
+                  $ref: '#/components/examples/400InvalidCaseFilters'
+                Invalid Gene Id Value:
+                  $ref: '#/components/examples/400InvalidGeneId'
+                Missing Gene Id:
+                  $ref: '#/components/examples/400MissingGeneId'
+                Gene Id Not Found:
+                  $ref: '#/components/examples/400GeneIdNotFound'
+      tags:
+        - Top Ssms By Gene
+  /analysis/top_ssms_by_case:
+    post:
+      summary: Download tsv file with top ssms data for given case context.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/TopSsmsByCaseRequestBody'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsByCaseTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsByCaseTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Missing Case Id:
+                  $ref: '#/components/examples/400MissingCaseId'
+                Invalid Case Id Value:
+                  $ref: '#/components/examples/400InvalidCaseId'
+                Case Id Not Found:
+                  $ref: '#/components/examples/400CaseIdNotFound'
+      tags:
+        - Top Ssms By Case
+    get:
+      summary: Download tsv file with top ssms data for given case context.
+      parameters:
+        - $ref: '#/components/parameters/XAuthTokenHeader'
+        - $ref: '#/components/parameters/XAuthTokenCookie'
+        - $ref: '#/components/parameters/AWGFenceCookie'
+        - $ref: '#/components/parameters/attachment'
+        - $ref: '#/components/parameters/ssms_filename'
+        - $ref: '#/components/parameters/case_id'
+        - $ref: '#/components/parameters/downloadCookieKey'
+        - $ref: '#/components/parameters/downloadCookiePath'
+      responses:
+        '200':
+          description: Successful user request.
+          content:
+            text/tab-separated-values:
+              schema:
+                $ref: '#/components/schemas/TopSsmsByCaseTsvResponse'
+              examples:
+                Top Ssms Tsv Response:
+                  $ref: '#/components/examples/TopSsmsByCaseTsvResponse'
+        '400':
+          description: Invalid user request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationFrequencyInvalidRequestResponse'
+              examples:
+                Invalid Attachment Value:
+                  $ref: '#/components/examples/400InvalidAttachment'
+                Missing Case Id:
+                  $ref: '#/components/examples/400MissingCaseId'
+                Invalid Case Id Value:
+                  $ref: '#/components/examples/400InvalidCaseId'
+                Case Id Not Found:
+                  $ref: '#/components/examples/400CaseIdNotFound'
+      tags:
+        - Top Ssms By Case
+components:
+  parameters:
+    XAuthTokenHeader:
+      name: X-Auth-Token
+      in: header
+      schema:
+        type: string
+      description: Valid GDC authentication token
+    XAuthTokenCookie:
+      name: X-Auth-Token
+      in: cookie
+      schema:
+        type: string
+      description: Valid GDC authentication token
+    AWGFenceCookie:
+      name: awg_access_token
+      in: cookie
+      schema:
+        type: string
+      description: Valid AWG fence authentication token
+    filters:
+      name: filters
+      in: query
+      schema:
+        type: string
+      description: GQL filters (url-encoded) defining the set of cases to include.
+      examples:
+        Filter By Cancer Gene Census:
+          value: '%7B%0A%20%20%22op%22%3A%20%22%3D%22%2C%0A%20%20%22content%22%3A%20%7B
+            %0A%20%20%20%20%22field%22%3A%20%22genes.is_cancer_gene_census%22%2C%0A%20%20%20
+            %20%22value%22%3A%20%5B%0A%20%20%20%20%20%20%22true%22%0A%20%20%20%20%5D%0A
+            %20%20%7D%0A%7D'
+    case_filters:
+      name: case_filters
+      in: query
+      schema:
+        type: string
+      description: GQL filters (url-encoded) defining the set of cases to include.
+      examples:
+        Filter By Cancer Gene Census:
+          value: '%7B%0A%20%20%22op%22%3A%20%22%3D%22%2C%0A%20%20%22content%22%3A%20%7B
+            %0A%20%20%20%20%22field%22%3A%20%22genes.is_cancer_gene_census%22%2C%0A%20%20%20
+            %20%22value%22%3A%20%5B%0A%20%20%20%20%20%20%22true%22%0A%20%20%20%20%5D%0A
+            %20%20%7D%0A%7D'
+    cohort_id:
+      name: cohort_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: ID of target cohort.
+      examples:
+        Cohort Id:
+          value: '681ff2e8-6073-4dab-a398-1f2203c2d7f5'
+    attachment:
+      name: attachment
+      in: query
+      schema:
+        type: string
+        enum: ['true', 'false']
+        default: 'false'
+      description: Flag indicating whether response should be an attachment.
+      examples:
+        True Value:
+          value: 'true'
+        False Value:
+          value: 'false'
+    mutated_genes_filename:
+      name: filename
+      in: query
+      schema:
+        type: string
+        default: top-mutated-genes.<YYYY>-<MM>-<DD>.tsv
+      description: Name for downloaded file.
+      examples:
+        Example File Name:
+          value: top-mutated-genes.2023-04-01.tsv
+    ssms_filename:
+      name: filename
+      in: query
+      schema:
+        type: string
+        default: top-ssms.<YYYY>-<MM>-<DD>.tsv
+      description: Name for downloaded file.
+      examples:
+        Example File Name:
+          value: top-ssms.2023-04-01.tsv
+    gene_id:
+      name: gene_id
+      required: true
+      in: query
+      schema:
+        $ref: '#/components/schemas/GeneIdField'
+      examples:
+        Example Gene Id:
+          value: ENSG00000141510
+    case_id:
+      name: case_id
+      required: true
+      in: query
+      schema:
+        $ref: '#/components/schemas/CaseIdField'
+      examples:
+        Example Case Id:
+          value: ecae5812-2b9c-4494-a79b-ae5a3d315ded
+    downloadCookieKey:
+      name: downloadCookieKey
+      in: query
+      schema:
+        type: string
+        default: ''
+      description: Download cookie key.
+    downloadCookiePath:
+      name: downloadCookiePath
+      in: query
+      schema:
+        type: string
+        default: '/'
+      description: Download cookie path.
+  requestBodies:
+    TopMutatedGenesRequestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              filters:
+                type: object
+                description: GQL filters defining the set of cases to include.
+              case_filters:
+                type: object
+                description: GQL filters defining the set of cases to include.
+              cohort_id:
+                type: string
+                format: uuid
+                description: ID of target cohort.
+              attachment:
+                type: string
+                enum: ['true', 'false']
+                description: Flag indicating whether response should be an attachment.
+                default: 'false'
+              filename:
+                type: string
+                description: Name for downloaded file.
+                default: top-mutated-genes.<YYYY>-<MM>-<DD>.tsv
+              downloadCookieKey:
+                type: string
+                description: Cookie download key.
+                default: ''
+              downloadCookiePath:
+                type: string
+                descrition: Cookie download path.
+                default: '/'
+          examples:
+            Mutation Frequency Request Body:
+              $ref: '#/components/examples/MutationFrequencyRequestBody'
+    TopSsmsRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TopSsmsRequestBody'
+          examples:
+            Mutation Frequency Request Body:
+              $ref: '#/components/examples/MutationFrequencyRequestBody'
+    TopSsmsByGeneRequestBody:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/TopSsmsRequestBody'
+              - $ref: '#/components/schemas/GeneId'
+          examples:
+            Top Ssms By Gene Request Body:
+              $ref: '#/components/examples/TopSsmsByGeneRequestBody'
+    TopSsmsByCaseRequestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TopSsmsByCaseRequestBody'
+          examples:
+            Top Ssms By Case Request Body:
+              $ref: '#/components/examples/TopSsmsByCaseRequestBody'
+  schemas:
+    GeneIdField:
+      type: string
+      description: ENSEMBL gene id.
+      pattern: '^ENSG\d{11}'
+    GeneId:
+      type: object
+      required:
+        - gene_id
+      properties:
+        gene_id:
+          $ref: '#/components/schemas/GeneIdField'
+    CaseIdField:
+      type: string
+      format: uuid
+      description: Case id.
+    Case:
+      type: object
+      required:
+        - case_id
+      properties:
+        case_id:
+          $ref: '#/components/schemas/CaseIdField'
+    TopSsmsRequestBody:
+      type: object
+      properties:
+        filters:
+          type: object
+          description: GQL filters defining the set of cases to include.
+        case_filters:
+          type: object
+          description: GQL filters defining the set of cases to include.
+        cohort_id:
+          type: string
+          format: uuid
+          description: ID of target cohort.
+        attachment:
+          type: string
+          enum: ['true', 'false']
+          description: Flag indicating whether response should be an attachment.
+          default: 'false'
+        filename:
+          type: string
+          description: Name for downloaded file.
+          default: top-ssms.<YYYY>-<MM>-<DD>.tsv
+        downloadCookieKey:
+          type: string
+          description: Download cookie key.
+          default: ''
+        downloadCookiePath:
+          type: string
+          description: Download cookie path.
+          default: '/'
+    TopSsmsByCaseRequestBody:
+      type: object
+      properties:
+        attachment:
+          type: string
+          enum: ['true', 'false']
+          description: Flag indicating whether response should be an attachment.
+          default: 'false'
+        filename:
+          type: string
+          description: Name for downloaded file.
+          default: top-ssms.<YYYY>-<MM>-<DD>.tsv
+        downloadCookieKey:
+          type: string
+          description: Download cookie key.
+          default: ''
+        downloadCookiePath:
+          type: string
+          description: Download cookie path.
+          default: '/'
+        case_id:
+          $ref: '#/components/schemas/CaseIdField'
+      required:
+        - case_id
+    TopMutatedGenesTsvResponse:
+      type: string
+      description: |
+        ## Columns returned in tsv file:
+
+        - gene_id:  ENSEMBL gene id
+        - symbol: HUGO gene symbol
+        - name: name of gene
+        - cytoband:  alphanumeric value used to describe chromosomal location targeted
+        or included in molecular analysis: can be more than one
+        - type: biotype of gene
+        - num_cohort_ssm_affected_cases: number of cases in cohort with at least one SSM
+        in given gene
+        - num_cohort_ssm_cases: number of cases in cohort that have been tested for SSM
+        - cohort_ssm_affected_cases_percentage:
+        cohort_ssm_affected_cases / cohort_ssm_cases
+        - num_gdc_ssm_affected_cases: number of all cases with at least one SSM in given gene
+        - num_gdc_ssm_cases: number of all cases that have been tested for SSM
+        - gdc_ssm_affected_cases_percentage: gdc_ssm_affected_cases / gdc_ssm_cases
+        - num_cohort_cnv_cases: number of cases in cohort that have been tested for CNV
+        - num_cohort_cnv_gain_cases: number of cases with a CNV Gain in given gene
+        - cohort_cnv_gain_cases_percentage:
+        cohort_cnv_gain_cases / cohort_cnv_cases
+        - num_cohort_cnv_loss_cases: number of cases with a CNV Loss in given gene
+        - cohort_cnv_loss_cases_percentage:
+        cohort_cnv_loss_cases / cohort_cnv_cases
+        - num_mutations: number of mutations in given gene
+        - annotations: cancer gene census
+    TopSsmsTsvResponse:
+      type: string
+      description: |
+        ## Columns returned in tsv file:
+
+        - ssm_id: somatic mutation id
+        - dna_change: genomic dna change
+        - protein_change: gene symbol and amino acid change
+        - type: mutation subtype
+        - consequence: canonical transcript consequence type
+        - num_cohort_ssm_affected_cases: number of cases in cohort with given SSM
+        - num_cohort_ssm_cases: number of cases in cohort that have been tested for SSM
+        - cohort_ssm_affected_cases_percentage:
+        cohort_ssm_affected_cases / cohort_ssm_cases
+        - num_gdc_ssm_affected_cases: number of cases in GDC with given SSM
+        - num_gdc_ssm_cases: number of cases in GDC that have been tested for SSM
+        - gdc_ssm_affected_cases_percentage: gdc_ssm_affected_cases / gdc_ssm_cases
+        - vep_impact: Ensembl Variant Effect Predictor impact
+        - sift_impact: Sorting Intolerant From Tolerant impact
+        - sift_score: Sorting Intolerant From Tolerant score
+        - polyphen_impact: Polymorphism Phenotyping impact
+        - polyphen_score: Polymorphism Phenotyping score
+    TopSsmsByGeneTsvResponse:
+      type: string
+      description: |
+        ## Columns returned in tsv file:
+
+        - ssm_id: somatic mutation id
+        - dna_change: genomic dna change
+        - protein_change: gene symbol and amino acid change
+        - type: mutation subtype
+        - consequence: canonical transcript consequence type
+        - num_ssm_affected_cases: number of cases in cohort with given SSM
+        - num_{GENE_ID}_cases: number of cases with gene id that have been tested for SSM
+        - ssm_affected_cases_percentage: cohort_ssm_affected_cases / cohort_ssm_cases
+        - num_gdc_ssm_affected_cases: number of cases in GDC with given SSM
+        - num_gdc_ssm_cases: number of cases in GDC that have been tested for SSM
+        - gdc_ssm_affected_cases_percentage: gdc_ssm_affected_cases / gdc_ssm_cases
+        - vep_impact: Ensembl Variant Effect Predictor impact
+        - sift_impact: Sorting Intolerant From Tolerant impact
+        - sift_score: Sorting Intolerant From Tolerant score
+        - polyphen_impact: Polymorphism Phenotyping impact
+        - polyphen_score: Polymorphism Phenotyping score
+    TopSsmsByCaseTsvResponse:
+      type: string
+      description: |
+        ## Columns returned in tsv file:
+
+        - ssm_id: somatic mutation id
+        - dna_change: genomic dna change
+        - protein_change: gene symbol and amino acid change
+        - type: mutation subtype
+        - consequence: canonical transcript consequence type
+        - num_{PROJECT_ID}_ssm_affected_cases: number of cases in given project with given SSM
+        - num_{PROJECT_ID}_cases: number of cases in project that have been tested for SSM
+        - ssm_affected_cases_percentage: cohort_ssm_affected_cases / cohort_ssm_cases
+        - num_gdc_ssm_affected_cases: number of cases in GDC with given SSM
+        - num_gdc_ssm_cases: number of cases in GDC that have been tested for SSM
+        - gdc_ssm_affected_cases_percentage: gdc_ssm_affected_cases / gdc_ssm_cases
+        - vep_impact: Ensembl Variant Effect Predictor impact
+        - sift_impact: Sorting Intolerant From Tolerant impact
+        - sift_score: Sorting Intolerant From Tolerant score
+        - polyphen_impact: Polymorphism Phenotyping impact
+        - polyphen_score: Polymorphism Phenotyping score
+
+        {PROJECT_ID} will be the project_id associated with the passed in case_id.
+    MutationFrequencyInvalidRequestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+  examples:
+    MutationFrequencyRequestBody:
+      value:
+        filters:
+          op: '='
+          content:
+            field: genes.is_cancer_gene_census
+            value:
+              - 'true'
+        case_filters:
+          op: '='
+          content:
+            field: cases.primary_site
+            value:
+              - Lip
+        cohort_id: 681ff2e8-6073-4dab-a398-1f2203c2d7f5
+        attachment: 'true'
+        filename: my-cohort-data.tsv
+        downloadCookieKey: 4b3a29ef7
+        downloadCookiePath: /
+    TopSsmsByGeneRequestBody:
+      value:
+        filters:
+          op: '='
+          content:
+            field: genes.is_cancer_gene_census
+            value:
+              - 'true'
+        case_filters:
+          op: '='
+          content:
+            field: cases.primary_site
+            value:
+              - Lip
+        cohort_id: 681ff2e8-6073-4dab-a398-1f2203c2d7f5
+        attachment: 'true'
+        filename: my-cohort-data.tsv
+        gene_id: ENSG00000141510
+        downloadCookieKey: 4b3a29ef7
+        downloadCookiePath: /
+    TopSsmsByCaseRequestBody:
+      value:
+        attachment: 'true'
+        filename: my-cohort-data.tsv
+        case_id: ecae5812-2b9c-4494-a79b-ae5a3d315ded
+        downloadCookieKey: 4b3a29ef7
+        downloadCookiePath: /
+    TopMutatedGenesTsvResponse:
+      value: "gene_id\tsymbol\tname\tcytoband\ttype\tnum_cohort_ssm_affected_cases
+        \tnum_cohort_ssm_cases\tcohort_percentage_ssm_affected_cases
+        \tnum_gdc_ssm_affected_cases\tnum_gdc_ssm_cases\tgdc_percentage_ssm_affected_cases
+        \tnum_cohort_cnv_affected_cases\tnum_cohort_cnv_gain_cases
+        \tcohort_percentage_cnv_gain_affected_cases\tnum_cohort_cnv_loss_cases
+        \tcohort_percentage_cnv_loss_affected_cases\tnum_mutations\tannotations\n
+        ENSG00000141510\tTP53\ttumor protein p53\t17p13.1\tprotein_coding\t4667\t13582
+        \t.3436\t4667\t13582\t.3436\t10744\t679\t.0632\t3508\t.3256\t1308\tCancer Gene Census"
+    TopSsmsTsvResponse:
+      value: "ssm_id\tdna_change\tprotein_change\ttype\tconsequence
+        \tnum_cohort_ssm_affected_cases\tnum_cohort_ssm_cases
+        \tcohort_percentage_ssm_affected_cases\tnum_gdc_ssm_affected_cases
+        \tnum_gdc_ssm_cases\tgdc_percentage_ssm_affected_cases
+        \tvep_impact\tsift_impact\tsift_score\tpolyphen_impact
+        \tpolyhen_score\n
+        84aef48f-31e6-52e4-8e05-7d5b9ab15087\tchr7:g.140753336A>T\tBRAF V640E
+        \tSubstitution\tMissense\t610\t12531\t.0487\t610\t12531\t.0487
+        \tMODERATE\tdeleterious\t0\tprobably_damaging\t.955"
+    TopSsmsByGeneTsvResponse:
+      value: "ssm_id\tdna_change\tprotein_change\ttype\tconsequence
+        \tnum_ssm_affected_cases\tnum_TP53_cases
+        \tssm_affected_cases_percentage\tnum_gdc_ssm_affected_cases
+        \tnum_gdc_ssm_cases\tgdc_percentage_ssm_affected_cases
+        \tvep_impact\tsift_impact\tsift_score\tpolyphen_impact
+        \tpolyhen_score\n
+        84aef48f-31e6-52e4-8e05-7d5b9ab15087\tchr7:g.140753336A>T\tBRAF V640E
+        \tSubstitution\tMissense\t610\t12531\t.0487\t610\t12531\t.0487
+        \tMODERATE\tdeleterious\t0\tprobably_damaging\t.955"
+    TopSsmsByCaseTsvResponse:
+      value: "ssm_id\tdna_change\tprotein_change\ttype\tconsequence
+        \tnum_TCGA-BRCA_ssm_affected_cases\tnum_TCGA-BRCA_ssm_cases
+        \tssm_affected_cases_percentage\tnum_gdc_ssm_affected_cases
+        \tnum_gdc_ssm_cases\tgdc_percentage_ssm_affected_cases
+        \tvep_impact\tsift_impact\tsift_score\tpolyphen_impact
+        \tpolyhen_score\n
+        84aef48f-31e6-52e4-8e05-7d5b9ab15087\tchr7:g.140753336A>T\tBRAF V640E
+        \tSubstitution\tMissense\t610\t12531\t.0487\t610\t12531\t.0487
+        \tMODERATE\tdeleterious\t0\tprobably_damaging\t.955"
+    400InvalidAttachment:
+      value:
+        message: 'attachment tar.gz is not supported.'
+    400InvalidCohortId:
+      value:
+        message: 'cohort_id should be a UUID.'
+    400InvalidFilters:
+      value:
+        message: 'file_id1 is not valid json.'
+    400InvalidCaseFilters:
+      value:
+        message: 'case_id1 is not valid json.'
+    400InvalidGeneId:
+      value:
+        message: 'gene_id1 is not a valid ENSEMBL gene id.'
+    400MissingGeneId:
+      value:
+        message: 'gene_id parameter is required.'
+    400GeneIdNotFound:
+      value:
+        message: 'ENSG12321232123 not found.'
+    400MissingCaseId:
+      value:
+        message: 'case_id paramter is required.'
+    400InvalidCaseId:
+      value:
+        message: 'case_id should be a UUID.'
+    400CaseIdNotFound:
+      value:
+        message: '12121212-1212-1212-1212-121212121212 does not exist.'

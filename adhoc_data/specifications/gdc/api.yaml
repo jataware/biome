@@ -7,8 +7,14 @@ description: |
 img_url: null
 last_updated: null
 name: Genomics Data Commons
-provider: adhoc:specialist_agents
+provider: adhoc:biome
 resources:
+  3c4f3737-151f-45e6-a200-a83ccecc33fe:
+    filepath: gdcapi.yaml
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
+    name: gdcapi
+    resource_id: 3c4f3737-151f-45e6-a200-a83ccecc33fe
+    resource_type: file
   4b9845c7-d61b-440d-880e-b3d2b315a415:
     filepath: facets.txt
     integration: 39771f58-c791-43e8-a19d-c2095c338567
@@ -132,6 +138,12 @@ resources:
       and return the results as a pandas dataframe.
     resource_id: 57f85658-1659-44e4-a9b8-ec9eb41f7aae
     resource_type: example
+  663af94d-5e38-43a9-8f1c-f2aad43dc774:
+    filepath: gene-expression.yaml
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
+    name: gene_expression
+    resource_id: 663af94d-5e38-43a9-8f1c-f2aad43dc774
+    resource_type: file
   74735957-03a3-4706-aa40-f8bf200553cc:
     filepath: gdc.md
     integration: 39771f58-c791-43e8-a19d-c2095c338567
@@ -174,6 +186,12 @@ resources:
       Get simple somatic mutation occurrences (cases) from GDC where the primary site is bronchus and lung, the gender is male, the age at diagnosis is less than 45 years old, and the patient is a lifelong non-smoker. Return the results as a pandas dataframe.
     resource_id: 7a94f76a-0854-41a3-bb97-69a4dcbcaad9
     resource_type: example
+  813aa4ac-8da8-4fef-9643-aa8940978fb6:
+    filepath: cohortapi.yaml
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
+    name: cohortapi
+    resource_id: 813aa4ac-8da8-4fef-9643-aa8940978fb6
+    resource_type: file
   9f1cc9a9-6acd-4797-b050-73afbaeb74c3:
     code: |
       import pandas as pd
@@ -255,8 +273,20 @@ resources:
     name: mappings
     resource_id: a96216e1-8a2b-4fab-90e8-565d1db62fbe
     resource_type: file
+  cc6c1aff-2833-4474-a7f1-5f246ae896d3:
+    filepath: scrna-seq-gene-expression.yaml
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
+    name: scrna_seq_gene_expression
+    resource_id: cc6c1aff-2833-4474-a7f1-5f246ae896d3
+    resource_type: file
+  e38b8476-6367-4db6-8204-bbce62bbf088:
+    filepath: mutation-frequency.yaml
+    integration: 39771f58-c791-43e8-a19d-c2095c338567
+    name: mutation_frequency
+    resource_id: e38b8476-6367-4db6-8204-bbce62bbf088
+    resource_type: file
 slug: genomics_data_commons
-source: |
+source: |-
   # GDC API Documentation
 
   Below you will find the GDC API documentation. Note that
@@ -300,5 +330,29 @@ source: |
 
   If a user asks you to filter based on the type of cancer, it is often productive to filter on
   disease type, primary diagnosis, or primary site.
+
+  # Additional Specs
+
+  Additionally, you have access to specific API specs that you can utilize to query GDC. They are:
+
+  ## Cohort API
+
+  {{cohortapi}}
+
+  ## GDC API
+
+  {{gdcapi}}
+
+  ## Gene Expression
+
+  {{gene_expression}}
+
+  ## Mutation Frequency
+
+  {{mutation_frequency}}
+
+  ## SCRNA Seq Gene Expression
+
+  {{scrna_seq_gene_expression}}
 url: null
 uuid: 39771f58-c791-43e8-a19d-c2095c338567

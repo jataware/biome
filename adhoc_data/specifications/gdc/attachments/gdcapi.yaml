@@ -1,0 +1,1962 @@
+---
+openapi: 3.0.3
+externalDocs:
+  url: https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started/
+  description: Please, visit our external documenation site for more details and examples.
+info:
+  description: |
+    ## OpenAPI specification for the Genomic Data Commons (GDC) API
+    * [Getting started guide](https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started/)
+    * [GDC Encyclopedia](https://docs.gdc.cancer.gov/Encyclopedia/)
+    ## Complex data types
+    Some of the data structures in this API cannot be well defined within this document.
+     Please, reference the external documentation for the following:
+     * [filters](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query)
+  title: Genomic Data Commons (GDC) API
+  version: 2.2.0
+  contact:
+    name: GDC API support
+    email: support@nci-gdc.datacommons.io
+
+servers:
+  - url: https://api.gdc.cancer.gov
+components:
+  securitySchemes:
+    auth-token:
+      type: apiKey
+      in: header
+      name: X-Auth-Token
+      description: |
+        (Optional) Acquired from the user profile after logging in at [GDC Portal](https://portal.gdc.cancer.gov/).
+        Required for accessing any protected data.
+  parameters:
+    expand:
+      description: The expand parameter provides a means to add additional groups
+        of nested fields in the response. The values for the `expand` parameter can
+        be accessed programmatically at the `_mapping` endpoint under the `expand`
+        key. The `fields` parameter can be used with `expand` to limit the data returned
+        at the root level but include all the nested data.
+      in: query
+      name: expand
+      schema:
+        $ref: '#/components/schemas/expand'
+    facets:
+      description: The facets parameter adds an `aggregations` key and data for a
+        specified `field` that is available from the `_mapping` endpoint `fields`
+        value. It provides all values that exist for that field, and the number of
+        entities (cases, projects, files, or annotations) for the value. The primary
+        intended use of this parameter is for displaying aggregate information in
+        the GDC Data Portal. It is typically coupled with `size=0` so that only aggregate
+        information is returned. This parameter is incompatable parameter `format=TSV`
+      in: query
+      name: facets
+      schema:
+        $ref: '#/components/schemas/facets'
+    fields:
+      description: This query parameter specifies which fields are to be included
+        in the API response. The fields in the API response will be unordered. The
+        values for the `fields` parameter can be accessed programmatically at the
+        `_mapping` endpoint under the `fields` key. The 'id' field will always be
+        returned.
+      in: query
+      name: fields
+      schema:
+        $ref: '#/components/schemas/fields'
+    file_id:
+      description: file ids
+      in: path
+      name: file_id
+      required: true
+      schema:
+        example: 1dd28069-5777-4ff9-bd2b-d1ba68e88b06
+        format: uuid
+        type: string
+    file_ids:
+      description: An array of file ids
+      in: path
+      name: file_ids
+      required: true
+      schema:
+        items:
+          $ref: '#/components/schemas/uuid'
+        type: array
+    filters_for_cases:
+      description: |
+        Filters are a complex structure to limit the results of a search. [Refer to the external
+        documentation for detailed information.](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query)
+        > NOTE: the filter needs to be URL encoded if used in a `GET` request.
+      in: query
+      name: filters
+      required: false
+      schema:
+        $ref: '#/components/schemas/filters'
+      examples:
+        CasesFilterByPrimarySiteExample:
+          value: |
+            {
+                "op":"=",
+                "content":{
+                    "field":"primary_site",
+                    "value":[
+                        "brain"
+                    ]
+                }
+            }
+        CasesFilterByProjectExample:
+          value: |
+            {
+                "op":"in",
+                "content":{
+                    "field":"cases.project.project_id",
+                    "value":[
+                        "TCGA-THYM",
+                        "TCGA-KICH"
+                    ]
+                }
+            }
+    filters_for_files:
+      description: |
+        Filters are a complex structure to limit the results of a search. [Refer to the external
+        documentation for detailed information.](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query)
+        > NOTE: the filter needs to be URL encoded if used in a `GET` request.
+      in: query
+      name: filters
+      required: false
+      schema:
+        $ref: '#/components/schemas/filters'
+      examples:
+        FilesFilterByDataType:
+          value: |
+            {
+              "op": "=",
+              "content": {
+                "field": "data_type",
+                "value": "Masked Copy Number Segment"
+              }
+            }
+        FilesFilterByProjectsExample:
+          value: |
+            {
+              "op":"in",
+              "content":{
+                "field":"cases.project.project_id",
+                "value":[
+                  "TCGA-THYM",
+                  "TCGA-KICH"
+                ]
+              }
+            }
+
+    filters:
+      description: |
+        Filters are a complex structure to limit the results of a search. [Refer to the external
+        documentation for detailed information.](https://docs.gdc.cancer.gov/API/Users_Guide/Search_and_Retrieval/#filters-specifying-the-query)
+        > NOTE: the filter needs to be URL encoded if used in a `GET` request.
+      in: query
+      name: filters
+      required: false
+      schema:
+        $ref: '#/components/schemas/filters'
+    format:
+      description: |
+        Specifies the API response format:
+        * JSON - `Content-Type: application/json`
+        * XML - `Content-Type: text/xml`
+        * TSV - `Content-Type: text/tab-separated-values`
+          > Note: TSV Nested elements will be 'flattened' as a unique header to be included in the TSV.
+            This can result in many headers which may exceed the limits of some TSV processing tools. When
+            requesting nested elements, it is recommended to use JSON or XML output formats.
+      in: query
+      name: format
+      schema:
+        $ref: '#/components/schemas/format'
+    from:
+      description: Specifies the first record to return from a set of search results.
+      in: query
+      name: from
+      required: false
+      schema:
+        default: 0
+        type: integer
+    pretty:
+      description: Returns response with indentations and line breaks in a human-readable
+        format. This is only applicable to `format` of type JSON or XML.
+      in: query
+      name: pretty
+      required: false
+      schema:
+        $ref: '#/components/schemas/pretty'
+    project_id:
+      description: project id
+      in: path
+      name: project_id
+      required: true
+      schema:
+        example: TCGA-PRAD
+        type: string
+    size:
+      description: Specifies the number of results to return.
+      in: query
+      name: size
+      required: false
+      schema:
+        default: 10
+        type: integer
+    sort:
+      description: Specifies sorting for the search results. The query parameter is
+        selected from the list of `fields` in the `_mapping` endpoint.
+      examples:
+        AcsendingExample:
+          value: disease_type:asc
+        DescendingExample:
+          value: disease_type:desc
+      in: query
+      name: sort
+      required: false
+      schema:
+        default:
+        type: string
+  responses:
+    200_annotation:
+      content:
+        application/json:
+          schema:
+            description: The metadata of a single file
+            properties:
+              data:
+                $ref: '#/components/schemas/annotation_metadata'
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_annotations:
+      content:
+        application/json:
+          schema:
+            description: annotations contained in the GDC
+            properties:
+              data:
+                properties:
+                  hits:
+                    items:
+                      $ref: '#/components/schemas/annotation_metadata_for_hits'
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/paginations'
+                type: object
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_case:
+      content:
+        application/json:
+          schema:
+            description: The metadata of a single file
+            properties:
+              data:
+                $ref: '#/components/schemas/case_metadata'
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_cases:
+      content:
+        application/json:
+          schema:
+            description: cases contained in the GDC
+            properties:
+              data:
+                properties:
+                  hits:
+                    items:
+                      $ref: '#/components/schemas/case_metadata_for_hits'
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/paginations'
+                type: object
+              warnings:
+                $ref: '#/components/schemas/warnings'
+              error:
+                $ref: '#/components/schemas/error'
+            type: object
+      description: ok
+    200_file:
+      content:
+        application/json:
+          schema:
+            description: The metadata of a single file
+            properties:
+              data:
+                $ref: '#/components/schemas/file_metadata'
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_files:
+      content:
+        application/json:
+          schema:
+            description: files contained in the GDC
+            properties:
+              data:
+                properties:
+                  hits:
+                    items:
+                      $ref: '#/components/schemas/file_metadata_for_hits'
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/paginations'
+                type: object
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_files_versions:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/file_versions'
+      description: An array of the latest files version information or a corresponding
+        error object.
+    200_files_versions_error:
+      content:
+        application/json:
+          schema:
+            description: version information about a file/files
+            items:
+              properties:
+                filename:
+                  $ref: '#/components/schemas/filename'
+                id:
+                  $ref: '#/components/schemas/uuid'
+                latest_filename:
+                  $ref: '#/components/schemas/filename'
+                latest_id:
+                  $ref: '#/components/schemas/uuid'
+                latest_md5:
+                  example: c2f9b196e154906a70c7ec46492a859d
+                  type: string
+                latest_release:
+                  items:
+                    $ref: '#/components/schemas/version'
+                  type: array
+                latest_size:
+                  example: 332092
+                  type: integer
+                latest_state:
+                  example: validated
+                  type: string
+                latest_version:
+                  $ref: '#/components/schemas/version'
+                md5:
+                  $ref: '#/components/schemas/md5sum'
+                release:
+                  $ref: '#/components/schemas/version'
+                size:
+                  example: 332092
+                  type: integer
+                state:
+                  example: validated
+                  type: string
+                version:
+                  $ref: '#/components/schemas/version'
+              type: object
+            type: array
+      description: OK - with error message
+    200_manifest:
+      description: Tab delimited text file.
+      content:
+        text/plain; charset=utf-8:
+          schema:
+            $ref: '#/components/schemas/manifest'
+    200_mapping:
+      content:
+        application/json:
+          schema:
+            description: information about fields and field groups available at the
+              endpoint
+            properties:
+              _mapping:
+                description: All available fields and their descriptions. The endpoint-agnostic
+                  field names provided here are compatible with the filters parameter
+                  but are not always compatible with the fields parameter
+                type: object
+              defaults:
+                description: The default set of fields included in the API response
+                  when the fields parameter is not used in the request
+                items:
+                  type: string
+                type: array
+              expand:
+                description: Field group names for use with the expand parameter
+                items:
+                  type: string
+                type: array
+              fields:
+                description: All available fields in an endpoint-specific format that
+                  is compatible with both the filters and fields parameters
+                items:
+                  type: string
+                type: array
+              multi:
+                description: GDC internal use
+                items:
+                  type: string
+                type: array
+              nested:
+                description: Nested fields
+                items:
+                  type: string
+                type: array
+            type: object
+      description: OK
+    200_project:
+      content:
+        application/json:
+          schema:
+            description: The metadata of a single file
+            properties:
+              data:
+                $ref: '#/components/schemas/project_metadata'
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    200_projects:
+      content:
+        application/json:
+          schema:
+            description: projects contained in the GDC
+            properties:
+              data:
+                properties:
+                  hits:
+                    items:
+                      $ref: '#/components/schemas/project_metadata_for_hits'
+                    type: array
+                  pagination:
+                    $ref: '#/components/schemas/paginations'
+                type: object
+              warnings:
+                $ref: '#/components/schemas/warnings'
+            type: object
+      description: ok
+    400_bad_request:
+      content:
+        application/json:
+          schema:
+            description: The submitted request was not correctly defined.
+            properties:
+              message:
+                type: string
+            type: object
+      description: Bad request
+    403_forbidden:
+      description: FORBIDDEN. Controlled access data requires an authenticated user
+        token with access to the controlled data to be included in the header information.
+    404_not_found:
+      description: NOT FOUND. The requested data could not be located.
+    404_not_found_with_message:
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                example: 1dd28069-5777-4ff9-0000-d1ba68e88b06 not found
+                type: string
+            type: object
+      description: NOT FOUND. An entity for the provided ID could not be found.
+  schemas:
+    annotation_metadata:
+      properties:
+        annotation_id:
+          example: 1c9a57d0-d4bf-5ecc-bb2a-1df936e85951
+          type: string
+        case_id:
+          example: dc7ec60b-5ea5-48a4-8908-55caf9214272
+          type: string
+        case_submitter_id:
+          example: TCGA-R8-A73M
+          type: string
+        category:
+          example: History of unacceptable prior treatment related to a prior/other
+            malignancy
+          type: string
+        classification:
+          example: Notification
+          type: string
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        entity_id:
+          example: dc7ec60b-5ea5-48a4-8908-55caf9214272
+          type: string
+        entity_submitter_id:
+          example: TCGA-R8-A73M
+          type: string
+        entity_type:
+          example: case
+          type: string
+        id:
+          example: 1c9a57d0-d4bf-5ecc-bb2a-1df936e85951
+          type: string
+        notes:
+          example: unknown treatment history
+          type: string
+        state:
+          example: released
+          type: string
+        status:
+          example: Approved
+          type: string
+        submitter_id:
+          example: '20733'
+          type: string
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+      type: object
+    annotation_metadata_for_hits:
+      properties:
+        annotation_id:
+          example: 1c9a57d0-d4bf-5ecc-bb2a-1df936e85951
+          type: string
+        case_id:
+          example: dc7ec60b-5ea5-48a4-8908-55caf9214272
+          type: string
+        case_submitter_id:
+          example: TCGA-R8-A73M
+          type: string
+        category:
+          example: History of unacceptable prior treatment related to a prior/other
+            malignancy
+          type: string
+        classification:
+          example: Notification
+          type: string
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        entity_id:
+          example: dc7ec60b-5ea5-48a4-8908-55caf9214272
+          type: string
+        entity_submitter_id:
+          example: TCGA-R8-A73M
+          type: string
+        entity_type:
+          example: case
+          type: string
+        id:
+          $ref: '#/components/schemas/uuid'
+        notes:
+          example: unknown treatment history
+          type: string
+        state:
+          example: released
+          type: string
+        status:
+          example: Approved
+          type: string
+        submitter_id:
+          example: '20733'
+          type: string
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+      type: object
+    case_metadata:
+      properties:
+        aliquot_ids:
+          items:
+            type: string
+          type: array
+        analyte_ids:
+          items:
+            type: string
+          type: array
+        case_id:
+          example: c739fd61-22b2-412d-bcf3-89bda45a2c0f
+          type: string
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        diagnosis_ids:
+          items:
+            type: string
+          type: array
+        disease_type:
+          example: Mesothelial Neoplasms
+          type: string
+        portion_ids:
+          items:
+            type: string
+          type: array
+        primary_site:
+          example: Bronchus and lung
+          type: string
+        sample_ids:
+          items:
+            type: string
+          type: array
+        slide_ids:
+          items:
+            type: string
+          type: array
+        state:
+          example: released
+          type: string
+        submitter_aliquot_ids:
+          items:
+            type: string
+          type: array
+        submitter_analyte_ids:
+          items:
+            type: string
+          type: array
+        submitter_diagnosis_ids:
+          items:
+            type: string
+          type: array
+        submitter_id:
+          example: TCGA-3H-AB3X
+          type: string
+        submitter_portion_ids:
+          items:
+            type: string
+          type: array
+        submitter_sample_ids:
+          items:
+            type: string
+          type: array
+        submitter_slide_ids:
+          items:
+            type: string
+          type: array
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+      type: object
+    case_metadata_for_hits:
+      properties:
+        aliquot_ids:
+          items:
+            type: string
+          type: array
+        analyte_ids:
+          items:
+            type: string
+          type: array
+        case_id:
+          example: c739fd61-22b2-412d-bcf3-89bda45a2c0f
+          type: string
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        diagnosis_ids:
+          items:
+            type: string
+          type: array
+        disease_type:
+          example: Mesothelial Neoplasms
+          type: string
+        id:
+          $ref: '#/components/schemas/uuid'
+        portion_ids:
+          items:
+            type: string
+          type: array
+        primary_site:
+          example: Bronchus and lung
+          type: string
+        sample_ids:
+          items:
+            type: string
+          type: array
+        slide_ids:
+          items:
+            type: string
+          type: array
+        state:
+          example: released
+          type: string
+        submitter_aliquot_ids:
+          items:
+            type: string
+          type: array
+        submitter_analyte_ids:
+          items:
+            type: string
+          type: array
+        submitter_diagnosis_ids:
+          items:
+            type: string
+          type: array
+        submitter_id:
+          example: TCGA-3H-AB3X
+          type: string
+        submitter_portion_ids:
+          items:
+            type: string
+          type: array
+        submitter_sample_ids:
+          items:
+            type: string
+          type: array
+        submitter_slide_ids:
+          items:
+            type: string
+          type: array
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+      type: object
+    count:
+      example: 1
+      type: integer
+    data:
+      properties:
+        hits:
+          $ref: '#/components/schemas/file_metadata_for_hits'
+        paginations:
+          $ref: '#/components/schemas/paginations'
+      type: object
+    datetime:
+      example: '2018-07-20T22:27:55.342974+00:00'
+      format: date-time
+      type: string
+    error:
+      properties:
+        caused_by:
+          properties:
+            reason:
+              type: string
+            type:
+              type: string
+          type: object
+        root_cause:
+          items:
+            properties:
+              reason:
+                type: string
+              type:
+                type: string
+            type: object
+          type: array
+        status:
+          example: 400
+          type: integer
+      type: object
+    expand:
+      default: ''
+      description: The expand parameter provides a means to add additional groups
+        of nested fields in the response. The values for the `expand` parameter can
+        be accessed programmatically at the _mapping endpoint under the `expand` key.
+        The `fields` parameter can be used with `expand` to limit the data returned
+        at the root level but include all the nested data.
+      pattern: '[a-z_:\.](,[a-z_\.])+'
+      type: string
+    facets:
+      default: ''
+      description: The facets parameter adds an `aggregations` key and data for a
+        specified `field` that is available from the `_mapping` endpoint `fields`
+        value. It provides all values that exist for that field, and the number of
+        entities (cases, projects, files, or annotations) for the value. The primary
+        intended use of this parameter is for displaying aggregate information in
+        the GDC Data Portal. It is typically coupled with `size=0` so that only aggregate
+        information is returned.
+      pattern: '[a-z]_\.'
+      type: string
+    fields:
+      default: ''
+      description: This query parameter specifies which fields are to be included
+        in the API response. The fields in the API response will be unordered. The
+        values for the `fields` parameter can be accessed programmatically at the
+        `_mapping` endpoint under the `fields` key. The 'id' field will always be
+        returned.
+      pattern: '[a-z_\.](,[a-z_\.])+'
+      type: string
+    file_metadata:
+      properties:
+        access:
+          example: open
+          type: string
+        acl:
+          items:
+            $ref: '#/components/schemas/phs_id'
+          type: array
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        data_category:
+          example: Simple Nucleotide Variation
+          type: string
+        data_format:
+          example: VCF
+          type: string
+        data_release:
+          example: '13.0'
+          type: string
+        data_type:
+          example: Raw Simple Somatic Mutation
+          type: string
+        experimental_strategy:
+          example: Targeted Sequencing
+          type: string
+        file_id:
+          $ref: '#/components/schemas/uuid'
+        file_name:
+          example: 333193d5-ca9a-4262-81f5-e9f3b44358fe.vcf.gz
+          type: string
+        file_size:
+          example: 866
+          type: integer
+        md5sum:
+          $ref: '#/components/schemas/md5sum'
+        state:
+          example: released
+          type: string
+        submitter-id:
+          example: AD19_SimpleSomaticMutation
+          type: string
+        type:
+          example: simple_somatic_mmutation
+          type: string
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+        version:
+          example: '1'
+          type: string
+      type: object
+    file_metadata_for_hits:
+      properties:
+        access:
+          example: controlled
+          type: string
+        acl:
+          items:
+            $ref: '#/components/schemas/phs_id'
+          type: array
+        created_datetime:
+          $ref: '#/components/schemas/datetime'
+        data_category:
+          example: Simple Nucleotide Variation
+          type: string
+        data_format:
+          example: VCF
+          type: string
+        data_release:
+          example: '13.0'
+          type: string
+        data_type:
+          example: Raw Simple Somatic Mutation
+          type: string
+        experimental_strategy:
+          example: Targeted Sequencing
+          type: string
+        file_id:
+          $ref: '#/components/schemas/uuid'
+        file_name:
+          example: 333193d5-ca9a-4262-81f5-e9f3b44358fe.vcf.gz
+          type: string
+        file_size:
+          example: 866
+          type: integer
+        id:
+          $ref: '#/components/schemas/uuid'
+        md5sum:
+          $ref: '#/components/schemas/md5sum'
+        state:
+          example: released
+          type: string
+        submitter-id:
+          example: AD19_SimpleSomaticMutation
+          type: string
+        type:
+          example: simple_somatic_mmutation
+          type: string
+        updated_datetime:
+          $ref: '#/components/schemas/datetime'
+        version:
+          example: '1'
+          type: string
+      type: object
+    file_version:
+      type: object
+      properties:
+        filename:
+          $ref: '#/components/schemas/filename'
+        id:
+          $ref: '#/components/schemas/uuid'
+        latest_filename:
+          $ref: '#/components/schemas/filename'
+        latest_id:
+          $ref: '#/components/schemas/uuid'
+        latest_md5:
+          example: c2f9b196e154906a70c7ec46492a859d
+          type: string
+        latest_release:
+          items:
+            $ref: '#/components/schemas/version'
+          type: array
+        latest_size:
+          example: 332092
+          type: integer
+        latest_state:
+          example: validated
+          type: string
+        latest_version:
+          $ref: '#/components/schemas/version'
+        md5:
+          $ref: '#/components/schemas/md5sum'
+        release:
+          $ref: '#/components/schemas/version'
+        size:
+          example: 332092
+          type: integer
+        state:
+          example: validated
+          type: string
+        version:
+          $ref: '#/components/schemas/version'
+    file_version_error:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid'
+        error:
+          example: No released file found
+          type: string
+    file_versions:
+      type: array
+      items:
+        anyOf:
+          - $ref: '#/components/schemas/file_version'
+          - $ref: '#/components/schemas/file_version_error'
+    filename:
+      example: 1dd28069-5777-4ff9-bd2b-d1ba68e88b06.vcf.gz
+      type: string
+    filter_content:
+      properties:
+        field:
+          description: 'Specifies a field that corresponds to a property defined in
+            the GDC Data Dictionary, a list of fields here: https://docs.gdc.cancer.gov/API/Users_Guide/Appendix_A_Available_Fields/'
+          example: cases.submitter_id
+          type: string
+        value:
+          items:
+            description: Values of fields to be compared to
+            example: TCGA-CK-4948
+            type: string
+          type: array
+      type: object
+    filters:
+      default:
+      description: Filters
+      properties:
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/filter_content'
+            - items:
+                $ref: '#/components/schemas/filters'
+              type: array
+        op:
+          $ref: '#/components/schemas/operator'
+      type: object
+    format:
+      default: JSON
+      description: |
+        Specifies the API response format:
+        * JSON - `Content-Type: application/json`
+        * XML - `Content-Type: text/xml`
+        * TSV - `Content-Type: text/tab-separated-values`
+          > Note: TSV Nested elements will be 'flattened' as a unique header to be included in the TSV.
+            This can result in many headers which may exceed the limits of some TSV processing tools. When
+            requesting nested elements, it is recommended to use JSON or XML output formats.
+      enum:
+        - JSON
+        - XML
+        - TSV
+      type: string
+    from:
+      description: |
+        Specifies the first record to return from the `total` set of search results.
+        Refer to the `pagination` element of a JSON or XML format response.
+      type: integer
+    gzip:
+      description: A compressed file format that may contain one or many files
+      format: binary
+    mapping:
+      properties:
+        description:
+          type: string
+      type: object
+    md5sum:
+      example: c2f9b196e154906a70c7ec46492a859d
+      type: string
+    operator:
+      enum:
+        - '='
+        - '!='
+        - <
+        - <=
+        - '>'
+        - '>='
+        - is
+        - not
+        - in
+        - exclude
+        - and
+        - or
+      type: string
+    manifest:
+      description: Tab delimited text file
+      type: string
+      example: |
+        id      filename        md5     size    state
+        083ad931-bc73-4d02-8d78-4b82f06f3c44    FM-AD_Clinical.Vulva.tsv        ab9212ec2f412ca0aab176ef32e2e4fc        3779    validated
+        0929c21d-9f81-4483-b75b-7b9f79eaab3e    YOWIE_p_TCGA_b71and106_N_GenomeWideSNP_6_F10_764074.grch38.seg.v2.txt   55cdd11b65f1f67bb3f5358606c71fda        34429   validated
+    page:
+      description: ''
+      example: 1
+      type: integer
+    pages:
+      example: 178101
+      type: integer
+    paginations:
+      properties:
+        count:
+          $ref: '#/components/schemas/count'
+        from:
+          $ref: '#/components/schemas/from'
+        page:
+          $ref: '#/components/schemas/page'
+        pages:
+          $ref: '#/components/schemas/pages'
+        size:
+          $ref: '#/components/schemas/size'
+        sort:
+          $ref: '#/components/schemas/sort'
+        total:
+          $ref: '#/components/schemas/total'
+      type: object
+    phs_id:
+      example: phs001179
+      type: string
+    pretty:
+      default: 'false'
+      description: Returns response with indentations and line breaks in a human-readable
+        format
+      enum:
+        - 'false'
+        - 'true'
+      type: string
+    project_metadata:
+      properties:
+        dbgap_accession_number:
+          example:
+          type: string
+        disease_type:
+          example:
+            - Cystic, Mucinous and Serous Neoplasms
+            - Ductal and Lobular Neoplasms
+            - Adenomas and Adenocarcinomas
+          items:
+            type: string
+          type: array
+        name:
+          example: Uterine Corpus Endometrial Carcinoma
+          type: string
+        primary_site:
+          example:
+            - Prostate gland
+          items:
+            type: string
+          type: array
+        project_id:
+          example: TCGA-PRAD
+          type: string
+        releasable:
+          example: true
+          type: boolean
+        released:
+          example: true
+          type: boolean
+        state:
+          example: open
+          type: string
+      type: object
+    project_metadata_for_hits:
+      properties:
+        dbgap_accession_number:
+          example:
+          type: string
+        disease_type:
+          example:
+            - Cystic, Mucinous and Serous Neoplasms
+            - Ductal and Lobular Neoplasms
+            - Adenomas and Adenocarcinomas
+          items:
+            type: string
+          type: array
+        id:
+          $ref: '#/components/schemas/uuid'
+        name:
+          example: Uterine Corpus Endometrial Carcinoma
+          type: string
+        primary_site:
+          example:
+            - Prostate gland
+          items:
+            type: string
+          type: array
+        project_id:
+          example: TCGA-PRAD
+          type: string
+        releasable:
+          example: true
+          type: boolean
+        released:
+          example: true
+          type: boolean
+        state:
+          example: open
+          type: string
+      type: object
+    request_parameters:
+      properties:
+        expand:
+          $ref: '#/components/schemas/expand'
+        facets:
+          $ref: '#/components/schemas/facets'
+        fields:
+          $ref: '#/components/schemas/fields'
+        filters:
+          $ref: '#/components/schemas/filters'
+        format:
+          $ref: '#/components/schemas/format'
+        from:
+          $ref: '#/components/schemas/from'
+        pretty:
+          $ref: '#/components/schemas/pretty'
+        size:
+          $ref: '#/components/schemas/size'
+        sort:
+          $ref: '#/components/schemas/sort'
+      type: object
+    search_and_retrieval:
+      properties:
+        expand:
+          $ref: '#/components/schemas/expand'
+        facets:
+          $ref: '#/components/schemas/facets'
+        fields:
+          $ref: '#/components/schemas/fields'
+        filters:
+          $ref: '#/components/schemas/filters'
+        format:
+          $ref: '#/components/schemas/format'
+        from:
+          $ref: '#/components/schemas/from'
+        pretty:
+          $ref: '#/components/schemas/pretty'
+        size:
+          $ref: '#/components/schemas/size'
+        sort:
+          $ref: '#/components/schemas/sort'
+      type: object
+    search_and_retrieval_form:
+      properties:
+        expand:
+          $ref: '#/components/schemas/expand'
+        facets:
+          $ref: '#/components/schemas/facets'
+        fields:
+          $ref: '#/components/schemas/fields'
+        filters:
+          $ref: '#/components/schemas/filters'
+        format:
+          $ref: '#/components/schemas/format'
+        from:
+          $ref: '#/components/schemas/from'
+        pretty:
+          $ref: '#/components/schemas/pretty'
+        size:
+          $ref: '#/components/schemas/size'
+        sort:
+          $ref: '#/components/schemas/sort'
+      type: object
+    search_and_retrieval_tsv:
+      description: |
+        **TSV File Format** uses the same key and values as the `application/x-www-form-urlencoded` format. The headers and values are separated by tabs.
+        ```
+        expand  facets  fields  filters format  from  pretty  size  sort
+        ""  ""  ""  null  JSON  0 false 1 ""
+        ```
+      type: string
+      format: binary
+    search_by_id:
+      properties:
+        expand:
+          $ref: '#/components/schemas/expand'
+        fields:
+          $ref: '#/components/schemas/fields'
+        format:
+          $ref: '#/components/schemas/format'
+        pretty:
+          $ref: '#/components/schemas/pretty'
+      type: object
+    size:
+      description: The number of results
+      example: 1
+      type: integer
+    sort:
+      default: ''
+      description: The sort query parameter sorts the results by a specific field,
+        and with the sort direction specified using the :asc (ascending) or  :desc
+        (descending) prefix, e.g. sort=field:desc. A list of all valid field names
+        is available in Appendix A; the list can also be accessed  programmatically
+        at the _mapping endpoint.
+      type: string
+    total:
+      example: 345381
+      type: integer
+    unspecified_binary_data:
+      description: A single file of unspecified type
+      format: binary
+    uuid:
+      example: 333193d5-ca9a-4262-81f5-e9f3b44358fe
+      format: uuid
+      type: string
+    uuids:
+      items:
+        $ref: '#/components/schemas/uuid'
+      type: array
+    version:
+      example: '1.0'
+      type: string
+    warnings:
+      type: object
+paths:
+  /annotatations/_mapping:
+    get:
+      summary: Provides information about available fields for use in searching.
+      description: 'Each search and retrieval endpoint is equipped with a _mapping
+        endpoint that provides information about available fields. For example, files/_mapping
+        endpoint provides information about fields and field groups available at the
+        files endpoint: https://api.gdc.cancer.gov/files/_mapping.'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_mapping'
+      tags:
+        - annotations
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /annotatations:
+    get:
+      summary: Search for annotations
+      description: The GDC annotatations endpoint enables search and retrieval of
+        information relating to annotatations stored in the GDC, including properties
+        such as classification, entity_submitter_id, submitter_id, and annotation_id.
+      parameters:
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/facets'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_annotations'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - annotations
+    post:
+      summary: Search for annotations
+      description: The GDC annotatations endpoint enables search and retrieval of
+        information relating to annotatations stored in the GDC, including properties
+        such as classification entity_submitter_id submitter_id, and annotation_id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_annotations'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - annotations
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /annotations/{annotation_id}:
+    get:
+      summary: Retrieve a single annotation
+      description: The /annotations endpoint supports a simple query format that retrieves
+        the metadata of a single annotation using its UUID.
+      parameters:
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_annotation'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - annotations
+    parameters:
+      - in: path
+        name: annotation_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/uuid'
+    post:
+      summary: Retrieve a single annotation
+      description: The /annotations endpoint supports a simple query format that retrieves
+        the metadata of a single annotation using its UUID.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_by_id'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_annotation'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - annotations
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /cases/_mapping:
+    get:
+
+      summary: Provides information about available fields for use in searching.
+      description: 'Each search and retrieval endpoint is equipped with a _mapping
+        endpoint that provides information about available fields. For example, cases/_mapping
+        endpoint provides information about fields and field groups available at the
+        cases endpoint: https://api.gdc.cancer.gov/cases/_mapping.'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_mapping'
+      tags:
+        - cases
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /cases:
+    get:
+      summary: Search for cases
+      description: The GDC cases endpoint enables search and retrieval of information
+        relating to cases stored in the GDC, including properties such as aliquot_ids,
+        submitter_aliquot_ids, primary_siteand submitter_portion_ids.
+      parameters:
+        - $ref: '#/components/parameters/filters_for_cases'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/facets'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_cases'
+        '400':
+          description: Client Error
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - cases
+    post:
+      summary: Search for cases
+      description: |
+        The GDC cases endpoint enables search and retrieval of information
+        relating to cases stored in the GDC, including properties such as aliquot_ids
+        submitter_aliquot_ids primary_site and submitter_portion_ids.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval_form'
+          text/tsv:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval_tsv'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_cases'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - cases
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /cases/{case_id}:
+    get:
+      summary: Retrieve a single case
+      description: The /cases endpoint supports a simple query format that retrieves
+        the metadata of a single case using its UUID.
+      parameters:
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_case'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - cases
+    parameters:
+      - in: path
+        name: case_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/uuid'
+    post:
+      summary: Retrieve a single case
+      description: The GDC cases endpoint enables search and retrieval of information
+        relating to cases stored in the GDC.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_by_id'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_case'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - cases
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /data/{file_ids}:
+    get:
+      description: To download a file, users can pass UUID(s) to the data endpoint.
+        If a single UUID is provided, the API will return the associated file. If
+        a comma-separated list of UUIDs is provided, the API will return an archive
+        file containing the requested files.
+      parameters:
+        - in: path
+          name: file_ids
+          description: A comma separated list of file_ids.
+          required: true
+          schema:
+            items:
+              $ref: '#/components/schemas/uuid'
+            type: array
+        - in: query
+          name: related_files
+          required: false
+          description: |
+            If the related_files=true parameter is specified, the following related files, if available, will be included in the download package by the GDC API:
+            * BAM index files (BAI files)
+            * Metadata files (such as SRA XML or MAGE-TAB files)
+          schema:
+            default: false
+            type: boolean
+        - in: query
+          name: tarfile
+          required: false
+          description: |
+            Download the specified files and the contents will be bundled
+            in a single tar file uncompressed rather than a tar.gz file which is the
+            default behavior.
+          schema:
+            type: string
+            example: tarfile
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/gzip'
+                  - $ref: '#/components/schemas/unspecified_binary_data'
+          description: OK. The returned data will be gzip if multiple file_ids were
+            specified or the file_type associated with file_id from the /files endpoint.
+        '403':
+          $ref: '#/components/responses/403_forbidden'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      tags:
+        - download
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /files/_mapping:
+    get:
+      summary: List searchable metadata names and types
+      description: 'Each search and retrieval endpoint is equipped with a _mapping
+        endpoint that provides information about available fields. For example, files/_mapping
+        endpoint provides information about fields and field groups available at the
+        files endpoint: https://api.gdc.cancer.gov/files/_mapping.'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_mapping'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+
+  /files:
+    get:
+      summary: Search file metadata
+      description: The GDC files endpoint enables search and retrieval of information
+        relating to files stored in the GDC, including properties such as access,
+        acl, created_datetime and data_format.
+      parameters:
+        - $ref: '#/components/parameters/filters_for_files'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/facets'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - files
+    post:
+      summary: Search file metadata
+      description: |
+        The GDC files endpoint enables search and retrieval of information
+        relating to files stored in the GDC, including properties such as access acl
+        created_datetime and data_format. The `GET` and `POST /files` endpoints provide different methods
+        to retrieve the same results. Refer to the `GET /files` endpoint for details on the fields for the POST data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /files/{file_id}:
+    get:
+      summary: Retrieve a single file's metadata
+      description: The /files endpoint supports a simple query format that retrieves
+        the metadata of a single file using its UUID. Note that the /files endpoint
+        is inactive when querying for earlier file versions. In that case, the /history
+        or /files/versions endpoints should be used instead.
+      parameters:
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_file'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - files
+    parameters:
+      - example: f5b0d36c-5cf7-404f-8593-94fcfd05d900
+        in: path
+        name: file_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/uuid'
+    post:
+      summary: Retrieve a single file's metadata
+      description: The /files endpoint supports a simple query format that retrieves
+        the metadata of a single file using its UUID. Note that the /files endpoint
+        is inactive when querying for earlier file versions. In that case, the /history
+        or /files/versions endpoints should be used instead.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_by_id'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_file'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /files/ids:
+    get:
+      summary: Retrieve metadata by file_id, file_name, or submitter_id
+      description: |
+        This convience method retrieves metadata by exact file_id, file_name, or submitter_id.
+        It is meant to be used on a return visit to this API.
+      parameters:
+        - example: 9c5b9758-5dda-43f9-b458-064cf322f081
+          in: query
+          name: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /files/versions/{file_ids}:
+    get:
+      summary: Retrieve latest version information for the provided file_ids.
+      description: |
+        Discover if there are new versions of files for your existing file_ids.
+        Enables retrieval of version information about a file.
+
+        A file may be versioned if a file is updated by the GDC (e.g. using  a new
+        alignment algorithm or fixing a file that contained an error). Version refers
+        to the instance of a particular file. Inputs can  either be a list of UUIDs
+        as shown in example 1 or a download manifest as shown in example 2. Output
+        includes information about the  current and latest version for any given
+        file. While /files also returns information about a file version this endpoint
+        will only work  for the most recent version of a file whereas /files/versions
+        will work for all previous and current versions of a file.
+      parameters:
+        - $ref: '#/components/parameters/file_ids'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files_versions'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+
+  /files/versions:
+    post:
+      summary: Retrieve latest version information for the provided file_ids.
+      description: |
+        Discover if there are new versions of files for your existing file_ids.
+        Enables retrieval of version information about a file.
+
+        A file may be versioned if a file is updated by the GDC (e.g. using  a new
+        alignment algorithm or fixing a file that contained an error). Version refers
+        to the instance of a particular file. Inputs can  either be a list of UUIDs
+        as shown in example 1 or a download manifest as shown in example 2. Output
+        includes information about the  current and latest version for any given
+        file. While /files also returns information about a file version this endpoint
+        will only work  for the most recent version of a file whereas /files/versions
+        will work for all previous and current versions of a file.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                ids:
+                  $ref: '#/components/schemas/uuids'
+              type: object
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files_versions'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /files/versions/manifest:
+    post:
+      summary: Retrieve latest version information for the files_ids in manifest format.
+      description: Reads file ids from manifest file passed by user as a stream and
+        return version info in standard format
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                properties:
+                  filename:
+                    $ref: '#/components/schemas/filename'
+                  id:
+                    $ref: '#/components/schemas/uuid'
+                  md5:
+                    $ref: '#/components/schemas/md5sum'
+                type: object
+              type: array
+          text/tsv:
+            schema:
+              $ref: '#/components/schemas/manifest'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_files_versions'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /history/{file_id}:
+    get:
+      summary: Version and release information about a file.
+      description: The GDC History Endpoint `https://api.gdc.cancer.gov/history` enables
+        search and retrieval of version and release information about a file. This
+        endpoint will return the entire provenance of all versions of a file. A file
+        may be versioned if a file is updated by the GDC (e.g. using a new alignment
+        algorithm or fixing a file that contained an error). Version refers to the
+        instance of a particular file. Release refers to which data release a file
+        was part of. A file may be a part of many different data releases with no
+        change in version number or content.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    data_release:
+                      example: '12.0'
+                      type: string
+                    file_change:
+                      example: released
+                      type: string
+                    release_date:
+                      $ref: '#/components/schemas/datetime'
+                    uuid:
+                      $ref: '#/components/schemas/uuid'
+                    version:
+                      example: '1'
+                      type: string
+                  type: object
+                type: array
+          description: OK
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - files
+    parameters:
+      - example: 1dd28069-5777-4ff9-bd2b-d1ba68e88b06
+        in: path
+        name: file_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/uuid'
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /manifest/{file_ids}:
+    get:
+      summary: Download manifest of file information for the provided file_ids
+      description: |
+        The [GDC manifest](https://docs.gdc.cancer.gov/Encyclopedia/pages/Manifest_File/)
+        endpoint allows users to create and download a manifest. This manifest can be used with:
+        * The GDC Data Transfer Tool to download a large volume of data.
+        * The /files/versions/manifest endpoint to get updated version information
+      parameters:
+        - in: path
+          description: The manifest endpoint generates a manifest file from a comma-separated
+            list of UUIDs.
+          name: file_ids
+          required: true
+          schema:
+            items:
+              $ref: '#/components/schemas/uuid'
+            type: array
+      responses:
+        '200':
+          $ref: '#/components/responses/200_manifest'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - files
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /projects/_mapping:
+    get:
+      summary: Provides information about available fields for use in searching.
+      description: 'Each search and retrieval endpoint is equipped with a _mapping
+        endpoint that provides information about available fields. For example, files/_mapping
+        endpoint provides information about fields and field groups available at the
+        files endpoint: https://api.gdc.cancer.gov/files/_mapping.'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_mapping'
+      tags:
+        - projects
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+
+  /projects:
+    get:
+      description: The GDC projects endpoint enables search and retrieval of information
+        relating to projects stored in the GDC, including properties such as dbgap_accession_number,
+        disease_type, nameand project_id.
+      parameters:
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/facets'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_projects'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - projects
+    post:
+      description: The GDC projects endpoint enables search and retrieval of information
+        relating to projects stored in the GDC, including properties such as dbgap_accession_number
+        disease_type nameand project_id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_projects'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - projects
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+  /projects/{project_id}:
+    get:
+      description: TODO
+      parameters:
+        - $ref: '#/components/parameters/filters'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/expand'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/facets'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_project'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - projects
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/uuid'
+    post:
+      description: The /files endpoint supports a simple query format that retrieves
+        the metadata of a single file using its UUID. Note that the /files endpoint
+        is inactive when querying for earlier file versions. In that case, the /history
+        or /files/versions endpoints should be used instead.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/search_and_retrieval'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200_project'
+        '404':
+          $ref: '#/components/responses/404_not_found_with_message'
+      tags:
+        - projects
+    servers:
+      - description: Permanent link to this version of the API endpoint.
+        url: /v0
+      - description: Link to the current version of this API endpoint.
+        url: /
+security:
+  - auth-token: []
+tags:
+  - name: annotations
+    description: |
+      [Annotations](https://docs.gdc.cancer.gov/Encyclopedia/pages/Annotations/) are
+      additional information about an entity. They contain important information about
+      files, cases, or metadata nodes that may be of use to data downloaders when
+      analyzing GDC data.
+  - name: cases
+    description: |
+      [A case](https://docs.gdc.cancer.gov/Encyclopedia/pages/Case/) is the collection of all data related to a specific patient in the context of a specific project.
+  - name: download
+    description: Th,e [data endpoint](https://docs.gdc.cancer.gov/API/Users_Guide/Downloading_Files/)
+      allows for downloading of file contents. Use the files endpoint to search for
+      files that you wish to download.
+  - name: files
+    description: |
+      The files endpoint enables search and retrieval of information relating to files stored in the GDC, including file properties such as file_name, md5sum, data_format, and others.
+      These endpoints are about finding files. If you need the file content, then download the files using the `/data` endpoints.
+      > Note: The `file_size` field associated with each file is reported in bytes.
+  - name: projects
+    description: |
+      The projects endpoint provides access to project records, the highest level of data organization in the GDC.
