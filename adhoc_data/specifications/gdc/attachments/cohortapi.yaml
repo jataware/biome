@@ -1,0 +1,562 @@
+---
+openapi: 3.0.3
+info:
+  title: CohortAPI
+  version: v0
+  description: Web services for creating, reading, updating and deleting cohorts.
+servers:
+  - url: https://api.gdc.cancer.gov/v0
+paths:
+  /cohorts/{cohort-id}:
+    get:
+      summary: Get Cohort
+      operationId: get-cohort
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cohort'
+              examples:
+                Cohort Example:
+                  $ref: '#/components/examples/Cohort-Example'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      description: Retrieve a cohort.
+      tags:
+        - Cohort
+    parameters:
+      - $ref: '#/components/parameters/cohort-id'
+    put:
+      summary: Update Cohort
+      operationId: put-cohorts-cohort-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cohort'
+              examples:
+                Example Cohort:
+                  $ref: '#/components/examples/Cohort-Example-Updated'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+        '401':
+          $ref: '#/components/responses/401_not_authorized'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      description: Update an existing cohort.
+      parameters:
+        - $ref: '#/components/parameters/gdc_context_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Cohort Example 1
+                  description: The cohort name.
+                filters:
+                  type: object
+                  description: The query filters defining the set of cases in a cohort.
+                type:
+                  type: string
+                  description: The cohort type.
+                  enum:
+                    - static
+                    - dynamic
+                  default: static
+                  example: static
+              required:
+                - name
+                - filters
+                - type
+            examples:
+              Update Cohort:
+                value:
+                  name: Cohort Update Example Trachea
+                  filters:
+                    op: '='
+                    content:
+                      field: cases.primary_site
+                      value: trachea
+                  type: static
+      tags:
+        - Cohort
+    delete:
+      summary: Delete Cohort
+      operationId: delete-cohorts-cohort-id
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/401_not_authorized'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      description: Delete an existing cohort.
+      parameters:
+        - $ref: '#/components/parameters/gdc_context_id'
+      tags:
+        - Cohort
+  /cohorts:
+    get:
+      summary: Get Cohorts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cohort'
+              examples:
+                Cohorts Example:
+                  $ref: '#/components/examples/Cohorts-Example'
+                Cohorts With Case IDs Example:
+                  $ref: '#/components/examples/Cohorts-With-Case-IDs-Example'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+        '401':
+          $ref: '#/components/responses/401_not_authorized'
+      operationId: get-cohorts
+      description: Retrieve a list of cohorts.
+      parameters:
+        - $ref: '#/components/parameters/include_case_ids'
+        - $ref: '#/components/parameters/gdc_context_id'
+      tags:
+        - Cohorts
+    post:
+      summary: Create Cohort
+      operationId: post-cohorts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cohort'
+              examples:
+                Example Cohort:
+                  $ref: '#/components/examples/Cohort-Example'
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      description: Create a new cohort.
+      parameters:
+        - in: cookie
+          name: gdc_context_id
+          schema:
+            type: string
+            format: uuid
+            nullable: true
+          description: The context ID associated with the target cohort(s). If one
+            is not provided, a new context will be created and the gdc_context_id
+            will be returned in a cookie.
+        - $ref: '#/components/parameters/delete_existing'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Cohort Example 1
+                  description: The cohort name.
+                filters:
+                  type: object
+                  description: The query filters defining the set of cases in a cohort.
+                type:
+                  type: string
+                  description: The cohort type.
+                  default: static
+                  enum:
+                    - static
+                    - dynamic
+                  example: static
+              required:
+                - name
+                - filters
+            examples:
+              Create Cohort Default Type:
+                value:
+                  name: Cohort Example Trachea
+                  filters:
+                    op: '='
+                    content:
+                      field: cases.primary_site
+                      value: trachea
+              Create Cohort Specifying Type:
+                value:
+                  name: Cohort Example Trachea
+                  filters:
+                    op: '='
+                    content:
+                      field: cases.primary_site
+                      value: trachea
+                  type: dynamic
+      tags:
+        - Cohorts
+  /cohorts/{cohort-id}/refresh-snapshot:
+    parameters:
+      - $ref: '#/components/parameters/cohort-id'
+    post:
+      summary: Refresh Cohort
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cohort'
+              examples:
+                Refresh Example:
+                  value:
+                    id: 6a46a89b-66f5-4082-84b9-839abb71eb68
+                    name: Cohort Refresh Example Trachea
+                    filters:
+                      op: '='
+                      content:
+                        field: cases.primary_site
+                        value: trachea
+                    case_ids:
+                      - 9edef09e-abc5-4b4c-9fc0-f2da7acd7d23
+                      - 28696dd9-4021-4cf8-afe8-537c129dd1c9
+                    data_release:
+                      id: 49f14b16-2775-4c27-8089-bfd58660e865
+                    created_datetime: 2022-11-04T21:38:53Z
+                    modified_datetime: 2022-11-04T21:40:19Z
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+        '401':
+          $ref: '#/components/responses/401_not_authorized'
+        '404':
+          $ref: '#/components/responses/404_not_found'
+      operationId: refresh-cohort
+      description: Refresh the set of cases in a cohort.
+      parameters:
+        - $ref: '#/components/parameters/gdc_context_id'
+      tags:
+        - Cohort Actions
+  /cohorts/context/download:
+    get:
+      summary: Download Context Key
+      operationId: download-context-key
+      description: Download key file containing GDC context id.
+      responses:
+        '200':
+          description: OK
+          content:
+            plain/text:
+              schema:
+                type: string
+                format: binary
+              examples:
+                File Download Example:
+                  value: 521d33f3-7a2a-4bd0-8cf4-477391f8513e
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      parameters:
+        - $ref: '#/components/parameters/gdc_context_id'
+      tags:
+        - Context
+  /cohorts/context/upload:
+    post:
+      summary: Upload Context Key
+      operationId: upload-context-key
+      description: Upload key file containing GDC context id to generate context cookie.
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+              examples:
+                File Upload Example:
+                  value:
+                    message: Your cohort cookie has been set.
+        '400':
+          $ref: '#/components/responses/400_bad_request'
+      tags:
+        - Context
+components:
+  schemas:
+    Cohort:
+      title: Cohort
+      type: object
+      description: Cohort Model
+      properties:
+        id:
+          type: string
+          example: 6a46a89b-66f5-4082-84b9-839abb71eb68
+          format: uuid
+          description: The cohort ID.
+        name:
+          type: string
+          example: Cohort Example 1
+          description: The cohort name.
+        filters:
+          type: object
+          description: The query filters defining the set of cases in a cohort.
+        type:
+          type: string
+          description: The cohort type.
+          default: static
+          enum:
+            - static
+            - dynamic
+          example: static
+        case_ids:
+          type: array
+          description: The set of case IDs defined for the cohort.
+          items:
+            type: string
+            format: uuid
+        data_release:
+          description: The data release associated with a cohort.
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 49f14b16-2775-4c27-8089-bfd58660e865
+              description: The data release node ID.
+        created_datetime:
+          type: string
+          format: date-time
+          example: 2022-11-04T21:38:53Z
+          description: The date the cohort was created.
+        modified_datetime:
+          type: string
+          format: date-time
+          example: 2022-11-04T21:38:53Z
+          description: The date the cohort was last modified.
+      required:
+        - id
+        - name
+        - filters
+  parameters:
+    cohort-id:
+      name: cohort-id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: ID of target cohort.
+    delete_existing:
+      name: delete_existing
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: When true, any cohorts in the associated gdc context that exist with
+        a matching cohort name will be deleted before creating/updating the cohort. By
+        default, if the cohort name matches an existing cohort (case-insensitive), an
+        error is returned indicating the cohort name is not unique.
+    include_case_ids:
+      name: include_case_ids
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: When true, include the case_ids property from the response.
+    gdc_context_id:
+      name: gdc_context_id
+      in: cookie
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The context ID associated with the target cohort(s).
+  responses:
+    400_bad_request:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The request includes missing or invalid parameters
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          examples:
+            Bad Request:
+              value:
+                message: One or more parameters is missing or invalid
+    401_not_authorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The context ID does not match that of the target cohort
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          examples:
+            Context ID Missing:
+              value:
+                message: Context id not provided.
+            Context ID Not Found:
+              value:
+                message: Context id does not exist
+            Context ID Does Not Match:
+              value:
+                message: Context id does not match that of cohort
+    404_not_found:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The requested resource cannot be found
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          examples:
+            Cohort ID Not Found:
+              value:
+                message: Cohort id does not exist
+  requestBodies: {}
+  examples:
+    Cohort-Example:
+      value:
+        id: 6a46a89b-66f5-4082-84b9-839abb71eb68
+        name: Cohort Example Trachea
+        filters:
+          op: '='
+          content:
+            field: cases.primary_site
+            value: trachea
+        type: static
+        case_ids:
+          - 9edef09e-abc5-4b4c-9fc0-f2da7acd7d23
+          - 28696dd9-4021-4cf8-afe8-537c129dd1c9
+        data_release:
+          id: 49f14b16-2775-4c27-8089-bfd58660e865
+        created_datetime: 2022-11-04T21:38:53Z
+        modified_datetime: 2022-11-04T21:38:53Z
+    Cohort-Example-Updated:
+      value:
+        id: 2d36156a-1665-4416-8c9b-6788078a1ee5
+        name: Cohort Update Example Trachea
+        filters:
+          op: '='
+          content:
+            field: cases.primary_site
+            value: trachea
+        type: static
+        case_ids:
+          - 9edef09e-abc5-4b4c-9fc0-f2da7acd7d23
+          - 28696dd9-4021-4cf8-afe8-537c129dd1c9
+        data_release:
+          id: 49f14b16-2775-4c27-8089-bfd58660e865
+        created_datetime: 2022-11-04T21:38:53Z
+        modified_datetime: 2022-11-04T21:40:19Z
+    Cohort-No-Case-IDs-Example:
+      value:
+        id: 6a46a89b-66f5-4082-84b9-839abb71eb68
+        name: Cohort Example Trachea
+        filters:
+          op: '='
+          content:
+            field: cases.primary_site
+            value: trachea
+        type: static
+        data_release:
+          id: 49f14b16-2775-4c27-8089-bfd58660e865
+        created_datetime: 2022-11-04T21:38:53Z
+        modified_datetime: 2022-11-04T21:38:53Z
+    Cohorts-With-Case-IDs-Example:
+      value:
+        - id: 8a5c7b7d-c5a2-406a-9b1c-9bc489fe07db
+          name: Cohort Example Trachea
+          filters:
+            op: '='
+            content:
+              field: cases.primary_site
+              value: trachea
+          type: static
+          case_ids:
+            - 9edef09e-abc5-4b4c-9fc0-f2da7acd7d23
+            - 28696dd9-4021-4cf8-afe8-537c129dd1c9
+          data_release:
+            id: 49f14b16-2775-4c27-8089-bfd58660e865
+          created_datetime: 2022-11-04T21:38:53Z
+          modified_datetime: 2022-11-04T21:38:53Z
+        - id: 7f6b2864-8580-4b2a-b18d-300469c3558e
+          name: Cohort Example Submitter
+          filters:
+            op: '='
+            content:
+              field: submitter_id
+              value: TCGA-BH-A0EA
+          type: static
+          case_ids:
+            - b21e3915-5e7a-4419-b199-935c40130412
+            - e3311a9f-c6de-4aae-b4dd-d64144be2732
+          data_release:
+            id: 49f14b16-2775-4c27-8089-bfd58660e865
+          created_datetime: 2022-11-04T21:38:53Z
+          modified_datetime: 2022-11-04T21:38:53Z
+    Cohorts-Example:
+      value:
+        - id: 8a5c7b7d-c5a2-406a-9b1c-9bc489fe07db
+          name: Cohort Example Trachea
+          filters:
+            op: '='
+            content:
+              field: cases.primary_site
+              value: trachea
+          type: static
+          data_release:
+            id: 49f14b16-2775-4c27-8089-bfd58660e865
+          created_datetime: 2022-11-04T21:38:53Z
+          modified_datetime: 2022-11-04T21:38:53Z
+        - id: 7f6b2864-8580-4b2a-b18d-300469c3558e
+          name: Cohort Example Submitter
+          filters:
+            op: '='
+            content:
+              field: submitter_id
+              value: TCGA-BH-A0EA
+          type: static
+          data_release:
+            id: 49f14b16-2775-4c27-8089-bfd58660e865
+          created_datetime: 2022-11-04T21:38:53Z
+          modified_datetime: 2022-11-04T21:38:53Z
+tags:
+  - name: Cohort
+  - name: Cohorts
+  - name: Context
+  - name: Cohort Actions

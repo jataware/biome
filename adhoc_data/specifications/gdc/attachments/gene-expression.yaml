@@ -1,0 +1,647 @@
+---
+openapi: 3.0.2
+info:
+  title: Gene expression
+  description: New endpoints to support gene expression
+  version: 0.0.2
+servers:
+  - url: https://api.gdc.cancer.gov
+security:
+  - securityRequirement: []
+paths:
+  /gene_expression/availability:
+    post:
+      description: >
+        Retrieve the availability of gene expression data for only case, only genes,
+        or both cases and genes.
+        The availability response informs the user if gene expression data exists
+        for each case or gene.  Gene
+        expression data is only available for protein-coding genes.
+      requestBody:
+        description: Cases or genes or both to retrieve details about.
+        required: true
+        content:
+          application/json:
+            schema:
+              description: >
+                Specify the cases or genes or both to operate on. This allows for
+                specifying cases-only, genes-only,
+                or both cases and genes.
+              allOf:
+                - $ref: "#/components/schemas/CaseCollections"
+                - $ref: "#/components/schemas/GeneCollections"
+            examples:
+              CaseSetIdAndGeneSetId:
+                summary: Both case set id and gene set id
+                description: >
+                  Request gene expression availability for all cases in a case set
+                  and all genes in a gene set.
+                value:
+                  {
+                    case_set_id: "aCaseSetId",
+                    gene_set_id: "aGeneSetId"
+                  }
+              CaseSetIdOnly:
+                summary: Case set id only
+                description: Request gene expression availability for all cases in
+                  a case set.
+                value:
+                  {
+                    case_set_id: "aCaseSetId"
+                  }
+              GeneSetIdOnly:
+                summary: Gene set id only
+                description: Request gene expression availability for all genes in
+                  a gene set.
+                value:
+                  {
+                    gene_set_id: "aGeneSetId"
+                  }
+              CaseIdsAndGeneIds:
+                summary: Both case ids and gene ids
+                description: >
+                  Request gene expression availability for a list of case by their
+                  UUIDs and a list of genes by
+                  their Ensembl gene ids.
+                value:
+                  {
+                    case_ids: ["dc809b76-71a5-4679-89ad-e70c7721518b", "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41"],
+                    gene_ids: ["ENSG00000000003", "ENSG00000128923"]
+                  }
+              CaseIdsOnly:
+                summary: Case ids only
+                description: Request gene expression availability for a list of cases
+                  by their UUIDs.
+                value:
+                  {
+                    case_ids: ["dc809b76-71a5-4679-89ad-e70c7721518b", "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41"]
+                  }
+              GeneIdsOnly:
+                summary: Gene ids only
+                description: Request gene expression availability for a list of genes
+                  by their Ensembl gene ids.
+                value:
+                  {
+                    gene_ids: ["ENSG00000000003", "ENSG00000128923"]
+                  }
+      responses:
+        '200':
+          description: Details about the given cases or genes or both.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cases:
+                    description: Details related to the requested cases, if cases
+                      were requests.
+                    type: object
+                    properties:
+                      with_gene_expression_count:
+                        description: The number of requested cases that have gene
+                          expression values.
+                        type: integer
+                      without_gene_expression_count:
+                        description: The number of requested cases that do not have
+                          gene expression values.
+                        type: integer
+                      details:
+                        description: Details for each requested case.
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            case_id:
+                              description: The UUID for the case.
+                              type: string
+                            has_gene_expression_values:
+                              description: >
+                                A flag indicating if the gene expression data is available
+                                for the case.
+                                True means that gene expression data is available
+                                for the case.  False
+                                means that gene expression data is not available for
+                                the case.
+                              type: boolean
+                  genes:
+                    description: Details related to the requested genes, if genes
+                      were requests.
+                    type: object
+                    properties:
+                      with_gene_expression_count:
+                        description: The number of requested genes that have gene
+                          expression values.
+                        type: integer
+                      without_gene_expression_count:
+                        description: The number of requested genes that do not have
+                          gene expression values.
+                        type: integer
+                      details:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            gene_id:
+                              description: The Ensembl gene id for the gene.
+                              type: string
+                            has_gene_expression_values:
+                              description: >
+                                A flag indicating if the gene expression data is available
+                                for the gene.
+                                True means that gene expression data is available
+                                for the gene.  False
+                                means that gene expression data is not available for
+                                the gene.
+                              type: boolean
+              examples:
+                CaseAndGeneDetails:
+                  summary: Case and gene details
+                  value:
+                    {
+                      cases: {
+                        with_gene_expression_count: 1,
+                        without_gene_expression_count: 1,
+                        details: [
+                          {
+                            case_id: "dc809b76-71a5-4679-89ad-e70c7721518b",
+                            has_gene_expression_values: true
+                          },
+                          {
+                            case_id: "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41",
+                            has_gene_expression_values: false
+                          }
+                        ]
+                      },
+                      genes: {
+                        with_gene_expression_count: 1,
+                        without_gene_expression_count: 1,
+                        details: [
+                          {
+                            gene_id: "ENSG00000000003",
+                            has_gene_expression_values: false
+                          },
+                          {
+                            gene_id: "ENSG00000128923",
+                            has_gene_expression_values: true
+                          }
+                        ]
+                      }
+                    }
+                CasesOnlyDetails:
+                  summary: Cases-only details
+                  value: |
+                    {
+                      cases: {
+                        with_gene_expression_count: 1,
+                        without_gene_expression_count: 1,
+                        details: [
+                          {
+                            case_id: "dc809b76-71a5-4679-89ad-e70c7721518b",
+                            has_gene_expression_values: true
+                          },
+                          {
+                            case_id: "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41",
+                            has_gene_expression_values: false
+                          }
+                        ]
+                      }
+                    }
+                GenesOnlyDetails:
+                  summary: Genes-only details
+                  value: |
+                    {
+                      genes: {
+                        with_gene_expression_count: 1,
+                        without_gene_expression_count: 1,
+                        details: [
+                          {
+                            gene_id: "ENSG00000000003",
+                            has_gene_expression_values: false
+                          },
+                          {
+                            gene_id: "ENSG00000128923",
+                            has_gene_expression_values: true
+                          }
+                        ]
+                      }
+                    }
+        '400':
+          description: |
+            A request can be rejected for multiple reasons, including:
+            - case_ids, case_set_id, cohort_id, and case_filters cannot be used together.
+            - gene_ids and gene_set_id cannot be used together.
+            - A case_set_id could not be found.
+            - A gene_set_id could not be found.
+            - Too many data points requested. (120k limit)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                CaseIdsAndCaseSetIdMutuallyExclusive:
+                  summary: case_ids, case_set_id, cohort_id, and case_filters cannot be used together
+                  value: |
+                    {
+                      message: "case_ids, case_set_id, cohort_id, and case_filters cannot be used together."
+                    }
+                GeneIdsAndGeneSetIdMutuallyExclusive:
+                  summary: gene_ids and gene_set_id cannot be used together
+                  value: |
+                    {
+                      message: "gene_ids and gene_set_id cannot be used together."
+                    }
+                CaseSetIdNotFound:
+                  summary: case_set_id not found.
+                  value: |
+                    {
+                      message: "Could not find a case set for case_set_id={case_set_id}."
+                    }
+                GeneSetIdNotFound:
+                  summary: gene_set_id not found.
+                  value: |
+                    {
+                      message: "Could not find a gene set for gene_set_id={gene_set_id}."
+                    }
+  /gene_expression/values:
+    post:
+      description: >
+        Get gene expression values for the given cases and genes. The response is
+        a tsv containing the expression values for genes to cases.
+      requestBody:
+        description: The cases and genes to retrieve data for.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValuesRequest"
+            examples:
+              CaseSetIdAndGeneSetId:
+                $ref: "#/components/examples/ValuesRequestByCaseSetIdAndGeneSetId"
+              CaseIdsAndGeneIds:
+                $ref: "#/components/examples/ValuesRequestByCaseIdsAndGeneIds"
+      responses:
+        '200':
+          description: >
+            A tsv of genes to cases. Each row represents the expression values
+            for a gene.  The first column is the ENSEMBL gene id. The subsequent columns are the case UUIDs.
+          content:
+            text/tab-separated-values:
+              schema:
+                description: A gene expression matrix where rows are genes and columns are cases.
+                type: string
+              example: |
+                gene_id<TAB>dc809b76-71a5-4679-89ad-e70c7721518b<TAB>ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41
+                ENSG00000000003<TAB>123.45<TAB>0.0
+                ENSG00000128923<TAB>234.56<TAB>345.67
+            application/json:
+              schema:
+                # TODO: https://gdc-ctds.atlassian.net/browse/DEV-2095
+                # JSON output is currently disabled.
+                # $ref: "#/components/schemas/ValuesResponseJson"
+                $ref: "#/components/schemas/ErrorResponse"
+        '400':
+          description: |
+            A request can be rejected for multiple reasons, including:
+            - Both cases and genes are required.
+            - case_ids, case_set_id, cohort_id, and case_filters cannot be used together.
+            - gene_ids and gene_set_id cannot be used together.
+            - A case_set_id could not be found.
+            - A gene_set_id could not be found.
+            - Too many data points requested. (120k limit)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                RequiresBothCasesAndGenes:
+                  summary: Both cases and genes are required
+                  value:
+                    {
+                      message: "Both cases and genes are required."
+                    }
+                CaseIdsAndCaseSetIdMutuallyExclusive:
+                  summary: case_ids, case_set_id, cohort_id, and case_filters cannot be used together
+                  value:
+                    {
+                      message: "case_ids, case_set_id, cohort_id, and case_filters cannot be used together."
+                    }
+                GeneIdsAndGeneSetIdMutuallyExclusive:
+                  summary: gene_ids and gene_set_id cannot be used together
+                  value:
+                    {
+                      message: "gene_ids and gene_set_id cannot be used together."
+                    }
+                CaseSetIdNotFound:
+                  summary: case_set_id not found
+                  value:
+                    {
+                      message: "Could not find a case set for case_set_id=\"aCaseSetId\"."
+                    }
+                GeneSetIdNotFound:
+                  summary: gene_set_id not found
+                  value:
+                    {
+                      message: "Could not find a gene set for gene_set_id=\"aGeneSetId\"."
+                    }
+  /gene_expression/gene_selection:
+    post:
+      description: |
+        Select the most variably expressed genes for a collection of cases and collection of genes.
+
+        The selection algorithm behaves as follows:
+        1. For each combination of case and gene, calculate "x = log2(uqfpkm + 1)"
+        1. For each gene, calculate the standard deviation of the x-values. If the standard deviation is 0, the gene is ineligible for selection.
+        1. For each gene, calculate the median of the x-values. If the median is less than a threshold, the gene is ineligible for selection.
+        1. Sort the eligible genes by their standard deviation in descending order.
+        1. Select the top genes, limited to the selection selection_size.
+      requestBody:
+        description: |
+          The request must define a collection of cases, a collection of genes, and a selection size. A minimum expression value may optionally be defined.
+
+          A collection of cases must be defined by exactly one of the following:
+          * `case_set_id`
+          * `case_ids`
+          * `cohort_id`
+          * `case_filters`
+
+          A collection of genes must be defined by exactly one of the following:
+          * `gene_set_id`
+          * `gene_ids`
+          * `gene_type`
+
+          A selection size (`selection_size`) defines the maximum number of genes to select.
+
+          An optional threshold (`min_median_log2_uqfpkm`) defines a minimum value for expression. Defaults to `1`.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneSelectionRequest'
+            examples:
+              CohortIdAndGeneType:
+                $ref: "#/components/examples/GeneSelectionByCohortIdAndGeneType"
+              CaseIdsAndGeneIds:
+                $ref: '#/components/examples/GeneSelectionByCaseIdsAndGeneIds'
+      responses:
+        '200':
+          description: >
+            The most variable genes for the given collection of cases an genes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneSelectionResponseListOfGenes"
+              examples:
+                Genes:
+                  $ref: "#/components/examples/GeneSelectionResponseGeneObjects"
+                GeneIds:
+                  $ref: '#/components/examples/GeneSelectionResponseGeneIds'
+        '400':
+          description: |
+            A request can be rejected for multiple reasons, including:
+            - Invalid case collection.
+            - Invalid gene collection.
+            - Invalid selection_size '{selection_size}'. Only a positive integer greater than zero is allowed.
+            - Invalid min_median_log2_uqfpkm '{min_median_log2_uqfpkm}'.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                TBD
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    CaseCollections:
+      description: Common ways to define a collection of cases.
+      type: object
+      properties:
+        case_set_id:
+          description: An identifier of a case set.
+          type: string
+          minLength: 1
+        case_ids:
+          description: A list of UUIDs for cases.
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+            pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+        cohort_id:
+          description: An identifier for a saved cohort.
+          type: string
+          minLength: 1
+        case_filters:
+          description: A filter for GDC cases.
+          type: object
+          additionalProperties: true
+    GeneCollections:
+      description: Common ways to define a collection of genes.
+      type: object
+      properties:
+        gene_set_id:
+          description: An identifier of a gene set.
+          type: string
+          minLength: 1
+        gene_ids:
+          description: A list of human ENSEMBL gene ids.
+          type: array
+          minItems: 1
+          items:
+            type: string
+            pattern: ^ENSG\d{11}$
+    ValuesRequest:
+      description: Request gene expression values for a collection of cases and a collection of genes.
+      allOf:
+        - $ref: "#/components/schemas/CaseCollections"
+        - $ref: "#/components/schemas/GeneCollections"
+        - type: object
+          properties:
+            format:
+              description: The data format of the response.
+              type: string
+              default: tsv
+              enum:
+                - tsv
+                - json
+            tsv_units:
+              description: |
+                The units of gene expression data if `format=tsv`:
+                * `uqfpkm` - FPKM-UQ values.
+                * `median_centered_log2_uqfpkm` - Median-centered log2(FPKM-UQ+1) values.
+              type: string
+              enum:
+              - uqfpkm
+              - median_centered_log2_uqfpkm
+
+    # TODO: https://gdc-ctds.atlassian.net/browse/DEV-2095
+    # ValuesResponseJson:
+    #   description:
+    #     The response describes a collection of cases and a collection of genes. In each
+    #     gene object, there is an array of expression values per case. For compactness, the
+    #     case information is not duplicated under each gene. Instead, the order of the per_case
+    #     arrays and the cases array are intended to match. For explicitness, each case object
+    #     and index property that can be used to access the per_case arrays.
+    #   type: object
+    #   properties:
+    #     cases:
+    #       type: array
+    #       items:
+    #         type: object
+    #         properties:
+    #           case_id:
+    #             type: string
+    #           submitter_id:
+    #             type: string
+    #           index:
+    #             type: integer
+    #     genes:
+    #       type: array
+    #       items:
+    #         type: object
+    #         properties:
+    #           gene_id:
+    #             type: string
+    #           symbol:
+    #             type: string
+    #           log2_uqfpkm_stddev:
+    #             type: number
+    #           log2_uqfpkm_median:
+    #             type: number
+    #           per_case_median_centered_log2_uqfpkm:
+    #             type: array
+    #             items:
+    #               type: number
+    #           per_case_uqfpkms:
+    #             type: array
+    #             items:
+    #               type: number
+
+    GeneSelectionRequest:
+      allOf:
+        - $ref: "#/components/schemas/CaseCollections"
+        - $ref: "#/components/schemas/GeneCollections"
+        - type: object
+          properties:
+            gene_type:
+              description: |
+                The type of genes:
+                * `protein_coding` - All protein-coding genes.
+              type: string
+              enum:
+              - protein_coding
+            selection_size:
+              description: The maximum number of genes to select.
+              type: integer
+              minimum: 1
+            min_median_log2_uqfpkm:
+              description: The inclusive minimum value for the median log2(uqfpkm+1)
+              type: number
+              default: 1
+    GeneSelectionResponseListOfGeneIds:
+      type: object
+      properties:
+        gene_selection:
+          description: A list of ENSEMBL gene ids in descending order of variability.
+          type: array
+          items:
+            type: string
+            pattern: ^ENSG\d{11}$
+    GeneSelectionResponseListOfGenes:
+      type: object
+      properties:
+        gene_selection:
+          description: A list of genes in descending order of variability.
+          type: array
+          items:
+            type: object
+            properties:
+              gene_id:
+                type: string
+                pattern: ^ENSG\d{11}$
+              symbol:
+                type: string
+              log2_uqfpkm_stddev:
+                type: number
+              log2_uqfpkm_median:
+                type: number
+  examples:
+    GeneSelectionByCaseIdsAndGeneIds:
+      summary: Select by case and gene ids.
+      description: >
+        Select the most variably expressed genes for a list of case UUIDs and a list of Ensemble gene id.
+      value:
+        {
+          case_ids: ["dc809b76-71a5-4679-89ad-e70c7721518b", "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41"],
+          gene_ids: ["ENSG00000000003", "ENSG00000128923"],
+          selection_size: 1
+        }
+    GeneSelectionByCohortIdAndGeneType:
+      summary: Select by cohort id and gene type.
+      description: >
+        Select the most variably expressed genes for a given cohort id and all protein-coding genes.
+      value:
+        {
+          cohort_id: "2731e395-d169-45cc-b580-bdc0b0c9244d",
+          gene_type: "protein_coding",
+          selection_size: 1000,
+          min_median_log2_uqfpkm: 2
+        }
+    GeneSelectionResponseGeneIds:
+      summary: Selected gene ids
+      description: A list of selected gene ids in descending order of variability.
+      value:
+        {
+          gene_selection: [
+            "ENSG00000128923",
+            "ENSG00000000003"
+          ]
+        }
+    GeneSelectionResponseGeneObjects:
+      summary: Selected genes
+      description: A list of selected genes in descending order of variability.
+      value:
+        {
+          gene_selection: [{
+            gene_id: "ENSG00000128923",
+            symbol: "MINDY2",
+            log2_uqfpkm_stddev: 234.5,
+            log2_uqfpkm_median: 12.2
+          },{
+            gene_id: "ENSG00000000003",
+            symbol: "TSPAN6",
+            log2_uqfpkm_stddev: 123.4,
+            log2_uqfpkm_median: 345.0
+          }]
+        }
+    ValuesRequestByCaseSetIdAndGeneSetId:
+      summary: Get by sets
+      description: >
+        Get gene expression values for a set of cases and a set of genes.
+      value:
+        {
+          case_set_id: "aCaseSetId",
+          gene_set_id: "aGeneSetId",
+          unit: "uqfpkm"
+        }
+    ValuesRequestByCaseIdsAndGeneIds:
+      summary: Get by case and gene ids.
+      description: >
+        Get gene expression values for a list of case UUIDs and a list of
+        Ensemble gene id.
+      value:
+        {
+          case_ids: ["dc809b76-71a5-4679-89ad-e70c7721518b", "ed8dbec5-0d99-4ef2-8294-c5e04ee6cc41"],
+          gene_ids: ["ENSG00000000003", "ENSG00000128923"],
+          unit: "median-centered"
+        }
