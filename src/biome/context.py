@@ -72,3 +72,12 @@ class BiomeContext(BeakerContext):
             "aqs_key": os.environ.get("API_EPA_AQS"),
         })
         await self.execute(command)
+        await super().setup(context_info, parent_header=parent_header)
+
+    async def default_preamble(self):
+        return f"""
+*	Before generating any code, come up with a plan and run it by me. If after you start to write or execute code you find that a resource is not available or something won’t work well, create a new plan and run it by me before writing and executing more code.
+*	If you don't have information about what options to pick, ask me questions to get this before generating. Check that you have all the necessary info first. Also, if you are unsure about an identifier or anything else, don't guess-- please ask me.
+*	In your results summary, include a concise summary of your methods, include the resources you used, any logic and options you used, any selections you made, and any assumptions you made.
+*	In your results summary, for every piece of information you report, include a footnote about the resource(s) you obtained the information from and indicate the code block and code lines that were responsible for generating this information. If it came from your general knowledge, please indicate that.
+"""
