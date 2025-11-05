@@ -41,6 +41,27 @@ class BiomeContext(BeakerContext):
             logger=logger,
             display_name="Specialist Agents"
         )
+
+        # Track missing API keys (must be set before super().__init__ for agent access)
+        self.api_key_map: Dict[str, str] = {
+            "API_EPA_AQS": "EPA AQS API",
+            "API_EPA_AQS_EMAIL": "EPA AQS Email",
+            "API_OPENFDA": "OpenFDA API",
+            "API_USDA_FDC": "USDA FDC API",
+            "API_CENSUS": "Census API",
+            "API_CDC_TRACKING_NETWORK": "CDC Tracking Network API",
+            "API_SYNAPSE": "Synapse API",
+            "NETRIAS_KEY": "NETRIAS API",
+            "ALPHAGENOME_KEY": "AlphaGenome API",
+            "IMMPORT_USERNAME": "ImmPort Username",
+            "IMMPORT_PASSWORD": "ImmPort Password",
+            "ENTREZ_EMAIL": "Entrez Email",
+            "ENTREZ_API_KEY": "Entrez API Key"
+        }
+        self.missing_api_keys: Dict[str, str] = self._get_missing_api_keys()
+        if self.missing_api_keys:
+            logger.warning(f"Missing API keys: {', '.join(self.missing_api_keys.values())}")
+
         super().__init__(
             beaker_kernel,
             self.agent_cls,
@@ -51,11 +72,19 @@ class BiomeContext(BeakerContext):
         if not isinstance(self.subkernel, PythonSubkernel):
             raise ValueError("This context is only valid for Python.")
 
+    def _get_missing_api_keys(self) -> Dict[str, str]:
+        """Identify API keys that are missing or invalid."""
+        def is_invalid(value: str) -> bool:
+            return not value or value in ("None", "")
+
+        return {
+            env_var: name
+            for env_var, name in self.api_key_map.items()
+            if is_invalid(os.environ.get(env_var, ""))
+        }
+
     async def setup(self, context_info=None, parent_header=None):
-        """
-        This runs on setup and invokes the `procedures/python3/setup.py` script to
-        configure the environment appropriately.
-        """
+        """Run setup script to configure the environment."""
         command = self.get_code("setup", {
             "aqs_api_key": os.environ.get("API_EPA_AQS"),
             "aqs_email": os.environ.get("API_EPA_AQS_EMAIL"),

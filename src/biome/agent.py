@@ -64,6 +64,11 @@ class BiomeAgent(BeakerAgent):
         self.logger = MessageLogger(self.log, logger)
         super().__init__(context, tools, **kwargs)
 
+        # Add missing API keys section to system prompt
+        if context and hasattr(context, 'missing_api_keys') and context.missing_api_keys:
+            missing_keys_prompt = self._build_missing_keys_prompt(context.missing_api_keys)
+            self.add_context(missing_keys_prompt)
+
     def initialize_literature_review(self):
         self.litreview_agent = LiteratureReviewAgent(self.lit_review_dir)
         self.litreview_agent.add_source("pubmed", PubmedSource())
@@ -73,6 +78,67 @@ class BiomeAgent(BeakerAgent):
             Entrez.email = entrez_email
         if (entrez_key := os.environ.get("ENTREZ_API_KEY", None)):
             Entrez.api_key = entrez_key
+
+    def _build_missing_keys_prompt(self, missing_keys: dict) -> str:
+        """Generate dynamic prompt section for missing API keys."""
+        prompt = """
+CRITICAL - MISSING API KEYS WARNING:
+
+The following API integrations are CURRENTLY UNAVAILABLE because their API keys are not configured:
+"""
+        for env_var, name in missing_keys.items():
+            prompt += f"  - {name} (environment variable: {env_var})\n"
+
+        prompt += """
+IMPORTANT: Before attempting to use any of these APIs, you MUST follow this procedure:
+
+STEP 1: When the user asks to use one of these APIs, IMMEDIATELY recognize that it requires a missing API key
+STEP 2: DO NOT attempt to write or execute code for that API yet
+STEP 3: Inform the user that the API requires configuration
+STEP 4: Use the 'ask_user' tool to ask if they have the API key
+STEP 5: If the user provides a key, use the 'set_api_key' tool to configure it
+STEP 6: After successfully setting the key, proceed with writing and executing the code
+STEP 7: If the user does not have a key, inform them the API cannot be used and suggest alternatives
+
+HANDLING API KEY ERRORS:
+If you do attempt to use an API and it returns an error like "invalid API key", "authentication failed",
+"unauthorized", or KeyError for an environment variable:
+1. Recognize this as an API key issue
+2. Inform the user that the API key appears to be invalid or missing
+3. Use the 'ask_user' tool to ask if they have a valid API key
+4. If provided, use 'set_api_key' to update it and retry
+5. If they don't have a valid key, inform them the API cannot be used
+
+Remember: Check for missing API keys BEFORE writing code, not after encountering errors.
+"""
+        return prompt
+
+    @tool()
+    async def set_api_key(self, key_name: str, key_value: str, agent: AgentRef) -> str:
+        """
+        Configure an API key for a biomedical data integration.
+
+        Args:
+            key_name: Environment variable name (e.g., "API_CENSUS", "ENTREZ_API_KEY")
+            key_value: API key or credential value
+
+        Returns:
+            Success message or error details
+        """
+        from typing import Dict
+        api_key_map = getattr(agent.context, 'api_key_map', {})
+
+        if key_name not in api_key_map:
+            valid_keys = ', '.join(api_key_map.keys())
+            return f"Error: Unknown API key '{key_name}'. Valid keys: {valid_keys}"
+
+        code = agent.context.get_code("set_env_var", {"key_name": key_name, "key_value": key_value})
+        await agent.context.evaluate(code)
+
+        if hasattr(agent.context, 'missing_api_keys'):
+            agent.context.missing_api_keys.pop(key_name, None)
+
+        return f"Successfully configured {api_key_map[key_name]}. You can now proceed with using this integration."
 
     @tool()
     async def drs_uri_info(self, uris: List[str]) -> List[dict]:
