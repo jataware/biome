@@ -44,19 +44,19 @@ class BiomeContext(BeakerContext):
 
         # Track missing API keys (must be set before super().__init__ for agent access)
         self.api_key_map: Dict[str, str] = {
-            "API_EPA_AQS": "EPA AQS API",
-            "API_EPA_AQS_EMAIL": "EPA AQS Email",
-            "API_OPENFDA": "OpenFDA API",
-            "API_USDA_FDC": "USDA FDC API",
-            "API_CENSUS": "Census API",
-            "API_CDC_TRACKING_NETWORK": "CDC Tracking Network API",
-            "API_SYNAPSE": "Synapse API",
-            "NETRIAS_KEY": "NETRIAS API",
-            "ALPHAGENOME_KEY": "AlphaGenome API",
-            "IMMPORT_USERNAME": "ImmPort Username",
-            "IMMPORT_PASSWORD": "ImmPort Password",
-            "ENTREZ_EMAIL": "Entrez Email",
-            "ENTREZ_API_KEY": "Entrez API Key"
+            "API_EPA_AQS": "EPA Air Quality System (air quality monitoring data)",
+            "API_EPA_AQS_EMAIL": "EPA Air Quality System email (required for API access)",
+            "API_OPENFDA": "OpenFDA (FDA adverse event reports and drug/device data)",
+            "API_USDA_FDC": "USDA FoodData Central (nutritional and food composition data)",
+            "API_CENSUS": "US Census Bureau API (demographic and economic data)",
+            "API_CDC_TRACKING_NETWORK": "CDC Environmental Public Health Tracking Network",
+            "API_SYNAPSE": "Sage Bionetworks Synapse (collaborative biomedical research platform)",
+            "NETRIAS_KEY": "NETRIAS (clinical trials and genomic data)",
+            "ALPHAGENOME_KEY": "AlphaGenome (genomic analysis and sequencing data)",
+            "IMMPORT_USERNAME": "ImmPort username (Immunology Database and Analysis Portal)",
+            "IMMPORT_PASSWORD": "ImmPort password (Immunology Database and Analysis Portal)",
+            "ENTREZ_EMAIL": "NCBI Entrez email (required for PubMed and NCBI database access)",
+            "ENTREZ_API_KEY": "NCBI Entrez API key (for higher rate limits on NCBI databases)"
         }
         self.missing_api_keys: Dict[str, str] = self._get_missing_api_keys()
         if self.missing_api_keys:
