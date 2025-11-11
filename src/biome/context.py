@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class BiomeContext(BeakerContext):
     SLUG = "biome"
+    DISPLAY_NAME = "Biomedical"
     agent_cls: "BaseAgent" = BiomeAgent
 
     def __init__(self, beaker_kernel: "LLMKernel", config: Dict[str, Any]):
