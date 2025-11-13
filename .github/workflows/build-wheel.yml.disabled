@@ -1,4 +1,4 @@
-name: Build and Deploy Wheel
+name: Build wheel
 
 on:
   push:

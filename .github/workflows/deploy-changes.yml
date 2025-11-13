@@ -1,8 +1,9 @@
-name: Build and Deploy Wheel
+name: Deploy code on server
 
 on:
   push:
-    branches: [ auto-deploy-fix ]
+    branches: [ main ]
+    tags: [ 'v*' ]
   workflow_dispatch:
     inputs:
       deploy_env:
