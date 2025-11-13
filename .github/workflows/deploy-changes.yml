@@ -1,0 +1,65 @@
+name: Build and Deploy Wheel
+
+on:
+  push:
+    branches: [ auto-deploy-fix ]
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Deployment environment'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - prod
+          - all
+      remote_host:
+        description: 'Remote host to deploy to'
+        required: false
+        default: 'host.biomedical.beakerhub.com'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      REMOTE_HOST: ${{ github.event.inputs.remote_host || 'host.biomedical.beakerhub.com' }}
+      # Set deployment environment based on trigger type or input
+      DEPLOY_ENV: ${{ github.event.inputs.deploy_env || (github.ref_type == 'tag' && 'prod' || 'beta') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/beaker-server
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/beaker-server
+
+      - name: Bundle code
+        id: bundle
+        run: |
+          code_archive=/tmp/code.tgz
+          tar -czf $code_archive .
+          echo "code_archive=$code_archive" >> $GITHUB_OUTPUT
+
+      - name: Upload code via SCP
+        id: upload
+        run: |
+          remote_file=/tmp/$(basename ${{ steps.bundle.outputs.code_archive }})
+          scp -i ~/.ssh/beaker-server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            ${{ steps.bundle.outputs.code_archive }} \
+            ubuntu@${{ env.REMOTE_HOST }}:$remote_file
+          echo "remote_file=$remote_file" >> $GITHUB_OUTPUT
+
+      - name: Run remote install
+        run: |
+          ssh ubuntu@${{ env.REMOTE_HOST }} \
+            -i ~/.ssh/beaker-server \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            sudo /usr/local/bin/build-update-local.sh \
+            "${{ steps.upload.outputs.remote_file }}" \
+            "${{ env.DEPLOY_ENV }}"
