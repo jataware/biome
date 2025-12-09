@@ -21,7 +21,7 @@ input:
     dataStandard:
       - none
     proprietary: true
-    source: https://www.cbioportal.org/
+    source: ""
 
 output:
   - name: analysis of data 1
