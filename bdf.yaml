@@ -1,0 +1,73 @@
+version: 0.0.1
+
+tool:
+  name: Beaker Biomedical
+  repo_url: https://github.com/jataware/biome
+  tool_homepage: https://beakerhub.com/
+  documentation_url: https://jataware.github.io/beaker-kernel/
+  tool_type: Notebook
+
+llm:
+  usesLlm: true
+  bringOwnKey: true
+
+input:
+  - name: use data and queries 1
+    dataCategory: User driven biomedical data + queries
+    dataClass: "other"
+    dataType: ""
+    format:
+      - none
+    dataStandard:
+      - none
+    proprietary: true
+    source: ""
+
+output:
+  - name: analysis of data 1
+    dataCategory: Analysis of data
+    dataClass: "other"
+    dataType: ""
+    format:
+      - none
+    dataStandard:
+      - none
+    proprietary: true
+    source: ""
+
+license:
+  license_type: Other
+  link: https://github.com/jataware/biome/blob/main/LICENSE
+
+funding:
+  source: DARPA
+  agreement: Not specified
+  link: ""
+
+domains:
+  - Biomedical
+
+credit:
+  - name: Jataware
+    role: Developer
+    org: Jataware
+    url: https://jataware.com/
+
+target_users:
+  primary_user:
+    user_type: researcher
+    technical_literacy_level:
+      - expert
+    biomedical_literacy_level:
+      - expert
+
+maturity:
+  beginning_maturity: 1
+  current_maturity: 7
+
+media:
+  [
+    { "link": "https://github.com/jataware/biome" },
+  ]
+
+collaborations: []
