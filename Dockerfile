@@ -34,15 +34,6 @@ RUN mkdir -p /tmp/archytas && \
 WORKDIR /tmp/archytas
 RUN uv pip install --system .
 
-# Install beaker-kernel from GitHub source (changes when you update REF)
-ARG BEAKER_KERNEL_REF=dev
-ADD https://codeload.github.com/jataware/beaker-kernel/tar.gz/$BEAKER_KERNEL_REF /tmp/beaker-kernel.tar.gz
-RUN mkdir -p /tmp/beaker-kernel && \
-    tar -xzf /tmp/beaker-kernel.tar.gz -C /tmp/beaker-kernel --strip-components=1
-
-WORKDIR /tmp/beaker-kernel
-RUN make build && \
-    uv pip install --system dist/beaker_kernel-*-py3-none-any.whl
 
 # Copy source code and install
 COPY --chown=1000:1000 . /jupyter
@@ -52,6 +43,21 @@ WORKDIR /jupyter
 # Clean up sensitive files and install local package
 RUN rm -f /jupyter/.beaker.conf /jupyter/.env && \
     uv pip install --system -e /jupyter
+
+# install after local package so that the arg ref supercedes the package version
+ARG BEAKER_KERNEL_REF=dev
+ADD https://codeload.github.com/jataware/beaker-kernel/tar.gz/$BEAKER_KERNEL_REF /tmp/beaker-kernel.tar.gz
+RUN mkdir -p /tmp/beaker-kernel && \
+    tar -xzf /tmp/beaker-kernel.tar.gz -C /tmp/beaker-kernel --strip-components=1
+
+WORKDIR /tmp/beaker-kernel
+RUN make beaker_kernel/service/ui/index.html \
+    && python -m build --no-isolation . \
+    && uv pip install --system dist/beaker_kernel-*-py3-none-any.whl
+
+# install ollama and prepull the 3.1:8b image
+RUN curl -fsSL https://ollama.com/install.sh | sh
+RUN bash -c "(ollama serve &) ; sleep 15 && ollama pull llama3.1:8b"
 
 # Create runtime directories
 RUN mkdir -m 777 /var/run/beaker
@@ -66,10 +72,13 @@ RUN mkdir -p /jupyter/.local /jupyter/.pqa /jupyter/.config/biopython/Bio/Entrez
     chown -R 1000:1000 /jupyter/.local /jupyter/.pqa /jupyter/.config
 
 # Set default server env variables
+# ollama added here as well for the single container image
 ENV BEAKER_AGENT_USER=jupyter \
     BEAKER_SUBKERNEL_USER=jupyter \
     BEAKER_RUN_PATH=/var/run/beaker \
-    BEAKER_APP=biome.app.BiomeApp
+    BEAKER_APP=biome.app.BiomeApp \
+    LLM_PROVIDER_IMPORT_PATH=archytas.models.ollama.OllamaModel \
+    LLM_SERVICE_MODEL=llama3.1:8b
 
-# Service
-CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
+# fixed context length - could be via ARG. entrypoint might not be the best place for this, deployment wise
+CMD ["bash", "-c", "(OLLAMA_CONTEXT_LENGTH=64000 ollama serve &) ; python -m beaker_kernel.service.server --ip 0.0.0.0"]

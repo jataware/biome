@@ -26,21 +26,24 @@ class BiomeContext(BeakerContext):
     agent_cls: "BaseAgent" = BiomeAgent
 
     def __init__(self, beaker_kernel: "LLMKernel", config: Dict[str, Any]):
-        from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
-        ttl_seconds = 1800
-        drafter_config_gemini = {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
-        drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
-        curator_config = {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
-        gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        # Disable integrations for ollama until adhoc-api UAII is updated
+        # TODO
 
-        # Initialize adhoc integration
-        adhoc_integration = BiomeAdhocIntegrations(
-            drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
-            curator_config=curator_config,
-            contextualizer_config=gpt_41_config,
-            logger=logger,
-            display_name="Specialist Agents"
-        )
+        # from adhoc_api.uaii import gpt_41, o3_mini, claude_37_sonnet, gemini_15_pro
+        # ttl_seconds = 1800
+        # drafter_config_gemini = {**gemini_15_pro, 'ttl_seconds': ttl_seconds, 'api_key': os.environ.get("GEMINI_API_KEY", "")}
+        # drafter_config_anthropic = {**claude_37_sonnet, 'api_key': os.environ.get("ANTHROPIC_API_KEY")}
+        # curator_config = {**o3_mini, 'api_key': os.environ.get("OPENAI_API_KEY")}
+        # gpt_41_config = {**gpt_41, 'api_key': os.environ.get("OPENAI_API_KEY")}
+
+        # # Initialize adhoc integration
+        # adhoc_integration = BiomeAdhocIntegrations(
+        #     drafter_config=[gpt_41_config, drafter_config_anthropic, drafter_config_gemini],
+        #     curator_config=curator_config,
+        #     contextualizer_config=gpt_41_config,
+        #     logger=logger,
+        #     display_name="Specialist Agents"
+        # )
 
         # Track missing API keys (must be set before super().__init__ for agent access)
         self.api_key_map: Dict[str, str] = {
@@ -66,7 +69,8 @@ class BiomeContext(BeakerContext):
             beaker_kernel,
             self.agent_cls,
             config,
-            integrations=[adhoc_integration]
+            #integrations=[adhoc_integration]
+            integrations=[]
         )
 
         if not isinstance(self.subkernel, PythonSubkernel):
