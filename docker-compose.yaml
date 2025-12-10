@@ -10,7 +10,8 @@ services:
       dockerfile: Dockerfile
       args:
         - ARCHYTAS_REF=main             # archytas branch/tag
-        - BEAKER_KERNEL_REF=dev         # beaker-kernel branch/tag
+        # pre-server fixes
+        - BEAKER_KERNEL_REF=b979ed280edd29d1967e4cc83d427651ac2a26d5
         - DOWNLOAD_CHEMBL_DATABASE=false # set to true if you want to download the ChEMBL database (it is several GB and is used in various workflows)
     ports:
       - "8888:8888"
@@ -34,21 +35,21 @@ services:
       - ./literature_review:/jupyter/_literature_review
     networks:
       - beaker
-  rest_api:
-    build:
-      context: .
-      dockerfile: ./rest_api/Dockerfile
-    volumes:
-      - ./adhoc_data:/jupyter/integrations
-    env_file:
-      - .env
-    ports:
-      - "8001:8001"
-    environment:
-      - BIOME_INTEGRATIONS_DIR=/integrations
-      - BIOME_DATA_DIR=/data
-    networks:
-      - beaker
+  # rest_api:
+  #   build:
+  #     context: .
+  #     dockerfile: ./rest_api/Dockerfile
+  #   volumes:
+  #     - ./adhoc_data:/jupyter/integrations
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8001:8001"
+  #   environment:
+  #     - BIOME_INTEGRATIONS_DIR=/integrations
+  #     - BIOME_DATA_DIR=/data
+  #   networks:
+  #     - beaker
   # ui:
   #   image: node:20
   #   user: "node"
