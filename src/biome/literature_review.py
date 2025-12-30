@@ -3,8 +3,6 @@ from time import sleep
 import os
 import logging
 import aiohttp
-from paperqa.clients.unpaywall import UnpaywallProvider
-from paperqa import Docs, Settings
 from pathlib import Path
 from typing import cast
 import traceback
@@ -48,6 +46,7 @@ class LiteratureReviewAgent:
         """
         run paperQA over the downloaded corpus and returns the response
         """
+        from paperqa import Docs, Settings
         docs = Docs()
         llm_model = os.environ.get("PAPERQA_LLM_MODEL", "gpt-4.1-mini")
         settings = Settings(
@@ -123,6 +122,7 @@ class PubmedSource(DocumentSource):
         """
         return the pdf link to a paper from unpaywall as a fallback method
         """
+        from paperqa.clients.unpaywall import UnpaywallProvider
         try:
             async with aiohttp.ClientSession() as session:
                 provider = UnpaywallProvider()
