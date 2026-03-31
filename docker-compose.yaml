@@ -26,6 +26,7 @@ services:
       - PYTHONBREAKPOINT=debugpy.breakpoint
       - BIOME_LIT_REVIEW_DIR=/jupyter/_literature_review
       - INTEGRATION_PATH=/jupyter/adhoc_data
+      - IDC_SKILL_REF=main              # idc-claude-skill branch/tag (e.g. main or v1.4.0)
     env_file:
       - .env
     volumes:
