@@ -49,6 +49,7 @@ COPY --chown=1000:1000 . /jupyter
 RUN chown -R 1000:1000 /jupyter
 WORKDIR /jupyter
 
+
 # Clean up sensitive files and install local package
 RUN rm -f /jupyter/.beaker.conf /jupyter/.env && \
     uv pip install --system -e /jupyter
@@ -71,8 +72,11 @@ ENV BEAKER_AGENT_USER=jupyter \
     BEAKER_RUN_PATH=/var/run/beaker \
     BEAKER_APP=biome.app.BiomeApp
 
+# Entrypoint (runs startup tasks before launching the server)
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Run as jupyter user
 USER jupyter
 
-# Service
-CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
+CMD ["/entrypoint.sh"]
