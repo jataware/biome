@@ -71,5 +71,8 @@ ENV BEAKER_AGENT_USER=jupyter \
     BEAKER_RUN_PATH=/var/run/beaker \
     BEAKER_APP=biome.app.BiomeApp
 
+# Run as jupyter user
+USER jupyter
+
 # Service
 CMD ["python", "-m", "beaker_kernel.service.server", "--ip", "0.0.0.0"]
