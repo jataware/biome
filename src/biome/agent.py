@@ -64,6 +64,9 @@ class BiomeAgent(BeakerAgent):
         self.logger = MessageLogger(self.log, logger)
         super().__init__(context, tools, **kwargs)
 
+        # Disable drafter/consultant tools in favor of load_integration_docs
+        self.disable("draft_integration_code", "consult_integration_docs")
+
         # Add missing API keys section to system prompt
         if context and hasattr(context, 'missing_api_keys') and context.missing_api_keys:
             missing_keys_prompt = self._build_missing_keys_prompt(context.missing_api_keys)
