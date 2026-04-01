@@ -192,10 +192,64 @@ resources:
     resource_id: 590305c8-9e62-49a5-a28f-8cc74df03667
     resource_type: example
   a155ea7d-f42f-4546-8d4c-b1135994ea47:
-    filepath: idc.md
+    filepath: skill.md
     integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
-    name: raw_documentation
+    name: skill
     resource_id: a155ea7d-f42f-4546-8d4c-b1135994ea47
+    resource_type: file
+  22c81bb3-66df-40dd-b0c4-7957df1a0ad7:
+    filepath: digital_pathology_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: digital_pathology_guide
+    resource_id: 22c81bb3-66df-40dd-b0c4-7957df1a0ad7
+    resource_type: file
+  32f90195-1bb0-450b-ba64-e5a1bee3f02e:
+    filepath: index_tables_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: index_tables_guide
+    resource_id: 32f90195-1bb0-450b-ba64-e5a1bee3f02e
+    resource_type: file
+  41354128-b1f9-4a46-9245-a096939b0c91:
+    filepath: cloud_storage_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: cloud_storage_guide
+    resource_id: 41354128-b1f9-4a46-9245-a096939b0c91
+    resource_type: file
+  51c38668-c0ef-485a-8c8e-fd3ce6f4fdfe:
+    filepath: use_cases.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: use_cases
+    resource_id: 51c38668-c0ef-485a-8c8e-fd3ce6f4fdfe
+    resource_type: file
+  565ba3e8-6c9f-4740-af9b-2b008265e791:
+    filepath: bigquery_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: bigquery_guide
+    resource_id: 565ba3e8-6c9f-4740-af9b-2b008265e791
+    resource_type: file
+  647afa18-a6df-4c2e-99a6-6f401014010f:
+    filepath: cli_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: cli_guide
+    resource_id: 647afa18-a6df-4c2e-99a6-6f401014010f
+    resource_type: file
+  780bda6c-2936-49c8-99a2-c1ffd6e791b5:
+    filepath: clinical_data_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: clinical_data_guide
+    resource_id: 780bda6c-2936-49c8-99a2-c1ffd6e791b5
+    resource_type: file
+  c0324da7-7de6-43a6-9eda-fd9b3eb1ca1a:
+    filepath: dicomweb_guide.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: dicomweb_guide
+    resource_id: c0324da7-7de6-43a6-9eda-fd9b3eb1ca1a
+    resource_type: file
+  f8de2fe5-67ba-47f6-b670-613deeaa4200:
+    filepath: sql_patterns.md
+    integration: b9f7983b-97b3-43c6-9b12-13b810e91ac0
+    name: sql_patterns
+    resource_id: f8de2fe5-67ba-47f6-b670-613deeaa4200
     resource_type: file
   bbfbce09-abfe-4565-a50b-6afc299df2d3:
     code: |
@@ -339,14 +393,35 @@ resources:
     resource_type: example
 slug: imaging_data_commons
 source: |
-  {{raw_documentation}}
+  {{skill}}
 
-  # Additional Instructions:
+  # Reference Documentation
 
-  Be sure to import and instantiate the client for the Imaging Data Commons API:
-  ```python
-  from idc_index import index
-  client = index.IDCClient()
-  ```
+  ## Index Tables Guide
+  {{index_tables_guide}}
+
+  ## SQL Patterns
+  {{sql_patterns}}
+
+  ## Use Cases
+  {{use_cases}}
+
+  ## Clinical Data Guide
+  {{clinical_data_guide}}
+
+  ## Cloud Storage Guide
+  {{cloud_storage_guide}}
+
+  ## DICOMweb Guide
+  {{dicomweb_guide}}
+
+  ## Digital Pathology Guide
+  {{digital_pathology_guide}}
+
+  ## BigQuery Guide
+  {{bigquery_guide}}
+
+  ## CLI Guide
+  {{cli_guide}}
 url: null
 uuid: b9f7983b-97b3-43c6-9b12-13b810e91ac0
